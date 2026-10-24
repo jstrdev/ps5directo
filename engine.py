@@ -967,6 +967,21 @@ def clean_host(text):
     return t.strip(".").strip("[]"), port
 
 
+def raw_mode(f):
+    """ftpsrv (ps5-payload-dev) descifra al vuelo los SELF (eboot.bin, .prx, .sprx): al bajarlos
+    llega el ELF de dentro, con otro tamano, y los listados tambien dan ese tamano. Su comando
+    SELF lo activa/desactiva en cada conexion: lo dejamos apagado para ver los archivos tal
+    cual estan. Los servidores que no lo conocen responden con error y no pasa nada.
+    (Gracias a RichyMX por encontrarlo.)"""
+    try:
+        r = f.sendcmd("SELF")
+        if "enabled" in r.lower():
+            r = f.sendcmd("SELF")
+        return "disabled" in r.lower()
+    except ftplib.all_errors:
+        return False
+
+
 class Ftp:
     def __init__(self, cfg):
         self.host = clean_host(cfg["ps5_ip"])[0]
@@ -987,6 +1002,7 @@ class Ftp:
         f.login(self.user, self.pw)
         f.set_pasv(True)
         f.voidcmd("TYPE I")
+        raw_mode(f)
         try:
             f.sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         except Exception:

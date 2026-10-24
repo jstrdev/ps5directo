@@ -1,4 +1,4 @@
-PS5 DIRECTO 1.19 — USER GUIDE (English)
+PS5 DIRECTO 1.19.1 — USER GUIDE (English)
 =========================================
 
 Paste links (or drag files from your PC) and the tool does the rest:
@@ -227,6 +227,13 @@ Settings and queue are stored in  %USERPROFILE%\.ps5directo
 
 WHAT'S NEW
 ----------
+1.19.1 - Fixed: the queue stopped updating by itself (since 1.18.3), so
+        "Remove" seemed to do nothing and then said "no existe". The file
+        browser now relists the open folder when an upload to it finishes.
+        Fixed "Download to PC" for games: ftpsrv decrypted eboot.bin/.prx/
+        .sprx on the fly, so downloads came out incomplete. Files are now
+        transferred exactly as stored (this also makes size comparisons
+        when resuming folders correct). Thanks to RichyMX for finding it.
 1.19  - Renewed file browser: right-click menu, keyboard shortcuts,
         clickable path, drives and places on the left, "Move to…" / "Copy
         to…" with recent destinations, a choice when pasting over existing

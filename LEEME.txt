@@ -1,5 +1,5 @@
-PS5 DIRECTO 1.19
-================
+PS5 DIRECTO 1.19.1
+==================
 (English: see README_EN.txt)
 
 Pega los enlaces (o arrastra archivos de tu PC) y la herramienta hace todo sola:
@@ -174,6 +174,16 @@ descarga sola, envio PC -> PS5 solo y las dos cosas a la vez, y te dice
 de quien es la culpa cuando va lento. Tambien hay uno solo PC -> PS5 en
 Ajustes.
 
+
+NOVEDADES 1.19.1
+- Arreglado: la cola dejaba de actualizarse sola (desde la 1.18.3), así que
+  "Quitar" parecía no hacer nada y luego decía "no existe".
+- El explorador vuelve a listar la carpeta abierta cuando termina una subida
+  a esa carpeta.
+- Arreglado "Descargar al PC" con juegos: ftpsrv descifraba al vuelo los
+  eboot.bin/.prx/.sprx y la descarga salía incompleta. Ahora se transfieren
+  tal cual están (también mejora comparar tamaños al reanudar carpetas).
+  Gracias a RichyMX por encontrarlo y proponer el arreglo.
 
 NOVEDADES 1.19
 - Explorador de archivos renovado: menú de clic derecho, atajos de teclado,

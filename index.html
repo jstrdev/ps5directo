@@ -1,0 +1,1603 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS5 Directo</title>
+<link rel="icon" href="/favicon.ico?v=1.18.2" sizes="any">
+<link rel="icon" type="image/png" sizes="256x256" href="/icon-256.png?v=1.18.2">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1.18.2">
+<link rel="manifest" href="/manifest.webmanifest">
+<style>
+:root{
+  --bg:#0e1116;--panel:#161b22;--panel2:#1c232c;--line:#2a323d;--text:#e6edf3;--muted:#8b97a5;
+  --accent:#3d8bfd;--accent2:#2f6fd0;--ok:#2ea043;--warn:#d29922;--err:#e5534b;--radius:12px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;color:var(--text);font:15px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;min-height:100vh;background-color:var(--bg);background-image:radial-gradient(900px 600px at 0% 0%,rgba(58,123,255,.13),transparent 60%),radial-gradient(800px 600px at 100% 100%,rgba(123,63,228,.12),transparent 60%),url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22260%22 viewBox=%220 0 260 260%22%3E%3Cg fill=%22none%22 stroke=%22%23ffffff%22 stroke-opacity=%22.075%22 stroke-width=%222.4%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath transform=%22translate%2840 48%29 rotate%28-12%29%22 d=%22M0 -15.0 L13.0 7.5 L-13.0 7.5 Z%22/%3E%3Ccircle cx=%22150%22 cy=%2236%22 r=%2212.0%22/%3E%3Cpath transform=%22translate%28228 92%29 rotate%288%29%22 d=%22M-12.0 -12.0 L12.0 12.0 M12.0 -12.0 L-12.0 12.0%22/%3E%3Crect transform=%22translate%2896 128%29 rotate%2814%29%22 x=%22-11.0%22 y=%22-11.0%22 width=%2222%22 height=%2222%22 rx=%223%22/%3E%3Ccircle cx=%2230%22 cy=%22190%22 r=%2210.0%22/%3E%3Cpath transform=%22translate%28196 200%29 rotate%2818%29%22 d=%22M0 -12.7 L11.0 6.4 L-11.0 6.4 Z%22/%3E%3Crect transform=%22translate%28232 232%29 rotate%28-10%29%22 x=%22-9.0%22 y=%22-9.0%22 width=%2218%22 height=%2218%22 rx=%223%22/%3E%3Cpath transform=%22translate%28124 232%29 rotate%28-6%29%22 d=%22M-10.0 -10.0 L10.0 10.0 M10.0 -10.0 L-10.0 10.0%22/%3E%3Ccircle cx=%22186%22 cy=%22140%22 r=%228.0%22/%3E%3Cpath transform=%22translate%2858 194%29 rotate%2830%29%22 d=%22M0 -10.4 L9.0 5.2 L-9.0 5.2 Z%22/%3E%3C/g%3E%3C/svg%3E");background-attachment:fixed;background-size:auto,auto,260px 260px}
+header{display:flex;align-items:center;gap:14px;padding:16px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(14,17,22,.82);backdrop-filter:blur(6px);z-index:5}
+header h1{font-size:19px;margin:0;font-weight:650;letter-spacing:.2px}
+header .sub{color:var(--muted);font-size:13px}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--ok)}.dot.err{background:var(--err)}.dot.warn{background:var(--warn)}
+main{max-width:1060px;margin:0 auto;padding:22px 20px 60px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.card{background:rgba(22,27,34,.86);backdrop-filter:blur(3px);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.card h2{font-size:15px;margin:0 0 12px;font-weight:600}
+textarea,input,select{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit}
+textarea{min-height:110px;resize:vertical;font-family:Consolas,"Cascadia Mono",monospace;font-size:13px}
+textarea:focus,input:focus{outline:2px solid var(--accent2);border-color:transparent}
+label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 5px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.row.tri{grid-template-columns:1fr 1fr 1fr}
+.row3{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+button{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+button:hover{border-color:#3b4553}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button.primary:hover{background:var(--accent2)}
+button.small{padding:5px 10px;font-size:13px}
+button.danger{color:#ffb4ae}
+.actions{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:12.5px}
+.jobs{display:grid;gap:12px}
+.job{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.job .top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.job .title{font-weight:600;font-size:15px;word-break:break-all}
+.chip{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);text-transform:capitalize}
+.chip.hecho{color:#7ee2a0;border-color:#2b6a3d}.chip.error{color:#ff9d96;border-color:#7a2d29}
+.chip.enviando,.chip.extrayendo,.chip.colocando,.chip.comprobando{color:#9ec5ff;border-color:#2f5490}
+.phase{color:var(--muted);font-size:13px;margin-top:6px;word-break:break-word}
+.bar{height:8px;background:var(--bg);border-radius:6px;overflow:hidden;margin-top:9px;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .6s}
+.bar.ex>i{background:#8957e5}
+.stats{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:6px}
+.stats b{color:var(--text);font-weight:600}
+.err{color:#ff9d96;font-size:13px;margin-top:8px;white-space:pre-wrap}
+.result{font-size:13px;margin-top:8px;color:#7ee2a0;font-family:Consolas,monospace}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--muted);font-size:12.5px}
+pre.log{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;max-height:240px;overflow:auto;font-size:12px;margin:8px 0 0;white-space:pre-wrap;word-break:break-all}
+.empty{color:var(--muted);text-align:center;padding:26px;border:1px dashed var(--line);border-radius:var(--radius)}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:0;width:min(720px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog .head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center}
+dialog .head h2{margin:0;font-size:16px}
+dialog .body{padding:4px 18px 18px;max-height:70vh;overflow:auto}
+.check{display:flex;gap:9px;align-items:center;margin-top:12px;font-size:14px;color:var(--text)}
+.check input{width:auto}
+/* --- pestanas --- */
+.tabs{display:flex;gap:4px;max-width:1060px;margin:14px auto 0;padding:0 20px}
+.tabs button{background:transparent;border:1px solid transparent;border-radius:9px;padding:8px 14px;color:var(--muted);font-weight:600}
+.tabs button:hover{color:var(--text);border-color:var(--line)}
+.tabs button.on{color:var(--text);background:var(--panel2);border-color:var(--line)}
+.tabs{overflow-x:auto;scrollbar-width:none}.tabs button{flex:none}
+@media(max-width:600px){.tabs{padding:0 12px;gap:2px}.tabs button{padding:7px 9px;font-size:13.5px}}
+.pickrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+/* --- explorador --- */
+.fm-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.fm-head h2{margin:0}
+.store{min-width:220px;text-align:right;font-size:13px;color:var(--muted)}
+.store b{color:var(--text)}
+.store .bar{margin-top:6px;height:6px}
+@media(max-width:600px){.store{min-width:0;flex:1 1 100%;text-align:left}#tabFiles .fmtable{display:block;overflow-x:auto}}
+.fm-bar{display:flex;gap:6px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.fm-bar input,.fm-bar select{width:auto}
+.fm-bar #fmPath{flex:1;min-width:220px;font-family:Consolas,"Cascadia Mono",monospace;font-size:13px}
+.fm-bar #fmSearch{width:170px}
+.fm-bar #fmPlaces{width:150px}
+.iconbtn{padding:6px 10px;min-width:34px}
+.fm-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.fm-actions .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.fm-actions button[disabled]{opacity:.4;cursor:default}
+.clip,.fmop{margin-top:10px;padding:9px 12px;border:1px solid #2f5490;background:rgba(61,139,253,.08);border-radius:9px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13.5px}
+.fmop .bar{flex:1;min-width:160px;margin:0}
+.fmtable{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+.fmtable th{color:var(--muted);font-weight:600;font-size:12px;text-align:left;padding:8px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
+.fmtable td{padding:7px 8px;border-bottom:1px solid rgba(42,50,61,.6);vertical-align:middle}
+.fmtable tr:hover td{background:rgba(255,255,255,.025)}
+.fmtable tr.sel td{background:rgba(61,139,253,.12)}
+.fmtable td.num,.fmtable th.num{text-align:right;white-space:nowrap}
+.fmtable td.mono{font-family:Consolas,"Cascadia Mono",monospace;color:var(--muted);font-size:12.5px}
+.fmtable input[type=checkbox]{width:auto}
+.fname{display:flex;align-items:center;gap:8px;cursor:pointer}
+.fname svg{flex:none;opacity:.85}
+.fname.dir span{color:#cfe0ff}
+.linkbtn{background:none;border:none;padding:0;color:var(--accent);cursor:pointer;font-size:12.5px}
+.rowact{display:flex;gap:4px;justify-content:flex-end;opacity:.5}
+tr:hover .rowact{opacity:1}
+.rowact button{padding:3px 8px;font-size:12px}
+.news-v{margin:14px 0 6px;font-size:14px;color:var(--accent)}
+.news-list{margin:0;padding-left:20px;line-height:1.5}.news-list li{margin:6px 0}
+.sp-grid{display:grid;grid-template-columns:280px 1fr;gap:22px;align-items:center;margin-top:14px}
+@media(max-width:760px){.sp-grid{grid-template-columns:1fr}.sp-donut{margin:0 auto}}
+.sp-donut{position:relative;width:280px;height:280px}
+.sp-donut svg{display:block}
+.sp-donut path{cursor:pointer;transition:opacity .15s}
+.sp-donut.hl path:not(.on){opacity:.35}
+.sp-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:0 70px}
+.sp-center b{font-size:22px}.sp-center span{color:var(--muted);font-size:12.5px}
+.sp-legend{display:flex;flex-direction:column;gap:5px;font-size:13.5px}
+.sp-legend .row{display:flex;align-items:center;gap:9px;padding:4px 6px;border-radius:7px;cursor:pointer}
+.sp-legend .row:hover,.sp-legend .row.on{background:rgba(255,255,255,.05)}
+.sp-legend .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-legend .sz{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.sw{width:12px;height:12px;border-radius:3px;flex:none;display:inline-block}
+.sw.free{background:transparent;border:1.5px dashed #5b6573}
+.sp-note{font-size:12px;color:var(--muted);margin-top:2px}
+.sp-note.dup,.sp-note.bad{color:var(--warn)}
+.sp-pct{height:5px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:4px;max-width:180px}
+.sp-pct>i{display:block;height:100%;border-radius:4px}
+.sp-tip{position:fixed;z-index:50;pointer-events:none;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;box-shadow:0 6px 20px rgba(0,0,0,.4);max-width:320px}
+.sp-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sp-tools select{width:auto}
+#spBody .mono{word-break:break-all}
+.sp-grid>*{min-width:0}
+#spListCard table{table-layout:fixed}
+#spListCard th:nth-child(1){width:28px}#spListCard th:nth-child(3){width:90px}#spListCard th:nth-child(4){width:150px}
+@media(max-width:600px){#spListCard th:nth-child(4){width:76px}#spListCard th:nth-child(3){width:72px}}
+#spBody td{overflow-wrap:anywhere}
+@media(max-width:600px){#spBody td:last-child button{display:block;width:100%;margin:3px 0}#spBody td:last-child{white-space:normal}}
+.fm-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:18px;margin-top:14px}
+.fm-side{display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--line);padding-right:12px}
+.side-h{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:10px 8px 4px}
+.side-h:first-child{margin-top:0}
+.side-i{display:flex;gap:9px;align-items:flex-start;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:7px 8px;color:var(--text);font-size:13.5px;width:100%}
+.side-i:hover{background:rgba(255,255,255,.04);border-color:transparent}
+.side-i.on{background:rgba(61,139,253,.14);color:#dbe7ff}
+.side-i svg{flex:none;margin-top:2px;color:var(--muted)}
+.side-i>span{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.side-i.small-i>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side-i small{color:var(--muted);font-size:11.5px}
+.side-i.small-i{font-size:12.5px;color:var(--muted);padding:5px 8px}
+.mini{display:block;height:4px;border-radius:3px;background:var(--bg);overflow:hidden}
+.mini b{display:block;height:100%;background:var(--accent)}
+.fm-main{min-width:0}
+.fm-main .fm-bar{margin-top:0}
+.crumbs{flex:1;min-width:200px;display:flex;align-items:center;gap:2px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px 6px;min-height:36px;cursor:text}
+.crumb{background:none;border:1px solid transparent;border-radius:6px;padding:3px 7px;font:13px Consolas,"Cascadia Mono",monospace;color:#bcd0ee}
+.crumb:hover{background:rgba(255,255,255,.06);border-color:transparent}
+.crumb.cur{color:var(--text);font-weight:600}
+.csep{color:var(--muted);font-size:12px}
+.selinfo{font-size:12.5px;color:var(--muted);margin-right:2px}
+.fmtable tr.cut td{opacity:.55}
+.fmtable th.sorted{color:var(--text)}
+.dots{padding:2px 9px;font-size:15px;line-height:1;opacity:.6}
+tr:hover .dots{opacity:1}
+.fm-drop{position:relative;border-radius:10px}
+.fm-drop.over{outline:2px dashed var(--accent);outline-offset:4px}
+.fm-drop.over::after{content:attr(data-drop);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,17,22,.75);color:var(--text);font-weight:600;border-radius:10px;pointer-events:none}
+.keys{font-size:11.5px;opacity:.7}
+.ctxmenu{position:fixed;z-index:60;min-width:210px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
+.ctxmenu button{display:flex;justify-content:space-between;gap:18px;width:100%;text-align:left;background:none;border:none;border-radius:6px;padding:7px 10px;font-size:13.5px}
+.ctxmenu button:hover,.ctxmenu button:focus{background:rgba(61,139,253,.18);outline:none}
+.ctxmenu button.danger{color:#ffb4ae}
+.ctxmenu kbd{font:11.5px "Segoe UI",system-ui,sans-serif;color:var(--muted)}
+.ctxmenu hr{border:none;border-top:1px solid var(--line);margin:4px 2px}
+.ctxmenu hr:first-child,.ctxmenu hr:last-child,.ctxmenu hr+hr{display:none}
+.pick-top{display:flex;gap:6px;align-items:center;margin-top:10px}
+.pick-cols{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px;margin-top:10px;height:min(360px,48vh)}
+.pick-side{overflow:auto;border-right:1px solid var(--line);padding-right:8px}
+.pick-list{overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px}
+.pick-i{display:flex;gap:9px;align-items:center;width:100%;text-align:left;background:none;border:none;border-radius:6px;padding:7px 9px;font-size:13.5px}
+.pick-i:hover{background:rgba(255,255,255,.05)}
+.pick-i[disabled]{opacity:.4;cursor:default}
+.pick-foot{display:flex;gap:8px;align-items:center;margin-top:12px}
+.cf-list{margin:8px 0 14px;padding:0;list-style:none;max-height:180px;overflow:auto}
+.cf-list li{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:13.5px}
+.cf-opts{display:flex;gap:8px;flex-wrap:wrap}
+#dlgConflict,#dlgExtract{width:min(520px,94vw)}
+#dlgExtract input{margin-bottom:2px}
+.bell{position:relative;padding:5px 9px}
+.bell svg{display:block}
+.bell.has{color:#fff}
+.badge{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--err);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.npanel{position:fixed;top:64px;right:16px;z-index:55;width:min(400px,calc(100vw - 32px));max-height:min(560px,75vh);display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.55)}
+.nhead{display:flex;gap:6px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.nhead h2{margin:0;font-size:15px}
+.nhead button{white-space:nowrap;padding:4px 8px;font-size:12px}
+#nList{overflow:auto;padding:6px}
+.nitem{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:8px}
+.nitem.link{cursor:pointer}
+.nitem:hover{background:rgba(255,255,255,.04)}
+.nitem.fresh{background:rgba(61,139,253,.09)}
+.ndot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:5px;background:var(--muted)}
+.nitem.ok .ndot{background:var(--ok)}.nitem.err .ndot{background:var(--err)}.nitem.warn .ndot{background:var(--warn)}.nitem.info .ndot{background:var(--accent)}
+.nbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:13.5px}
+.nbody span{color:var(--muted);font-size:12.5px;word-break:break-word}
+.nbody small{color:var(--muted);font-size:11.5px;opacity:.8}
+.nx{background:none;border:none;color:var(--muted);font-size:17px;padding:0 4px;line-height:1;opacity:0}
+.nitem:hover .nx{opacity:1}
+.job.flash{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:860px){.fm-layout{grid-template-columns:1fr}.fm-side{border-right:none;padding-right:0;flex-direction:row;flex-wrap:wrap;gap:4px}.side-h{display:none}.side-i{width:auto;padding:5px 9px;border:1px solid var(--line)}.side-i small,.side-i .mini{display:none}.pick-cols{grid-template-columns:1fr}.pick-side{display:none}}
+.acttable{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:10px}
+.acttable th{color:var(--muted);font-weight:600;font-size:12px;text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+.acttable td{padding:8px;border-bottom:1px solid rgba(42,50,61,.6);vertical-align:top}
+@media(max-width:720px){.fmtable .hide-s{display:none}}
+/* --- guia de bienvenida --- */
+.tour-spot{position:fixed;z-index:50;border-radius:12px;box-shadow:0 0 0 9999px rgba(5,8,14,.72),0 0 0 2px var(--accent),0 0 24px rgba(61,139,253,.55);transition:all .25s ease;pointer-events:none}
+.tour-spot.none{box-shadow:0 0 0 9999px rgba(5,8,14,.72);width:0!important;height:0!important}
+.tour-box{position:fixed;z-index:51;width:min(380px,calc(100vw - 32px));background:var(--panel2);border:1px solid #34405a;border-radius:14px;padding:16px 18px;box-shadow:0 18px 50px rgba(0,0,0,.5);transition:top .25s ease,left .25s ease}
+.tour-box h3{margin:0 0 6px;font-size:16px}
+.tour-box p{margin:0 0 12px;color:#c7d0db;font-size:14px}
+.tour-box .tb-foot{display:flex;align-items:center;gap:8px}
+.tour-box .tb-step{color:var(--muted);font-size:12px;margin-right:auto}
+.tour-block{position:fixed;inset:0;z-index:49}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:10px;opacity:0;transition:.3s;max-width:420px}
+.toast.show{opacity:1}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.step{font-size:11.5px;color:var(--muted);padding:2px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line)}
+.step.on{color:#9ec5ff;border-color:#2f5490}.step.done{color:#7ee2a0;border-color:#2b6a3d}
+@media(max-width:720px){.row,.row3,.row.tri{grid-template-columns:1fr}header{flex-wrap:wrap}}
+.drophint{font-size:12px;opacity:.7;margin-top:6px}
+.drophint.flash{opacity:1;color:#ffcf6b}
+.muted{opacity:.6}
+.warn{color:#ffcf6b;font-size:13px;margin-top:6px}
+.chk{display:flex;gap:8px;align-items:flex-start;padding:4px 0;font-size:13px}
+.chk .ok{color:#4ade80}.chk .bad{color:#f87171}
+.chip.pausado{color:#ffcf6b;border-color:#6b5a2b}
+</style>
+</head>
+<body>
+<header>
+  <svg width="40" height="40" style="flex:none;filter:drop-shadow(0 4px 12px rgba(75,79,230,.45))" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"> <defs> <linearGradient id="lg_bg" x1="0" y1="0" x2="1" y2="1"> <stop offset="0" stop-color="#3a7bff"/> <stop offset=".55" stop-color="#4b4fe6"/> <stop offset="1" stop-color="#7b3fe4"/> </linearGradient> <radialGradient id="lg_glow" cx=".3" cy=".2" r=".9"> <stop offset="0" stop-color="#fff" stop-opacity=".35"/> <stop offset=".5" stop-color="#fff" stop-opacity="0"/> </radialGradient> <linearGradient id="lg_arrow" x1="0" y1="0" x2="0" y2="1"> <stop offset="0" stop-color="#ffffff"/> <stop offset="1" stop-color="#dfe6ff"/> </linearGradient> </defs> <rect x="8" y="8" width="240" height="240" rx="58" fill="url(#lg_bg)"/> <rect x="8" y="8" width="240" height="240" rx="58" fill="url(#lg_glow)"/> <rect x="9.5" y="9.5" width="237" height="237" rx="56.5" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="3"/> <g stroke="#fff" stroke-linecap="round" stroke-opacity=".45" stroke-width="9"> <line x1="62" y1="58" x2="62" y2="92"/> <line x1="194" y1="58" x2="194" y2="92"/> </g> <path d="M128 44 c9 0 15 6 15 15 v58 h22 c11 0 16 13 8 21 l-35 37 c-6 6-14 6-20 0 l-35-37 c-8-8-3-21 8-21 h22 v-58 c0-9 6-15 15-15z" fill="url(#lg_arrow)"/> <path d="M52 168 v18 c0 14 10 24 24 24 h104 c14 0 24-10 24-24 v-18" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/> <circle cx="176" cy="190" r="5.5" fill="#7dffb2"/> </svg>
+  <div>
+    <h1>PS5 Directo <span id="ver" data-noi18n style="font-size:12px;font-weight:400;opacity:.55"></span></h1>
+    <div class="sub">Envía archivos a tu consola por la red local, sin pasar por el disco del PC</div>
+  </div>
+  <div class="spacer"></div>
+  <span class="pill" id="pFtp"><span class="dot"></span>FTP</span>
+  <span class="pill" id="pBf"><span class="dot"></span>BFpilot</span>
+  <span class="pill" id="pFree" hidden></span>
+  <button class="small bell" id="btnBell" title="Notificaciones"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="badge" id="bellN" hidden></span></button>
+  <button class="small" id="btnLang" data-noi18n title="Idioma / Language"></button>
+  <button class="small" id="btnTour" title="Guía rápida: para qué es cada cosa">Guía</button>
+  <button class="small" id="btnExtHead" title="Capturar enlaces desde el navegador sin copiar y pegar">Extensión</button>
+  <button class="small" id="btnUpdHead" title="Buscar o instalar una versión nueva">Actualizar</button>
+  <button class="small" id="btnSettings">Ajustes</button>
+  <button class="small" id="btnQuit" title="Cierra PS5 Directo del todo">Salir</button>
+</header>
+<div class="npanel" id="nPanel" hidden>
+  <div class="nhead"><h2>Notificaciones</h2><div class="spacer"></div><button class="small" id="nAllRead">Marcar leídos</button><button class="small" id="nClear">Borrar todo</button></div>
+  <div id="nList"></div>
+</div>
+<nav class="tabs" id="tabs">
+  <button data-tab="Transfers" class="on">Transferencias</button>
+  <button data-tab="Files">Archivos de la consola</button>
+  <button data-tab="Space">Espacio</button>
+  <button data-tab="Activity">Actividad</button>
+</nav>
+
+<main id="tabTransfers">
+  <section class="card">
+    <h2>Nueva transferencia</h2>
+    <label for="lines">Enlaces directos (uno por línea). Pega todas las partes juntas: .part1.rar, .part2.rar… o .001, .002…</label>
+    <textarea id="lines" placeholder="https://servidor/archivo.part1.rar&#10;https://servidor/archivo.part2.rar&#10;&#10;También vale la ruta de un archivo o carpeta de tu PC (D:\Descargas\archivo.rar) o un enlace ftp:// de tu NAS"></textarea>
+    <div class="drophint" id="drophint">Archivos de tu PC: suéltalos en esta página y los busco en tu PC, o arrástralos sobre el <b>icono de PS5 Directo</b>, o clic derecho → <b>Enviar a → PS5 Directo</b>.</div>
+    <div class="pickrow">
+      <button class="small" id="btnPickFiles">Elegir archivos…</button>
+      <button class="small" id="btnPickFolder">Elegir carpeta…</button>
+      <span class="hint">Una carpeta se manda tal cual (si tiene sce_sys, como aplicación) y salta lo que ya esté igual en la consola.</span>
+    </div>
+    <div class="row tri">
+      <div>
+        <label for="pw">Contraseña del comprimido (si la tiene)</label>
+        <input id="pw" type="text" autocomplete="off" placeholder="Opcional. Si la dejas vacía prueba las de Ajustes y las del nombre">
+      </div>
+      <div>
+        <label for="dest">Destino en la PS5</label>
+        <input id="dest" type="text" value="/data/homebrew" list="destList">
+        <datalist id="destList"><option value="/data/homebrew"></datalist>
+      </div>
+      <div>
+        <label for="where">Dónde descomprimir</label>
+        <select id="where">
+          <option value="ps5">En la PS5 (BFpilot)</option>
+          <option value="pc">En el PC (7-Zip)</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="btnAdd">Añadir a la cola</button>
+      <span class="hint">Si pegas enlaces de varios archivos distintos, los separa solo. «En el PC» usa 7-Zip y manda el contenido ya descomprimido y comprobado (más datos por el Wi-Fi, pero sin BFpilot).</span>
+    </div>
+  </section>
+
+  <section>
+    <div style="display:flex;align-items:center;margin-bottom:10px">
+      <h2 style="font-size:15px;margin:0">Cola</h2>
+      <div class="spacer"></div>
+      <button class="small" id="btnClear">Quitar terminados</button>
+    </div>
+    <div class="jobs" id="jobs"></div>
+  </section>
+</main>
+
+<main id="tabFiles" hidden>
+  <section class="card">
+    <div class="fm-head">
+      <h2>Archivos de la consola</h2>
+      <div class="spacer"></div>
+      <div class="store" id="fmStore"></div>
+    </div>
+    <div class="fm-layout">
+      <aside class="fm-side" id="fmSide"></aside>
+      <div class="fm-main">
+        <div class="fm-bar">
+          <button class="small iconbtn" id="fmBack" title="Atrás (Alt+←)">←</button>
+          <button class="small iconbtn" id="fmFwd" title="Adelante (Alt+→)">→</button>
+          <button class="small iconbtn" id="fmUp" title="Subir un nivel (Retroceso)">↑</button>
+          <div class="crumbs" id="fmCrumbs" title="Haz clic en el hueco para escribir una ruta"></div>
+          <input id="fmPath" value="/data/homebrew" spellcheck="false" hidden>
+          <input id="fmSearch" placeholder="Buscar aquí…">
+          <button class="small iconbtn" id="fmRefresh" title="Actualizar (F5)">⟳</button>
+        </div>
+        <div class="fm-actions">
+          <button class="small" id="fmMkdir">Nueva carpeta</button>
+          <button class="small" id="fmUpFiles">Subir archivos aquí</button>
+          <button class="small" id="fmUpFolder">Subir carpeta aquí</button>
+          <span class="sep"></span>
+          <span class="selinfo" id="fmSelInfo"></span>
+          <button class="small" id="fmCopy" disabled title="Ctrl+C">Copiar</button>
+          <button class="small" id="fmCut" disabled title="Ctrl+X">Cortar</button>
+          <button class="small" id="fmMoveTo" disabled>Mover a…</button>
+          <button class="small" id="fmRename" disabled title="F2">Renombrar</button>
+          <button class="small" id="fmDownload" disabled>Descargar al PC</button>
+          <button class="small" id="fmMore" disabled>Más…</button>
+          <button class="small danger" id="fmDelete" disabled title="Supr">Borrar</button>
+        </div>
+        <div class="clip" id="fmClip" hidden></div>
+        <div class="fmop" id="fmOp" hidden></div>
+        <div class="fm-drop" id="fmTableWrap">
+        <table class="fmtable">
+          <thead><tr>
+            <th style="width:28px"><input type="checkbox" id="fmAll"></th>
+            <th data-sort="name">Nombre</th>
+            <th data-sort="size" class="num">Tamaño</th>
+            <th data-sort="mtime" class="hide-s">Modificado</th>
+            <th class="hide-s">Permisos</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody id="fmBody"></tbody>
+        </table>
+        </div>
+        <p class="hint" id="fmHint" style="margin-top:10px"></p>
+        <p class="hint keys">Atajos: doble clic abre · clic derecho para el menú · Supr borra · F2 renombra · Ctrl+C / Ctrl+X / Ctrl+V · Ctrl+A selecciona todo · Retroceso sube</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main id="tabSpace" hidden>
+  <section class="card">
+    <div class="fm-head"><h2>Espacio</h2><div class="spacer"></div>
+      <div class="sp-tools"><select id="spRoot"><option value="/data">Almacenamiento interno</option></select>
+      <button class="primary small" id="spScan">Analizar</button></div></div>
+    <p class="hint">Mira qué ocupa sitio en la consola, con nombres y tamaños, para decidir qué borrar. Avisa de juegos repetidos (por ejemplo la carpeta y su versión convertida), envíos a medias y restos. Necesita BFpilot.</p>
+    <div id="spProg" hidden><div class="phase" id="spPhase"></div><div class="bar"><i id="spBar"></i></div>
+      <button class="small" id="spCancel" style="margin-top:8px">Cancelar</button></div>
+    <div id="spOut"></div>
+  </section>
+  <section class="card" id="spListCard" hidden>
+    <div class="fm-head"><h2>Todo lo que ocupa sitio</h2><div class="spacer"></div>
+      <button class="small" id="spDel" disabled>Borrar seleccionados</button></div>
+    <table class="fmtable"><thead><tr><th style="width:28px"></th><th>Nombre</th><th class="num">Tamaño</th><th></th></tr></thead>
+    <tbody id="spBody"></tbody></table>
+  </section>
+</main>
+
+<main id="tabActivity" hidden>
+  <section class="card">
+    <div class="fm-head"><h2>Actividad</h2><div class="spacer"></div><button class="small" id="actClear">Borrar historial</button></div>
+    <p class="hint">Historial de transferencias terminadas o con error (las últimas 500).</p>
+    <table class="acttable"><thead><tr><th>Fecha</th><th>Nombre</th><th>Resultado</th><th class="num">Tamaño</th><th>Duración</th><th>Destino</th></tr></thead>
+    <tbody id="actBody"></tbody></table>
+  </section>
+</main>
+
+<div class="ctxmenu" id="fmMenu" hidden></div>
+<dialog id="dlgPick">
+  <div class="head"><h2 id="pickTitle">Mover a…</h2><div class="spacer"></div><button class="small" id="pickX">Cerrar</button></div>
+  <div class="body">
+    <div class="pick-top"><button class="small iconbtn" id="pickUp" title="Subir un nivel">↑</button><div class="crumbs" id="pickCrumbs"></div></div>
+    <div class="pick-cols">
+      <div class="pick-side" id="pickSide"></div>
+      <div class="pick-list" id="pickList"></div>
+    </div>
+    <p class="hint" id="pickNote"></p>
+    <div class="pick-foot"><button class="small" id="pickNew">Nueva carpeta</button><div class="spacer"></div><button class="primary" id="pickGo">Mover aquí</button></div>
+  </div>
+</dialog>
+<dialog id="dlgConflict">
+  <div class="head"><h2 id="cfTitle">Ya existe</h2></div>
+  <div class="body">
+    <p id="cfBody"></p>
+    <ul class="cf-list" id="cfList" data-noi18n></ul>
+    <div class="cf-opts">
+      <button class="primary" data-m="replace" id="cfReplace">Reemplazar / combinar</button>
+      <button data-m="keepboth">Conservar ambos</button>
+      <button data-m="skip">Omitir</button>
+      <button data-m="">Cancelar</button>
+    </div>
+    <p class="hint" id="cfHint">Reemplazar sobrescribe los archivos con el mismo nombre. Si es una carpeta, se combina: lo que ya tenía y no estás pegando se queda. Conservar ambos le pone (2) al nuevo.</p>
+  </div>
+</dialog>
+<dialog id="dlgExtract">
+  <div class="head"><h2 id="exTitle">Extraer</h2></div>
+  <div class="body">
+    <p class="hint">La consola lo descomprime en una carpeta al lado del archivo (con BFpilot) y deja el comprimido como está. Nada pasa por el PC.</p>
+    <label>Carpeta</label><input id="exFolder" spellcheck="false">
+    <label style="margin-top:10px">Contraseña (solo si tiene)</label><input id="exPw" spellcheck="false" autocomplete="off">
+    <p class="hint" id="exNote"></p>
+    <div class="pick-foot"><div class="spacer"></div><button id="exCancel">Cancelar</button><button class="primary" id="exGo">Extraer</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgNews">
+  <div class="head"><h2 id="newsTitle">Novedades</h2><div class="spacer"></div></div>
+  <div class="body"><div id="newsBody"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="primary" id="btnNewsOk">Entendido</button></div></div>
+</dialog>
+
+<dialog id="dlgSpeed">
+  <div class="head"><h2>Test de velocidad</h2><div class="spacer"></div><button class="small" id="btnSpeedClose">Cerrar</button></div>
+  <div class="body">
+    <p class="hint">Mide por separado la descarga desde el enlace, el envío del PC a la PS5 y las dos cosas a la vez (unos 30 segundos). Así se sabe de quién es la culpa cuando va lento. No se guarda nada: el archivo de prueba de la PS5 se borra al acabar.</p>
+    <div id="speedOut" style="margin-top:10px"></div>
+  </div>
+</dialog>
+
+<dialog id="dlg">
+  <div class="head"><h2>Ajustes</h2><div class="spacer"></div><button class="small" id="btnClose">Cerrar</button></div>
+  <div class="body">
+    <div class="row">
+      <div><label>IP de la PS5</label><input id="s_ps5_ip" placeholder="por ejemplo 192.168.1.50"></div>
+      <div><label>Destino por defecto</label><input id="s_dest"></div>
+    </div>
+    <div class="row3">
+      <div><label>Puerto FTP</label><input id="s_ftp_port" type="number"></div>
+      <div><label>Usuario FTP</label><input id="s_ftp_user"></div>
+      <div><label>Contraseña FTP</label><input id="s_ftp_pass" type="password" placeholder="(vacía)"></div>
+      <div><label>Puerto BFpilot</label><input id="s_bf_port" type="number"></div>
+    </div>
+    <div class="row3">
+      <div><label>Conexiones por archivo</label><input id="s_streams" type="number" min="1" max="32"></div>
+      <div><label>Partes a la vez (1-4)</label><input id="s_parallel_files" type="number" min="1" max="4"></div>
+      <div><label>Trozo (MB)</label><input id="s_chunk_mb" type="number" min="1" max="64"></div>
+      <div><label>Memoria (MB)</label><input id="s_buffer_mb" type="number" min="32" max="2048"></div>
+      <div><label>Reintentos</label><input id="s_retries" type="number" min="0" max="50"></div>
+    </div>
+    <div class="row3">
+      <div><label>Límite de velocidad a la PS5 (MB/s, 0 = sin límite)</label><input id="s_limit_mbps" type="number" min="0" max="1000"></div>
+      <div><label>Dejar siempre libre en la PS5 (GB)</label><input id="s_space_margin_gb" type="number" min="0" max="500"></div>
+      <div><label>Hilos al descomprimir (0 = automático, máx. 8)</label><input id="s_extract_threads" type="number" min="0" max="8"></div>
+    </div>
+    <p><button class="small" id="btnSpeedPS5">Test de velocidad PC → PS5</button> <span class="hint">Para incluir la descarga, usa "Test de velocidad" en una transferencia de la cola.</span></p>
+    <p class="hint">El límite se aplica al momento, sin parar nada. Si el espacio libre baja del margen, PS5 Directo para el envío o la descompresión antes de llenar la consola (0 = no vigilar). Con alojamientos que limitan conexiones usa solo 2 por archivo y baja más si el servidor protesta.</p>
+    <div style="margin-top:12px">
+      <label>Contraseñas que usas a menudo (una por línea). Se prueban solas si el trabajo no lleva contraseña.</label>
+      <textarea id="s_passwords" style="min-height:80px"></textarea>
+    </div>
+    <label class="check"><input type="checkbox" id="s_guess_passwords"> Probar también contraseñas sacadas del nombre del archivo (lo que va entre corchetes, como [WEB.COM])</label>
+    <label class="check"><input type="checkbox" id="s_delete_archives"> Borrar los comprimidos al terminar bien (de la PS5, o las partes bajadas al PC)</label>
+    <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
+      <b>Descomprimir en el PC</b>
+      <p class="hint">Alternativa a BFpilot: 7-Zip descomprime en el PC sobre la marcha y la app manda los archivos ya sueltos, comprobando cada uno con su CRC. No escribe nada descomprimido en el PC y en la PS5 solo ocupa el contenido final (sin el RAR al lado). A cambio, por el Wi-Fi viaja todo sin comprimir (puede ser 3-4 veces más) y los enlaces se bajan antes al PC (hace falta sitio para el RAR).</p>
+      <div class="row tri">
+        <div><label>Por defecto</label><select id="s_extract_where"><option value="ps5">En la PS5 (BFpilot)</option><option value="pc">En el PC (7-Zip)</option></select></div>
+        <div><label>Carpeta del PC para bajar los RAR</label><input id="s_pc_temp_dir" type="text" placeholder="Descargas\PS5 Directo (temporal)"></div>
+        <div><label>Ruta de 7z.exe (vacío = buscarlo)</label><input id="s_sevenzip_path" type="text" placeholder="C:\Program Files\7-Zip\7z.exe"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="btnSave">Guardar</button>
+      <button id="btnTest">Probar conexión</button>
+      <button id="btnHealth" class="small">Revisión completa</button>
+      <span class="hint" id="testOut"></span>
+      <div id="healthOut" style="margin-top:8px"></div>
+      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
+        <b id="extSection">Extensión para capturar enlaces (Chrome / Edge)</b>
+        <p class="hint">Con ella, al pulsar Descargar en cualquier web (después del captcha), el enlace de un .rar/.7z/.zip/.pkg va directo aquí y el navegador no descarga nada. Si PS5 Directo está cerrado, la descarga sigue normal.<br>
+        Instalarla (una vez): 1) Abre <b>chrome://extensions</b> (o <b>edge://extensions</b>) · 2) Activa <b>Modo de desarrollador</b> · 3) <b>Cargar descomprimida</b> y elige la carpeta <b>extension</b> de PS5 Directo.</p>
+        <button id="btnExtFolder" class="small">Abrir la carpeta de la extensión</button> <span class="hint" id="extOut"></span>
+      </div>
+      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
+        <b>Actualizar PS5 Directo</b> <span class="hint" id="curVer"></span>
+        <p class="hint">Elige el .zip de la versión nueva y se instala solo (guarda una copia de la versión actual en la carpeta .backup). Se reinicia y se abre una ventana nueva.</p>
+        <input type="file" id="updFile" accept=".zip" hidden>
+        <button id="btnUpdZip" class="small">Instalar actualización (.zip)</button>
+        <div style="margin-top:8px"><label>GitHub para buscar actualizaciones (usuario/repositorio, opcional)</label><input id="s_update_repo" placeholder="por ejemplo: usuario/ps5directo"></div>
+        <button id="btnUpdCheck" class="small" style="margin-top:6px">Buscar actualización en GitHub</button>
+        <div id="updOut" class="hint" style="margin-top:6px"></div>
+      </div>
+      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
+        <b>Permisos de las aplicaciones</b>
+        <p class="hint">Lo que descomprimió BFpilot puede haber quedado sin permiso de ejecución y la PS5 no lo abre (error CE-107750-0). Esto pone permisos 777 a todas las aplicaciones en carpeta. No toca el contenido.</p>
+        <button id="btnPerms" class="small">Reparar permisos</button>
+        <div id="permsOut" class="hint" style="margin-top:8px"></div>
+      </div>
+      <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
+        <b>Limpieza de la PS5</b>
+        <p class="hint">Busca en /data/ps5directo restos que ya no usa ninguna transferencia de la cola (partes de trabajos quitados, descompresiones a medias...). Te enseña cuánto ocupa cada cosa antes de borrar.</p>
+        <button id="btnScan" class="small">Buscar restos</button>
+        <div id="cleanOut" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:16px">Necesitas en la PS5: el servidor FTP (puerto 2121) y <b>BFpilot</b> cargado desde Payload Manager (puerto 5905). Para ir más rápido, con Wi-Fi baja “Trozo” a 2–4 MB.</p>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+<script>
+const I18N_EXACT={"Atrás (Alt+←)": "Back (Alt+←)", "Adelante (Alt+→)": "Forward (Alt+→)", "Subir un nivel (Retroceso)": "Up one level (Backspace)", "Haz clic en el hueco para escribir una ruta": "Click the empty space to type a path", "Actualizar (F5)": "Refresh (F5)", "Cortar": "Cut", "Mover a…": "Move to…", "Copiar a…": "Copy to…", "Más…": "More…", "Más acciones": "More actions", "Atajos: doble clic abre · clic derecho para el menú · Supr borra · F2 renombra · Ctrl+C / Ctrl+X / Ctrl+V · Ctrl+A selecciona todo · Retroceso sube": "Shortcuts: double-click opens · right-click for the menu · Del deletes · F2 renames · Ctrl+C / Ctrl+X / Ctrl+V · Ctrl+A selects all · Backspace goes up", "Mover aquí": "Move here", "Copiar aquí": "Copy here", "Nueva carpeta": "New folder", "Ya existe": "Already exists", "Reemplazar / combinar": "Replace / merge", "Reemplazar": "Replace", "Combinar": "Merge", "Conservar ambos": "Keep both", "Omitir": "Skip", "Reemplazar sobrescribe los archivos con el mismo nombre. Si es una carpeta, se combina: lo que ya tenía y no estás pegando se queda. Conservar ambos le pone (2) al nuevo.": "Replace overwrites files with the same name. Folders are merged: whatever they already had that you are not pasting stays. Keep both adds (2) to the new one.", "¿Qué hago con los que ya existen en la carpeta de destino?": "What should I do with the ones that already exist in the destination folder?", "Extraer": "Extract", "Extraer…": "Extract…", "Carpeta": "Folder", "Contraseña (solo si tiene)": "Password (only if it has one)", "La consola lo descomprime en una carpeta al lado del archivo (con BFpilot) y deja el comprimido como está. Nada pasa por el PC.": "The console extracts it into a folder next to the archive (with BFpilot) and leaves the archive as it is. Nothing goes through the PC.", "Notificaciones": "Notifications", "Marcar leídos": "Mark all read", "Borrar todo": "Clear all", "Descartar": "Dismiss", "Unidades": "Drives", "Accesos": "Places", "Recientes": "Recent", "Destinos recientes": "Recent destinations", "libres": "free", "Almacenamiento interno": "Internal storage", "Aplicaciones (homebrew)": "Apps (homebrew)", "Datos (/data)": "Data (/data)", "Paquetes (/data/pkg)": "Packages (/data/pkg)", "Restos de PS5 Directo": "PS5 Directo leftovers", "BFpilot no está cargado: el explorador va por FTP. Copiar pasa por el PC (más lento), y para descomprimir o ver el espacio libre hace falta BFpilot.": "BFpilot is not loaded: the browser works over FTP. Copying goes through the PC (slower), and extracting or showing free space needs BFpilot.", "desde": "from", "Pegar dentro": "Paste inside", "Pegar aquí": "Paste here", "Subir archivos aquí": "Upload files here", "Subir carpeta aquí": "Upload folder here", "Actualizar la carpeta": "Refresh folder", "Supr": "Del", "Copiar ruta de esta carpeta": "Copy this folder's path", "Abrir": "Open", "Descargar al PC": "Download to PC", "Copiar": "Copy", "Renombrar": "Rename", "Calcular tamaño": "Calculate size", "Permisos 777": "Permissions 777", "Copiar ruta": "Copy path", "Copiar rutas": "Copy paths", "Borrar": "Delete", "Ve a la carpeta de destino y pulsa \"Pegar aquí\" (o Ctrl+V)": "Go to the destination folder and click \"Paste here\" (or Ctrl+V)", "Ruta copiada": "Path copied", "El nombre no puede llevar / ni \\": "The name cannot contain / or \\", "No se puede pegar una carpeta dentro de sí misma": "You cannot paste a folder inside itself", "No hay carpetas dentro.": "No folders inside.", "Una carpeta no se puede meter dentro de sí misma.": "A folder cannot go inside itself.", "Ya está en esta carpeta.": "It is already in this folder.", "Otra unidad sin BFpilot: se copia pasando por el PC y luego se borra el original.": "Another drive without BFpilot: it is copied through the PC and then the original is deleted.", "BFpilot no está cargado: cárgalo en la PS5 para poder extraer.": "BFpilot is not loaded: load it on the PS5 to extract.", "Ya hay una carpeta con ese nombre: se usará uno nuevo terminado en (2).": "There is already a folder with that name: a new one ending in (2) will be used.", "Pon un solo nombre de carpeta, sin /": "Use a single folder name, without /", "No los encuentro en tu PC: usa \"Subir archivos aquí\"": "I cannot find them on your PC: use \"Upload files here\"", "Extrayendo": "Extracting", "ahora": "now", "Aún no hay avisos. Aquí aparecerán las transferencias terminadas, los errores, las desconexiones y las versiones nuevas.": "No notifications yet. Finished transfers, errors, disconnections and new versions will show up here.", "Novedades": "What's new", "Entendido": "Got it", "Se ha actualizado. Esto es lo nuevo:": "PS5 Directo has been updated. Here is what's new:", "Transferencias es la cola. En Archivos de la consola navegas por la PS5: ves tamaños, copias, mueves, renombras, borras, bajas al PC o subes archivos y carpetas. Espacio te enseña en un gráfico qué ocupa más y qué puedes borrar. Actividad guarda el historial.": "Transfers is the queue. In Console files you browse the PS5: see sizes, copy, move, rename, delete, download to the PC or upload files and folders. Space shows in a chart what takes up the most room and what you can delete. Activity keeps the history.", "Espacio": "Space", "Analizar": "Analyze", "Mira qué ocupa sitio en la consola, con nombres y tamaños, para decidir qué borrar. Avisa de juegos repetidos (por ejemplo la carpeta y su versión convertida), envíos a medias y restos. Necesita BFpilot.": "See what takes up space on the console, with names and sizes, to decide what to delete. It flags repeated games (for example a folder and its converted version), half-sent transfers and leftovers. Needs BFpilot.", "Todo lo que ocupa sitio": "Everything that takes up space", "Borrar seleccionados": "Delete selected", "Disco externo": "External drive", "Libre": "Free", "Borrando…": "Deleting…", "¿Borrar de la consola? No se puede deshacer.": "Delete from the console? This cannot be undone.", "Juegos instalados desde la PS5": "Games installed from the PS5", "Sistema y otros datos de la consola": "System and other console data", "Otros": "Other", "Borrado. Vuelvo a medir el espacio…": "Deleted. Measuring the space again…", "Envía archivos a tu consola por la red local, sin pasar por el disco del PC": "Send files to your console over your local network, without going through your PC's disk", "Guía": "Guide", "Guía rápida: para qué es cada cosa": "Quick guide: what each part does", "Extensión": "Extension", "Capturar enlaces desde el navegador sin copiar y pegar": "Capture links from your browser without copy and paste", "Actualizar": "Update", "Buscar o instalar una versión nueva": "Check for or install a new version", "Ajustes": "Settings", "Salir": "Quit", "Cierra PS5 Directo del todo": "Closes PS5 Directo completely", "Nueva transferencia": "New transfer", "Enlaces directos (uno por línea). Pega todas las partes juntas: .part1.rar, .part2.rar… o .001, .002…": "Direct links (one per line). Paste all parts together: .part1.rar, .part2.rar… or .001, .002…", "https://servidor/archivo.part1.rar": "https://server/file.part1.rar", "https://servidor/archivo.part2.rar": "https://server/file.part2.rar", "También vale la ruta de un archivo de tu PC, por ejemplo: D:\\Descargas\\archivo.rar": "A file path on your PC also works, for example: D:\\Downloads\\file.rar", "Archivos de tu PC: suéltalos en esta página y los busco en tu PC, o arrástralos sobre el": "Files on your PC: drop them on this page and I'll find them on your PC, or drag them onto the", "icono de PS5 Directo": "PS5 Directo icon", ", o clic derecho →": ", or right-click →", "Enviar a → PS5 Directo": "Send to → PS5 Directo", "Contraseña del comprimido (si la tiene)": "Archive password (if any)", "Opcional. Si la dejas vacía prueba las de Ajustes y las del nombre": "Optional. If empty, it tries the ones in Settings and the one in the file name", "Destino en la PS5": "Destination on the PS5", "Dónde descomprimir": "Where to extract", "En la PS5 (BFpilot)": "On the PS5 (BFpilot)", "En el PC (7-Zip)": "On the PC (7-Zip)", "Añadir a la cola": "Add to queue", "Si pegas enlaces de varios archivos distintos, los separa solo. «En el PC» usa 7-Zip y manda el contenido ya descomprimido y comprobado (más datos por el Wi-Fi, pero sin BFpilot).": "If you paste links to several different files, it splits them automatically. \"On the PC\" uses 7-Zip and sends the content already extracted and verified (more data over Wi-Fi, but no BFpilot needed).", "Cola": "Queue", "Quitar terminados": "Clear finished", "No hay nada en la cola. Pega enlaces arriba.": "The queue is empty. Paste links above.", "Transferencia": "Transfer", "Pausar": "Pause", "Reanudar": "Resume", "Cancelar": "Cancel", "Reintentar": "Retry", "Quitar": "Remove", "Test de velocidad": "Speed test", "Mide descarga, envío y las dos cosas a la vez": "Measures download, upload and both at once", "Bajar al PC": "Download to PC", "Descomprimir y enviar": "Extract and send", "Colocar": "Place", "Listo": "Done", "Enviar": "Send", "Descomprimir": "Extract", "Enviado": "Sent", "de": "of", "Velocidad a la PS5": "Speed to PS5", "Quedan": "Remaining", "Descompresión en la PS5": "Extraction on the PS5", "Archivos y registro": "Files and log", "Copiar registro": "Copy log", "Registro copiado. Pégalo donde quieras (Ctrl+V).": "Log copied. Paste it anywhere (Ctrl+V).", "Registro copiado.": "Log copied.", "Contraseña del comprimido (vacío = probar las guardadas):": "Archive password (empty = try the saved ones):", "¿Cancelar esta transferencia? Lo ya enviado se conserva y se puede reintentar.": "Cancel this transfer? What was already sent is kept and you can retry.", "Añadido a la cola": "Added to queue", "pendiente": "pending", "comprobando": "checking", "enviando": "sending", "en cola para descomprimir": "waiting to extract", "extrayendo": "extracting", "colocando": "placing", "hecho": "done", "error": "error", "cancelado": "cancelled", "pausado": "paused", "Mide por separado la descarga desde el enlace, el envío del PC a la PS5 y las dos cosas a la vez (unos 30 segundos). Así se sabe de quién es la culpa cuando va lento. No se guarda nada: el archivo de prueba de la PS5 se borra al acabar.": "Measures separately the download from the link, the upload from PC to PS5, and both at once (about 30 seconds), so you know what's to blame when it's slow. Nothing is kept: the test file on the PS5 is deleted at the end.", "Cerrar": "Close", "Midiendo…": "Measuring…", "Descarga sola": "Download only", "PC → PS5 solo": "PC → PS5 only", "Las dos a la vez: descarga / envío": "Both at once: download / upload", "Llegaría a la PS5 descargando y enviando": "Would reach the PS5 downloading and sending", "IP de la PS5": "PS5 IP address", "por ejemplo 192.168.1.50": "for example 192.168.1.50", "Destino por defecto": "Default destination", "Puerto FTP": "FTP port", "Usuario FTP": "FTP user", "Contraseña FTP": "FTP password", "(vacía)": "(empty)", "Puerto BFpilot": "BFpilot port", "Conexiones por archivo": "Connections per file", "Partes a la vez (1-4)": "Parts at once (1-4)", "Trozo (MB)": "Chunk (MB)", "Memoria (MB)": "Memory (MB)", "Reintentos": "Retries", "Límite de velocidad a la PS5 (MB/s, 0 = sin límite)": "Speed limit to PS5 (MB/s, 0 = no limit)", "Dejar siempre libre en la PS5 (GB)": "Always keep free on PS5 (GB)", "Hilos al descomprimir (0 = automático, máx. 8)": "Extraction threads (0 = auto, max 8)", "Test de velocidad PC → PS5": "PC → PS5 speed test", "Para incluir la descarga, usa \"Test de velocidad\" en una transferencia de la cola.": "To include the download, use \"Speed test\" on a transfer in the queue.", "El límite se aplica al momento, sin parar nada. Si el espacio libre baja del margen, PS5 Directo para el envío o la descompresión antes de llenar la consola (0 = no vigilar). Con alojamientos que limitan conexiones usa solo 2 por archivo y baja más si el servidor protesta.": "The limit applies instantly, without stopping anything. If free space drops below the margin, PS5 Directo stops sending or extracting before the console fills up (0 = don't watch). With hosts that limit connections, use just 2 per file and lower it if the server complains.", "Contraseñas que usas a menudo (una por línea). Se prueban solas si el trabajo no lleva contraseña.": "Passwords you use often (one per line). They're tried automatically if the transfer has no password.", "Probar también contraseñas sacadas del nombre del archivo (lo que va entre corchetes, como [WEB.COM])": "Also try passwords taken from the file name (whatever is in brackets, like [WEB.COM])", "Borrar los comprimidos al terminar bien (de la PS5, o las partes bajadas al PC)": "Delete the archives when finished successfully (from the PS5, or the parts downloaded to the PC)", "Descomprimir en el PC": "Extract on the PC", "Alternativa a BFpilot: 7-Zip descomprime en el PC sobre la marcha y la app manda los archivos ya sueltos, comprobando cada uno con su CRC. No escribe nada descomprimido en el PC y en la PS5 solo ocupa el contenido final (sin el RAR al lado). A cambio, por el Wi-Fi viaja todo sin comprimir (puede ser 3-4 veces más) y los enlaces se bajan antes al PC (hace falta sitio para el RAR).": "Alternative to BFpilot: 7-Zip extracts on the PC on the fly and the app sends the loose files, verifying each one with its CRC. Nothing extracted is written to the PC, and on the PS5 it only takes the final size (no RAR alongside). The trade-off: everything travels uncompressed over Wi-Fi (can be 3-4 times more), and links are downloaded to the PC first (you need room for the RAR).", "Por defecto": "Default", "Carpeta del PC para bajar los RAR": "PC folder to download the RARs to", "Descargas\\PS5 Directo (temporal)": "Downloads\\PS5 Directo (temporary)", "Ruta de 7z.exe (vacío = buscarlo)": "Path to 7z.exe (empty = find it)", "Guardar": "Save", "Guardado": "Saved", "Probar conexión": "Test connection", "Revisión completa": "Full check", "Probando…": "Testing…", "Revisando…": "Checking…", "Extensión para capturar enlaces (Chrome / Edge)": "Link-capture extension (Chrome / Edge)", "Con ella, al pulsar Descargar en cualquier web (después del captcha), el enlace de un .rar/.7z/.zip/.pkg va directo aquí y el navegador no descarga nada. Si PS5 Directo está cerrado, la descarga sigue normal.": "With it, when you click Download on any site (after the captcha), the link to a .rar/.7z/.zip/.pkg comes straight here and the browser downloads nothing. If PS5 Directo is closed, the download goes ahead normally.", "Instalarla (una vez): 1) Abre": "Install it (once): 1) Open", "(o": "(or", ") · 2) Activa": ") · 2) Turn on", "Modo de desarrollador": "Developer mode", "· 3)": "· 3)", "Cargar descomprimida": "Load unpacked", "y elige la carpeta": "and choose the", "de PS5 Directo.": "folder of PS5 Directo.", "Abrir la carpeta de la extensión": "Open the extension folder", "Actualizar PS5 Directo": "Update PS5 Directo", "Elige el .zip de la versión nueva y se instala solo (guarda una copia de la versión actual en la carpeta .backup). Se reinicia y se abre una ventana nueva.": "Choose the .zip of the new version and it installs itself (it keeps a copy of the current version in the .backup folder). It restarts and opens a new window.", "Instalar actualización (.zip)": "Install update (.zip)", "GitHub para buscar actualizaciones (usuario/repositorio, opcional)": "GitHub to check for updates (user/repository, optional)", "por ejemplo: usuario/ps5directo": "for example: user/ps5directo", "Buscar actualización en GitHub": "Check GitHub for updates", "Buscando…": "Searching…", "Hay una versión nueva:": "A new version is available:", "Actualizar ahora": "Update now", "Descargando e instalando…": "Downloading and installing…", "Instalando…": "Installing…", "Elige el .zip de la versión nueva": "Choose the .zip of the new version", "PS5 Directo se está reiniciando y abrirá una ventana nueva en unos segundos. Ya puedes cerrar esta.": "PS5 Directo is restarting and will open a new window in a few seconds. You can close this one.", "Permisos de las aplicaciones": "App permissions", "Lo que descomprimió BFpilot puede haber quedado sin permiso de ejecución y la PS5 no lo abre (error CE-107750-0). Esto pone permisos 777 a todas las aplicaciones en carpeta. No toca el contenido.": "Content extracted by BFpilot may have been left without execute permission, and the PS5 won't open it (error CE-107750-0). This sets 777 permissions on every app folder. It doesn't touch the content.", "Reparar permisos": "Fix permissions", "Revisando… (puede tardar un poco si hay muchas)": "Checking… (may take a while if there are many)", "No hay aplicaciones en carpeta.": "No app folders found.", "ya estaba bien": "already fine", "Limpieza de la PS5": "PS5 cleanup", "Busca en /data/ps5directo restos que ya no usa ninguna transferencia de la cola (partes de trabajos quitados, descompresiones a medias...). Te enseña cuánto ocupa cada cosa antes de borrar.": "Looks in /data/ps5directo for leftovers no transfer in the queue uses anymore (parts of removed transfers, half-finished extractions...). It shows how much each one takes before deleting.", "Buscar restos": "Find leftovers", "Buscando… (puede tardar unos segundos)": "Searching… (may take a few seconds)", "No hay nada que limpiar.": "Nothing to clean.", "Necesitas en la PS5: el servidor FTP (puerto 2121) y": "On the PS5 you need: the FTP server (port 2121) and", "cargado desde Payload Manager (puerto 5905). Para ir más rápido, con Wi-Fi baja “Trozo” a 2–4 MB.": "loaded from Payload Manager (port 5905). For more speed on Wi-Fi, lower \"Chunk\" to 2–4 MB.", "Eso parece una carpeta: suelta los archivos de dentro": "That looks like a folder: drop the files inside it", "Hay trabajos en marcha. Si sales se paran (luego puedes darle a Reintentar y siguen donde iban). ¿Salir?": "Transfers are running. Quitting stops them (later you can click Retry and they continue where they left off). Quit?", "¿Cerrar PS5 Directo?": "Close PS5 Directo?", "PS5 Directo se ha cerrado. Ya puedes cerrar esta ventana.": "PS5 Directo has closed. You can close this window now.", "Listo en la PS5": "Done on the PS5", "Problema en PS5 Directo": "Problem in PS5 Directo", "enlace": "link", "Hay transferencias en marcha. Actualizar reinicia el programa y tendrás que pulsar Reintentar en ellos (siguen donde iban). ¿Seguir?": "Transfers are running. Updating restarts the program and you'll have to click Retry on them (they continue where they left off). Continue?", "¿Instalarla ahora?": "Install it now?", "Pon la IP de tu PS5 y pulsa Guardar": "Enter your PS5's IP and click Save", "Bienvenido a PS5 Directo": "Welcome to PS5 Directo", "Envía archivos a tu consola por la red local mientras se descargan, sin pasar por el disco del PC, y los deja descomprimidos y en su sitio. Te enseño en un minuto para qué es cada cosa.": "Send files to your console over your local network while they download, without going through your PC's disk, and leave them extracted and in place. Here's a one-minute tour of what each part does.", "Estado de la consola": "Console status", "Estos dos puntos dicen si la consola responde. FTP es por donde se envían los archivos; BFpilot es el que descomprime y coloca. Verde = listo. Rojo = carga el payload en la PS5 o revisa la IP en Ajustes.": "These two dots tell you if the console responds. FTP is how files are sent; BFpilot extracts and places them. Green = ready. Red = load the payload on the PS5 or check the IP in Settings.", "Qué quieres enviar": "What to send", "Pega aquí los enlaces directos, uno por línea (todas las partes .part1, .part2... juntas, en cualquier orden). También vale la ruta de un archivo de tu PC, o arrastrar archivos a esta ventana.": "Paste direct links here, one per line (all parts .part1, .part2... together, in any order). A file path on your PC also works, or drag files onto this window.", "Contraseña": "Password", "Si el comprimido lleva contraseña y la sabes, escríbela. Si la dejas vacía, prueba las que guardes en Ajustes y la que venga entre corchetes en el nombre del archivo.": "If the archive has a password and you know it, type it. If you leave it empty, it tries the ones saved in Settings and whatever is in brackets in the file name.", "Destino": "Destination", "Dónde acaba en la consola. /data/homebrew es la carpeta que escanea ShadowMountPlus para que aparezca en el menú. También puedes elegir un USB.": "Where it ends up on the console. /data/homebrew is the folder ShadowMountPlus scans to show it in the menu. You can also choose a USB drive.", "En la PS5 (BFpilot): por el Wi-Fi viaja el comprimido, más rápido. En el PC (7-Zip): descomprime aquí sobre la marcha y comprueba cada archivo; viajan más datos, pero no depende de BFpilot.": "On the PS5 (BFpilot): the archive travels over Wi-Fi, which is faster. On the PC (7-Zip): it extracts here on the fly and verifies each file; more data travels, but it doesn't depend on BFpilot.", "A la cola": "To the queue", "Añade la transferencia. Puedes añadir varias: mientras una se descomprime en la consola, la siguiente ya se va enviando.": "Adds the transfer. You can add several: while one is extracting on the console, the next one is already being sent.", "La cola": "The queue", "Aquí ves cada transferencia: progreso, velocidad, tiempo restante y sus pasos. Puedes Pausar y Reanudar (sigue donde iba), Reintentar si algo falla y abrir \"Archivos y registro\" para ver el detalle.": "Here you see each transfer: progress, speed, time left and its steps. You can Pause and Resume (it continues where it left off), Retry if something fails, and open \"Files and log\" for details.", "Extensión del navegador": "Browser extension", "Opcional. Con ella, al pulsar Descargar en una web, el enlace llega aquí directo, sin copiar y pegar. Este botón abre su carpeta y las instrucciones.": "Optional. With it, when you click Download on a website, the link comes straight here, no copy and paste. This button opens its folder and the instructions.", "Busca la versión nueva e instálala con un clic. Guarda una copia de la anterior por si acaso.": "Finds the new version and installs it in one click. It keeps a copy of the previous one just in case.", "Lo primero: la IP de tu PS5. Ahí están también el límite de velocidad, el espacio que dejar libre, \"Revisión completa\" (comprueba que todo funciona), \"Reparar permisos\" y \"Limpieza\".": "First things first: your PS5's IP. You'll also find the speed limit, the space to keep free, \"Full check\" (tests that everything works), \"Fix permissions\" and \"Cleanup\".", "¡Listo!": "All set!", "Puedes volver a ver esta guía cuando quieras con este botón. Ahora vamos a poner la IP de tu PS5.": "You can see this guide again anytime with this button. Now let's enter your PS5's IP.", "Transferencias": "Transfers", "Comparar": "Compare", "También vale la ruta de un archivo o carpeta de tu PC (D:\\Descargas\\archivo.rar) o un enlace ftp:// de tu NAS": "A file or folder path on your PC also works (D:\\Downloads\\file.rar), or an ftp:// link to your NAS", "Leído del comprimido": "Read from archive", "Velocidad (comprimido)": "Speed (compressed)", "Archivos de la consola": "Console files", "Actividad": "Activity", "Elegir archivos…": "Choose files…", "Elegir carpeta…": "Choose folder…", "Una carpeta se manda tal cual (si tiene sce_sys, como aplicación) y salta lo que ya esté igual en la consola.": "A folder is sent as it is (as an app if it has sce_sys) and skips whatever is already identical on the console.", "Elige la carpeta que quieres enviar": "Choose the folder to send", "Elige los archivos que quieres enviar": "Choose the files to send", "Se ha abierto la ventana para elegir (puede salir detrás)": "The picker window is open (it may appear behind this one)", "Adelante": "Forward", "Subir un nivel": "Up one level", "Ir a…": "Go to…", "Buscar aquí…": "Search here…", "Mover": "Move", "Nombre": "Name", "Tamaño": "Size", "Modificado": "Modified", "Permisos": "Permissions", "Cargando…": "Loading…", "libres de": "free of", "BFpilot no responde: solo lectura por FTP. Cárgalo para copiar, mover, borrar o calcular tamaños.": "BFpilot isn't responding: read-only via FTP. Load it to copy, move, delete or calculate sizes.", "Nada coincide con la búsqueda.": "Nothing matches the search.", "Carpeta vacía.": "Empty folder.", "calcular": "calculate", "Descargar": "Download", "Para copiar:": "To copy:", "Para mover:": "To move:", "elementos": "items", "Ve a la carpeta de destino y pulsa \"Pegar aquí\"": "Go to the destination folder and click \"Paste here\"", "Nombre de la carpeta nueva:": "Name of the new folder:", "Nuevo nombre:": "New name:", "Copiando": "Copying", "Moviendo": "Moving", "Borrando": "Deleting", "Descargando al PC": "Downloading to PC", "Poniendo permisos": "Setting permissions", "Hecho": "Done", "Abrir carpeta": "Open folder", "Historial de transferencias terminadas o con error (las últimas 500).": "History of finished or failed transfers (the last 500).", "Borrar historial": "Clear history", "Fecha": "Date", "Resultado": "Result", "Duración": "Duration", "Todavía no hay nada en el historial.": "Nothing in the history yet.", "¿Borrar todo el historial?": "Clear the whole history?", "Pestañas": "Tabs", "Transferencias es la cola. En Archivos de la consola navegas por la PS5: ves tamaños, copias, mueves, renombras, borras, bajas al PC o subes archivos y carpetas. Actividad guarda el historial.": "Transfers is the queue. In Console files you browse the PS5: see sizes, copy, move, rename, delete, download to the PC or upload files and folders. Activity keeps the history.", "Saltar guía": "Skip guide", "Atrás": "Back", "Siguiente": "Next", "Empezar": "Start", "Pulsa Actualizar arriba para instalarla.": "Click Update at the top to install it.", "Se perdió la conexión con el FTP de la PS5": "Lost connection with the PS5 FTP", "Se perdió la conexión con BFpilot de la PS5": "Lost connection with BFpilot on the PS5", "Otra vez conectado con el FTP de la PS5": "Connected again to the PS5 FTP", "Otra vez conectado con BFpilot de la PS5": "Connected again to BFpilot on the PS5", "Descomprimir en la consola necesita BFpilot cargado en la PS5": "Extracting on the console needs BFpilot loaded on the PS5", "Eso no es un comprimido (.rar, .7z o .zip)": "That is not an archive (.rar, .7z or .zip)", "Contraseña incorrecta o necesaria: vuelve a intentarlo con la contraseña": "Wrong or missing password: try again with the password", "Bórralos desde la consola: Ajustes > Almacenamiento": "Delete them from the console: Settings > Storage", "No tiene sce_sys: no es una app completa (¿envío cortado o copia a medias?)": "No sce_sys: not a complete app (cut-off transfer or half copy?)", "Instalador .pkg: si ya está instalado, se puede borrar": ".pkg installer: if it is already installed, it can be deleted", "Restos de envíos de PS5 Directo": "Leftovers from PS5 Directo transfers", "Datos de payloads o ajustes: bórralo solo si sabes qué es": "Payload data or settings: delete it only if you know what it is", "Archivo a medias de un envío": "Half-sent file", "Para analizar el espacio hace falta BFpilot cargado en la PS5": "Analyzing the space needs BFpilot loaded on the PS5", "Ya se está analizando": "Already analyzing", "Se cerro el programa a medias. Pulsa Reintentar: continua donde se quedo.": "The program closed midway. Click Retry: it continues where it left off.", "Comprobando enlaces": "Checking links", "En cola": "Queued", "tamano desconocido": "unknown size", "(aviso antes de enviar: puedes pausarlo si no lo quieres)": "(warning before sending: pause it if you don't want it)", "Para unir partes hace falta saber el tamano de cada una": "To join parts the size of each one must be known", "El servidor no deja continuar; se empieza desde cero": "The server does not allow resuming; starting from scratch", "Envio completo": "Upload complete", "Enviado. Esperando turno para descomprimir": "Sent. Waiting for its turn to extract", "En pausa": "Paused", "En pausa (pulsa Reanudar para seguir)": "Paused (click Resume to continue)", "Cancelado": "Cancelled", "Terminado": "Finished", "Listo. ShadowMountPlus lo anadira al inicio en unos segundos": "Done. ShadowMountPlus will add it to the home screen in a few seconds", "Listo. Copiado en la PS5": "Done. Copied to the PS5", "el envio": "sending", "la descompresion": "extraction", "Para bajar al PC hace falta saber el tamano de cada parte": "To download to the PC the size of each part must be known", "Para descomprimir en el PC hace falta 7-Zip (gratis, 7-zip.org). Instalalo, o pon la ruta de 7z.exe en Ajustes, o elige 'Descomprimir en la PS5'.": "Extracting on the PC needs 7-Zip (free, 7-zip.org). Install it, set the path to 7z.exe in Settings, or choose 'Extract on the PS5'.", "Leyendo el contenido del comprimido": "Reading the archive contents", "Ninguna contrasena abre el comprimido. Escribela en el trabajo o en Ajustes y pulsa Reintentar (no se vuelve a descargar).": "No password opens the archive. Enter it in the transfer or in Settings and click Retry (it won't download again).", "(solido)": "(solid)", "El comprimido tiene contrasena. Escribela en el trabajo o en Ajustes y pulsa Reintentar.": "The archive has a password. Enter it in the transfer or in Settings and click Retry.", "Descomprimiendo en el PC y enviando a la PS5": "Extracting on the PC and sending to the PS5", "Contrasena correcta": "Password correct", "Ninguna contrasena ha funcionado. Escribela en el trabajo o en Ajustes y pulsa Reintentar (no se vuelve a descargar).": "No password worked. Enter it in the transfer or in Settings and click Retry (it won't download again).", "Colocando en su sitio": "Placing it", "BFpilot no esta cargado: lo coloco por FTP": "BFpilot isn't loaded: placing it via FTP", "Borradas del PC las partes descargadas": "Downloaded parts deleted from the PC", "Descarga al PC": "Download to PC", "Bajado al PC": "Downloaded to PC", "sin datos": "no data", "BFpilot no responde. Cargalo en la PS5 desde Payload Manager; sigo esperando.": "BFpilot isn't responding. Load it on the PS5 from Payload Manager; I'll keep waiting.", "Esperando a BFpilot (cargalo desde Payload Manager)": "Waiting for BFpilot (load it from Payload Manager)", "No encontre sce_sys ni imagenes: dejo todo junto en una carpeta": "No sce_sys or images found: leaving everything together in a folder", "Es un .pkg: instalalo con ps5upload (Install Package) desde /data/pkg.": "It's a .pkg: install it with ps5upload (Install Package) from /data/pkg.", "Ya estaba descomprimido de antes; paso a colocarlo": "Already extracted before; placing it", "sin contrasena": "no password", "Ninguna contrasena ha funcionado. Escribela en el trabajo o en Ajustes y pulsa Reintentar (no hace falta volver a descargar).": "No password worked. Enter it in the transfer or in Settings and click Retry (no need to download again).", "Borrando los comprimidos de la PS5": "Deleting the archives from the PS5", "hay sitio de sobra": "plenty of room", "Aviso: la descompresion no da senales de vida desde hace 5 min. Mira en BFpilot (puerto 5905) si sigue 'running' antes de cancelar.": "Warning: extraction has shown no sign of life for 5 min. Check in BFpilot (port 5905) whether it's still 'running' before cancelling.", "La descompresion vuelve a avanzar": "Extraction is moving again", "Permisos ya correctos": "Permissions already correct", "Este BFpilot no sabe cambiar permisos: lo hago por FTP": "This BFpilot can't change permissions: doing it via FTP", "Hace falta BFpilot cargado para revisar los permisos": "BFpilot must be loaded to check permissions", "Reintentando la descompresion": "Retrying extraction", "El servidor rechaza a este programa (403). Si el enlace ha caducado, genera uno nuevo.": "The server rejects this program (403). If the link has expired, generate a new one.", "Akirabox: ese enlace solo vale en el navegador. Empieza la descarga, copia el enlace de download.akirabox.com que sale en Ctrl+J (o en tu gestor de descargas), cancela y pegalo aqui.": "Akirabox: that link only works in the browser. Start the download, copy the download.akirabox.com link shown in Ctrl+J (or in your download manager), cancel it and paste it here.", "El enlace devuelve una pagina web, no un archivo. Usa el enlace de descarga directa.": "The link returns a web page, not a file. Use the direct download link.", "El servidor no permite continuar a medias": "The server does not allow resuming", "el servidor no respeto el rango pedido": "the server didn't honor the requested range", "Falta la IP de la PS5: ponla en Ajustes": "The PS5's IP is missing: set it in Settings", "Respuesta rara de BFpilot": "Unexpected response from BFpilot", "error de BFpilot": "BFpilot error", "BFpilot ocupado con otra tarea": "BFpilot is busy with another task", "la extraccion fallo": "extraction failed", "BFpilot tarda demasiado": "BFpilot is taking too long", "no responde (cargalo desde Payload Manager)": "not responding (load it from Payload Manager)", "FTP de la PS5": "PS5 FTP", "Escribir en la PS5": "Writing to the PS5", "La prueba no se guardo bien": "The test file wasn't saved correctly", "Revisa que el servidor FTP permita escribir en /data": "Check that the FTP server allows writing to /data", "El FTP no deja escribir: prueba a recargar el payload FTP": "The FTP won't allow writing: try reloading the FTP payload", "7-Zip en el PC": "7-Zip on the PC", "no instalado": "not installed", "Hace falta para 'Descomprimir en el PC': instalalo desde 7-zip.org": "Needed for 'Extract on the PC': install it from 7-zip.org", "Solo hace falta si eliges descomprimir en el PC": "Only needed if you choose to extract on the PC", "Cargalo desde Payload Manager: sin el no se puede descomprimir": "Load it from Payload Manager: extraction isn't possible without it", "Descompresion": "Extraction", "Actualiza BFpilot a la ultima version": "Update BFpilot to the latest version", "Espacio libre": "Free space", "Queda poco: borra restos (Limpieza) o algo que no uses": "Running low: delete leftovers (Cleanup) or something you don't use", "Tarea en BFpilot": "BFpilot task", "BFpilot no responde: cargalo para poder buscar restos": "BFpilot isn't responding: load it to search for leftovers", "Espera a que termine la descompresion: BFpilot esta ocupado": "Wait for the extraction to finish: BFpilot is busy", "Es bajo: el cuello es el Wi-Fi/cable entre PC y PS5 o el FTP de la consola.": "It's low: the bottleneck is the Wi-Fi/cable between PC and PS5 or the console's FTP.", "Es bajo: el alojamiento te esta dando poca velocidad ahora mismo (limite de cuenta gratis, enlace castigado o servidor lento). No es tu red.": "It's low: the host is giving you little speed right now (free account limit, throttled link or slow server). It's not your network.", "Aqui manda el alojamiento: mientras de tan poca velocidad, nada de tu lado lo va a mejorar.": "Here the host is the limit: while it gives so little speed, nothing on your side will improve it.", "Estan compitiendo peor de lo normal: prueba el limite de velocidad en Ajustes un poco por debajo de esa cifra, o un cable de red en el PC.": "They compete worse than normal: try the speed limit in Settings a bit below that figure, or a network cable on the PC.", "Es lo normal para una sola radio: compartir el aire tiene ese coste.": "That's normal for a single radio: sharing the airtime has that cost.", "Solo un cable de red en el PC lo mejoraria de verdad.": "Only a network cable on the PC would really improve it.", "Comparando con lo que ya hay en la PS5": "Comparing with what is already on the PS5", "Ruta no valida": "Invalid path", "BFpilot no responde: cargalo para copiar, mover, borrar o calcular tamanos": "BFpilot isn't responding: load it to copy, move, delete or calculate sizes", "Ya hay una operacion en marcha en el explorador": "An operation is already running in the file browser", "No se puede copiar una carpeta dentro de si misma": "A folder can't be copied into itself", "No se puede mover una carpeta dentro de si misma": "A folder can't be moved into itself", "operacion no valida": "invalid operation", "descarga incompleta": "incomplete download", "Descomprimiendo el .tar en el PC y enviando a la PS5": "Extracting the .tar on the PC and sending to the PS5", "el FTP corto la descarga": "the FTP cut the download", "Ya hay un test en marcha": "A test is already running", "Pausa el envio antes del test (si no, se mezclan las medidas)": "Pause sending before the test (otherwise the measurements mix)", "Hay trabajos en marcha: espera a que terminen o pausalos antes de actualizar": "Transfers are running: wait for them to finish or pause them before updating", "Ese archivo no es un .zip valido": "That file isn't a valid .zip", "Ese .zip no es de PS5 Directo (no trae app.py y engine.py)": "That .zip isn't PS5 Directo (no app.py and engine.py)", "No encuentro la version dentro del .zip": "Can't find the version inside the .zip", "Pon el repositorio como usuario/nombre en Ajustes": "Enter the repository as user/name in Settings", "Esa release no tiene un .zip": "That release has no .zip", "Pega al menos un enlace": "Paste at least one link", "El destino debe estar en /data o /mnt": "The destination must be in /data or /mnt", "no existe": "doesn't exist", "solo desde la extension": "only from the extension", "enlace no valido": "invalid link"};
+const I18N_RX=[["^Este ZIP usa cifrado AES y BFpilot todavia no sabe abrirlo \\(solo el cifrado ZIP clasico\\)\\. Los archivos ya estan en la PS5, en ([\\s\\S]*?)\\. Puedes bajarlos al PC, extraerlos con 7-Zip y subir la carpeta\\.$", "This ZIP uses AES encryption and BFpilot can't open it yet (only classic ZIP encryption). The files are already on the PS5, in {0}. You can download them to the PC, extract them with 7-Zip and upload the folder."], ["^Aviso: lo descomprimido puede ocupar hasta ~5 veces el RAR \\(~([\\s\\S]*?)\\) y quedan ([\\s\\S]*?) libres\\. Puede bastar, pero si el espacio baja del margen lo paro\\. Si puedes, libera espacio\\.$", "Warning: extracted content can take up to ~5 times the RAR (~{0}) and {1} is free. It may be enough, but if space drops below the margin I stop. Free up space if you can."], ["^Ojo: el contenido descomprimido puede ocupar hasta ~5 veces el RAR \\(~([\\s\\S]*?)\\) y no se si cabra\\. Si al descomprimir baja del margen, lo paro y los RAR se quedan en la PS5\\.$", "Heads up: extracted content can take up to ~5 times the RAR (~{0}) and it may not fit. If space drops below the margin while extracting, I stop and the RARs stay on the PS5."], ["^AVISO: no pude poner los permisos de ([\\s\\S]*?) \\(([\\s\\S]*?)\\)\\. Si no arranca, en FileZilla: clic derecho en la carpeta > Permisos > 777 > recurrir a subdirectorios\\.$", "WARNING: couldn't set permissions on {0} ({1}). If it doesn't launch, in FileZilla: right-click the folder > File permissions > 777 > recurse into subdirectories."], ["^No cabe en el PC: hay que bajar ([\\s\\S]*?) a ([\\s\\S]*?) y solo hay ([\\s\\S]*?) libres\\. Libera espacio, cambia la carpeta temporal en Ajustes o descomprime en la PS5\\.$", "Not enough space on the PC: {0} must be downloaded to {1} and only {2} is free. Free up space, change the temporary folder in Settings, or extract on the PS5."], ["^No cabe en la PS5: descomprimido ocupa ([\\s\\S]*?), faltan por mandar ([\\s\\S]*?), hay ([\\s\\S]*?) libres y dejo ([\\s\\S]*?) de margen\\. Libera espacio y pulsa Reintentar\\.$", "Not enough space on the PS5: extracted it takes {0}, {1} left to send, {2} free and I keep {3} as margin. Free up space and click Retry."], ["^No hay sitio en la PS5: faltan por enviar ([\\s\\S]*?), hay ([\\s\\S]*?) libres y dejo ([\\s\\S]*?) de margen \\(Ajustes\\)\\. Libera espacio y pulsa Reintentar\\.$", "Not enough space on the PS5: {0} left to send, {1} free and I keep {2} as margin (Settings). Free up space and click Retry."], ["^La IP de la PS5 no es valida \\(([\\s\\S]*?)\\): en Ajustes escribe solo los numeros, por ejemplo 192\\.168\\.1\\.50, sin ftp:\\/\\/ ni puerto$", "The PS5 IP is not valid ({0}): in Settings type just the numbers, for example 192.168.1.50, without ftp:// or a port"], ["^Parado para no llenar la PS5 \\(([\\s\\S]*?)\\): quedan ([\\s\\S]*?) libres y el margen es ([\\s\\S]*?)\\. Libera espacio y pulsa Reintentar; sigue donde iba\\.$", "Stopped so the PS5 doesn't fill up ({0}): {1} free and the margin is {2}. Free up space and click Retry; it continues where it left off."], ["^BFpilot no abre ZIP partidos \\(\\.z01, \\.z02\\.\\.\\.\\)\\. Uno los RAR\\/7z partidos, pero este formato no\\. Los archivos estan en ([\\s\\S]*?)\\.$", "BFpilot can't open split ZIPs (.z01, .z02...). I can join split RAR/7z, but not this format. The files are in {0}."], ["^No cabe en la PS5: faltan ([\\s\\S]*?) por enviar, hay ([\\s\\S]*?) libres y el margen es ([\\s\\S]*?)\\. Libera espacio y pulsa Reintentar\\.$", "It doesn't fit on the PS5: {0} left to send, {1} free and the margin is {2}. Free up space and click Retry."], ["^Ojo: ya tienes ([\\s\\S]*?) en ([\\s\\S]*?)\\. Dos copias con el mismo Title ID pueden liar a ShadowMountPlus \\(deja solo una\\)\\.([\\s\\S]*?)$", "Heads up: you already have {0} in {1}. Two copies with the same Title ID can confuse ShadowMountPlus (keep only one).{2}"], ["^Ojo: ya tienes ([\\s\\S]*?) en ([\\s\\S]*?)\\. Dos copias con el mismo Title ID pueden liar a ShadowMountPlus \\(deja solo una\\)\\.$", "Heads up: you already have {0} in {1}. Two copies with the same Title ID can confuse ShadowMountPlus (keep only one)."], ["^El comprimido tiene enlaces \\(([\\s\\S]*?)\\); eso solo lo sabe extraer BFpilot\\. Descomprimelo en la PS5\\.$", "The archive contains links ({0}); only BFpilot can extract those. Extract it on the PS5."], ["^No hay sitio en la PS5: quedan ([\\s\\S]*?) libres y el margen es ([\\s\\S]*?)\\. Libera espacio y pulsa Reintentar\\.$", "Not enough space on the PS5: {0} free and the margin is {1}. Free up space and click Retry."], ["^Ya existe ([\\s\\S]*?)\\. No lo piso: borralo o renombralo y pulsa Reintentar\\. Lo extraido esta en ([\\s\\S]*?)$", "{0} already exists. I won't overwrite it: delete or rename it and click Retry. What was extracted is in {1}"], ["^Recibido de la extensión: ([\\s\\S]*?)\\. Cuando estén todas las partes, pulsa \"Añadir a la cola\"\\.$", "Received from the extension: {0}. When all parts are in, click \"Add to queue\"."], ["^Ya existe ([\\s\\S]*?)\\. No lo piso: borralo o renombralo y pulsa Reintentar\\. Lo enviado esta en ([\\s\\S]*?)$", "{0} already exists. I won't overwrite it: delete or rename it and click Retry. What was sent is in {1}"], ["^Lo usa \"([\\s\\S]*?)\" de la cola: si lo borras, esa transferencia tendrá que enviarse otra vez\\.$", "Used by \"{0}\" in the queue: if you delete it, that transfer will have to be sent again."], ["^No encuentro en la PS5 lo enviado \\(([\\s\\S]*?)\\)\\. Pulsa Reintentar para mandarlo de nuevo\\.$", "I can't find what was sent on the PS5 ({0}). Click Retry to send it again."], ["^Juego enviado ya descomprimido: ([\\s\\S]*?) archivos, ([\\s\\S]*?), todos comprobados con su CRC$", "Sent already extracted: {0} files, {1}, all verified with their CRC"], ["^No encontré: ([\\s\\S]*?)\\. Arrástralos sobre el icono de PS5 Directo o pega la ruta\\.$", "Not found: {0}. Drag them onto the PS5 Directo icon or paste the path."], ["^El archivo ([\\s\\S]*?) no cuadra con su CRC \\(datos danados o contrasena incorrecta\\)$", "File {0} doesn't match its CRC (damaged data or wrong password)"], ["^Comprueba la IP en Ajustes y que el payload FTP este cargado \\(puerto ([\\s\\S]*?)\\)$", "Check the IP in Settings and that the FTP payload is loaded (port {0})"], ["^Las dos cosas a la vez: en la practica llegarian unos ([\\s\\S]*?) MB\\/s a la PS5\\.$", "Both at once: in practice about {0} MB/s would reach the PS5."], ["^Carpeta enviada: ([\\s\\S]*?) archivos nuevos, ([\\s\\S]*?) ya estaban iguales, ([\\s\\S]*?) continuados$", "Folder sent: {0} new files, {1} were already identical, {2} resumed"], ["^Enviado ya descomprimido: ([\\s\\S]*?) archivos, ([\\s\\S]*?), todos comprobados con su CRC$", "Sent already extracted: {0} files, {1}, all verified with their CRC"], ["^Hay ([\\s\\S]*?) elementos repetidos \\(mismo juego dos veces\\): revisa la lista\\.$", "There are {0} repeated items (the same game twice): check the list."], ["^Con una sola radio Wi-Fi lo maximo esperable seria unos ([\\s\\S]*?) MB\\/s\\.$", "With a single Wi-Fi radio the most you could expect is about {0} MB/s."], ["^Añadidas ([\\s\\S]*?) ruta\\(s\\)\\. Revisa destino y pulsa \"Añadir a la cola\"\\.$", "Added {0} path(s). Check the destination and click \"Add to queue\"."], ["^Ya tienes la última \\(v([\\s\\S]*?)\\)\\. ¿Quieres instalar una desde un \\.zip\\?$", "You already have the latest (v{0}). Do you want to install one from a .zip?"], ["^Detectados ([\\s\\S]*?) archivos distintos: los separo en varios trabajos$", "Detected {0} different files: splitting them into several transfers"], ["^No conecto con el programa\\. ¿Cerraste la ventana negra\\? \\(([\\s\\S]*?)\\)$", "Can't reach the program. Did you close the black window? ({0})"], ["^Quedan restos en ([\\s\\S]*?) \\(vacios\\)\\. Puedes borrarlos con Limpieza\\.$", "Leftovers remain in {0} (empty). You can delete them with Cleanup."], ["^¿Borrar ([\\s\\S]*?) elemento\\(s\\) de la consola\\? No se puede deshacer\\.$", "Delete {0} item(s) from the console? This can't be undone."], ["^La PS5 solo tiene ([\\s\\S]*?) libres: seguramente se lleno el disco\\.$", "The PS5 only has {0} free: the disk probably filled up."], ["^¿Borrar ([\\s\\S]*?) elemento\\(s\\) de la PS5 \\(([\\s\\S]*?)\\)\\? No se puede deshacer\\.$", "Delete {0} item(s) from the PS5 ({1})? This can't be undone."], ["^La descarga de ([\\s\\S]*?) se quedo corta \\(([\\s\\S]*?) de ([\\s\\S]*?)\\)\\. Pulsa Reintentar\\.$", "The download of {0} came up short ({1} of {2}). Click Retry."], ["^Este alojamiento limita las conexiones: uso ([\\s\\S]*?) por archivo$", "This host limits connections: using {0} per file"], ["^Descomprimiendo en el PC y enviando: archivo ([\\s\\S]*?) de ([\\s\\S]*?) · ([\\s\\S]*?)$", "Extracting on the PC and sending: file {0} of {1} · {2}"], ["^justo de espacio \\(en el peor caso podria llegar a ~([\\s\\S]*?)\\)$", "tight on space (worst case it could reach ~{0})"], ["^El servidor va con problemas \\(([\\s\\S]*?)\\): bajo a ([\\s\\S]*?) conexiones$", "The server is struggling ({0}): lowering to {1} connections"], ["^se perdio demasiado del archivo ([\\s\\S]*?); empieza otra vez$", "too much of file {0} was lost; starting again"], ["^Por seguridad no borro carpetas de primer nivel \\(([\\s\\S]*?)\\)$", "For safety I don't delete top-level folders ({0})"], ["^Hay ([\\s\\S]*?) envíos a medias o restos que puedes borrar\\.$", "There are {0} half-sent transfers or leftovers you can delete."], ["^Dentro hay ([\\s\\S]*?) archivos que ocupan ([\\s\\S]*?) descomprimidos([\\s\\S]*?)$", "It contains {0} files taking {1} extracted{2}"], ["^Espacio libre en la PS5: ([\\s\\S]*?) \\(el juego necesita ([\\s\\S]*?)\\)$", "Free space on the PS5: {0} ({1} needed)"], ["^Aviso: queda poco espacio en la PS5 \\(([\\s\\S]*?) libres\\)$", "Warning: the PS5 is running low on space ({0} free)"], ["^Tamano en la consola ([\\s\\S]*?) distinto del esperado ([\\s\\S]*?)$", "Size on the console {0} differs from expected {1}"], ["^tamano en la consola ([\\s\\S]*?) distinto del esperado ([\\s\\S]*?)$", "size on the console {0} differs from expected {1}"], ["^Ya existe ([\\s\\S]*?); no lo piso\\. Lo enviado esta en ([\\s\\S]*?)$", "{0} already exists; I won't overwrite it. What was sent is in {1}"], ["^Permisos arreglados \\(777\\) en ([\\s\\S]*?) de ([\\s\\S]*?) elementos([\\s\\S]*?)$", "Permissions fixed (777) on {0} of {1} items{2}"], ["^Continuo donde iba: ([\\s\\S]*?) ya estaban en la PS5$", "Continuing where I left off: {0} was already on the PS5"], ["^\\(unos ([\\s\\S]*?) segundos; no cierres el programa\\)$", "(about {0} seconds; don't close the program)"], ["^Espacio libre en la PS5: ([\\s\\S]*?) \\(hacen falta ([\\s\\S]*?)\\)$", "Free space on the PS5: {0} ({1} needed)"], ["^Borrando restos de un intento anterior: ([\\s\\S]*?)$", "Deleting leftovers from a previous attempt: {0}"], ["^Hay una versión nueva: v([\\s\\S]*?) \\(tienes la v([\\s\\S]*?)\\)\\.$", "A new version is available: v{0} (you have v{1})."], ["^No pude abrir el selector de archivos: ([\\s\\S]*?)$", "Couldn't open the file picker: {0}"], ["^¿Instalar ([\\s\\S]*?)\\? PS5 Directo se reiniciará\\.$", "Install {0}? PS5 Directo will restart."], ["^Añadido a la cola: se sube tal cual a ([\\s\\S]*?)$", "Added to the queue: uploaded as-is to {0}"], ["^Ya existe algo llamado ([\\s\\S]*?) en esa carpeta$", "There is already something called {0} in that folder"], ["^Ruta peligrosa dentro del comprimido: ([\\s\\S]*?)$", "Dangerous path inside the archive: {0}"], ["^Descarga sola desde ese enlace: ([\\s\\S]*?) MB\\/s\\.$", "Download only from that link: {0} MB/s."], ["^Ya hay ([\\s\\S]*?) elementos con el mismo nombre$", "There are already {0} items with the same name"], ["^7-Zip termino con errores \\(codigo ([\\s\\S]*?)\\): ([\\s\\S]*?)$", "7-Zip finished with errors (code {0}): {1}"], ["^Me salto ([\\s\\S]*?) \\(enlace o archivo especial\\)$", "Skipping {0} (link or special file)"], ["^Enviado ya descomprimido: ([\\s\\S]*?) archivos, ([\\s\\S]*?)$", "Sent already extracted: {0} files, {1}"], ["^La copia de ([\\s\\S]*?) salio incompleta \\(([\\s\\S]*?) de ([\\s\\S]*?)\\)$", "The copy of {0} came out incomplete ({1} of {2})"], ["^ESPACIO: quedan ([\\s\\S]*?) libres \\(< ([\\s\\S]*?)\\)\\. Paro ([\\s\\S]*?)\\.$", "SPACE: {0} free (< {1}). Stopping {2}."], ["^Las partes descargadas se quedan en ([\\s\\S]*?)$", "The downloaded parts stay in {0}"], ["^El \\.tar esta danado o no es un tar: ([\\s\\S]*?)$", "The .tar is damaged or isn't a tar: {0}"], ["^Ahora mismo esta descomprimiendo: ([\\s\\S]*?)%$", "Extracting right now: {0}%"], ["^Borrado: ([\\s\\S]*?) elemento\\(s\\), ([\\s\\S]*?) liberados\\.$", "Deleted: {0} item(s), {1} freed."], ["^Permisos 777 puestos en ([\\s\\S]*?) elementos$", "Permissions 777 set on {0} items"], ["^No puedo conectar con el FTP ([\\s\\S]*?):([\\s\\S]*?) \\(([\\s\\S]*?)\\)$", "Can't connect to the FTP {0}:{1} ({2})"], ["^Buscando ([\\s\\S]*?) archivo\\(s\\) en tu PC\\.\\.\\.$", "Looking for {0} file(s) on your PC..."], ["^Conexion cortada \\(([\\s\\S]*?)\\)\\. Reintento ([\\s\\S]*?)\\/([\\s\\S]*?)$", "Connection dropped ({0}). Retry {1}/{2}"], ["^No se puede abrir el enlace \\(([\\s\\S]*?)\\): ([\\s\\S]*?)([\\s\\S]*?)$", "Can't open the link ({0}): {1}{2}"], ["^BFpilot ha dejado de responder: ([\\s\\S]*?)$", "BFpilot stopped responding: {0}"], ["^7-Zip no pudo leer el archivo: ([\\s\\S]*?)$", "7-Zip couldn't read the file: {0}"], ["^7-Zip: contrasena incorrecta \\(([\\s\\S]*?)\\)$", "7-Zip: wrong password ({0})"], ["^Buscando ([\\s\\S]*?) archivo\\(s\\) en tu PC…$", "Looking for {0} file(s) on your PC…"], ["^Enviando y uniendo ([\\s\\S]*?) partes en ([\\s\\S]*?)$", "Sending and joining {0} parts into {1}"], ["^Conexion con la PS5 perdida: ([\\s\\S]*?)$", "Connection to the PS5 lost: {0}"], ["^Los comprimidos se quedan en ([\\s\\S]*?)$", "The archives stay in {0}"], ["^Fallo al descargar un trozo: ([\\s\\S]*?)$", "Failed to download a chunk: {0}"], ["^Duplicado: ([\\s\\S]*?) también está en ([\\s\\S]*?)$", "Duplicate: {0} is also in {1}"], ["^Bajando ([\\s\\S]*?) partes al PC \\(([\\s\\S]*?)\\) en ([\\s\\S]*?)$", "Downloading {0} parts to the PC ({1}) into {2}"], ["^Bajando al PC: parte ([\\s\\S]*?) de ([\\s\\S]*?) \\(([\\s\\S]*?)\\)$", "Downloading to PC: part {0} of {1} ({2})"], ["^Descomprimiendo en la PS5 \\(([\\s\\S]*?)\\)$", "Extracting on the PS5 ({0})"], ["^respuesta corta \\(([\\s\\S]*?) de ([\\s\\S]*?) bytes\\)$", "short response ({0} of {1} bytes)"], ["^Carpeta con ([\\s\\S]*?) archivos \\(([\\s\\S]*?)\\) -> ([\\s\\S]*?)$", "Folder with {0} files ({1}) -> {2}"], ["^FTP: ([\\s\\S]*?) · BFpilot: ([\\s\\S]*?) · libre: ([\\s\\S]*?)$", "FTP: {0} · BFpilot: {1} · free: {2}"], ["^sin cambios desde hace ([\\s\\S]*?) min$", "no change for {0} min"], ["^([\\s\\S]*?)  sin descarga en paralelo$", "{0}  no parallel download"], ["^Novedades de PS5 Directo ([\\s\\S]*?)$", "What's new in PS5 Directo {0}"], ["^Borrar seleccionados \\(([\\s\\S]*?), ([\\s\\S]*?)\\)$", "Delete selected ({0}, {1})"], ["^Error al poner permisos: ([\\s\\S]*?)$", "Error setting permissions: {0}"], ["^Espacio libre en la PS5: ([\\s\\S]*?)$", "Free space on the PS5: {0}"], ["^Aprovecho lo ya enviado: ([\\s\\S]*?)$", "Reusing what was already sent: {0}"], ["^Enviando ([\\s\\S]*?) partes a la vez$", "Sending {0} parts at once"], ["^Ya estaba en la consola: ([\\s\\S]*?)$", "Already on the console: {0}"], ["^No pude cerrar ([\\s\\S]*?) en la PS5$", "Couldn't close {0} on the PS5"], ["^no responde en el puerto ([\\s\\S]*?)$", "not responding on port {0}"], ["^Ya tienes la última \\(v([\\s\\S]*?)\\)\\.$", "You already have the latest (v{0})."], ["^Probando contrasena ([\\s\\S]*?) de ([\\s\\S]*?)$", "Trying password {0} of {1}"], ["^Descompresion a medias: ([\\s\\S]*?)$", "Half-finished extraction: {0}"], ["^Fallo al leer del FTP ([\\s\\S]*?): ([\\s\\S]*?)$", "Failed to read from the FTP {0}: {1}"], ["^Usado ([\\s\\S]*?) de ([\\s\\S]*?)\\. Analizado: ([\\s\\S]*?)$", "Used {0} of {1}. Analyzed: {2}"], ["^Hay una versión nueva: ([\\s\\S]*?)$", "A new version is available: {0}"], ["^Problema: ([\\s\\S]*?)\\. Reintento ([\\s\\S]*?)\\/([\\s\\S]*?)$", "Problem: {0}. Retry {1}/{2}"], ["^Lo descomprimido ocupa ([\\s\\S]*?)$", "Extracted size: {0}"], ["^Arreglando permisos de ([\\s\\S]*?)$", "Fixing permissions of {0}"], ["^BFpilot respondio HTTP ([\\s\\S]*?)$", "BFpilot answered HTTP {0}"], ["^No existe el archivo: ([\\s\\S]*?)$", "File doesn't exist: {0}"], ["^PC -> PS5 solo: ([\\s\\S]*?) MB\\/s\\.$", "PC -> PS5 only: {0} MB/s."], ["^Continuando ([\\s\\S]*?) desde ([\\s\\S]*?) MB$", "Resuming {0} from {1} MB"], ["^No existe la carpeta: ([\\s\\S]*?)$", "Folder doesn't exist: {0}"], ["^Continuando desde ([\\s\\S]*?) MB$", "Continuing from {0} MB"], ["^Se puede escribir en ([\\s\\S]*?)$", "Can write to {0}"], ["^No existe en el FTP: ([\\s\\S]*?)$", "Doesn't exist on the FTP: {0}"], ["^Suelta para subir a ([\\s\\S]*?)$", "Drop to upload to {0}"], ["^Error al descargar: ([\\s\\S]*?)$", "Error downloading: {0}"], ["^([\\s\\S]*?): continuando desde ([\\s\\S]*?)$", "{0}: continuing from {1}"], ["^Uniendo ([\\s\\S]*?) partes en ([\\s\\S]*?)$", "Joining {0} parts into {1}"], ["^7-Zip se paro en ([\\s\\S]*?): ([\\s\\S]*?)$", "7-Zip stopped at {0}: {1}"], ["^Descomprimiendo ([\\s\\S]*?) \\(([\\s\\S]*?)\\)$", "Extracting {0} ({1})"], ["^Resto \\(([\\s\\S]*?) elementos\\)$", "Rest ({0} items)"], ["^Actualizado a la v([\\s\\S]*?)$", "Updated to v{0}"], ["^\\(eboot\\.bin tenía ([\\s\\S]*?)\\)$", "(eboot.bin had {0})"], ["^No pude buscarlo: ([\\s\\S]*?)$", "Couldn't search for it: {0}"], ["^Descargado al PC: ([\\s\\S]*?)$", "Downloaded to PC: {0}"], ["^Permisos puestos: ([\\s\\S]*?)$", "Permissions set: {0}"], ["^Error al extraer: ([\\s\\S]*?)$", "Error extracting: {0}"], ["^Falta por enviar: ([\\s\\S]*?)$", "Left to send: {0}"], ["^leido del RAR ([\\s\\S]*?) de ([\\s\\S]*?)$", "read from RAR {0} of {1}"], ["^Enviando carpeta: ([\\s\\S]*?)$", "Sending folder: {0}"], ["^FTP: ([\\s\\S]*?) · BFpilot: ([\\s\\S]*?)$", "FTP: {0} · BFpilot: {1}"], ["^Error al copiar: ([\\s\\S]*?)$", "Error copying: {0}"], ["^Error al borrar: ([\\s\\S]*?)$", "Error deleting: {0}"], ["^Hecho: liberados ([\\s\\S]*?)$", "Done: {0} freed"], ["^No pude borrar ([\\s\\S]*?): ([\\s\\S]*?)$", "Couldn't delete {0}: {1}"], ["^([\\s\\S]*?) libres \\(margen ([\\s\\S]*?)\\)$", "{0} free (margin {1})"], ["^Partes enviadas: ([\\s\\S]*?)$", "Sent parts: {0}"], ["^Liberarás unos ([\\s\\S]*?)\\.$", "You'll free about {0}."], ["^Error al mover: ([\\s\\S]*?)$", "Error moving: {0}"], ["^No pude bajar ([\\s\\S]*?): ([\\s\\S]*?)$", "Couldn't download {0}: {1}"], ["^\"([\\s\\S]*?)\" ya está aquí$", "\"{0}\" is already here"], ["^Midiendo ([\\s\\S]*?) de ([\\s\\S]*?): ([\\s\\S]*?)$", "Measuring {0} of {1}: {2}"], ["^contrasena ([\\s\\S]*?) de ([\\s\\S]*?)$", "password {0} of {1}"], ["^([\\s\\S]*?) seleccionados$", "{0} selected"], ["^Libre en PS5: ([\\s\\S]*?)$", "Free on PS5: {0}"], ["^\\(tienes la v([\\s\\S]*?)\\)\\.$", "(you have v{0})."], ["^Actualizar · v([\\s\\S]*?)$", "Update · v{0}"], ["^Disco externo ([\\s\\S]*?)$", "External drive {0}"], ["^descomprimido ([\\s\\S]*?)$", "extracted {0}"], ["^\\(tienes la v([\\s\\S]*?)\\)$", "(you have v{0})"], ["^Casi vacía \\(([\\s\\S]*?)\\)$", "Almost empty ({0})"], ["^Comprobando: ([\\s\\S]*?)$", "Checking: {0}"], ["^Extraído en ([\\s\\S]*?)$", "Extracted to {0}"], ["^Guardado en ([\\s\\S]*?)$", "Saved to {0}"], ["^arreglados ([\\s\\S]*?)$", "fixed {0}"], ["^Terminado: ([\\s\\S]*?)$", "Finished: {0}"], ["^Copiar ([\\s\\S]*?) a…$", "Copy {0} to…"], ["^([\\s\\S]*?) elementos$", "{0} items"], ["^Extraer «([\\s\\S]*?)»$", "Extract «{0}»"], ["^liberados ([\\s\\S]*?)$", "{0} freed"], ["^libres de ([\\s\\S]*?)$", "free of {0}"], ["^libres de ([\\s\\S]*?)$", "free of {0}"], ["^Extraído: ([\\s\\S]*?)$", "Extracted: {0}"], ["^No existe ([\\s\\S]*?)$", "{0} does not exist"], ["^En el PC: ([\\s\\S]*?)$", "On the PC: {0}"], ["^Colocado: ([\\s\\S]*?)$", "Placed: {0}"], ["^([\\s\\S]*?):([\\s\\S]*?) responde$", "{0}:{1} responds"], ["^Formatos: ([\\s\\S]*?)$", "Formats: {0}"], ["^Ya existe ([\\s\\S]*?)$", "{0} already exists"], ["^Mover ([\\s\\S]*?) a…$", "Move {0} to…"], ["^hace ([\\s\\S]*?) min$", "{0} min ago"], ["^descarga ([\\s\\S]*?)$", "download {0}"], ["^Carpeta: ([\\s\\S]*?)$", "Folder: {0}"], ["^Está en: ([\\s\\S]*?)$", "It's in: {0}"], ["^Copiado: ([\\s\\S]*?)$", "Copied: {0}"], ["^Borrado: ([\\s\\S]*?)$", "Deleted: {0}"], ["^Enviando ([\\s\\S]*?)$", "Sending {0}"], ["^Enviado: ([\\s\\S]*?)$", "Sent: {0}"], ["^Versión ([\\s\\S]*?)$", "Version {0}"], ["^Movido: ([\\s\\S]*?)$", "Moved: {0}"], ["^version ([\\s\\S]*?)$", "version {0}"], ["^hace ([\\s\\S]*?) h$", "{0} h ago"], ["^Error: ([\\s\\S]*?)$", "Error: {0}"], ["^ERROR: ([\\s\\S]*?)$", "ERROR: {0}"], ["^Fallo: ([\\s\\S]*?)$", "Failed: {0}"], ["^([\\s\\S]*?) tenia ([\\s\\S]*?)$", "{0} had {1}"], ["^error: ([\\s\\S]*?)$", "error: {0}"], ["^libre ([\\s\\S]*?)$", "free {0}"], ["^Otro: ([\\s\\S]*?)$", "Other: {0}"], ["^ok \\(([\\s\\S]*?)\\)$", "ok ({0})"], ["^USB ([\\s\\S]*?)$", "USB {0}"], ["^(\\d+) de (\\d+)$", "{0} of {1}"]];
+// --- idioma: español (original) o inglés. Traduce el texto de la página y los mensajes del programa.
+const LANG=(()=>{try{const v=localStorage.getItem('ps5d_lang');if(v==='es'||v==='en')return v}catch(e){}
+  return (navigator.language||'es').toLowerCase().startsWith('es')?'es':'en'})();
+document.documentElement.lang=LANG;
+const I18N_RXC=I18N_RX.map(([a,b])=>[new RegExp(a),b]);
+const I18N_CACHE=new Map();
+function trCore(c){
+  if(I18N_EXACT[c]!==undefined) return I18N_EXACT[c];
+  for(const [rx,en] of I18N_RXC){const m=rx.exec(c); if(m) return en.replace(/\{(\d)\}/g,(_,i)=>tr(m[+i+1]||''));}
+  return null;
+}
+function tr(s){
+  if(LANG!=='en'||s==null) return s;
+  s=String(s); if(!/[a-záéíóúñ¿¡]/i.test(s)) return s;
+  if(I18N_CACHE.has(s)) return I18N_CACHE.get(s);
+  const lead=s.match(/^\s*(?:[:·—]\s+)?/)[0], trail=s.match(/\s*$/)[0];
+  const core=s.slice(lead.length, s.length-trail.length);
+  let r=core?trCore(core):'';
+  if(r==null){
+    if(core.includes('\n')) r=core.split('\n').map(trLine).join('\n');
+    else{
+      for(const sep of [' -- ',' · ']){ if(core.includes(sep)){ r=core.split(sep).map(tr).join(sep); break } }
+      if(r==null){ const parts=core.split(/(?<=[.!?:])\s+(?=[A-ZÁÉÍÓÚ¿¡(])/); if(parts.length>1){ const t=parts.map(tr); r=t.join(' ') } }
+    }
+  }
+  const out=lead+(r==null?core:r)+trail;
+  if(I18N_CACHE.size>5000) I18N_CACHE.clear();
+  I18N_CACHE.set(s,out); return out;
+}
+function trLine(l){const m=/^(\d\d:\d\d:\d\d )([\s\S]*)$/.exec(l); return m?m[1]+tr(m[2]):tr(l)}
+const I18N_SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1};
+function trText(n){
+  const p=n.parentNode; if(!p||I18N_SKIP[p.nodeName]||(p.closest&&p.closest('[data-noi18n]'))) return;
+  const v=n.nodeValue; const nv=(p.nodeName==='PRE')?v.split('\n').map(trLine).join('\n'):tr(v);
+  if(nv!==v) n.nodeValue=nv;
+}
+function trAttrs(el){ for(const a of ['placeholder','title']){ const v=el.getAttribute&&el.getAttribute(a); if(v){ const nv=tr(v); if(nv!==v) el.setAttribute(a,nv) } } }
+function trTree(root){
+  if(LANG!=='en'||!root) return;
+  if(root.nodeType===3){trText(root);return}
+  if(root.nodeType!==1||I18N_SKIP[root.nodeName]||(root.closest&&root.closest('[data-noi18n]'))) return;
+  trAttrs(root); root.querySelectorAll('[placeholder],[title]').forEach(trAttrs);
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT); let n; while((n=w.nextNode())) trText(n);
+}
+if(LANG==='en'){
+  trTree(document.body);
+  new MutationObserver(ms=>{for(const m of ms){
+    if(m.type==='characterData') trText(m.target);
+    else if(m.type==='attributes') trAttrs(m.target);
+    else m.addedNodes.forEach(trTree);
+  }}).observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['placeholder','title']});
+  const _c=window.confirm.bind(window), _p=window.prompt.bind(window);
+  window.confirm=m=>_c(tr(m)); window.prompt=(m,d)=>_p(tr(m),d);
+}
+function setLang(l){try{localStorage.setItem('ps5d_lang',l)}catch(e){} location.reload()}
+</script>
+
+<script>
+const TOKEN = new URLSearchParams(location.hash.slice(1)).get('t') || '';
+const $ = (id) => document.getElementById(id);
+let state = {jobs:[], settings:{}};
+let openLogs = new Set();
+
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),3500)}
+// Consultas que se pueden repetir sin efectos: si falla la conexion un instante, se reintenta
+const SAFE_API=new Set(['/api/state','/api/test','/api/settings','/api/places','/api/whatsnew','/api/space/state']);
+async function api(path, body){
+  for(let i=0;;i++){
+    try{ return await api1(path, body) }
+    catch(e){
+      if(!(e instanceof TypeError) || i>=2 || !(body===undefined || SAFE_API.has(path))) throw e;
+      await new Promise(r=>setTimeout(r, 400*(i+1)));
+    }
+  }
+}
+async function api1(path, body){
+  const r = await fetch(path,{method: body===undefined?'GET':'POST',headers:{'X-Token':TOKEN,'X-UI':'1','Content-Type':'application/json'},body: body===undefined?undefined:JSON.stringify(body)});
+  const j = await r.json().catch(()=>({ok:false,error:'HTTP '+r.status}));
+  if(!r.ok || j.ok===false) throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+function human(n){if(n==null||n<0)return '?';const u=['B','KB','MB','GB','TB'];let i=0;n=Number(n);while(n>=1024&&i<u.length-1){n/=1024;i++}return (i?n.toFixed(1):n)+' '+u[i]}
+function eta(sec){if(!isFinite(sec)||sec<=0)return '';const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=Math.floor(sec%60);return h?`${h} h ${m} min`:m?`${m} min ${s} s`:`${s} s`}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+const ORDER=['comprobando','enviando','en cola para descomprimir','extrayendo','colocando','hecho'];
+function pcStepsHtml(j){
+  // Modo "descomprimir en el PC": bajar al PC -> descomprimir y enviar -> colocar -> listo
+  const hasUrl=(j.sources||[]).some(x=>x.kind==='url');
+  const labels=(hasUrl?[['bajar','Bajar al PC']]:[]).concat([['enviar','Descomprimir y enviar'],['colocar','Colocar'],['hecho','Listo']]);
+  let cur = j.status==='hecho'?'hecho':(['colocando','en cola para descomprimir'].includes(j.status)?'colocar':(j.pc_step||'enviar'));
+  const keys=labels.map(x=>x[0]); const ci=keys.indexOf(cur);
+  return '<div class="steps">'+labels.map(([k,l],i)=>{const cls=j.status==='hecho'||i<ci?'done':(i===ci&&!['error','cancelado','pausado'].includes(j.status)?'on':'');return `<span class="step ${cls}">${l}</span>`}).join('')+'</div>';
+}
+function folderStepsHtml(j){
+  // carpetas y envios "tal cual": comparar -> enviar -> listo
+  const labels=['Comparar','Enviar','Listo'];
+  let ci=j.status==='hecho'?3:(['en cola para descomprimir','colocando'].includes(j.status)?2:(j.status==='enviando'&&!/^Compar/.test(j.phase||'')?1:0));
+  return '<div class="steps">'+labels.map((l,i)=>{const cls=j.status==='hecho'||i<ci?'done':(i===ci&&!['error','cancelado','pausado'].includes(j.status)?'on':'');return `<span class="step ${cls}">${l}</span>`}).join('')+'</div>';
+}
+function stepsHtml(st){
+  const labels=[['enviando','Enviar'],['extrayendo','Descomprimir'],['colocando','Colocar'],['hecho','Listo']];
+  const idx=ORDER.indexOf(st);
+  return '<div class="steps">'+labels.map(([k,l])=>{const ki=ORDER.indexOf(k);const cls= st==='hecho'||idx>ki?'done':(idx===ki||(k==='enviando'&&st==='comprobando')||(k==='extrayendo'&&st==='en cola para descomprimir'))?'on':'';return `<span class="step ${cls}">${l}</span>`}).join('')+'</div>';
+}
+
+const logScroll = {};   // id -> {top, bottom}
+function render(){
+  const box=$('jobs');
+  // si estas seleccionando texto en la cola, no redibujar (para poder copiar)
+  const sel=window.getSelection();
+  if(sel && !sel.isCollapsed && box.contains(sel.anchorNode)) return;
+  box.querySelectorAll('pre.log').forEach(p=>{
+    const id=p.closest('.job').dataset.id;
+    logScroll[id]={top:p.scrollTop, bottom: p.scrollHeight-p.scrollTop-p.clientHeight<20};
+  });
+  if(!state.jobs.length){box.innerHTML='<div class="empty">No hay nada en la cola. Pega enlaces arriba.</div>';return}
+  box.innerHTML=state.jobs.map(j=>{
+    const pct = j.total>0? Math.min(100, j.sent*100/j.total):0;
+    const sending = j.status==='enviando';
+    const left = sending && j.speed>0 && j.total>0 ? eta((j.total-j.sent)/j.speed):'';
+    const files = (j.sources||[]).map(s=>`${esc(s.name)} (${human(s.size)})`).join('<br>');
+    const showEx = (['extrayendo','colocando'].includes(j.status) || j.extract_pct>0) && !j.pcx;
+    const canCancel = !['hecho','error','cancelado','pausado'].includes(j.status);
+    const canRetry = ['error','cancelado'].includes(j.status);
+    const canPause = ['pendiente','comprobando','enviando'].includes(j.status);
+    const paused = j.status==='pausado';
+    return `<div class="job" data-id="${j.id}">
+      <div class="top"><span class="title" data-noi18n>${esc(j.title|| (j.sources&&j.sources[0]&&j.sources[0].name) || 'Transferencia')}</span>
+        <span class="chip ${esc(j.status.split(' ')[0])}">${esc(j.status)}</span><div class="spacer"></div>
+        ${canPause?`<button class="small" data-act="pause">Pausar</button>`:''}
+        ${paused?`<button class="small" data-act="retry">Reanudar</button>`:''}
+        ${canCancel?`<button class="small danger" data-act="cancel">Cancelar</button>`:''}
+        ${canRetry?`<button class="small" data-act="retry">Reintentar</button>`:''}
+        ${(!canPause && (j.sources||[]).some(x=>x.kind==='url') && !['extrayendo','colocando'].includes(j.status))?`<button class="small" data-act="speed" title="Mide descarga, envío y las dos cosas a la vez">Test de velocidad</button>`:''}
+        ${!canCancel?`<button class="small" data-act="remove">Quitar</button>`:''}
+      </div>
+      ${(j.raw||((j.sources||[])[0]||{}).kind==='folder')?folderStepsHtml(j):(j.pc_step||j.pcx)?pcStepsHtml(j):stepsHtml(j.status)}
+      <div class="phase">${esc(j.phase)}</div>
+      <div class="bar"><i style="width:${j.status==='hecho'?100:pct.toFixed(1)}%"></i></div>
+      <div class="stats"><span>${esc(j.sent_label||'Enviado')} <b>${human(j.sent)}</b> de <b>${human(j.total)}</b></span>
+        ${sending?`<span>${esc(j.speed_label||'Velocidad a la PS5')} <b>${human(j.speed)}/s</b></span>`:''}${sending&&j.dl_speed>0&&j.sources&&j.sources.some(x=>x.kind==='url')?`<span class="muted">descarga ${human(j.dl_speed)}/s</span>`:''}${left?`<span>Quedan <b>${left}</b></span>`:''}</div>
+      ${showEx?`<div class="bar ex"><i style="width:${j.extract_pct||0}%"></i></div><div class="stats"><span>Descompresión en la PS5 <b>${j.extract_pct||0}%</b></span><span>${esc(j.extract_text||'')}</span></div>`:''}
+      ${j.warning?`<div class="warn">${esc(j.warning)}</div>`:''}
+      ${j.error?`<div class="err">${esc(j.error)}</div>`:''}
+      ${(j.result||[]).length?`<div class="result" data-noi18n>${j.result.map(esc).join('<br>')}</div>`:''}
+      <details ${openLogs.has(j.id)?'open':''} data-log="${j.id}"><summary>Archivos y registro</summary>
+        <div class="hint" style="margin-top:6px" data-noi18n>${files||'—'}</div>
+        <pre class="log">${esc((j.log||[]).slice(-120).join('\n'))}</pre>
+        <button class="small" data-act="copylog" style="margin-top:6px">Copiar registro</button></details>
+    </div>`}).join('');
+  box.querySelectorAll('details').forEach(d=>d.addEventListener('toggle',()=>{
+    // al redibujar, un <details open> tambien dispara 'toggle': solo bajar si lo abres tu
+    if(d.open && !openLogs.has(d.dataset.log)){
+      openLogs.add(d.dataset.log);
+      const p=d.querySelector('pre.log'); if(p) p.scrollTop=p.scrollHeight;
+    } else if(!d.open) openLogs.delete(d.dataset.log);
+  }));
+  box.querySelectorAll('pre.log').forEach(p=>{
+    const st=logScroll[p.closest('.job').dataset.id];
+    p.scrollTop = (!st || st.bottom) ? p.scrollHeight : st.top;   // sigue abajo si estabas abajo
+  });
+}
+
+$('jobs').addEventListener('click', async (ev)=>{
+  const b=ev.target.closest('button[data-act]'); if(!b) return;
+  const id=b.closest('.job').dataset.id, act=b.dataset.act; let body={};
+  if(act==='speed'){
+    const job=state.jobs.find(x=>x.id===id); const src=(job.sources||[]).find(x=>x.kind==='url');
+    speedTest(src?src.input:''); return;
+  }
+  if(act==='copylog'){
+    const job=state.jobs.find(x=>x.id===id);
+    const txt=[job.title, job.status, job.error||'', ...(job.sources||[]).map(s=>s.name+' ('+human(s.size)+')'), '', ...(job.log||[])].join('\n');
+    try{await navigator.clipboard.writeText(txt); toast('Registro copiado. Pégalo donde quieras (Ctrl+V).')}
+    catch(e){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('Registro copiado.')}
+    return;
+  }
+  if(act==='retry'){const job=state.jobs.find(x=>x.id===id); if(job && /contrase/i.test(job.error||'')){const p=prompt('Contraseña del comprimido (vacío = probar las guardadas):',''); if(p===null) return; body.password=p}}
+  if(act==='cancel' && !confirm('¿Cancelar esta transferencia? Lo ya enviado se conserva y se puede reintentar.')) return;
+  try{await api(`/api/job/${id}/${act}`, body); refresh()}catch(e){toast(e.message)}
+});
+
+$('btnAdd').onclick = async ()=>{
+  try{await api('/api/add',{lines:$('lines').value,password:$('pw').value,dest:$('dest').value,where:$('where').value});$('lines').value='';$('pw').value='';toast('Añadido a la cola');refresh()}
+  catch(e){toast(e.message)}
+};
+$('btnClear').onclick = async ()=>{await api('/api/clear',{}).catch(()=>{});refresh()};
+
+const SKEYS=['ps5_ip','dest','extract_where','pc_temp_dir','sevenzip_path','ftp_port','ftp_user','ftp_pass','bf_port','streams','parallel_files','limit_mbps','space_margin_gb','extract_threads','update_repo','chunk_mb','buffer_mb','retries'];
+$('btnSettings').onclick=()=>{const s=state.settings;SKEYS.forEach(k=>{if(k!=='ftp_pass')$('s_'+k).value=s[k]??''});$('s_ftp_pass').value='';$('s_passwords').value=(s.passwords||[]).join('\n');$('s_guess_passwords').checked=!!s.guess_passwords;$('s_delete_archives').checked=!!s.delete_archives;$('testOut').textContent='';$('dlg').showModal()};
+$('btnClose').onclick=()=>$('dlg').close();
+async function saveSettings(){const b={};SKEYS.forEach(k=>{const v=$('s_'+k).value;if(k==='ftp_pass'&&!v)return;b[k]=v});b.passwords=$('s_passwords').value.split('\n');b.guess_passwords=$('s_guess_passwords').checked;b.delete_archives=$('s_delete_archives').checked;await api('/api/settings',b)}
+$('btnSave').onclick=async()=>{try{await saveSettings();toast('Guardado');$('dlg').close();refresh();checkConn()}catch(e){toast(e.message)}};
+$('btnTest').onclick=async()=>{$('testOut').textContent='Probando…';try{await saveSettings();const r=await api('/api/test',{});$('testOut').textContent=`FTP: ${r.ftp} · BFpilot: ${r.bf}${r.free?' · libre: '+r.free:''}`;paintConn(r)}catch(e){$('testOut').textContent=e.message}};
+
+function paintConn(r){
+  const set=(id,ok,txt)=>{const p=$(id);p.querySelector('.dot').className='dot '+(ok?'ok':'err');p.title=txt};
+  set('pFtp', r.ftp==='ok', 'FTP: '+r.ftp); set('pBf', String(r.bf).startsWith('ok'), 'BFpilot: '+r.bf);
+  if(r.free){$('pFree').hidden=false;$('pFree').textContent='Libre en PS5: '+r.free}
+}
+async function checkConn(){try{paintConn(await api('/api/test',{}))}catch(e){}}
+
+let refreshFails=0, refreshing=false;
+async function refresh(){
+  if(refreshing) return; refreshing=true;
+  try{const s=await api('/api/state');refreshFails=0;state=s;paintBell(s.unread||0);if(s.version){$('ver').textContent='v'+s.version;document.title='PS5 Directo v'+s.version}if(s.inbox>0)takeInbox();if(!$('dest').dataset.touched)$('dest').value=s.settings.dest||'/data/homebrew';if(!$('where').dataset.touched)$('where').value=s.settings.extract_where==='pc'?'pc':'ps5';render()}
+  catch(e){ if(++refreshFails>=5) $('jobs').innerHTML=`<div class="empty">No conecto con el programa. Cierra esta ventana y abre PS5 Directo otra vez. (${esc(e.message)})</div>`}
+  finally{ refreshing=false }
+  fmAfterUploads();
+}
+// Cuando termina una subida a la carpeta que tienes abierta en el explorador, se vuelve a listar sola
+const fmDoneSeen=new Set(); let fmDoneInit=false;
+function fmAfterUploads(){
+  if(!state||!state.jobs) return;
+  let hit=false;
+  for(const j of state.jobs){
+    if(j.status!=='hecho'||fmDoneSeen.has(j.id)) continue;
+    fmDoneSeen.add(j.id);
+    if(!fmDoneInit) continue;
+    const d=(j.dest||'').replace(/\/+$/,'');
+    if(typeof fm!=='undefined'&&fm.loaded&&(d===fm.path||(j.result||[]).some(r=>parentOf(r)===fm.path))) hit=true;
+  }
+  fmDoneInit=true;
+  if(hit&&curTab==='Files'&&!fm.busy) fmGo(fm.path,true);
+}
+$('dest').addEventListener('input',()=>$('dest').dataset.touched='1');
+$('where').addEventListener('change',()=>$('where').dataset.touched='1');
+// --- guia de bienvenida (la primera vez, y con el boton "Guia")
+const TOUR=[
+ {t:null,h:'Bienvenido a PS5 Directo',p:'Envía archivos a tu consola por la red local mientras se descargan, sin pasar por el disco del PC, y los deja descomprimidos y en su sitio. Te enseño en un minuto para qué es cada cosa.'},
+ {t:'#pFtp',h:'Estado de la consola',p:'Estos dos puntos dicen si la consola responde. FTP es por donde se envían los archivos; BFpilot es el que descomprime y coloca. Verde = listo. Rojo = carga el payload en la PS5 o revisa la IP en Ajustes.',pad:6,with:'#pBf'},
+ {t:'#lines',h:'Qué quieres enviar',p:'Pega aquí los enlaces directos, uno por línea (todas las partes .part1, .part2... juntas, en cualquier orden). También vale la ruta de un archivo de tu PC, o arrastrar archivos a esta ventana.'},
+ {t:'#pw',h:'Contraseña',p:'Si el comprimido lleva contraseña y la sabes, escríbela. Si la dejas vacía, prueba las que guardes en Ajustes y la que venga entre corchetes en el nombre del archivo.'},
+ {t:'#dest',h:'Destino',p:'Dónde acaba en la consola. /data/homebrew es la carpeta que escanea ShadowMountPlus para que aparezca en el menú. También puedes elegir un USB.'},
+ {t:'#where',h:'Dónde descomprimir',p:'En la PS5 (BFpilot): por el Wi-Fi viaja el comprimido, más rápido. En el PC (7-Zip): descomprime aquí sobre la marcha y comprueba cada archivo; viajan más datos, pero no depende de BFpilot.'},
+ {t:'#btnAdd',h:'A la cola',p:'Añade la transferencia. Puedes añadir varias: mientras una se descomprime en la consola, la siguiente ya se va enviando.'},
+ {t:'#jobs',h:'La cola',p:'Aquí ves cada transferencia: progreso, velocidad, tiempo restante y sus pasos. Puedes Pausar y Reanudar (sigue donde iba), Reintentar si algo falla y abrir "Archivos y registro" para ver el detalle.'},
+ {t:'#btnExtHead',h:'Extensión del navegador',p:'Opcional. Con ella, al pulsar Descargar en una web, el enlace llega aquí directo, sin copiar y pegar. Este botón abre su carpeta y las instrucciones.'},
+ {t:'#btnUpdHead',h:'Actualizar',p:'Busca la versión nueva e instálala con un clic. Guarda una copia de la anterior por si acaso.'},
+ {t:'#btnSettings',h:'Ajustes',p:'Lo primero: la IP de tu PS5. Ahí están también el límite de velocidad, el espacio que dejar libre, "Revisión completa" (comprueba que todo funciona), "Reparar permisos" y "Limpieza".'},
+ {t:'#tabs',h:'Pestañas',p:'Transferencias es la cola. En Archivos de la consola navegas por la PS5: ves tamaños, copias, mueves, renombras, borras, bajas al PC o subes archivos y carpetas. Espacio te enseña en un gráfico qué ocupa más y qué puedes borrar. Actividad guarda el historial.'},
+ {t:'#btnTour',h:'¡Listo!',p:'Puedes volver a ver esta guía cuando quieras con este botón. Ahora vamos a poner la IP de tu PS5.'},
+];
+let tourI=0, tourEls=null, tourDone=null;
+function tourEnd(){
+  if(tourEls){tourEls.forEach(e=>e.remove());tourEls=null}
+  window.removeEventListener('resize',tourPlace);
+  api('/api/settings',{tour_done:true}).catch(()=>{});
+  if(state.settings) state.settings.tour_done=true;
+  const cb=tourDone; tourDone=null; if(cb) cb();
+}
+function tourPlace(){
+  if(!tourEls) return;
+  const [blk,spot,box]=tourEls, st=TOUR[tourI];
+  const el=st.t&&document.querySelector(st.t);
+  box.querySelector('h3').textContent=tr(st.h); box.querySelector('p').textContent=tr(st.p);
+  box.querySelector('.tb-step').textContent=tr((tourI+1)+' de '+TOUR.length);
+  box.querySelector('[data-t=back]').hidden=tourI===0;
+  box.querySelector('[data-t=next]').textContent=tr(tourI===TOUR.length-1?'Empezar':'Siguiente');
+  const bw=box.offsetWidth, bh=box.offsetHeight, W=innerWidth, H=innerHeight;
+  if(!el){spot.className='tour-spot none';spot.style.left=W/2+'px';spot.style.top=H/2+'px';
+    box.style.left=Math.max(16,(W-bw)/2)+'px';box.style.top=Math.max(16,(H-bh)/2)+'px';return}
+  let r=el.getBoundingClientRect();
+  if(st.with){const r2=document.querySelector(st.with).getBoundingClientRect();
+    r={left:Math.min(r.left,r2.left),top:Math.min(r.top,r2.top),right:Math.max(r.right,r2.right),bottom:Math.max(r.bottom,r2.bottom)}}
+  const pad=st.pad||8;
+  const L=r.left-pad,T=r.top-pad,Wd=(r.right-r.left)+pad*2,Ht=Math.min((r.bottom-r.top)+pad*2,H-T-8);
+  spot.className='tour-spot';Object.assign(spot.style,{left:L+'px',top:T+'px',width:Wd+'px',height:Math.max(Ht,24)+'px'});
+  let top=T+Math.max(Ht,24)+12; if(top+bh>H-12) top=Math.max(12,T-bh-12);
+  let left=Math.min(Math.max(12,L),W-bw-12);
+  box.style.left=left+'px'; box.style.top=top+'px';
+}
+function tourGo(i){
+  tourI=Math.max(0,Math.min(TOUR.length-1,i));
+  const st=TOUR[tourI], el=st.t&&document.querySelector(st.t);
+  if(el){el.scrollIntoView({block:'center',behavior:'instant'})}
+  requestAnimationFrame(tourPlace);
+}
+function startTour(onDone){
+  if(tourEls) return;
+  try{$('dlg').open&&$('dlg').close()}catch(e){}
+  tourDone=onDone||null;
+  const blk=document.createElement('div');blk.className='tour-block';
+  const spot=document.createElement('div');spot.className='tour-spot none';
+  const box=document.createElement('div');box.className='tour-box';
+  box.innerHTML='<h3></h3><p></p><div class="tb-foot"><span class="tb-step"></span><button class="small" data-t="skip">Saltar guía</button><button class="small" data-t="back">Atrás</button><button class="small primary" data-t="next">Siguiente</button></div>';
+  document.body.append(blk,spot,box); tourEls=[blk,spot,box];
+  box.querySelector('[data-t=skip]').onclick=tourEnd;
+  box.querySelector('[data-t=back]').onclick=()=>tourGo(tourI-1);
+  box.querySelector('[data-t=next]').onclick=()=>tourI===TOUR.length-1?tourEnd():tourGo(tourI+1);
+  window.addEventListener('resize',tourPlace);
+  tourGo(0);
+}
+function needIp(){ if(state.settings && !state.settings.ps5_ip){$('btnSettings').click();setTimeout(()=>{try{$('s_ps5_ip').focus()}catch(e){}},100);toast('Pon la IP de tu PS5 y pulsa Guardar')} }
+$('btnTour').onclick=()=>startTour();
+$('btnLang').textContent=LANG==='en'?'Español':'English';
+$('btnLang').onclick=()=>setLang(LANG==='en'?'es':'en');
+document.addEventListener('keydown',e=>{ if(!tourEls) return;
+  if(e.key==='Escape') tourEnd(); else if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();tourI===TOUR.length-1?tourEnd():tourGo(tourI+1)} else if(e.key==='ArrowLeft') tourGo(tourI-1)});
+refresh().then(()=>{
+  if(state.settings && !state.settings.tour_done) startTour(needIp); else { needIp(); showNews(); }
+  checkUpdateQuiet();
+}); checkConn();
+setInterval(refresh, 1000); setInterval(checkConn, 20000);
+// Avisar al programa cuando se cierra la ventana (minimizarla no cuenta)
+addEventListener('pagehide',()=>{try{navigator.sendBeacon('/api/bye?t='+encodeURIComponent(TOKEN))}catch(e){}});
+// Al volver a la ventana, ponerse al dia enseguida
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh();checkConn();if(curTab==='Files'&&fm.loaded)fmGo(fm.path,true)}});
+</script>
+<script>
+['dragover','drop'].forEach(ev=>window.addEventListener(ev,async e=>{
+  if(!(e.dataTransfer&&[...e.dataTransfer.types].includes('Files'))) return;
+  e.preventDefault();
+  if(ev!=='drop') return;
+  const files=[...e.dataTransfer.files].filter(f=>f.size>0||f.type);
+  if(!files.length){toast('Eso parece una carpeta: suelta los archivos de dentro');return;}
+  const h=document.getElementById('drophint');
+  h.textContent='Buscando '+files.length+' archivo(s) en tu PC...';h.classList.add('flash');
+  try{
+    const r=await api('/api/locate',{files:files.map(f=>({name:f.name,size:f.size}))});
+    const ta=document.getElementById('lines');
+    const got=files.map(f=>r.found[f.name]).filter(Boolean);
+    if(got.length){ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+got.join('\n');}
+    const miss=files.filter(f=>!r.found[f.name]).map(f=>f.name);
+    h.textContent=got.length?('Añadidas '+got.length+' ruta(s). Revisa destino y pulsa "Añadir a la cola".'):'';
+    if(miss.length) h.textContent+=' No encontré: '+miss.join(', ')+'. Arrástralos sobre el icono de PS5 Directo o pega la ruta.';
+  }catch(err){h.textContent='No pude buscarlo: '+err.message;}
+  setTimeout(()=>h.classList.remove('flash'),6000);
+}));
+</script>
+<script>
+document.getElementById('btnQuit').addEventListener('click',async()=>{
+  const run=(state&&state.jobs||[]).some(j=>!['hecho','error','cancelado'].includes(j.status));
+  if(!confirm(run?'Hay trabajos en marcha. Si sales se paran (luego puedes darle a Reintentar y siguen donde iban). ¿Salir?':'¿Cerrar PS5 Directo?'))return;
+  try{await api('/api/quit',{})}catch(e){}
+  document.body.innerHTML='<p style="padding:40px;font-family:sans-serif">PS5 Directo se ha cerrado. Ya puedes cerrar esta ventana.</p>';
+  setTimeout(()=>window.close(),800);
+});
+</script>
+<script>
+async function speedTest(url){
+  const out=document.getElementById('speedOut'); const d=document.getElementById('dlgSpeed');
+  out.innerHTML='<b>Midiendo…</b> (unos '+(url?30:10)+' segundos; no cierres el programa)'; d.showModal();
+  try{await api('/api/speedtest',{url})}catch(e){out.textContent=e.message;return}
+  const t0=Date.now();
+  while(true){
+    await new Promise(r=>setTimeout(r,1500));
+    let r; try{r=await api('/api/speedtest/result',{})}catch(e){out.textContent=e.message;return}
+    if(!r.running && r.result){
+      const x=r.result, f=v=>v==null?'—':v.toFixed(1)+' MB/s';
+      out.innerHTML=`<table style="width:100%;font-size:14px;border-collapse:collapse">
+        <tr><td>Descarga sola</td><td style="text-align:right"><b>${f(x.dl)}</b></td></tr>
+        <tr><td>PC → PS5 solo</td><td style="text-align:right"><b>${f(x.up)}</b></td></tr>
+        <tr><td>Las dos a la vez: descarga / envío</td><td style="text-align:right">${f(x.both_dl)} / ${f(x.both_up)}</td></tr>
+        <tr><td>Llegaría a la PS5 descargando y enviando</td><td style="text-align:right"><b>${f(x.pipe)}</b></td></tr>
+      </table><p style="margin-top:12px">${esc(x.verdict)}</p>${x.error?`<div class="err">${esc(x.error)}</div>`:''}`;
+      return;
+    }
+    out.innerHTML='<b>Midiendo…</b> '+Math.round((Date.now()-t0)/1000)+' s';
+  }
+}
+document.getElementById('btnSpeedClose').onclick=()=>document.getElementById('dlgSpeed').close();
+document.getElementById('btnSpeedPS5').onclick=()=>{document.getElementById('dlg').close();speedTest('')};
+</script>
+<script>
+// --- revision completa
+$('btnHealth').onclick=async()=>{
+  const o=$('healthOut'); o.textContent='Revisando…';
+  try{await saveSettings(); const r=await api('/api/health',{});
+    o.innerHTML=r.checks.map(c=>`<div class="chk"><span class="${c.ok?'ok':'bad'}">${c.ok?'✔':'✘'}</span><div><b>${esc(c.name)}</b>: ${esc(c.detail)}${c.fix?`<div class="hint">${esc(c.fix)}</div>`:''}</div></div>`).join('');
+  }catch(e){o.textContent=e.message}
+};
+// --- permisos
+$('btnPerms').onclick=async()=>{
+  const o=$('permsOut'); o.textContent='Revisando… (puede tardar un poco si hay muchas)';
+  try{const r=await api('/api/fixperms',{});
+    if(!r.results.length){o.textContent='No hay aplicaciones en carpeta.';return}
+    o.innerHTML=r.results.map(x=>x.error?`${esc(x.path)}: <span class="err">${esc(x.error)}</span>`:
+      `${esc(x.path)}: ${x.changed?`<b>arreglados ${x.changed}</b> de ${x.seen}${x.eboot.length?` (eboot.bin tenía ${esc(x.eboot[0])})`:''}`:'ya estaba bien'}`).join('<br>');
+  }catch(e){o.textContent=e.message}
+};
+// --- limpieza
+let cleanItems=[];
+$('btnScan').onclick=async()=>{
+  const o=$('cleanOut'); o.textContent='Buscando… (puede tardar unos segundos)';
+  try{const r=await api('/api/cleanup/scan',{}); cleanItems=r.items;
+    if(!cleanItems.length){o.textContent='No hay nada que limpiar.';return}
+    o.innerHTML=cleanItems.map((it,i)=>`<label class="chk"><input type="checkbox" data-i="${i}" ${it.in_use?'':'checked'}><div>${esc(it.label)} — <b>${human(it.size)}</b>${it.in_use?`<div class="hint">Lo usa "${esc(it.in_use)}" de la cola: si lo borras, esa transferencia tendrá que enviarse otra vez.</div>`:''}</div></label>`).join('')
+      +`<button id="btnClean" class="small danger" style="margin-top:8px">Borrar seleccionados</button>`;
+    $('btnClean').onclick=async()=>{
+      const sel=[...o.querySelectorAll('input[data-i]:checked')].map(x=>cleanItems[+x.dataset.i]);
+      if(!sel.length) return;
+      const tot=sel.reduce((a,b)=>a+(b.size||0),0);
+      if(!confirm(`¿Borrar ${sel.length} elemento(s) de la PS5 (${human(tot)})? No se puede deshacer.`)) return;
+      o.textContent='Borrando…';
+      try{const d=await api('/api/cleanup/delete',{paths:sel.map(x=>x.path)}); o.textContent=`Borrado: ${d.deleted.length} elemento(s), ${human(tot)} liberados.`; checkConn()}catch(e){o.textContent=e.message}
+    };
+  }catch(e){o.textContent=e.message}
+};
+// --- destinos segun unidades montadas
+async function loadDests(){try{const r=await api('/api/places',{});$('destList').innerHTML=r.dests.map(d=>`<option value="${esc(d)}">`).join('')}catch(e){}}
+loadDests(); setInterval(loadDests, 60000);
+// --- avisos de Windows al terminar o fallar
+const lastStatus={};
+function notifyChanges(){
+  for(const j of (state.jobs||[])){
+    const prev=lastStatus[j.id]; lastStatus[j.id]=j.status;
+    if(!prev || prev===j.status) continue;
+    if(j.status==='hecho'||j.status==='error'){
+      const title=j.status==='hecho'?'Listo en la PS5':'Problema en PS5 Directo';
+      const body=(j.title||'Transferencia')+(j.status==='error'?': '+(j.error||'').slice(0,120):'');
+      try{ if('Notification' in window && Notification.permission==='granted') new Notification(tr(title),{body:tr(body),icon:'/favicon.ico'}); }catch(e){}
+    }
+  }
+}
+setInterval(notifyChanges, 1500);
+document.addEventListener('click',()=>{try{if('Notification' in window && Notification.permission==='default') Notification.requestPermission()}catch(e){}},{once:true});
+</script>
+<script>
+// --- enlaces que llegan de la extension del navegador
+let taking=false;
+async function takeInbox(){
+  if(taking) return; taking=true;
+  try{const r=await api('/api/inbox/take',{}); const ta=$('lines');
+    const have=new Set(ta.value.split('\n').map(x=>x.trim()).filter(Boolean));
+    const add=r.items.filter(i=>!have.has(i.url));
+    if(add.length){ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+add.map(i=>i.url).join('\n');
+      toast('Recibido de la extensión: '+add.map(i=>i.name||'enlace').join(', ')+'. Cuando estén todas las partes, pulsa "Añadir a la cola".');
+      ta.scrollIntoView({block:'center'});}
+  }catch(e){} finally{taking=false}
+}
+// --- extension
+$('btnExtFolder').onclick=async()=>{try{const r=await api('/api/open_ext_folder',{});$('extOut').textContent=r.ok?('Carpeta: '+r.path):('Está en: '+r.path)}catch(e){$('extOut').textContent=e.message}};
+// --- actualizar
+$('btnSettings').addEventListener('click',()=>{$('curVer').textContent=state.version?('(tienes la v'+state.version+')'):''});
+$('btnUpdZip').onclick=()=>$('updFile').click();
+$('updFile').onchange=async()=>{
+  const f=$('updFile').files[0]; if(!f) return; const o=$('updOut');
+  if(!confirm('¿Instalar '+f.name+'? PS5 Directo se reiniciará.')) {$('updFile').value='';return}
+  o.textContent='Instalando…';
+  const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
+  try{const r=await api('/api/update/zip',{data:b64}); afterUpdate(r.version)}catch(e){o.textContent=e.message;toast(e.message)}
+  $('updFile').value='';
+};
+$('btnUpdCheck').onclick=async()=>{
+  const o=$('updOut'); o.textContent='Buscando…';
+  try{await saveSettings(); const r=await api('/api/update/check',{});
+    if(!r.ok){o.textContent=r.error;return}
+    if(!r.newer){o.textContent='Ya tienes la última (v'+r.current+').';return}
+    o.innerHTML='Hay una versión nueva: <b>v'+esc(r.latest)+'</b> (tienes la v'+esc(r.current)+'). <button class="small" id="btnUpdGo">Actualizar ahora</button>';
+    $('btnUpdGo').onclick=async()=>{o.textContent='Descargando e instalando…';try{const x=await api('/api/update/github',{});afterUpdate(x.version)}catch(e){o.textContent=e.message}};
+  }catch(e){o.textContent=e.message}
+};
+// --- botones de la cabecera
+function jobsRunning(){return (state.jobs||[]).some(j=>['comprobando','enviando','extrayendo','colocando'].includes(j.status))}
+$('btnExtHead').onclick=async()=>{
+  $('btnSettings').click();
+  setTimeout(()=>$('extSection').scrollIntoView({block:'start'}),50);
+  try{await $('btnExtFolder').onclick()}catch(e){}
+};
+let latestSeen=null;
+async function checkUpdateQuiet(){
+  if(!state.repo) return;
+  try{const r=await api('/api/update/check',{}); if(r.ok&&r.newer){latestSeen=r.latest;$('btnUpdHead').textContent='Actualizar · v'+r.latest;$('btnUpdHead').classList.add('primary')}}catch(e){}
+}
+$('btnUpdHead').onclick=async()=>{
+  if(jobsRunning() && !confirm('Hay transferencias en marcha. Actualizar reinicia el programa y tendrás que pulsar Reintentar en ellos (siguen donde iban). ¿Seguir?')) return;
+  if(!state.repo){
+    toast('Elige el .zip de la versión nueva');
+    $('updFile').click(); return;
+  }
+  try{const r=await api('/api/update/check',{});
+    if(!r.ok){toast(r.error);return}
+    if(!r.newer){
+      if(confirm('Ya tienes la última (v'+r.current+'). ¿Quieres instalar una desde un .zip?')) $('updFile').click();
+      return}
+    if(!confirm('Hay una versión nueva: v'+r.latest+' (tienes la v'+r.current+').'+(r.notes?'\n\n'+r.notes.slice(0,600):'')+'\n\n¿Instalarla ahora?')) return;
+    toast('Descargando e instalando…');
+    const x=await api('/api/update/github',{}); afterUpdate(x.version);
+  }catch(e){toast(e.message)}
+};
+function afterUpdate(v){
+  document.body.innerHTML='<div style="padding:40px;font-family:system-ui,sans-serif;color:#ddd;background:#0d1117;min-height:100vh"><h2>Actualizado a la v'+esc(v)+'</h2><p>PS5 Directo se está reiniciando y abrirá una ventana nueva en unos segundos. Ya puedes cerrar esta.</p></div>';
+}
+</script>
+<script>
+// ===================== pestañas =====================
+let curTab='Transfers';
+function showTab(t){
+  curTab=t;
+  ['Transfers','Files','Space','Activity'].forEach(x=>{$('tab'+x).hidden=(x!==t)});
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  try{localStorage.setItem('ps5d_tab',t)}catch(e){}
+  if(t==='Files'&&!fm.loaded) fmGo(fm.path,true);
+  if(t==='Activity') loadActivity();
+  if(t==='Space') spEnter();
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+// ===================== elegir archivos / carpeta del PC =====================
+async function pick(kind){
+  const title=kind==='folder'?tr('Elige la carpeta que quieres enviar'):tr('Elige los archivos que quieres enviar');
+  toast(tr('Se ha abierto la ventana para elegir (puede salir detrás)'));
+  const r=await api('/api/pick',{kind,title});
+  if(!r.ok){toast(r.error);return []}
+  return r.paths||[];
+}
+$('btnPickFiles').onclick=async()=>{const ps=await pick('files'); if(ps.length){const ta=$('lines');ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+ps.join('\n');toast(tr('Añadidas {0} ruta(s). Revisa destino y pulsa "Añadir a la cola".').replace('{0}',ps.length))}};
+$('btnPickFolder').onclick=async()=>{const ps=await pick('folder'); if(ps.length){const ta=$('lines');ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+ps.join('\n');toast(tr('Añadidas {0} ruta(s). Revisa destino y pulsa "Añadir a la cola".').replace('{0}',ps.length))}};
+
+// ===================== novedades tras actualizar =====================
+async function showNews(){
+  let r; try{r=await api('/api/whatsnew',{lang:LANG})}catch(e){return}
+  if(!r.ok||!r.show) return;
+  $('newsTitle').textContent=tr('Novedades de PS5 Directo {0}').replace('{0}',r.version);
+  $('newsBody').innerHTML=`<p class="hint">${esc(tr('Se ha actualizado. Esto es lo nuevo:'))}</p>`+r.entries.map(e=>
+    `<div class="news-v">${esc(tr('Versión {0}').replace('{0}',e.version))}</div><ul class="news-list" data-noi18n>${e.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul>`).join('');
+  $('dlgNews').showModal();
+}
+$('btnNewsOk').onclick=()=>{$('dlgNews').close()};
+$('dlgNews').addEventListener('close',()=>api('/api/whatsnew/seen',{}).catch(()=>{}));
+
+// ===================== espacio en la consola =====================
+const SP_COL=['#3987e5','#d95926','#199e70','#c98500','#d55181','#008300','#9085e9','#e66767'];
+const SP_REST='#56606d', SP_SYS='#3f4955', SP_INST='#6f7a87';
+const sp={res:null,slices:[],sel:new Set(),poll:null,drives:false,hl:-1};
+// nombre para ensenar: el titulo del juego y, si es una imagen, su tipo (para distinguir duplicados)
+function spName(x){const ext=(x.kind==='image'&&/\.([a-z0-9]+)$/i.exec(x.name)); return (x.title||tr(x.name))+(ext&&x.title?' · '+ext[1].toLowerCase():'')}
+async function spDrives(){
+  if(sp.drives) return; sp.drives=true;
+  try{const r=await api('/api/places',{}); const roots=[];
+    (r.dests||[]).forEach(d=>{const m=d.match(/^\/mnt\/(usb|ext)\d+/); if(m&&!roots.includes(m[0]))roots.push(m[0])});
+    $('spRoot').innerHTML=`<option value="/data">${esc(tr('Almacenamiento interno'))}</option>`+roots.map(x=>`<option value="${esc(x)}">${esc(tr('Disco externo'))} ${esc(x)}</option>`).join('');
+  }catch(e){}
+}
+function spEnter(){
+  spDrives();
+  spPoll().then(st=>{ if(st && !st.busy && !st.result && !st.error) spScan(); });
+}
+async function spScan(){
+  const r=await api('/api/space/scan',{root:$('spRoot').value});
+  if(!r.ok){toast(r.error);return}
+  sp.sel.clear(); spWatch();
+}
+function spWatch(){clearInterval(sp.poll); sp.poll=setInterval(spPoll,800); spPoll()}
+async function spPoll(){
+  let r; try{r=await api('/api/space/state',{})}catch(e){return null}
+  const st=r.space;
+  $('spProg').hidden=!st.busy; $('spScan').disabled=st.busy;
+  if(st.busy){
+    $('spPhase').textContent=tr('Midiendo {0} de {1}: {2}').replace('{0}',st.done+1).replace('{1}',st.total||'?').replace('{2}',st.current||'');
+    $('spBar').style.width=(st.total?st.done*100/st.total:3)+'%';
+    return st;
+  }
+  clearInterval(sp.poll);
+  if(st.error){$('spOut').innerHTML=`<p class="err">${esc(st.error)}</p>`;return st}
+  if(st.result && st.result!==sp.res){ if(!sp.res||st.result.t!==sp.res.t){sp.res=st.result; spRender()} }
+  return st;
+}
+function spSlices(r){
+  const items=r.items.filter(x=>x.kind!=='system'&&x.size>0), sys=r.items.filter(x=>x.kind==='system'&&x.size>0);
+  const out=[]; items.slice(0,8).forEach((x,i)=>out.push({name:spName(x),size:x.size,color:SP_COL[i],item:x}));
+  const rest=items.slice(8); const restSz=rest.reduce((a,x)=>a+x.size,0);
+  if(restSz>0) out.push({name:tr('Resto ({0} elementos)').replace('{0}',rest.length),size:restSz,color:SP_REST});
+  sys.forEach(x=>out.push({name:tr(x.name),size:x.size,color:SP_INST,item:x}));
+  if(r.other>0) out.push({name:r.root==='/data'?tr('Sistema y otros datos de la consola'):tr('Otros'),size:r.other,color:SP_SYS});
+  if(r.free>0) out.push({name:tr('Libre'),size:r.free,color:'free'});
+  return out;
+}
+function spArc(cx,cy,R,r,a0,a1){
+  const p=(a,rad)=>[cx+rad*Math.sin(a),cy-rad*Math.cos(a)], big=(a1-a0)>Math.PI?1:0;
+  if(a1-a0>=Math.PI*2-1e-6) a1=a0+Math.PI*2-1e-4;
+  const [x0,y0]=p(a0,R),[x1,y1]=p(a1,R),[x2,y2]=p(a1,r),[x3,y3]=p(a0,r);
+  return `M${x0} ${y0}A${R} ${R} 0 ${big} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${big} 0 ${x3} ${y3}Z`;
+}
+function spCenter(i){
+  const r=sp.res, c=$('spCenter'); if(!c) return;
+  if(i<0||!sp.slices[i]){c.innerHTML=`<b>${esc(human(r.free))}</b><span>${esc(tr('libres de {0}').replace('{0}',human(r.total)))}</span>`;return}
+  const s=sp.slices[i]; c.innerHTML=`<b>${esc(human(s.size))}</b><span>${esc(s.name)}<br>${(s.size*100/Math.max(1,r.total)).toFixed(1)}%</span>`;
+}
+function spHL(i){
+  sp.hl=i; const d=document.querySelector('.sp-donut');
+  if(d){d.classList.toggle('hl',i>=0); d.querySelectorAll('path').forEach((p,k)=>p.classList.toggle('on',k===i))}
+  document.querySelectorAll('.sp-legend .row').forEach((row,k)=>row.classList.toggle('on',k===i));
+  spCenter(i);
+}
+function spRender(){
+  const r=sp.res; sp.slices=spSlices(r);
+  const tot=Math.max(1,sp.slices.reduce((a,x)=>a+x.size,0));
+  let a=0; const paths=sp.slices.map((s,i)=>{const a0=a, a1=a+s.size/tot*Math.PI*2; a=a1;
+    const free=s.color==='free';
+    return `<path d="${spArc(140,140,132,86,a0,a1)}" fill="${free?'#1c232c':s.color}" stroke="${free?'#5b6573':'#161b22'}" stroke-width="2" ${free?'stroke-dasharray="4 3"':''} data-i="${i}"></path>`}).join('');
+  const dups=r.items.filter(x=>x.dup).length, bad=r.items.filter(x=>x.kind==='incomplete'||x.kind==='leftover').length;
+  let warn='';
+  if(dups) warn+=`<p class="sp-note dup">⚠ ${esc(tr('Hay {0} elementos repetidos (mismo juego dos veces): revisa la lista.').replace('{0}',dups))}</p>`;
+  if(bad) warn+=`<p class="sp-note bad">⚠ ${esc(tr('Hay {0} envíos a medias o restos que puedes borrar.').replace('{0}',bad))}</p>`;
+  $('spOut').innerHTML=`<div class="sp-grid">
+    <div class="sp-donut"><svg width="280" height="280" viewBox="0 0 280 280" role="img" aria-label="${esc(tr('Espacio'))}">${paths}</svg><div class="sp-center" id="spCenter"></div></div>
+    <div><div class="sp-legend">${sp.slices.map((s,i)=>`<div class="row" data-i="${i}"><span class="sw ${s.color==='free'?'free':''}" style="${s.color==='free'?'':'background:'+s.color}"></span><span class="nm" data-noi18n>${esc(s.name)}</span><span class="sz">${esc(human(s.size))} · ${(s.size*100/Math.max(1,r.total)).toFixed(1)}%</span></div>`).join('')}</div>
+    <p class="hint" style="margin-top:10px">${esc(tr('Usado {0} de {1}. Analizado: {2}').replace('{0}',human(r.used)).replace('{1}',human(r.total)).replace('{2}',r.root))}</p>${warn}</div></div>`;
+  spCenter(-1);
+  const tip=$('spTip')||Object.assign(document.body.appendChild(document.createElement('div')),{id:'spTip',className:'sp-tip',hidden:true});
+  document.querySelectorAll('.sp-donut path').forEach(p=>{
+    const i=+p.dataset.i, s=sp.slices[i];
+    p.onmouseenter=()=>spHL(i); p.onmouseleave=()=>{spHL(-1);tip.hidden=true};
+    p.onmousemove=ev=>{tip.hidden=false; tip.innerHTML=`<b data-noi18n>${esc(s.name)}</b><br>${esc(human(s.size))} · ${(s.size*100/Math.max(1,r.total)).toFixed(1)}%${s.item?`<br><span class="hint" data-noi18n>${esc(s.item.path)}</span>`:''}`;
+      tip.style.left=Math.min(innerWidth-330,ev.clientX+14)+'px'; tip.style.top=(ev.clientY+14)+'px'};
+    p.onclick=()=>{ if(s.item){const row=document.querySelector(`#spBody tr[data-p="${CSS.escape(s.item.path)}"]`); if(row){row.scrollIntoView({block:'center',behavior:'smooth'});row.classList.add('sel');setTimeout(()=>row.classList.remove('sel'),1500)}} };
+  });
+  document.querySelectorAll('.sp-legend .row').forEach(row=>{const i=+row.dataset.i; row.onmouseenter=()=>spHL(i); row.onmouseleave=()=>spHL(-1);
+    row.onclick=()=>document.querySelectorAll('.sp-donut path')[i]?.onclick()});
+  spTable();
+}
+function spTable(){
+  const r=sp.res, col={}; sp.slices.forEach(s=>{if(s.item&&s.color!=='free')col[s.item.path]=s.color});
+  $('spListCard').hidden=false;
+  $('spBody').innerHTML=r.items.filter(x=>x.size>0||x.kind==='incomplete').map(x=>{
+    const pct=x.size*100/Math.max(1,r.total);
+    const notes=(x.notes||[]).map(n=>`<div class="sp-note ${/^Duplicado/.test(n)?'dup':(x.kind==='incomplete'||x.kind==='leftover')?'bad':''}">${esc(tr(n))}</div>`).join('');
+    const sw=col[x.path]?`<span class="sw" style="background:${col[x.path]}"></span> `:'';
+    return `<tr data-p="${esc(x.path)}" class="${sp.sel.has(x.path)?'sel':''}">
+      <td>${x.deletable?`<input type="checkbox" class="spck" ${sp.sel.has(x.path)?'checked':''}>`:''}</td>
+      <td><div>${sw}<b data-noi18n>${esc(spName(x))}</b></div><div class="hint mono" data-noi18n style="font-family:Consolas,monospace">${esc(x.path)}</div>${notes}
+        <div class="sp-pct"><i style="width:${Math.max(.5,Math.min(100,pct)).toFixed(1)}%;background:${col[x.path]||SP_REST}"></i></div></td>
+      <td class="num">${esc(human(x.size))}<div class="hint">${pct.toFixed(1)}%</div></td>
+      <td class="num">${x.kind!=='system'?`<button class="small spopen">${esc(tr('Abrir'))}</button> `:''}${x.deletable?`<button class="small spdel">${esc(tr('Borrar'))}</button>`:''}</td></tr>`}).join('');
+  $('spBody').querySelectorAll('tr').forEach(tr_=>{const p=tr_.dataset.p;
+    const ck=tr_.querySelector('.spck'); if(ck) ck.onchange=()=>{ck.checked?sp.sel.add(p):sp.sel.delete(p); tr_.classList.toggle('sel',ck.checked); spSelInfo()};
+    const o=tr_.querySelector('.spopen'); if(o) o.onclick=()=>{const it=sp.res.items.find(x=>x.path===p); showTab('Files'); fmGo(it&&it.dir?p:parentOf(p))};
+    const d=tr_.querySelector('.spdel'); if(d) d.onclick=()=>spDelete([p]);
+  });
+  spSelInfo();
+}
+function spSelInfo(){
+  const sz=sp.res?sp.res.items.filter(x=>sp.sel.has(x.path)).reduce((a,x)=>a+x.size,0):0;
+  $('spDel').disabled=!sp.sel.size;
+  $('spDel').textContent=sp.sel.size?tr('Borrar seleccionados ({0}, {1})').replace('{0}',sp.sel.size).replace('{1}',human(sz)):tr('Borrar seleccionados');
+}
+async function spDelete(paths){
+  const its=sp.res.items.filter(x=>paths.includes(x.path)), sz=its.reduce((a,x)=>a+x.size,0);
+  const list=its.slice(0,12).map(x=>'• '+(x.title?x.title+' — ':'')+x.path+' ('+human(x.size)+')').join('\n')+(its.length>12?'\n…':'');
+  if(!confirm(tr('¿Borrar de la consola? No se puede deshacer.')+'\n\n'+list+'\n\n'+tr('Liberarás unos {0}.').replace('{0}',human(sz)))) return;
+  const r=await api('/api/fm/delete',{paths}); if(!r.ok){toast(r.error);return}
+  $('spProg').hidden=false; $('spCancel').hidden=true; $('spPhase').textContent=tr('Borrando…'); $('spBar').style.width='30%';
+  for(;;){await new Promise(z=>setTimeout(z,800)); let o; try{o=(await api('/api/fm/op',{})).op}catch(e){continue}
+    if(o.busy){$('spPhase').textContent=tr('Borrando…')+' '+(o.current||''); $('spBar').style.width=(o.items_total?Math.max(5,o.items_done*100/o.items_total):30)+'%'; continue}
+    $('spCancel').hidden=false;
+    if(o.error) toast(o.error); else toast(tr('Borrado. Vuelvo a medir el espacio…'));
+    break}
+  paths.forEach(p=>sp.sel.delete(p)); spScan();
+}
+$('spScan').onclick=spScan;
+$('spCancel').onclick=()=>api('/api/space/cancel',{});
+$('spDel').onclick=()=>spDelete([...sp.sel]);
+$('spRoot').onchange=spScan;
+
+// ===================== explorador de la consola =====================
+const fm={path:'/data/homebrew',entries:[],back:[],fwd:[],sel:new Set(),sizes:{},sort:'name',asc:true,clip:null,loaded:false,busy:false,via:'bfpilot',drives:[],anchor:null};
+const ICON_DIR='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fb0ff" stroke-width="2" stroke-linejoin="round"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.2h8.8A1.5 1.5 0 0 1 21 8.7v9.8A1.5 1.5 0 0 1 19.5 20h-15A1.5 1.5 0 0 1 3 18.5z"/></svg>';
+const ICON_FILE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b97a5" stroke-width="2" stroke-linejoin="round"><path d="M6 3h8l5 5v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/></svg>';
+const ICON_ARC='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e0b25a" stroke-width="2" stroke-linejoin="round"><path d="M6 3h8l5 5v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M10 6h2M10 9h2M10 12h2M10 15h2v3h-2z"/></svg>';
+const ICON_DRIVE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M5 13l2.5-8h9L19 13"/><circle cx="17" cy="16.5" r="1" fill="currentColor"/></svg>';
+const ICON_PIN='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.2h8.8A1.5 1.5 0 0 1 21 8.7v9.8A1.5 1.5 0 0 1 19.5 20h-15A1.5 1.5 0 0 1 3 18.5z"/></svg>';
+const ARCH_RX=/\.(part0*1\.rar|rar|7z|7z\.0*1|zip)$/i;
+function joinPath(a,b){return (a.replace(/\/+$/,'')+'/'+b).replace(/\/+/g,'/')}
+function parentOf(p){const x=p.replace(/\/+$/,'').split('/');x.pop();return x.join('/')||'/'}
+function baseName(p){return p.replace(/\/+$/,'').split('/').pop()}
+function fmtDate(t){if(!t)return '';const d=new Date(t*1000);return d.toLocaleDateString()+' '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
+function fmtMode(m){return m==null?'':(m&0o777).toString(8)}
+function lsGet(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function entryOf(p){return fm.entries.find(x=>joinPath(fm.path,x.name)===p)}
+function rememberRecent(key,p){const r=lsGet(key,[]).filter(x=>x!==p); r.unshift(p); lsSet(key,r.slice(0,6))}
+
+async function fmGo(path,noHist){
+  path=(path||'/').trim()||'/';
+  const hint=$('fmHint'); hint.textContent=tr('Cargando…');
+  let r; try{r=await api('/api/fm/list',{path})}catch(e){hint.textContent=e.message;return}
+  if(!r.ok){hint.textContent=r.error;return}
+  if(!noHist && fm.path!==r.path){fm.back.push(fm.path);fm.fwd=[]}
+  if(fm.path!==r.path){fm.sel.clear(); fm.anchor=null}
+  fm.path=r.path; fm.entries=r.entries; fm.loaded=true; fm.via=r.via;
+  for(const p of [...fm.sel]) if(!entryOf(p)) fm.sel.delete(p);
+  $('fmPath').value=fm.path; rememberRecent('ps5d_fm_recent',fm.path);
+  fmPaintStore(r); fmCrumbs(); fmSide();
+  hint.textContent=r.via==='ftp'?tr('BFpilot no está cargado: el explorador va por FTP. Copiar pasa por el PC (más lento), y para descomprimir o ver el espacio libre hace falta BFpilot.'):'';
+  fmRender();
+}
+function fmPaintStore(r){
+  if(r.total){const used=r.total-r.free; $('fmStore').innerHTML=`<b>${human(r.free)}</b> ${esc(tr('libres de'))} ${human(r.total)}<div class="bar"><i style="width:${Math.min(100,used*100/r.total).toFixed(1)}%"></i></div>`}
+  else $('fmStore').textContent='';
+}
+function crumbsHtml(path){
+  const parts=path.split('/').filter(Boolean); let acc='';
+  return `<button class="crumb" data-p="/">/</button>`+parts.map((x,i)=>{acc+='/'+x; return `${i?'<span class="csep">›</span>':''}<button class="crumb${i===parts.length-1?' cur':''}" data-p="${esc(acc)}" data-noi18n>${esc(x)}</button>`}).join('');
+}
+function fmCrumbs(){ $('fmCrumbs').innerHTML=crumbsHtml(fm.path) }
+$('fmCrumbs').addEventListener('click',e=>{const b=e.target.closest('.crumb'); if(b) return fmGo(b.dataset.p);
+  $('fmCrumbs').hidden=true; const i=$('fmPath'); i.hidden=false; i.value=fm.path; i.focus(); i.select()});
+$('fmPath').addEventListener('keydown',e=>{if(e.key==='Enter'){$('fmPath').hidden=true;$('fmCrumbs').hidden=false;fmGo($('fmPath').value)} if(e.key==='Escape'){$('fmPath').hidden=true;$('fmCrumbs').hidden=false}});
+$('fmPath').addEventListener('blur',()=>{$('fmPath').hidden=true;$('fmCrumbs').hidden=false});
+
+const FM_PLACES=[['/data/homebrew','Aplicaciones (homebrew)'],['/data','Datos (/data)'],['/data/pkg','Paquetes (/data/pkg)'],['/data/ps5directo','Restos de PS5 Directo']];
+async function fmLoadDrives(){try{const r=await api('/api/fm/drives',{}); fm.drives=r.drives||[]; fmSide()}catch(e){}}
+function fmSide(){
+  const cur=fm.path, on=p=>cur===p||cur.startsWith(p+'/');
+  const drives=fm.drives.length?fm.drives:[{path:'/data',name:'Almacenamiento interno'}];
+  const best=drives.filter(d=>on(d.path)).sort((a,b)=>b.path.length-a.path.length)[0];
+  let h=`<div class="side-h">${esc(tr('Unidades'))}</div>`+drives.map(d=>`<button class="side-i${best&&best.path===d.path?' on':''}" data-p="${esc(d.path)}">${ICON_DRIVE}<span><span>${esc(tr(d.name))}</span>${d.total?`<small>${esc(human(d.free))} ${esc(tr('libres'))}</small><i class="mini"><b style="width:${Math.min(100,(d.total-d.free)*100/d.total).toFixed(0)}%"></b></i>`:''}</span></button>`).join('');
+  h+=`<div class="side-h">${esc(tr('Accesos'))}</div>`+FM_PLACES.map(([p,n])=>`<button class="side-i${cur===p?' on':''}" data-p="${esc(p)}">${ICON_PIN}<span>${esc(tr(n))}</span></button>`).join('');
+  const rec=lsGet('ps5d_fm_recent',[]).filter(p=>p!==cur&&!FM_PLACES.some(x=>x[0]===p)).slice(0,5);
+  if(rec.length) h+=`<div class="side-h">${esc(tr('Recientes'))}</div>`+rec.map(p=>`<button class="side-i small-i" data-p="${esc(p)}" title="${esc(p)}" data-noi18n>${ICON_PIN}<span>${esc(baseName(p)||'/')}</span></button>`).join('');
+  $('fmSide').innerHTML=h;
+}
+$('fmSide').addEventListener('click',e=>{const b=e.target.closest('[data-p]'); if(b) fmGo(b.dataset.p)});
+
+function fmVisible(){const q=$('fmSearch').value.trim().toLowerCase();
+  let list=fm.entries.filter(e=>!q||e.name.toLowerCase().includes(q));
+  const k=fm.sort, dir=fm.asc?1:-1;
+  list.sort((a,b)=>{ if(a.dir!==b.dir) return a.dir?-1:1;
+    let va=k==='size'?(a.dir?(fm.sizes[joinPath(fm.path,a.name)]??-1):a.size):k==='mtime'?a.mtime:a.name.toLowerCase();
+    let vb=k==='size'?(b.dir?(fm.sizes[joinPath(fm.path,b.name)]??-1):b.size):k==='mtime'?b.mtime:b.name.toLowerCase();
+    return (va>vb?1:va<vb?-1:0)*dir});
+  return list}
+function fmRender(){
+  const q=$('fmSearch').value.trim(), list=fmVisible(), body=$('fmBody');
+  document.querySelectorAll('.fmtable th[data-sort]').forEach(th=>th.classList.toggle('sorted',th.dataset.sort===fm.sort));
+  if(!list.length){body.innerHTML=`<tr><td colspan="6" class="hint" style="padding:18px;text-align:center">${esc(tr(q?'Nada coincide con la búsqueda.':'Carpeta vacía.'))}</td></tr>`}
+  else body.innerHTML=list.map(e=>{
+    const full=joinPath(fm.path,e.name), sz=e.dir?fm.sizes[full]:e.size, cut=fm.clip&&fm.clip.op==='move'&&fm.clip.paths.includes(full);
+    const icon=e.dir?ICON_DIR:(ARCH_RX.test(e.name)?ICON_ARC:ICON_FILE);
+    return `<tr data-p="${esc(full)}" data-dir="${e.dir?1:0}" class="${fm.sel.has(full)?'sel':''}${cut?' cut':''}">
+      <td><input type="checkbox" ${fm.sel.has(full)?'checked':''}></td>
+      <td><div class="fname ${e.dir?'dir':''}" data-noi18n>${icon}<span>${esc(e.name)}</span></div></td>
+      <td class="num">${sz!=null?human(sz):(e.dir?`<button class="linkbtn" data-a="du">${esc(tr('calcular'))}</button>`:'')}</td>
+      <td class="hide-s mono">${fmtDate(e.mtime)}</td>
+      <td class="hide-s mono">${fmtMode(e.mode)}</td>
+      <td><button class="small dots" data-a="menu" title="${esc(tr('Más acciones'))}">⋯</button></td></tr>`}).join('');
+  $('fmAll').checked=list.length>0&&list.every(e=>fm.sel.has(joinPath(fm.path,e.name)));
+  fmButtons();
+}
+function fmSelSize(){let t=0,unk=false; for(const p of fm.sel){const e=entryOf(p); if(!e) continue; const s=e.dir?fm.sizes[p]:e.size; if(s==null) unk=true; else t+=s} return [t,unk]}
+function fmButtons(){
+  const n=fm.sel.size;
+  ['fmCopy','fmCut','fmMoveTo','fmDownload','fmMore','fmDelete'].forEach(id=>$(id).disabled=n===0||fm.busy);
+  $('fmRename').disabled=n!==1||fm.busy;
+  const [t,unk]=fmSelSize();
+  $('fmSelInfo').textContent=n?tr('{0} seleccionados').replace('{0}',n)+(t?' · '+human(t)+(unk?'+':''):''):'';
+  const c=$('fmClip');
+  if(fm.clip){c.hidden=false;c.innerHTML=`<span>${esc(tr(fm.clip.op==='copy'?'Para copiar:':'Para mover:'))} <b data-noi18n>${fm.clip.paths.length===1?esc(baseName(fm.clip.paths[0])):fm.clip.paths.length+' '+esc(tr('elementos'))}</b> <span class="hint" data-noi18n>${esc(tr('desde'))} ${esc(parentOf(fm.clip.paths[0]))}</span></span><button class="small primary" id="fmPaste" ${fm.busy?'disabled':''}>${esc(tr('Pegar aquí'))}</button><button class="small" id="fmClipX">${esc(tr('Cancelar'))}</button>`;
+    $('fmPaste').onclick=()=>fmPaste(); $('fmClipX').onclick=()=>{fm.clip=null;fmRender()}}
+  else c.hidden=true;
+}
+function fmSelect(p,ev){
+  const list=fmVisible().map(e=>joinPath(fm.path,e.name));
+  if(ev&&ev.shiftKey&&fm.anchor&&list.includes(fm.anchor)){const a=list.indexOf(fm.anchor),b=list.indexOf(p); if(!(ev.ctrlKey||ev.metaKey)) fm.sel.clear(); list.slice(Math.min(a,b),Math.max(a,b)+1).forEach(x=>fm.sel.add(x))}
+  else if(ev&&(ev.ctrlKey||ev.metaKey)){fm.sel.has(p)?fm.sel.delete(p):fm.sel.add(p); fm.anchor=p}
+  else {fm.sel.clear(); fm.sel.add(p); fm.anchor=p}
+  fmPaintSel();
+}
+// marca la seleccion sin volver a dibujar la tabla (si no, el doble clic no llega a la fila)
+function fmPaintSel(){
+  document.querySelectorAll('#fmBody tr[data-p]').forEach(r=>{const on=fm.sel.has(r.dataset.p); r.classList.toggle('sel',on); const c=r.querySelector('input[type=checkbox]'); if(c) c.checked=on});
+  const vis=fmVisible(); $('fmAll').checked=vis.length>0&&vis.every(e=>fm.sel.has(joinPath(fm.path,e.name)));
+  fmButtons();
+}
+$('fmBody').addEventListener('click',async ev=>{
+  const tr_=ev.target.closest('tr[data-p]'); if(!tr_) return;
+  const p=tr_.dataset.p, isDir=tr_.dataset.dir==='1';
+  const a=ev.target.closest('[data-a]');
+  if(a){ev.stopPropagation();
+    if(a.dataset.a==='du') return fmDu([p]);
+    if(a.dataset.a==='menu'){ if(!fm.sel.has(p)){fm.sel.clear();fm.sel.add(p);fm.anchor=p;fmPaintSel()} const r=a.getBoundingClientRect(); return fmOpenMenu(r.right,r.bottom,'sel')}
+  }
+  if(ev.target.type==='checkbox'){ ev.target.checked?fm.sel.add(p):fm.sel.delete(p); fm.anchor=p; tr_.classList.toggle('sel',ev.target.checked); fmButtons(); return }
+  if(ev.target.closest('.fname') && isDir && !ev.ctrlKey && !ev.shiftKey) return fmGo(p);
+  fmSelect(p,ev);
+});
+$('fmBody').addEventListener('dblclick',ev=>{const tr_=ev.target.closest('tr[data-p]'); if(!tr_) return; if(tr_.dataset.dir==='1') fmGo(tr_.dataset.p); else if(ARCH_RX.test(tr_.dataset.p)) fmExtract(tr_.dataset.p)});
+$('fmBody').addEventListener('contextmenu',ev=>{const tr_=ev.target.closest('tr[data-p]'); ev.preventDefault();
+  if(!tr_) return fmOpenMenu(ev.clientX,ev.clientY,'bg');
+  const p=tr_.dataset.p; if(!fm.sel.has(p)){fm.sel.clear();fm.sel.add(p);fm.anchor=p;fmPaintSel()}
+  fmOpenMenu(ev.clientX,ev.clientY,'sel')});
+$('fmTableWrap').addEventListener('contextmenu',ev=>{if(ev.target.closest('tr[data-p]')||ev.target.closest('thead')) return; ev.preventDefault(); fm.sel.clear(); fmRender(); fmOpenMenu(ev.clientX,ev.clientY,'bg')});
+$('fmAll').onchange=()=>{fmVisible().forEach(e=>{const p=joinPath(fm.path,e.name); $('fmAll').checked?fm.sel.add(p):fm.sel.delete(p)}); fmRender()};
+document.querySelectorAll('.fmtable th[data-sort]').forEach(th=>th.onclick=()=>{const k=th.dataset.sort; fm.asc=fm.sort===k?!fm.asc:true; fm.sort=k; fmRender()});
+$('fmSearch').addEventListener('input',fmRender);
+$('fmRefresh').onclick=()=>fmGo(fm.path,true);
+$('fmUp').onclick=()=>fmGo(parentOf(fm.path));
+$('fmBack').onclick=()=>{if(!fm.back.length)return; fm.fwd.push(fm.path); fmGo(fm.back.pop(),true)};
+$('fmFwd').onclick=()=>{if(!fm.fwd.length)return; fm.back.push(fm.path); fmGo(fm.fwd.pop(),true)};
+function selList(){return [...fm.sel]}
+
+// ---- menu contextual ----
+function fmOpenMenu(x,y,kind){
+  const m=$('fmMenu'), sel=selList(), one=sel.length===1?entryOf(sel[0]):null, items=[];
+  const it=(a,label,key,cls)=>items.push(`<button data-m="${a}" class="${cls||''}">${esc(tr(label))}${key?`<kbd>${esc(tr(key))}</kbd>`:''}</button>`);
+  const sep=()=>items.push('<hr>');
+  if(kind==='bg'){
+    if(fm.clip) it('paste','Pegar aquí','Ctrl+V'), sep();
+    it('mkdir','Nueva carpeta'); it('upf','Subir archivos aquí'); it('upd','Subir carpeta aquí'); sep();
+    it('refresh','Actualizar la carpeta','F5'); it('copypath','Copiar ruta de esta carpeta');
+  } else {
+    if(one&&one.dir) it('open','Abrir','Enter');
+    if(one&&!one.dir&&ARCH_RX.test(one.name)) it('extract','Extraer…');
+    it('download','Descargar al PC'); sep();
+    it('copy','Copiar','Ctrl+C'); it('cut','Cortar','Ctrl+X');
+    if(fm.clip&&one&&one.dir) it('pasteinto','Pegar dentro');
+    it('copyto','Copiar a…'); it('moveto','Mover a…'); sep();
+    if(one) it('rename','Renombrar','F2');
+    if(sel.some(p=>{const e=entryOf(p);return e&&e.dir})) it('du','Calcular tamaño');
+    it('chmod','Permisos 777'); it('copypath',sel.length>1?'Copiar rutas':'Copiar ruta'); sep();
+    it('delete','Borrar','Supr','danger');
+  }
+  m.innerHTML=items.join(''); m.hidden=false;
+  const w=m.offsetWidth,h=m.offsetHeight;
+  m.style.left=Math.max(6,Math.min(x,innerWidth-w-6))+'px'; m.style.top=Math.max(6,Math.min(y,innerHeight-h-6))+'px';
+  m.querySelector('button')?.focus();
+}
+function fmMenuClose(){$('fmMenu').hidden=true}
+document.addEventListener('mousedown',e=>{if(!e.target.closest('#fmMenu')) fmMenuClose()});
+addEventListener('blur',fmMenuClose); addEventListener('resize',fmMenuClose); document.addEventListener('scroll',fmMenuClose,true);
+$('fmMenu').addEventListener('keydown',e=>{const bs=[...$('fmMenu').querySelectorAll('button')], i=bs.indexOf(document.activeElement);
+  if(e.key==='ArrowDown'){e.preventDefault();bs[(i+1)%bs.length].focus()} else if(e.key==='ArrowUp'){e.preventDefault();bs[(i-1+bs.length)%bs.length].focus()} else if(e.key==='Escape') fmMenuClose()});
+$('fmMenu').addEventListener('click',e=>{const b=e.target.closest('[data-m]'); if(!b) return; fmMenuClose(); fmAct(b.dataset.m)});
+function fmAct(a){
+  const sel=selList();
+  switch(a){
+    case 'open': return fmGo(sel[0]);
+    case 'extract': return fmExtract(sel[0]);
+    case 'download': return fmOpStart('/api/fm/download',{paths:sel});
+    case 'copy': case 'cut': fm.clip={op:a==='copy'?'copy':'move',paths:sel}; fmRender(); return toast(tr('Ve a la carpeta de destino y pulsa "Pegar aquí" (o Ctrl+V)'));
+    case 'paste': return fmPaste();
+    case 'pasteinto': return fmPaste(sel[0]);
+    case 'copyto': return fmPick('copy',sel);
+    case 'moveto': return fmPick('move',sel);
+    case 'rename': return fmRename(sel[0]);
+    case 'du': return fmDu(sel.filter(p=>{const e=entryOf(p);return e&&e.dir}));
+    case 'chmod': return fmOpStart('/api/fm/chmod',{paths:sel});
+    case 'copypath': { const t=(sel.length?sel:[fm.path]).join('\n'); navigator.clipboard?.writeText(t).then(()=>toast(tr('Ruta copiada')),()=>toast(t)); return }
+    case 'delete': return fmDelete(sel);
+    case 'mkdir': return $('fmMkdir').click();
+    case 'upf': return fmUpload('files');
+    case 'upd': return fmUpload('folder');
+    case 'refresh': return fmGo(fm.path,true);
+  }
+}
+$('fmCopy').onclick=()=>fmAct('copy');
+$('fmCut').onclick=()=>fmAct('cut');
+$('fmMoveTo').onclick=()=>fmAct('moveto');
+$('fmRename').onclick=()=>fmAct('rename');
+$('fmDownload').onclick=()=>fmAct('download');
+$('fmDelete').onclick=()=>fmAct('delete');
+$('fmMore').onclick=()=>{const r=$('fmMore').getBoundingClientRect(); fmOpenMenu(r.left,r.bottom+4,'sel')};
+
+// ---- atajos de teclado (solo en la pestaña de archivos y fuera de las casillas de texto) ----
+document.addEventListener('keydown',e=>{
+  if(curTab!=='Files'||tourEls||document.querySelector('dialog[open]')) return;
+  if(!$('fmMenu').hidden) return;
+  const t=e.target, typing=t&&(t.tagName==='INPUT'&&t.type!=='checkbox'||t.tagName==='TEXTAREA'||t.tagName==='SELECT');
+  if(typing) return;
+  const k=e.key, ctrl=e.ctrlKey||e.metaKey, sel=selList();
+  if(k==='F5'){e.preventDefault(); return fmGo(fm.path,true)}
+  if(k==='Backspace'||(e.altKey&&k==='ArrowUp')){e.preventDefault(); return fmGo(parentOf(fm.path))}
+  if(e.altKey&&k==='ArrowLeft'){e.preventDefault(); return $('fmBack').click()}
+  if(e.altKey&&k==='ArrowRight'){e.preventDefault(); return $('fmFwd').click()}
+  if(ctrl&&k.toLowerCase()==='a'){e.preventDefault(); fmVisible().forEach(x=>fm.sel.add(joinPath(fm.path,x.name))); return fmPaintSel()}
+  if(ctrl&&k.toLowerCase()==='v'){e.preventDefault(); return fmPaste()}
+  if(k==='Escape'){fm.sel.clear(); return fmPaintSel()}
+  if(!sel.length||fm.busy) return;
+  if(k==='Delete'){e.preventDefault(); return fmAct('delete')}
+  if(k==='F2'&&sel.length===1){e.preventDefault(); return fmAct('rename')}
+  if(ctrl&&k.toLowerCase()==='c'&&!getSelection().toString()){e.preventDefault(); return fmAct('copy')}
+  if(ctrl&&k.toLowerCase()==='x'){e.preventDefault(); return fmAct('cut')}
+  if(k==='Enter'&&sel.length===1){const en=entryOf(sel[0]); if(en&&en.dir){e.preventDefault(); return fmGo(sel[0])}}
+});
+
+// ---- acciones ----
+$('fmMkdir').onclick=async()=>{const n=prompt(tr('Nombre de la carpeta nueva:'),''); if(!n) return;
+  if(/[\/\\]/.test(n)||n==='.'||n==='..') return toast(tr('El nombre no puede llevar / ni \\'));
+  const r=await api('/api/fm/mkdir',{path:joinPath(fm.path,n)}).catch(e=>({ok:false,error:e.message})); if(!r.ok) return toast(r.error); fmGo(fm.path,true)};
+async function fmRename(p){const old=baseName(p); const n=prompt(tr('Nuevo nombre:'),old); if(!n||n===old) return;
+  if(/[\/\\]/.test(n)||n==='.'||n==='..') return toast(tr('El nombre no puede llevar / ni \\'));
+  const r=await api('/api/fm/rename',{src:p,dst:joinPath(parentOf(p),n)}).catch(e=>({ok:false,error:e.message})); if(!r.ok) return toast(r.error);
+  fm.sel.clear(); fm.sel.add(joinPath(parentOf(p),n)); fmGo(fm.path,true)}
+async function fmDu(paths){for(const p of paths){fm.sizes[p]=undefined; try{const r=await api('/api/fm/du',{path:p}); if(r.ok) fm.sizes[p]=r.size; else toast(r.error)}catch(e){toast(e.message)} fmRender()}}
+function fmDelete(paths){if(!paths.length) return;
+  const names=paths.map(baseName); const list=names.slice(0,6).join('\n')+(names.length>6?'\n…':'');
+  if(!confirm(tr('¿Borrar {0} elemento(s) de la consola? No se puede deshacer.').replace('{0}',paths.length)+'\n\n'+list)) return;
+  fmOpStart('/api/fm/delete',{paths}).then(ok=>{if(ok){paths.forEach(p=>fm.sel.delete(p))}})}
+// pegar con aviso de conflictos
+function fmAskConflict(conf,op){
+  return new Promise(res=>{
+    const d=$('dlgConflict');
+    $('cfTitle').textContent=conf.length===1?tr('"{0}" ya está aquí').replace('{0}',conf[0].name):tr('Ya hay {0} elementos con el mismo nombre').replace('{0}',conf.length);
+    $('cfBody').textContent=tr(op==='copy'?'¿Qué hago con los que ya existen en la carpeta de destino?':'¿Qué hago con los que ya existen en la carpeta de destino?');
+    $('cfList').innerHTML=conf.slice(0,8).map(c=>`<li>${c.dir?ICON_DIR:ICON_FILE} ${esc(c.name)}</li>`).join('')+(conf.length>8?'<li>…</li>':'');
+    const allDirs=conf.every(c=>c.dir), allFiles=conf.every(c=>!c.dir);
+    $('cfReplace').textContent=tr(allDirs?'Combinar':allFiles?'Reemplazar':'Reemplazar / combinar');
+    $('cfReplace').hidden=conf.some(c=>c.same);
+    d.querySelectorAll('.cf-opts button').forEach(b=>b.onclick=()=>{d.close(); res(b.dataset.m)});
+    d.onclose=()=>res(''); d.showModal();
+  });
+}
+async function fmDoPaste(op,srcs,dst){
+  let conf=[]; try{conf=(await api('/api/fm/conflicts',{srcs,dst})).conflicts||[]}catch(e){}
+  if(op==='move') conf=conf.filter(c=>!c.same);
+  let mode='replace';
+  if(conf.length){mode=await fmAskConflict(conf,op); if(!mode) return false}
+  return fmOpStart('/api/fm/paste',{op,srcs,dst,mode});
+}
+async function fmPaste(into){if(!fm.clip||fm.busy) return; const c=fm.clip, dst=into||fm.path;
+  if(c.paths.some(p=>dst===p||dst.startsWith(p+'/'))) return toast(tr('No se puede pegar una carpeta dentro de sí misma'));
+  const ok=await fmDoPaste(c.op,c.paths,dst); if(ok){ if(c.op==='move') fm.clip=null; rememberRecent('ps5d_fm_dest',dst); fmButtons()}}
+async function fmUpload(kind){const ps=await pick(kind); if(!ps.length) return; fmUploadPaths(ps)}
+async function fmUploadPaths(ps){
+  try{await api('/api/add',{lines:ps.join('\n'),dest:fm.path,raw:true}); toast(tr('Añadido a la cola: se sube tal cual a {0}').replace('{0}',fm.path)); refresh()}catch(e){toast(e.message)}}
+$('fmUpFiles').onclick=()=>fmUpload('files');
+$('fmUpFolder').onclick=()=>fmUpload('folder');
+
+// ---- Mover a… / Copiar a… ----
+const pk={op:'move',srcs:[],path:'/data'};
+async function fmPick(op,srcs){
+  pk.op=op; pk.srcs=srcs;
+  $('pickTitle').textContent=(op==='move'?tr('Mover {0} a…'):tr('Copiar {0} a…')).replace('{0}',srcs.length===1?'«'+baseName(srcs[0])+'»':tr('{0} elementos').replace('{0}',srcs.length));
+  $('pickGo').textContent=tr(op==='move'?'Mover aquí':'Copiar aquí');
+  const rec=lsGet('ps5d_fm_dest',[]);
+  $('pickSide').innerHTML=`<div class="side-h">${esc(tr('Unidades'))}</div>`+(fm.drives.length?fm.drives:[{path:'/data',name:'Almacenamiento interno'}]).map(d=>`<button class="side-i" data-p="${esc(d.path)}">${ICON_DRIVE}<span>${esc(tr(d.name))}</span></button>`).join('')
+    +`<div class="side-h">${esc(tr('Accesos'))}</div>`+FM_PLACES.map(([p,n])=>`<button class="side-i" data-p="${esc(p)}">${ICON_PIN}<span>${esc(tr(n))}</span></button>`).join('')
+    +(rec.length?`<div class="side-h">${esc(tr('Destinos recientes'))}</div>`+rec.map(p=>`<button class="side-i small-i" data-p="${esc(p)}" title="${esc(p)}" data-noi18n>${ICON_PIN}<span>${esc(p)}</span></button>`).join(''):'');
+  $('dlgPick').showModal(); pickGo(rec[0]||parentOf(srcs[0]));
+}
+async function pickGo(path){
+  $('pickList').innerHTML=`<p class="hint">${esc(tr('Cargando…'))}</p>`;
+  let r; try{r=await api('/api/fm/dirs',{path})}catch(e){$('pickList').innerHTML=`<p class="err">${esc(e.message)}</p>`;return}
+  pk.path=r.path; $('pickCrumbs').innerHTML=crumbsHtml(r.path);
+  $('pickList').innerHTML=r.dirs.length?r.dirs.map(d=>{const full=joinPath(r.path,d), bad=pk.srcs.includes(full);
+    return `<button class="pick-i" data-p="${esc(full)}" ${bad?'disabled':''} data-noi18n>${ICON_DIR}<span>${esc(d)}</span></button>`}).join(''):`<p class="hint">${esc(tr('No hay carpetas dentro.'))}</p>`;
+  const into=pk.srcs.some(p=>r.path===p||r.path.startsWith(p+'/')), here=pk.op==='move'&&pk.srcs.every(p=>parentOf(p)===r.path);
+  $('pickGo').disabled=into||here;
+  $('pickNote').textContent=into?tr('Una carpeta no se puede meter dentro de sí misma.'):here?tr('Ya está en esta carpeta.'):
+    (pk.op==='move'&&fm.via==='ftp'&&!sameDrive(pk.srcs[0],r.path)?tr('Otra unidad sin BFpilot: se copia pasando por el PC y luego se borra el original.'):'');
+}
+function driveOf(p){const m=p.match(/^\/mnt\/(usb|ext)\d+/); return m?m[0]:'/data'}
+function sameDrive(a,b){return driveOf(a)===driveOf(b)}
+$('pickCrumbs').addEventListener('click',e=>{const b=e.target.closest('.crumb'); if(b) pickGo(b.dataset.p)});
+$('pickList').addEventListener('click',e=>{const b=e.target.closest('[data-p]'); if(b&&!b.disabled) pickGo(b.dataset.p)});
+$('pickSide').addEventListener('click',e=>{const b=e.target.closest('[data-p]'); if(b) pickGo(b.dataset.p)});
+$('pickUp').onclick=()=>pickGo(parentOf(pk.path));
+$('pickX').onclick=()=>$('dlgPick').close();
+$('pickNew').onclick=async()=>{const n=prompt(tr('Nombre de la carpeta nueva:'),''); if(!n) return; if(/[\/\\]/.test(n)) return toast(tr('El nombre no puede llevar / ni \\'));
+  const r=await api('/api/fm/mkdir',{path:joinPath(pk.path,n)}).catch(e=>({ok:false,error:e.message})); if(!r.ok) return toast(r.error); pickGo(joinPath(pk.path,n))};
+$('pickGo').onclick=async()=>{const dst=pk.path; $('dlgPick').close();
+  const ok=await fmDoPaste(pk.op,pk.srcs,dst); if(ok){rememberRecent('ps5d_fm_dest',dst); if(pk.op==='move') fm.sel.clear()}};
+
+// ---- Extraer… ----
+let exSrc='';
+function fmExtract(p){
+  exSrc=p; const name=baseName(p);
+  $('exTitle').textContent=tr('Extraer «{0}»').replace('{0}',name);
+  $('exFolder').value=name.replace(/\.part0*1\.rar$/i,'').replace(/\.7z\.0*1$/i,'').replace(/\.(rar|7z|zip)$/i,'');
+  $('exPw').value=''; const taken=fm.entries.some(e=>e.name===$('exFolder').value);
+  $('exNote').textContent=fm.via==='ftp'?tr('BFpilot no está cargado: cárgalo en la PS5 para poder extraer.'):taken?tr('Ya hay una carpeta con ese nombre: se usará uno nuevo terminado en (2).'):'';
+  $('exGo').disabled=fm.via==='ftp';
+  $('dlgExtract').showModal(); $('exFolder').focus();
+}
+$('exCancel').onclick=()=>$('dlgExtract').close();
+$('exGo').onclick=async()=>{const folder=$('exFolder').value.trim(); if(!folder||/[\/\\]/.test(folder)) return toast(tr('Pon un solo nombre de carpeta, sin /'));
+  $('dlgExtract').close(); fmOpStart('/api/fm/extract',{src:exSrc,folder,password:$('exPw').value})};
+
+// ---- arrastrar archivos del PC a la carpeta abierta ----
+$('tabFiles').addEventListener('dragover',e=>{if(curTab!=='Files'||!e.dataTransfer||![...e.dataTransfer.types].includes('Files')) return; e.preventDefault(); e.stopPropagation(); $('fmTableWrap').classList.add('over'); $('fmTableWrap').dataset.drop=tr('Suelta para subir a {0}').replace('{0}',fm.path)});
+$('tabFiles').addEventListener('dragleave',e=>{if(!$('tabFiles').contains(e.relatedTarget)) $('fmTableWrap').classList.remove('over')});
+$('tabFiles').addEventListener('drop',async e=>{if(curTab!=='Files'||!e.dataTransfer||!e.dataTransfer.files.length) return; e.preventDefault(); e.stopPropagation(); $('fmTableWrap').classList.remove('over');
+  const files=[...e.dataTransfer.files].map(f=>({name:f.name,size:f.size,lastModified:f.lastModified}));
+  toast(tr('Buscando {0} archivo(s) en tu PC…').replace('{0}',files.length));
+  let r; try{r=await api('/api/locate',{files})}catch(err){return toast(err.message)}
+  const found=Object.values(r.found||{}); if(!found.length) return toast(tr('No los encuentro en tu PC: usa "Subir archivos aquí"'));
+  fmUploadPaths(found)});
+
+// operaciones largas (copiar, mover, borrar, bajar, permisos, extraer) con progreso
+const OPNAME={copy:'Copiando',move:'Moviendo',delete:'Borrando',download:'Descargando al PC',chmod:'Poniendo permisos',extract:'Extrayendo'};
+let fmPoll=null;
+async function fmOpStart(url,body){
+  try{const r=await api(url,body); if(!r.ok){toast(r.error);return false}}catch(e){toast(e.message);return false}
+  fm.busy=true; fmButtons(); fmWatch(); return true;
+}
+function fmWatch(){clearInterval(fmPoll); fmPoll=setInterval(fmPollOp,900); fmPollOp()}
+function fmtSecs(n){n=Math.max(0,Math.round(n));const m=Math.floor(n/60);return m?m+' min '+(n%60)+' s':n+' s'}
+let fmStoreT=0;
+async function fmPollOp(){
+  let r; try{r=await api('/api/fm/op',{})}catch(e){return}
+  // mientras borra o copia, el espacio libre de arriba se va actualizando
+  if(r.op&&r.op.busy&&Date.now()-fmStoreT>4000){fmStoreT=Date.now(); api('/api/fm/stat',{path:fm.path}).then(x=>{if(x.ok)fmPaintStore(x)}).catch(()=>{})}
+  const o=r.op, box=$('fmOp');
+  if(!o.op){box.hidden=true;clearInterval(fmPoll);fm.busy=false;return}
+  box.hidden=false;
+  const pct=o.bytes_total>0?Math.min(100,o.bytes_done*100/o.bytes_total):(o.items_total?o.items_done*100/o.items_total:0);
+  if(o.busy){
+    box.innerHTML=`<b>${esc(tr(OPNAME[o.op]||o.op))}</b> <span class="hint" data-noi18n>${esc((o.current||'').split('/').pop())}</span>
+      <div class="bar"><i style="width:${pct.toFixed(1)}%"></i></div>
+      <span class="hint">${o.bytes_total?human(o.bytes_done)+' / '+human(o.bytes_total):(o.items_done+' / '+o.items_total)}${o.op==='delete'&&o.bytes_done?' · '+esc(tr('liberados {0}').replace('{0}',human(o.bytes_done||0))):''} · ${fmtSecs(Date.now()/1000-(o.t0||Date.now()/1000))}</span>
+      <button class="small" id="fmOpCancel">${esc(tr('Cancelar'))}</button>`;
+    $('fmOpCancel').onclick=()=>api('/api/fm/cancel',{});
+  } else {
+    const was=fm.busy; clearInterval(fmPoll); fm.busy=false; fmButtons();
+    box.innerHTML=o.error?`<span class="err" style="margin:0">${esc(tr(o.error))}</span><button class="small" id="fmOpOk">${esc(tr('Cerrar'))}</button>`
+      :`<span>✔ ${esc(tr(o.message||'Hecho'))}</span>${o.op==='download'?`<button class="small" id="fmOpenLocal">${esc(tr('Abrir carpeta'))}</button>`:''}<button class="small" id="fmOpOk">${esc(tr('Cerrar'))}</button>`;
+    $('fmOpOk').onclick=()=>{box.hidden=true};
+    if($('fmOpenLocal')) $('fmOpenLocal').onclick=()=>api('/api/fm/open_local',{});
+    if(o.op!=='download'&&was) fmGo(fm.path,true);
+  }
+}
+fmWatch(); fmLoadDrives(); setInterval(()=>{if(curTab==='Files')fmLoadDrives()},60000);
+
+// ===================== campana de notificaciones =====================
+let notifs=[], nFresh=new Set();
+function paintBell(n){const b=$('bellN'); b.hidden=!n; b.textContent=n>99?'99+':String(n); $('btnBell').classList.toggle('has',!!n)}
+function ago(t){const s=Math.max(0,Date.now()/1000-t); if(s<60) return tr('ahora'); if(s<3600) return tr('hace {0} min').replace('{0}',Math.floor(s/60)); if(s<86400) return tr('hace {0} h').replace('{0}',Math.floor(s/3600)); return new Date(t*1000).toLocaleDateString()}
+async function loadNotifs(){try{const r=await api('/api/notifs',{}); notifs=r.items||[]; paintBell(r.unread||0); renderNotifs()}catch(e){}}
+function renderNotifs(){
+  const box=$('nList');
+  if(!notifs.length){box.innerHTML=`<p class="hint" style="padding:18px;text-align:center">${esc(tr('Aún no hay avisos. Aquí aparecerán las transferencias terminadas, los errores, las desconexiones y las versiones nuevas.'))}</p>`;return}
+  box.innerHTML=notifs.map(n=>`<div class="nitem ${n.level}${nFresh.has(n.id)?' fresh':''}${n.link?' link':''}" data-id="${esc(n.id)}">
+    <span class="ndot"></span>
+    <div class="nbody"><b>${esc(tr(n.title))}</b>${n.body?`<span>${esc(tr(n.body))}</span>`:''}<small>${esc(ago(n.t))}</small></div>
+    <button class="nx" data-x title="${esc(tr('Descartar'))}">×</button></div>`).join('');
+}
+async function openNotifs(){
+  const p=$('nPanel'); if(!p.hidden){p.hidden=true;return}
+  await loadNotifs(); nFresh=new Set(notifs.filter(n=>!n.read).map(n=>n.id)); renderNotifs();
+  p.hidden=false;
+  if(nFresh.size) api('/api/notifs/read',{all:true}).then(()=>paintBell(0)).catch(()=>{});
+}
+$('btnBell').onclick=e=>{e.stopPropagation(); openNotifs()};
+document.addEventListener('mousedown',e=>{if(!e.target.closest('#nPanel')&&!e.target.closest('#btnBell')) $('nPanel').hidden=true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape') $('nPanel').hidden=true});
+$('nAllRead').onclick=async()=>{await api('/api/notifs/read',{all:true}).catch(()=>{}); nFresh.clear(); notifs.forEach(n=>n.read=true); paintBell(0); renderNotifs()};
+$('nClear').onclick=async()=>{if(!notifs.length) return; await api('/api/notifs/clear',{}).catch(()=>{}); notifs=[]; paintBell(0); renderNotifs()};
+$('nList').addEventListener('click',async e=>{
+  const it=e.target.closest('.nitem'); if(!it) return; const n=notifs.find(x=>x.id===it.dataset.id); if(!n) return;
+  if(e.target.closest('[data-x]')){await api('/api/notifs/remove',{id:n.id}).catch(()=>{}); notifs=notifs.filter(x=>x!==n); renderNotifs(); return}
+  const l=n.link; if(!l) return; $('nPanel').hidden=true;
+  if(l.action==='update') return $('btnUpdHead').click();
+  if(l.tab==='Files'){showTab('Files'); if(l.path) fmGo(l.path); return}
+  if(l.tab==='Transfers'){showTab('Transfers'); setTimeout(()=>{const c=document.querySelector(`.job[data-id="${CSS.escape(l.job||'')}"]`); if(c){c.scrollIntoView({block:'center',behavior:'smooth'});c.classList.add('flash');setTimeout(()=>c.classList.remove('flash'),1600)} else showTab('Activity')},150)}
+});
+setInterval(()=>{const n=$('nList'); if(!$('nPanel').hidden) renderNotifs()},30000);
+
+// ===================== actividad =====================
+async function loadActivity(){
+  let r; try{r=await api('/api/history',{})}catch(e){return}
+  const items=r.items||[];
+  $('actBody').innerHTML=items.length?items.map(h=>{
+    const ok=h.status==='hecho', d=new Date(h.t*1000), m=Math.floor((h.secs||0)/60);
+    const dur=h.secs>=3600?Math.floor(h.secs/3600)+' h '+(m%60)+' min':(m?m+' min '+(h.secs%60)+' s':(h.secs||0)+' s');
+    return `<tr><td class="mono">${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</td>
+      <td data-noi18n>${esc(h.title)}</td>
+      <td><span class="chip ${ok?'hecho':'error'}">${esc(h.status)}</span>${h.error?`<div class="hint">${esc(h.error.slice(0,160))}</div>`:''}</td>
+      <td class="num">${h.size>0?human(h.size):''}</td><td>${dur}</td>
+      <td class="mono" data-noi18n>${esc((h.result||[]).join(', ')||h.dest||'')}</td></tr>`}).join('')
+    :`<tr><td colspan="6" class="hint" style="padding:18px;text-align:center">${esc(tr('Todavía no hay nada en el historial.'))}</td></tr>`;
+}
+$('actClear').onclick=async()=>{if(!confirm(tr('¿Borrar todo el historial?')))return; await api('/api/history/clear',{}); loadActivity()};
+try{const t=localStorage.getItem('ps5d_tab'); if(t&&t!=='Transfers'&&$('tab'+t)) showTab(t)}catch(e){}
+</script>
+</body>
+</html>
