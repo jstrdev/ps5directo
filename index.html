@@ -740,6 +740,7 @@ async function refresh(){
   if(refreshing) return; refreshing=true;
   try{const s=await api('/api/state');refreshFails=0;state=s;paintBell(s.unread||0);if(s.version){$('ver').textContent='v'+s.version;document.title='PS5 Directo v'+s.version}if(s.inbox>0)takeInbox();if(!$('dest').dataset.touched)$('dest').value=s.settings.dest||'/data/homebrew';if(!$('where').dataset.touched)$('where').value=s.settings.extract_where==='pc'?'pc':'ps5';render()}
   catch(e){ if(++refreshFails<5) return; $('jobs').innerHTML=`<div class="empty">No conecto con el programa. Cierra esta ventana y abre PS5 Directo otra vez. (${esc(e.message)})</div>`}
+  finally{ refreshing=false }
 }
 $('dest').addEventListener('input',()=>$('dest').dataset.touched='1');
 $('where').addEventListener('change',()=>$('where').dataset.touched='1');

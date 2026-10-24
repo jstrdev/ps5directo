@@ -967,6 +967,19 @@ def clean_host(text):
     return t.strip(".").strip("[]"), port
 
 
+def raw_mode(f):
+    """ftpsrv (ps5-payload-dev) descifra al vuelo los SELF (eboot.bin, .prx, .sprx) por defecto:
+    al bajarlos llegan con otro tamano y otro contenido. El comando SELF lo cambia por conexion:
+    lo apago para que todo se transfiera tal cual esta. Si el servidor no lo conoce, no pasa nada."""
+    for _ in range(2):
+        try:
+            r = f.sendcmd("SELF")
+        except ftplib.all_errors:
+            return
+        if "disabled" in r.lower():
+            return
+
+
 class Ftp:
     def __init__(self, cfg):
         self.host = clean_host(cfg["ps5_ip"])[0]
@@ -985,6 +998,7 @@ class Ftp:
             raise PipeError("La IP de la PS5 no es valida (%s): en Ajustes escribe solo los numeros, "
                             "por ejemplo 192.168.1.50, sin ftp:// ni puerto" % self.host)
         f.login(self.user, self.pw)
+        raw_mode(f)
         f.set_pasv(True)
         f.voidcmd("TYPE I")
         try:
