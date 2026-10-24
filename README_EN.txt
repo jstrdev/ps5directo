@@ -1,4 +1,4 @@
-PS5 DIRECTO 1.18.3 — USER GUIDE (English)
+PS5 DIRECTO 1.19 — USER GUIDE (English)
 =========================================
 
 Paste links (or drag files from your PC) and the tool does the rest:
@@ -23,8 +23,15 @@ TABS
     destination folder), delete, download to the PC (to Downloads\PS5
     Directo), set 777 permissions, and upload files or folders as-is into
     the current folder.
-    Copy, move, delete and folder sizes need BFpilot; without it the
-    browser is read-only over FTP.
+    Right-click a file or the empty space for the menu; shortcuts: Del,
+    F2, Ctrl+C / Ctrl+X / Ctrl+V, Ctrl+A and Backspace. "Move to…" and
+    "Copy to…" open a folder picker with recent destinations. If something
+    with the same name already exists when pasting, you choose replace/merge,
+    keep both or skip. "Extract…" unpacks a .rar/.7z/.zip that is already on
+    the console. Drives (with free space) and quick places are on the left.
+    You can drag files from the PC onto the open folder.
+    Without BFpilot almost everything works over FTP (copying goes through
+    the PC, slower); extracting and showing free space do need BFpilot.
   - Space: a pie chart of what takes up space on the console, with each
     game's name and size. It flags repeated games (for example a folder and
     its version converted to an image), half-sent transfers and leftovers,
@@ -220,6 +227,19 @@ Settings and queue are stored in  %USERPROFILE%\.ps5directo
 
 WHAT'S NEW
 ----------
+1.19  - Renewed file browser: right-click menu, keyboard shortcuts,
+        clickable path, drives and places on the left, "Move to…" / "Copy
+        to…" with recent destinations, a choice when pasting over existing
+        items (replace, merge, keep both or skip), "Extract…" for archives
+        already on the console, and dragging files from the PC onto the
+        open folder.
+      - The file browser no longer needs BFpilot for most things: rename,
+        move, delete, new folder, permissions, sizes and copy work over FTP.
+      - Notification bell at the top: finished or failed transfers, file
+        operations, console disconnections and new versions.
+1.18.4 - Fixed: leaving the window minimized or in the background for a while
+        made the program close itself, showing "Failed to fetch" on return.
+        Now it only closes when you actually close the window.
 1.18.3 - Fixed "Failed to fetch" and the queue appearing and disappearing: on
         Windows two PS5 Directo could end up listening on the same port (e.g.
         when opened twice in a row). Now only one can be open. Brief

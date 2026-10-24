@@ -1,5 +1,5 @@
-PS5 DIRECTO 1.18.3
-==================
+PS5 DIRECTO 1.19
+================
 (English: see README_EN.txt)
 
 Pega los enlaces (o arrastra archivos de tu PC) y la herramienta hace todo sola:
@@ -24,8 +24,15 @@ PESTAÑAS
     luego "Pegar aquí" en la carpeta de destino), borrar, bajar al PC
     (a Descargas\PS5 Directo), poner permisos 777 y subir archivos o
     carpetas tal cual a la carpeta en la que estás.
-    Copiar, mover, borrar y calcular tamaños necesitan BFpilot; sin él, el
-    explorador funciona en solo lectura por FTP.
+    Clic derecho en un archivo o en el hueco para el menú; atajos: Supr,
+    F2, Ctrl+C / Ctrl+X / Ctrl+V, Ctrl+A y Retroceso. "Mover a…" y "Copiar
+    a…" abren un selector de carpetas con los destinos recientes. Si al pegar
+    ya existe algo con el mismo nombre, eliges reemplazar/combinar, conservar
+    ambos u omitir. "Extraer…" descomprime en la consola un .rar/.7z/.zip que
+    ya esté allí. A la izquierda tienes las unidades (con su espacio libre) y
+    accesos rápidos. Puedes arrastrar archivos del PC a la carpeta abierta.
+    Sin BFpilot casi todo funciona por FTP (copiar pasa por el PC, más
+    lento); descomprimir y ver el espacio libre sí necesitan BFpilot.
   - Espacio: gráfico de quesitos con lo que ocupa sitio en la consola, con
     el nombre de cada juego y su tamaño. Avisa de juegos repetidos (por
     ejemplo la carpeta y su versión convertida a imagen), envíos a medias y
@@ -167,6 +174,22 @@ descarga sola, envio PC -> PS5 solo y las dos cosas a la vez, y te dice
 de quien es la culpa cuando va lento. Tambien hay uno solo PC -> PS5 en
 Ajustes.
 
+
+NOVEDADES 1.19
+- Explorador de archivos renovado: menú de clic derecho, atajos de teclado,
+  ruta por tramos, unidades y accesos a la izquierda, "Mover a…" / "Copiar
+  a…" con destinos recientes, aviso al pegar si ya existe (reemplazar,
+  combinar, conservar ambos u omitir), "Extraer…" de comprimidos que ya
+  están en la consola, y arrastrar archivos del PC a la carpeta abierta.
+- El explorador ya no necesita BFpilot para casi nada: renombrar, mover,
+  borrar, crear carpetas, permisos, tamaños y copiar funcionan solo con FTP.
+- Campana de notificaciones arriba: transferencias terminadas o con error,
+  operaciones de archivos, desconexiones de la consola y versiones nuevas.
+
+NOVEDADES 1.18.4
+- Arreglado: si dejabas la ventana minimizada o en segundo plano un rato, el
+  programa se cerraba solo y al volver salía "Failed to fetch". Ahora solo se
+  cierra cuando cierras la ventana de verdad.
 
 NOVEDADES 1.18.3
 - Arreglado "Failed to fetch" y la cola que aparecía y desaparecía: en Windows

@@ -22,7 +22,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 
-VERSION = "1.18.3"
+VERSION = "1.19.0"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -81,6 +81,7 @@ def _save_json(path, obj):
 
 def load_state():
     global JOBS
+    load_notifs()
     try:
         with open(SETTINGS_FILE, encoding="utf-8") as f:
             SETTINGS.update(json.load(f))
@@ -575,8 +576,47 @@ def record_history(job):
                 "dest": job.get("dest") or "",
             })
             _save_json(HISTORY_FILE, hist[-500:])
+        title = job.get("title") or "Transferencia"
+        link = {"tab": "Transfers", "job": job["id"]}
+        if job.get("status") == "hecho":
+            notify("ok", "Terminado: %s" % title, ", ".join(job.get("result") or [])[:300], link)
+        elif job.get("status") == "error":
+            notify("err", "Error: %s" % title, job.get("error") or "", link)
     except Exception:
         traceback.print_exc()
+
+
+NOTIF_FILE = os.path.join(DATA_DIR, "notifications.json")
+NOTIF_LOCK = threading.Lock()
+NOTIFS = []          # lo mas nuevo primero
+
+
+def load_notifs():
+    try:
+        with open(NOTIF_FILE, encoding="utf-8") as f:
+            NOTIFS[:] = json.load(f)[:100]
+    except Exception:
+        pass
+
+
+def save_notifs():
+    with NOTIF_LOCK:
+        data = list(NOTIFS)
+    try:
+        _save_json(NOTIF_FILE, data)
+    except Exception:
+        pass
+
+
+def notify(level, title, body="", link=None, key=None):
+    """Aviso para la campana. level: ok, info, warn, err. key evita repetir el mismo aviso."""
+    with NOTIF_LOCK:
+        if key and any(n.get("key") == key for n in NOTIFS):
+            return
+        NOTIFS.insert(0, {"id": secrets.token_hex(4), "t": time.time(), "level": level, "title": title,
+                          "body": (body or "")[:600], "link": link, "key": key, "read": False})
+        del NOTIFS[100:]
+    save_notifs()
 
 
 def read_history():
@@ -650,13 +690,177 @@ def fm_bf():
     return bf
 
 
-def _fm_start(op, items_total, fn):
+def fm_bf_opt():
+    """BFpilot si esta cargado, o None (entonces se hace por FTP)."""
+    bf = E.BFpilot(cfg_snapshot())
+    return bf if bf.alive() else None
+
+
+# ---- lo mismo por FTP, para cuando BFpilot no esta cargado -------------------
+
+def _ftp_entries(f, path):
+    """[(nombre, es_carpeta, tamano)] de una carpeta remota."""
+    out = []
+    try:
+        for name, facts in f.mlsd(path, facts=["type", "size"]):
+            t = facts.get("type")
+            if t in ("file", "dir"):
+                out.append((name, t == "dir", int(facts.get("size") or 0)))
+    finally:
+        try:
+            f.voidcmd("TYPE I")
+        except Exception:
+            pass
+    return out
+
+
+def _ftp_kind(f, path):
+    """'dir', 'file' o None."""
+    parent, name = posixpath.dirname(path) or "/", posixpath.basename(path)
+    try:
+        for n, d, _ in _ftp_entries(f, parent):
+            if n == name:
+                return "dir" if d else "file"
+    except Exception:
+        pass
+    return None
+
+
+def _ftp_walk(f, root, cancel=None):
+    """(archivos [(ruta, rel, tamano)], carpetas [rel]) de una carpeta, de arriba abajo."""
+    files, dirs = [], []
+    stack = [""]
+    while stack:
+        if cancel is not None and cancel.is_set():
+            raise E.Cancelled()
+        rel = stack.pop()
+        cur = root + ("/" + rel if rel else "")
+        for n, d, sz in _ftp_entries(f, cur):
+            r = (rel + "/" + n).lstrip("/")
+            if d:
+                dirs.append(r)
+                stack.append(r)
+            else:
+                files.append((cur + "/" + n, r, sz))
+    return files, dirs
+
+
+def ftp_du(cfg, path):
+    def go(f):
+        k = _ftp_kind(f, path)
+        if k == "file":
+            return int(f.size(path) or 0)
+        files, _ = _ftp_walk(f, path)
+        return sum(sz for _, _, sz in files)
+    return E.Ftp(cfg).call(go)
+
+
+def ftp_rmtree(cfg, path, cancel, on_item=None):
+    def go(f):
+        k = _ftp_kind(f, path)
+        if k is None:
+            return
+        if k == "file":
+            f.delete(path)
+            return
+        files, dirs = _ftp_walk(f, path, cancel)
+        for i, (rp, _, _) in enumerate(files):
+            if cancel.is_set():
+                raise E.Cancelled()
+            if on_item:
+                on_item(rp, i, len(files))
+            f.delete(rp)
+        for d in sorted(dirs, key=lambda x: -x.count("/")):
+            f.rmd(path + "/" + d)
+        f.rmd(path)
+    E.Ftp(cfg).call(go)
+
+
+def ftp_chmod_tree(cfg, path, cancel):
+    def go(f):
+        n = 1
+        f.sendcmd("SITE CHMOD 777 " + path)
+        if _ftp_kind(f, path) == "dir":
+            files, dirs = _ftp_walk(f, path, cancel)
+            for d in dirs:
+                f.sendcmd("SITE CHMOD 777 %s/%s" % (path, d))
+            for rp, _, _ in files:
+                if cancel.is_set():
+                    raise E.Cancelled()
+                f.sendcmd("SITE CHMOD 777 " + rp)
+            n += len(files) + len(dirs)
+        return n
+    return E.Ftp(cfg).call(go)
+
+
+def ftp_relay_copy(cfg, src, target, cancel, progress):
+    """Copia dentro de la consola pasando por el PC (sin BFpilot): lee por una conexion FTP
+    y escribe por otra. progress(bytes_hechos, bytes_totales, ruta_actual)."""
+    a = E.Ftp(cfg).connect()
+    b = E.Ftp(cfg).connect()
+    try:
+        k = _ftp_kind(a, src)
+        if k is None:
+            raise E.PipeError("No existe %s" % src)
+        if k == "file":
+            files, dirs = [(src, "", int(a.size(src) or 0))], []
+        else:
+            files, dirs = _ftp_walk(a, src, cancel)
+            E.Ftp.mkdirs(b, target)
+            for d in dirs:
+                E.Ftp.mkdirs(b, target + "/" + d)
+        total = sum(sz for _, _, sz in files)
+        done = 0
+        for rp, rel, sz in files:
+            if cancel.is_set():
+                raise E.Cancelled()
+            dst = target + ("/" + rel if rel else "")
+            E.Ftp.mkdirs(b, posixpath.dirname(dst))
+            cr = a.transfercmd("RETR " + rp)
+            cw = b.transfercmd("STOR " + dst)
+            try:
+                while True:
+                    if cancel.is_set():
+                        raise E.Cancelled()
+                    chunk = cr.recv(E.MiB)
+                    if not chunk:
+                        break
+                    cw.sendall(chunk)
+                    done += len(chunk)
+                    progress(done, total, rp)
+            finally:
+                cr.close()
+                cw.close()
+            a.voidresp()
+            b.voidresp()
+            got = E.Ftp.size(b, dst)
+            if got is not None and got != sz:
+                raise E.PipeError("La copia de %s salio incompleta (%s de %s)" % (rp, got, sz))
+    finally:
+        for f in (a, b):
+            try:
+                f.quit()
+            except Exception:
+                pass
+
+
+# ---- operaciones largas con progreso -----------------------------------------
+
+OP_DONE = {"copy": "Copiado", "move": "Movido", "delete": "Borrado", "download": "Descargado al PC",
+           "chmod": "Permisos puestos", "extract": "Extraído"}
+OP_FAIL = {"copy": "Error al copiar", "move": "Error al mover", "delete": "Error al borrar",
+           "download": "Error al descargar", "chmod": "Error al poner permisos", "extract": "Error al extraer"}
+
+
+def _fm_start(op, items_total, fn, where=None, names=None):
     with LOCK:
         if FMOP["busy"]:
             raise E.PipeError("Ya hay una operacion en marcha en el explorador")
         FMOP.update(busy=True, op=op, current="", items_done=0, items_total=items_total, bytes_done=0,
                     bytes_total=0, error="", message="", t0=time.time(), local="")
     FM_CANCEL.clear()
+    what = ", ".join((names or [])[:3]) + ("…" if names and len(names) > 3 else "")
+    link = {"tab": "Files", "path": where} if where else None
 
     def run():
         try:
@@ -664,6 +868,10 @@ def _fm_start(op, items_total, fn):
             with LOCK:
                 if not FMOP["message"]:
                     FMOP["message"] = "Hecho"
+                msg = FMOP["message"]
+            if time.time() - FMOP["t0"] > 8 or op in ("extract",):
+                notify("ok", "%s: %s" % (OP_DONE.get(op, op), what) if what else OP_DONE.get(op, op),
+                       msg if msg != "Hecho" else "", link)
         except E.Cancelled:
             with LOCK:
                 FMOP["error"] = "Cancelado"
@@ -671,59 +879,143 @@ def _fm_start(op, items_total, fn):
             traceback.print_exc()
             with LOCK:
                 FMOP["error"] = str(e)
+            notify("err", "%s: %s" % (OP_FAIL.get(op, op), what) if what else OP_FAIL.get(op, op),
+                   str(e), link)
         finally:
             with LOCK:
                 FMOP["busy"] = False
     threading.Thread(target=run, daemon=True).start()
 
 
-def fm_paste(op, srcs, dst, overwrite=False):
-    bf = fm_bf()
+def _names_in(path):
+    try:
+        return {e["name"]: e["dir"] for e in fm_list(path)["entries"]}
+    except Exception:
+        return {}
+
+
+def _free_name(name, taken):
+    """'juego' -> 'juego (2)'; 'a.zip' -> 'a (2).zip'."""
+    base, ext = name, ""
+    m = re.match(r"^(.*?)(\.[A-Za-z0-9]{1,5})$", name)
+    if m and m.group(1):
+        base, ext = m.group(1), m.group(2)
+    k = 2
+    while "%s (%d)%s" % (base, k, ext) in taken:
+        k += 1
+    return "%s (%d)%s" % (base, k, ext)
+
+
+def fm_conflicts(srcs, dst):
+    dst = fm_clean(dst)
+    have = _names_in(dst)
+    out = []
+    for s in srcs:
+        s = fm_clean(s)
+        n = posixpath.basename(s)
+        if n in have:
+            out.append({"name": n, "dir": have[n], "same": posixpath.dirname(s) == dst})
+    return out
+
+
+def fm_paste(op, srcs, dst, mode="replace"):
+    """mode: replace (reemplaza archivos / combina carpetas), skip, keepboth."""
     dst = fm_clean(dst)
     srcs = [fm_clean(x) for x in srcs]
+    if mode not in ("replace", "skip", "keepboth"):
+        mode = "replace"
     for s in srcs:
         if dst == s or dst.startswith(s + "/"):
             raise E.PipeError("No se puede %s una carpeta dentro de si misma" % ("mover" if op == "move" else "copiar"))
+    cfg = cfg_snapshot()
+    bf = fm_bf_opt()
+
+    def bf_job(kind, s, d, overwrite):
+        bf._req("POST", "/api/fs/" + kind, form={"src": s, "dst": d, "overwrite": "1" if overwrite else "0"})
+        while True:
+            time.sleep(0.7)
+            if FM_CANCEL.is_set():
+                try:
+                    bf._req("GET", "/api/fs/job/cancel")
+                except Exception:
+                    pass
+            j = bf._req("GET", "/api/fs/job/status")
+            with LOCK:
+                FMOP.update(bytes_done=int(j.get("copiedBytes") or 0), bytes_total=int(j.get("totalBytes") or 0),
+                            current=j.get("current") or s)
+            if not j.get("busy"):
+                if j.get("error"):
+                    raise E.PipeError(j["error"])
+                break
+        if FM_CANCEL.is_set():
+            raise E.Cancelled()
+
+    def relay(s, target):
+        def prog(done, total, cur):
+            with LOCK:
+                FMOP.update(bytes_done=done, bytes_total=total, current=cur)
+        ftp_relay_copy(cfg, s, target, FM_CANCEL, prog)
 
     def work():
+        taken = set(_names_in(dst))
         for i, s in enumerate(srcs):
             if FM_CANCEL.is_set():
                 raise E.Cancelled()
+            name = posixpath.basename(s)
+            same_dir = posixpath.dirname(s) == dst
             with LOCK:
                 FMOP.update(current=s, items_done=i, bytes_done=0, bytes_total=0)
-            if op == "move" and posixpath.dirname(s) == dst:
+            if op == "move" and same_dir:
                 continue
-            bf._req("POST", "/api/fs/" + op, form={"src": s, "dst": dst, "overwrite": "1" if overwrite else "0"})
-            while True:
-                time.sleep(0.7)
-                if FM_CANCEL.is_set():
+            new = name
+            if name in taken:
+                if mode == "skip":
+                    continue
+                if mode == "keepboth" or same_dir:
+                    new = _free_name(name, taken)
+            taken.add(new)
+            target = dst.rstrip("/") + "/" + new
+            if bf is not None:
+                if new == name:
+                    bf_job(op, s, dst, mode == "replace")
+                else:
+                    # BFpilot copia con el mismo nombre: a una carpeta temporal y luego se renombra
+                    tmp = "%s/.ps5d-%s" % (dst.rstrip("/"), secrets.token_hex(3))
+                    bf.mkdir(tmp)
                     try:
-                        bf._req("GET", "/api/fs/job/cancel")
+                        bf_job(op, s, tmp, False)
+                        bf.rename(tmp + "/" + name, target)
+                    finally:
+                        try:
+                            bf.delete(tmp)
+                        except Exception:
+                            pass
+            else:
+                if op == "move":
+                    try:
+                        E.Ftp(cfg).call(lambda f: f.rename(s, target))
+                        continue
                     except Exception:
-                        pass
-                j = bf._req("GET", "/api/fs/job/status")
-                with LOCK:
-                    FMOP.update(bytes_done=int(j.get("copiedBytes") or 0), bytes_total=int(j.get("totalBytes") or 0),
-                                current=j.get("current") or s)
-                if not j.get("busy"):
-                    if j.get("error"):
-                        raise E.PipeError(j["error"])
-                    break
-            if FM_CANCEL.is_set():
-                raise E.Cancelled()
+                        pass            # otro disco o ya existe: copia y luego borra
+                relay(s, target)
+                if op == "move":
+                    ftp_rmtree(cfg, s, FM_CANCEL)
         with LOCK:
             FMOP["items_done"] = len(srcs)
-    _fm_start(op, len(srcs), work)
+    _fm_start(op, len(srcs), work, where=dst, names=[posixpath.basename(x) for x in srcs])
 
 
 def fm_delete(paths):
-    bf = fm_bf()
     paths = [fm_clean(x) for x in paths]
     for p in paths:
         if p.count("/") < 2:
             raise E.PipeError("Por seguridad no borro carpetas de primer nivel (%s)" % p)
+    bf = fm_bf_opt()
+    cfg = cfg_snapshot()
 
     def free_now():
+        if bf is None:
+            return None
         try:
             return int(bf._req("GET", "/api/fs/stat", {"path": paths[0].rsplit("/", 1)[0] or "/"},
                                timeout=8).get("availableBytes") or 0)
@@ -749,13 +1041,70 @@ def fm_delete(paths):
                 raise E.Cancelled()
             with LOCK:
                 FMOP.update(current=p, items_done=i)
-            bf.delete(p, FM_CANCEL, on_tick=tick)
+            if bf is not None:
+                bf.delete(p, FM_CANCEL, on_tick=tick)
+            else:
+                ftp_rmtree(cfg, p, FM_CANCEL,
+                           lambda rp, k, n: FMOP.update(current=rp))
         tick()
         with LOCK:
             FMOP["items_done"] = len(paths)
             if FMOP["bytes_done"]:
                 FMOP["message"] = "Hecho: liberados %s" % human(FMOP["bytes_done"])
-    _fm_start("delete", len(paths), work)
+    _fm_start("delete", len(paths), work, where=posixpath.dirname(paths[0]) if paths else None,
+              names=[posixpath.basename(x) for x in paths])
+
+
+def fm_du(path):
+    path = fm_clean(path)
+    bf = fm_bf_opt()
+    if bf is not None:
+        return bf.du(path, timeout=300)
+    return ftp_du(cfg_snapshot(), path)
+
+
+def fm_extract(src, folder, password="", exists="keepboth"):
+    """Descomprime un .rar/.7z/.zip que ya esta en la consola, en una carpeta a su lado."""
+    src = fm_clean(src)
+    bf = E.BFpilot(cfg_snapshot())
+    if not bf.alive():
+        raise E.PipeError("Descomprimir en la consola necesita BFpilot cargado en la PS5")
+    parent, name = posixpath.dirname(src) or "/", posixpath.basename(src)
+    if not E.is_archive(name):
+        raise E.PipeError("Eso no es un comprimido (.rar, .7z o .zip)")
+    have = _names_in(parent)
+    # de un .part3.rar o un .7z.002 se extrae desde el primero
+    group = [n for n in have if not have[n] and E.set_key(n) == E.set_key(name) and E.is_archive(n)]
+    first = E.first_volume(group or [name]) or name
+    src = parent.rstrip("/") + "/" + first
+    folder = (folder or "").strip().strip("/")
+    if not folder or "/" in folder or folder in (".", ".."):
+        raise E.PipeError("Pon un solo nombre de carpeta, sin /")
+    if folder in have:          # BFpilot no extrae sobre una carpeta que ya existe
+        folder = _free_name(folder, set(have))
+    dst = parent.rstrip("/") + "/" + folder
+
+    def work():
+        with LOCK:
+            FMOP.update(current=first)
+
+        def st(j):
+            with LOCK:
+                FMOP.update(bytes_done=int(j.get("bytesWritten") or 0), bytes_total=int(j.get("totalBytes") or 0),
+                            current=j.get("current") or first)
+        try:
+            j = bf.extract(src, dst, password, FM_CANCEL, st)
+        except E.PipeError as e:
+            if E.is_password_error(str(e)):
+                raise E.PipeError("Contraseña incorrecta o necesaria: vuelve a intentarlo con la contraseña")
+            raise
+        try:
+            bf.fix_perms(dst, FM_CANCEL)
+        except Exception:
+            pass
+        with LOCK:
+            FMOP.update(items_done=1, message="Extraído en %s" % dst)
+    _fm_start("extract", 1, work, where=parent, names=[first])
 
 
 def fm_download(paths):
@@ -813,11 +1162,12 @@ def fm_download(paths):
         with LOCK:
             FMOP.update(items_done=len(files), bytes_done=done,
                         message="Guardado en %s" % root_local)
-    _fm_start("download", len(paths), work)
+    _fm_start("download", len(paths), work, names=[posixpath.basename(x) for x in paths])
 
 
 def fm_chmod(paths):
-    bf = fm_bf()
+    bf = fm_bf_opt()
+    cfg = cfg_snapshot()
     paths = [fm_clean(x) for x in paths]
 
     def work():
@@ -825,7 +1175,10 @@ def fm_chmod(paths):
         for i, p in enumerate(paths):
             with LOCK:
                 FMOP.update(current=p, items_done=i)
-            c, _, _ = bf.fix_perms(p, FM_CANCEL)
+            if bf is not None:
+                c, _, _ = bf.fix_perms(p, FM_CANCEL)
+            else:
+                c = ftp_chmod_tree(cfg, p, FM_CANCEL)
             changed += c
         with LOCK:
             FMOP.update(items_done=len(paths), message="Permisos 777 puestos en %d elementos" % changed)
@@ -1006,7 +1359,32 @@ def fm_api(p, b):
     if p == "/api/fm/list":
         return fm_list(b.get("path") or "/data")
     if p == "/api/fm/du":
-        return {"size": fm_bf().du(fm_clean(b.get("path")))}
+        return {"size": fm_du(b.get("path"))}
+    if p == "/api/fm/dirs":
+        path = fm_clean(b.get("path") or "/data")
+        return {"path": path, "dirs": sorted([e["name"] for e in fm_list(path)["entries"] if e["dir"]],
+                                             key=str.lower)}
+    if p == "/api/fm/conflicts":
+        return {"conflicts": fm_conflicts(b.get("srcs") or [], b.get("dst") or "/")}
+    if p == "/api/fm/extract":
+        fm_extract(b.get("src"), b.get("folder"), str(b.get("password") or ""), b.get("exists") or "keepboth")
+        return {}
+    if p == "/api/fm/drives":
+        bf = fm_bf_opt()
+        out = [{"path": "/data", "name": "Almacenamiento interno"}]
+        if bf is not None:
+            for m in (bf.places() or {}).get("mounts") or []:
+                mp = (m.get("path") or "").rstrip("/")
+                if re.match(r"^/mnt/(usb|ext)\d+$", mp):
+                    out.append({"path": mp, "name": ("USB " if "/usb" in mp else "Disco externo ") + mp[-1]})
+            for d in out:
+                try:
+                    st = bf._req("GET", "/api/fs/stat", {"path": d["path"]}, timeout=6)
+                    d["free"] = st.get("availableBytes")
+                    d["total"] = st.get("usableTotalBytes") or st.get("totalBytes")
+                except Exception:
+                    pass
+        return {"drives": out, "bfpilot": bf is not None}
     if p == "/api/fm/mkdir":
         path = fm_clean(b.get("path"))
         bf = E.BFpilot(cfg_snapshot())
@@ -1017,10 +1395,10 @@ def fm_api(p, b):
         return {}
     if p == "/api/fm/rename":
         src, dst = fm_clean(b.get("src")), fm_clean(b.get("dst"))
+        if posixpath.basename(dst) in _names_in(posixpath.dirname(dst) or "/"):
+            raise E.PipeError("Ya existe algo llamado %s en esa carpeta" % posixpath.basename(dst))
         bf = E.BFpilot(cfg_snapshot())
         if bf.alive():
-            if bf.exists(dst):
-                raise E.PipeError("Ya existe %s" % dst)
             bf.rename(src, dst)
         else:
             E.Ftp(cfg_snapshot()).call(lambda f: f.rename(src, dst))
@@ -1029,7 +1407,7 @@ def fm_api(p, b):
         op = b.get("op")
         if op not in ("copy", "move"):
             raise E.PipeError("operacion no valida")
-        fm_paste(op, b.get("srcs") or [], b.get("dst"), bool(b.get("overwrite")))
+        fm_paste(op, b.get("srcs") or [], b.get("dst"), b.get("mode") or ("replace" if b.get("overwrite") else "replace"))
         return {}
     if p == "/api/fm/delete":
         fm_delete(b.get("paths") or [])
@@ -1055,6 +1433,26 @@ def fm_api(p, b):
         return {"paths": pick_paths(b.get("kind") or "files", b.get("title") or "")}
     if p == "/api/history":
         return {"items": read_history()}
+    if p == "/api/notifs":
+        with NOTIF_LOCK:
+            return {"items": list(NOTIFS), "unread": sum(1 for n in NOTIFS if not n.get("read"))}
+    if p == "/api/notifs/read":
+        with NOTIF_LOCK:
+            for n in NOTIFS:
+                if b.get("all") or n["id"] == b.get("id"):
+                    n["read"] = not b.get("unread")
+        save_notifs()
+        return {}
+    if p == "/api/notifs/remove":
+        with NOTIF_LOCK:
+            NOTIFS[:] = [n for n in NOTIFS if n["id"] != b.get("id")]
+        save_notifs()
+        return {}
+    if p == "/api/notifs/clear":
+        with NOTIF_LOCK:
+            NOTIFS[:] = []
+        save_notifs()
+        return {}
     if p == "/api/history/clear":
         _save_json(HISTORY_FILE, [])
         return {}
@@ -2059,7 +2457,28 @@ def extract_worker():
 TOKEN = secrets.token_urlsafe(18)
 
 
+CONN_STATE = {"ftp": None, "bf": None}
+
+
+def _conn_change(kind, ok, detail):
+    """Avisa solo cuando algo que funcionaba deja de funcionar (y cuando vuelve)."""
+    name = "el FTP" if kind == "ftp" else "BFpilot"
+    prev = CONN_STATE[kind]
+    CONN_STATE[kind] = ok
+    if prev is True and not ok:
+        notify("warn", "Se perdió la conexión con %s de la PS5" % name, detail)
+    elif prev is False and ok:
+        notify("info", "Otra vez conectado con %s de la PS5" % name)
+
+
 def test_connection(cfg):
+    out = _test_connection(cfg)
+    _conn_change("ftp", out["ftp"] == "ok", out["ftp"])
+    _conn_change("bf", str(out["bf"]).startswith("ok"), out["bf"])
+    return out
+
+
+def _test_connection(cfg):
     out = {"ftp": None, "bf": None, "free": None}
     try:
         f = E.Ftp(cfg).connect()
@@ -2588,6 +3007,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if self.headers.get("X-UI"):
                 UI_SEEN["t"] = time.time()
+                UI_SEEN["bye"] = 0.0
             with LOCK:
                 jobs = []
                 for j in JOBS:
@@ -2595,7 +3015,8 @@ class Handler(BaseHTTPRequestHandler):
                     d["has_password"] = bool(j.get("password"))
                     d["pcx"] = (j.get("info") or {}).get("mode") == "pcx"
                     jobs.append(d)
-                st = {"ok": True, "version": VERSION, "home": HERE, "settings": dict(SETTINGS), "jobs": jobs,
+                st = {"ok": True, "version": VERSION, "home": HERE,
+                      "unread": sum(1 for n in NOTIFS if not n.get("read")), "settings": dict(SETTINGS), "jobs": jobs,
                       "inbox": len(INBOX), "repo": SETTINGS.get("update_repo") or DEFAULT_REPO}
             st["settings"].pop("ftp_pass", None)
             return self._send(200, st)
@@ -2607,6 +3028,12 @@ class Handler(BaseHTTPRequestHandler):
             or o.startswith("extension://")
 
     def do_POST(self):
+        if self.path.split("?")[0] == "/api/bye":
+            # la ventana se esta cerrando (sendBeacon no deja poner cabeceras: token en la URL)
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            if (q.get("t") or [""])[0] == TOKEN:
+                UI_SEEN["bye"] = time.time()
+            return self._send(200, {"ok": True})
         if self.path == "/api/ext/capture":
             if not self._from_extension():
                 return self._send(403, {"ok": False, "error": "solo desde la extension"})
@@ -2657,6 +3084,9 @@ class Handler(BaseHTTPRequestHandler):
                 ver, url, notes = github_latest(update_repo())
             except Exception as e:
                 return self._send(200, {"ok": False, "error": str(e)})
+            if _ver_tuple(ver) > _ver_tuple(VERSION):
+                notify("info", "Hay una versión nueva: %s" % ver, "Pulsa Actualizar arriba para instalarla.",
+                       {"action": "update"}, key="update:" + ver)
             return self._send(200, {"ok": True, "current": VERSION, "latest": ver, "notes": notes,
                                     "newer": _ver_tuple(ver) > _ver_tuple(VERSION)})
         if p == "/api/update/github":
@@ -2714,7 +3144,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/space/") or p in ("/api/pick", "/api/history", "/api/history/clear"):
+        if p.startswith("/api/fm/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p in ("/api/pick", "/api/history", "/api/history/clear"):
             try:
                 return self._send(200, dict(ok=True, **fm_api(p, b)))
             except E.PipeError as e:
@@ -3111,16 +3541,24 @@ def busy():
         return any(j["status"] not in ("hecho", "error", "cancelado", "pausado") for j in JOBS)
 
 
-UI_SEEN = {"t": 0.0}
+UI_SEEN = {"t": 0.0, "bye": 0.0}
 
 
-def watch_ui(grace=180):
-    """Si la ventana lleva un rato cerrada y no hay nada en marcha, se cierra el programa.
-    Si hay trabajo, sigue en segundo plano; abre PS5 Directo otra vez para verlo."""
+def watch_ui(grace=30, silent=6 * 3600):
+    """Se cierra el programa cuando cierras la ventana (la ventana avisa al cerrarse) y no hay
+    nada en marcha. Si la ventana solo esta minimizada, el navegador la "duerme" y deja de
+    preguntar: eso NO cuenta como cerrada (antes el programa se apagaba y al volver salia
+    "Failed to fetch"). Por si el navegador se cuelga sin avisar, tras `silent` segundos
+    sin noticias tambien se cierra."""
     while True:
         time.sleep(10)
-        seen = UI_SEEN["t"]
-        if seen and time.time() - seen > grace and not busy():
+        seen, bye = UI_SEEN["t"], UI_SEEN["bye"]
+        if busy() or not seen:
+            continue
+        now = time.time()
+        if bye and bye >= seen - 1 and now - bye > grace:
+            os._exit(0)
+        if now - seen > silent:
             os._exit(0)
 
 
