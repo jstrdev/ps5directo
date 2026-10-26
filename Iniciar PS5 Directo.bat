@@ -2,11 +2,15 @@
 chcp 65001 >nul
 title PS5 Directo
 cd /d "%~dp0"
-where py >nul 2>nul
-if %errorlevel%==0 (
-  py -3 app.py %*
+if exist "%~dp0python\python.exe" (
+  "%~dp0python\python.exe" app.py %*
 ) else (
-  python app.py %*
+  where py >nul 2>nul
+  if not errorlevel 1 (
+    py -3 app.py %*
+  ) else (
+    python app.py %*
+  )
 )
 if %errorlevel%==3 exit /b 0
 echo.

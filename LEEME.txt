@@ -1,6 +1,54 @@
-PS5 DIRECTO 1.19.1
+PS5 DIRECTO 1.20.0
 ==================
 (English: see README_EN.txt)
+
+EMPIEZA AQUÍ (5 MINUTOS)
+========================
+Lo que necesitas antes:
+  - Una PS5 con el jailbreak ya hecho. PS5 Directo no hace el jailbreak.
+  - Un PC con Windows 10 u 11 conectado a la misma red que la PS5.
+
+Paso 1. Descarga
+  En la página de GitHub del programa, entra en "Releases" y descarga
+  PS5Directo-X.Y.Z-portable-windows.zip (trae todo, no hay que instalar
+  nada más). Descomprímelo en una carpeta, por ejemplo en Documentos.
+
+Paso 2. Ábrelo
+  Doble clic en "PS5 Directo.vbs". Se abre en su propia ventana y crea un
+  icono en el escritorio para la próxima vez. Si Windows pregunta si quieres
+  abrir un archivo descargado de internet, pulsa "Abrir".
+
+Paso 3. En la PS5
+  Carga el jailbreak como siempre y ShadowMountPlus (es lo que hace que lo
+  que envíes aparezca en el menú). Si tu menú de payloads también carga el
+  FTP (ftpsrv) y BFpilot, mejor; si no, PS5 Directo te ayuda en el paso 5.
+
+Paso 4. La IP de la PS5
+  El asistente que sale al abrir te la pide. En la PS5: Ajustes > Red >
+  Ver estado de la conexión > "Dirección IPv4" (algo como 192.168.1.50).
+
+Paso 5. Comprobar la conexión
+  El asistente mira si responden el FTP y BFpilot. Si alguno sale en rojo,
+  pulsa "Cargar" a su lado y se envía solo. (Con Y2JB Autoloader eso no
+  funciona: cárgalos desde Payload Manager en la PS5 y pulsa "Volver a
+  comprobar".)
+
+Paso 6. Envía algo
+  Pega un enlace de descarga directa (o arrastra un archivo de tu PC a la
+  ventana) y pulsa "Añadir a la cola". Cuando ponga "Listo", ya está en el
+  menú de la PS5.
+
+¿Algo no va?
+  Ajustes > "Revisión completa" dice qué falla y cómo arreglarlo. Los dos
+  puntos de arriba (FTP y BFpilot) en rojo: púlsalos para cargarlos. Puedes
+  repetir el asistente en Ajustes > "Asistente de primeros pasos".
+
+Aviso: PS5 Directo solo copia archivos. Úsalo con contenido que tengas
+derecho a usar (tus copias de seguridad y homebrew). Lo que hagas con él
+es responsabilidad tuya.
+
+(Lo de abajo es la guía completa: no hace falta leerla para empezar.)
+
 
 Pega los enlaces (o arrastra archivos de tu PC) y la herramienta hace todo sola:
 
@@ -34,10 +82,10 @@ PESTAÑAS
     Sin BFpilot casi todo funciona por FTP (copiar pasa por el PC, más
     lento); descomprimir y ver el espacio libre sí necesitan BFpilot.
   - Espacio: gráfico de quesitos con lo que ocupa sitio en la consola, con
-    el nombre de cada juego y su tamaño. Avisa de juegos repetidos (por
+    el nombre de cada aplicación y su tamaño. Avisa de contenido repetido (por
     ejemplo la carpeta y su versión convertida a imagen), envíos a medias y
     restos, y permite borrarlos desde ahí (pide confirmación). Necesita
-    BFpilot. Los juegos instalados desde la propia PS5 se ven pero se borran
+    BFpilot. Lo instalado desde la propia PS5 se ve pero se borra
     desde la consola.
   - Actividad: historial de lo que se ha terminado o ha fallado.
 
@@ -175,12 +223,138 @@ de quien es la culpa cuando va lento. Tambien hay uno solo PC -> PS5 en
 Ajustes.
 
 
+BIBLIOTECA
+----------
+La pestaña Biblioteca enseña lo que hay en /data/homebrew (y en los USB) con su
+portada, nombre, Title ID, versión, si es carpeta o imagen (.ffpkg, .ffpfsc,
+.exfat) y qué firmware pide. Si pones el firmware de tu PS5 en Ajustes
+(por ejemplo 13.60), marca en rojo los que no arrancarán. También avisa de
+contenido repetido, de DLC/actualizaciones y de carpetas incompletas. Funciona
+solo con FTP; con BFpilot además ve cuánto ocupa cada carpeta.
+El firmware sale de param.json y, si trae backport (carpeta
+fakelib), de lo que piden sus ejecutables. Al terminar cada transferencia
+también se comprueba y te avisa si no va a arrancar.
+
+
+IMÁGENES Y LZ4 (PS5 DUMP FORGE)
+-------------------------------
+En "Cómo dejarlo en la PS5" la opción por defecto es «Sin convertir»: se deja
+tal como viene (un comprimido se descomprime; si ya es una imagen .ffpkg,
+.exfat o .ffpfsc, o viene en LZ4, se envía sin tocar). Además puedes elegir:
+  - Carpeta normal: siempre acaba en carpeta; si es una imagen, un .fpkg o
+    viene en LZ4, se deshace en el PC.
+  - Imagen .ffpkg: la que recomienda ShadowMountPlus. Velocidad completa.
+  - Imagen .exfat o .ffpfs: también las monta ShadowMountPlus.
+  - Imagen comprimida .ffpfsc: ocupa un 30-60 % menos, pero la consola la lee
+    más despacio (150-250 MB/s) y algunos títulos pueden dar tirones.
+  - Paquete .fpkg: se instala como una app de la tienda. Solo firmware 11.60
+    o inferior (kstuff, fpkg-enable y ppr-patch). Se deja en /data/pkg.
+    Para .fpkg y .ffpfsc puedes elegir la compresión (rápida, equilibrada,
+    mínimo tamaño o sin comprimir).
+  - LZ4 (carpeta o dentro de una .ffpkg): solo títulos AMPR. Experimental: con
+    algunos títulos se cuelga al guardar partida. Si no es AMPR, se
+    manda como carpeta o como .ffpkg normal.
+Se prepara en el PC con PS5 Dump Forge (github.com/quer3q/ps5-dump-forge, se
+descarga solo la primera vez) y se envía un único archivo: va más rápido por
+FTP que miles de archivos pequeños y no tiene el problema de permisos. Hace
+falta sitio en el PC para la imagen. Las imágenes .ffpkg/.ffpfsc no son
+paquetes FPKG: no se instalan, ShadowMountPlus las monta (hasta 13.60 con
+ShadowMountPlus 1.7). Los DLC y actualizaciones se mandan como carpeta.
+
+
+ANTES DE ENVIAR
+---------------
+- Si ya está en la consola (mismo Title ID), la transferencia se
+  para y te pregunta: enviar igualmente, reemplazar la copia que hay o
+  cancelar. Se puede desactivar en Ajustes.
+- Si pegas el .sfv / .md5 / .sha1 junto con las partes (o están en la misma
+  carpeta del PC), cada parte se comprueba mientras se envía. Si una llega
+  dañada, se borra de la consola y se avisa antes de descomprimir.
+- Si falta sitio, el error trae un botón "Hacer sitio": en la pestaña Espacio
+  te propone qué borrar (restos, copias repetidas, instaladores .pkg) hasta
+  llegar a lo que necesitas. Nada se borra sin confirmar.
+
+
+PAYLOADS, DIAGNÓSTICO, MÓVIL Y PROGRAMAR
+----------------------------------------
+- Pulsa en los puntos FTP / BFpilot (o Ajustes > Cargar payloads) para
+  mandar ftpsrv o BFpilot a la PS5 por el cargador de ELF (puerto 9021,
+  etaHEN o elfldr). Se descargan de GitHub y se guardan. El cargador de
+  Y2JB Autoloader solo acepta la propia consola: con él usa Payload Manager.
+- "¿Por qué va lento?" revisa si el PC va por Wi-Fi o cable, la banda y la
+  señal, cables a 100 Mb/s, VPN, redes distintas y el ping a la PS5, y te
+  dice qué cambiar.
+- El botón del móvil (arriba) enseña un código QR para abrir PS5 Directo
+  desde el móvil en la misma red: pegar enlaces, ver la cola, pausar, ver
+  tu biblioteca. Desde el móvil no se pueden instalar actualizaciones ni
+  cambiar rutas de programas.
+- "Programar" (en la cola): empezar a una hora y suspender o apagar el PC
+  al terminar (avisa y espera 1 minuto). Mientras hay envíos, el PC no se
+  suspende solo.
+
+
+VERSIÓN PORTABLE
+----------------
+En cada versión hay dos descargas: PS5Directo-X.Y.Z.zip (necesita Python
+instalado) y PS5Directo-X.Y.Z-portable-windows.zip, que trae Python dentro:
+descomprimir y abrir, sin instalar nada.
+
+
+NOVEDADES 1.20.0
+- Asistente de primeros pasos (IP, comprobar la conexión y cargar lo que
+  falta, firmware) y una guía más corta y sencilla.
+- Pestaña Biblioteca: lo que hay en la consola con portada, versión, formato y
+  el firmware que pide; marca los que no arrancan en tu firmware, repetidos,
+  DLC e incompletos.
+- Imágenes .ffpkg / .ffpfsc y LZ4 con PS5 Dump Forge (opcional): se preparan
+  en el PC y se envía un solo archivo. Se eligen con tarjetas debajo del
+  destino, con la explicación de cada uno y el espacio que hace falta en el PC;
+  la primera vez avisa de que convertir ocupa sitio en el PC hasta terminar.
+  Si lo descargado ya es una imagen, se envía tal cual o se convierte al
+  formato elegido, y se coloca aunque BFpilot no esté cargado.
+- Nuevos formatos: carpeta normal, .exfat, .ffpfs y .fpkg (con compresión
+  a elegir). Se aceptan carpetas, .zip/.7z/.rar, imágenes, .fpkg y LZ4, y
+  sin 7-Zip el contenido se saca con PS5 Dump Forge.
+- Los formatos van agrupados (primero los que ocupan menos) y el botón
+  «¿Cuál elijo?» compara ventajas e inconvenientes de cada uno.
+- Tiempo que queda (y hora aproximada) al enviar, descomprimir y convertir.
+- En el móvil, al terminar o fallar algo sale un aviso grande, vibra y pita
+  (con la página abierta).
+- Biblioteca: marca como LZ4 las carpetas empaquetadas en LZ4 (y filtro LZ4).
+- Arreglado: al reanudar un envío preguntaba «Ya está en la consola» por lo
+  que ese mismo envío había dejado a medias.
+- Arreglado: en algunos Chrome de Android la página del móvil salía en
+  blanco.
+- Abrir en el móvil: la página va comprimida (carga antes por Wi-Fi) y la
+  ventana muestra «Qué le llega del móvil» para saber si llega y si se corta.
+- Aviso de firmware: pon el de tu PS5 en Ajustes y te avisa de lo que no
+  arrancará (tiene en cuenta el backport).
+- Si ya está en la consola, pregunta antes de enviarlo (enviar
+  igualmente, reemplazar o cancelar).
+- Comprobación con .sfv / .md5 / .sha1 mientras se envía.
+- "Hacer sitio": propone qué borrar cuando falta espacio.
+- Cargar ftpsrv y BFpilot en la PS5 desde el programa (puerto 9021).
+- "¿Por qué va lento?": diagnóstico de la red del PC.
+- Abrir desde el móvil con un código QR.
+- Programar la cola, suspender o apagar al terminar, y el PC no se
+  suspende mientras envía.
+- Versión portable con Python incluido.
+- Arreglado: solo con FTP (sin BFpilot), ftpsrv devolvía la raíz de la consola
+  al listar una carpeta; afectaba al explorador y al envío de carpetas.
+- Abrir en el móvil: botón para dar permiso en el Firewall de Windows si la
+  página se queda en blanco.
+
+NOVEDADES 1.19.2
+- Arreglado "504 Option not supported" en Archivos de la consola cuando
+  BFpilot no está cargado: el explorador ya lista las carpetas solo con
+  ftpsrv (y con servidores FTP que no tienen MLSD).
+
 NOVEDADES 1.19.1
 - Arreglado: la cola dejaba de actualizarse sola (desde la 1.18.3), así que
   "Quitar" parecía no hacer nada y luego decía "no existe".
 - El explorador vuelve a listar la carpeta abierta cuando termina una subida
   a esa carpeta.
-- Arreglado "Descargar al PC" con juegos: ftpsrv descifraba al vuelo los
+- Arreglado "Descargar al PC" con aplicaciones: ftpsrv descifraba al vuelo los
   eboot.bin/.prx/.sprx y la descarga salía incompleta. Ahora se transfieren
   tal cual están (también mejora comparar tamaños al reanudar carpetas).
   Gracias a RichyMX por encontrarlo y proponer el arreglo.
@@ -221,7 +395,7 @@ NOVEDADES 1.18.1
 
 NOVEDADES 1.18
 - Pestaña "Espacio": gráfico de quesitos y lista de todo lo que ocupa sitio en
-  la consola, con el nombre de cada juego y su tamaño. Marca juegos repetidos
+  la consola, con el nombre de cada aplicación y su tamaño. Marca contenido repetido
   (por ejemplo la carpeta y su versión convertida), envíos a medias y restos,
   y se pueden borrar desde ahí. También con discos USB/externos.
 - Descargas más rápidas: cada conexión se reutiliza para muchos trozos

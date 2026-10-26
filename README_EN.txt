@@ -1,5 +1,31 @@
-PS5 DIRECTO 1.19.1 — USER GUIDE (English)
+PS5 DIRECTO 1.20.0 — USER GUIDE (English)
 =========================================
+
+QUICK START (5 MINUTES)
+=======================
+You need: a PS5 that is already jailbroken (PS5 Directo doesn't do that)
+and a Windows 10/11 PC on the same network.
+
+1. Download PS5Directo-X.Y.Z-portable-windows.zip from the GitHub Releases
+   page (nothing else to install) and extract it, e.g. into Documents.
+2. Double-click "PS5 Directo.vbs". If Windows asks whether to open a file
+   downloaded from the internet, click "Open".
+3. On the PS5, load your jailbreak and ShadowMountPlus as usual.
+4. The wizard asks for the PS5's IP: on the PS5, Settings > Network >
+   View Connection Status > "IPv4 Address".
+5. It checks the FTP server and BFpilot. If one is red, click "Load" next to
+   it. (With Y2JB Autoloader that doesn't work: load them from Payload
+   Manager on the PS5 and click "Check again".)
+6. Paste a direct download link (or drag a file onto the window) and click
+   "Add to queue". When it says "Done", it's in the PS5's menu.
+
+Something wrong? Settings > "Full check" tells you what and how to fix it.
+
+Note: PS5 Directo only copies files. Use it with content you have the
+right to use (your own backups and homebrew).
+
+(The full guide follows; you don't need it to get started.)
+
 
 Paste links (or drag files from your PC) and the tool does the rest:
 
@@ -33,10 +59,10 @@ TABS
     Without BFpilot almost everything works over FTP (copying goes through
     the PC, slower); extracting and showing free space do need BFpilot.
   - Space: a pie chart of what takes up space on the console, with each
-    game's name and size. It flags repeated games (for example a folder and
+    app's name and size. It flags duplicate content (for example a folder and
     its version converted to an image), half-sent transfers and leftovers,
     and lets you delete them from there (it asks first). Needs BFpilot.
-    Games installed from the PS5 itself are shown but deleted on the console.
+    Anything installed from the PS5 itself is shown but deleted on the console.
   - Activity: history of finished and failed transfers.
 
 PC FOLDERS
@@ -225,12 +251,112 @@ Images (.exfat, .ffpkg, .ffpfsc) go to /data/homebrew.
 Settings and queue are stored in  %USERPROFILE%\.ps5directo
 
 
+LIBRARY
+-------
+The Library tab shows what's in /data/homebrew (and on USB drives) with its
+cover, name, Title ID, version, folder or image (.ffpkg, .ffpfsc, .exfat)
+and the firmware it needs. Set your PS5's firmware in Settings (e.g. 13.60)
+and the ones that won't launch are flagged in red. It also flags duplicates,
+DLC/updates and incomplete folders. Works with FTP alone; with BFpilot it
+also shows how much each folder takes. Firmware comes from param.json and,
+for backported titles (fakelib folder), from what the executables require.
+Every finished transfer is checked too.
+
+IMAGES AND LZ4 (PS5 DUMP FORGE)
+-------------------------------
+"How to leave it on the PS5" defaults to "No conversion": left as it comes
+(archives are extracted; an .ffpkg, .exfat or .ffpfsc image or LZ4 content
+is sent untouched). You can also pick:
+  - Plain folder: always ends up as a folder; images, .fpkg and LZ4 are
+    unpacked on the PC.
+  - .ffpkg image: recommended by ShadowMountPlus. Full speed.
+  - .exfat or .ffpfs image: ShadowMountPlus mounts them too.
+  - Compressed .ffpfsc image: 30-60% smaller, but read more slowly
+    (150-250 MB/s); some titles may stutter.
+  - .fpkg package: installs like a store app. Firmware 11.60 or lower only
+    (kstuff, fpkg-enable and ppr-patch). Left in /data/pkg. For .fpkg and
+    .ffpfsc you can pick the compression.
+  - LZ4 (folder or inside an .ffpkg): AMPR titles only. Experimental: some
+    titles crash when saving. Non-AMPR content is sent as a folder or plain
+    .ffpkg.
+It's prepared on the PC with PS5 Dump Forge (github.com/quer3q/ps5-dump-forge,
+downloaded automatically the first time) and sent as a single file. Needs
+room on the PC for the image. .ffpkg/.ffpfsc images are not FPKG packages:
+they aren't installed, ShadowMountPlus mounts them. DLC and updates are
+sent as folders.
+
+BEFORE SENDING
+--------------
+- If it's already on the console (same Title ID), the transfer
+  stops and asks: send anyway, replace the copy there, or cancel.
+- Paste the .sfv / .md5 / .sha1 with the parts (or keep it next to them on
+  the PC) and every part is checked while it's sent.
+- When there's no room, the error has a "Make room" button that suggests
+  what to delete in the Space tab. Nothing is deleted without confirmation.
+
+PAYLOADS, DIAGNOSTICS, PHONE AND SCHEDULE
+-----------------------------------------
+- Click the FTP / BFpilot dots (or Settings > Load payloads) to send ftpsrv
+  or BFpilot to the PS5's ELF loader (port 9021, etaHEN or elfldr). The Y2JB
+  Autoloader loader only accepts the console itself: use Payload Manager.
+- "Why is it slow?" checks Wi-Fi vs cable, band and signal, 100 Mb/s links,
+  VPNs, different networks and the ping to the PS5.
+- The phone button shows a QR code to open PS5 Directo from your phone on
+  the same network.
+- "Schedule" (queue): start at a set time and sleep or shut down the PC when
+  done. The PC doesn't go to sleep while transfers are running.
+
+PORTABLE VERSION
+----------------
+Each release has PS5Directo-X.Y.Z.zip (needs Python installed) and
+PS5Directo-X.Y.Z-portable-windows.zip, which includes Python: extract and run.
+
 WHAT'S NEW
 ----------
+1.20.0 - First-steps wizard (IP, connection check and loading what's
+        missing, firmware) and a shorter, simpler guide.
+      - New Library tab: what's on the console with cover, version, format
+        and required firmware, flagging what won't launch on yours.
+      - .ffpkg / .ffpfsc images and LZ4 with PS5 Dump Forge (optional):
+        prepared on the PC and sent as a single file. Picked with cards under
+        the destination, each explained, with the room needed on the PC; the
+        first time it warns that converting takes PC space until it's done.
+        A download that's already an image is sent as is or converted to
+        the chosen format, and placed even without BFpilot.
+      - New formats: plain folder, .exfat, .ffpfs and .fpkg (with a
+        compression choice). Without 7-Zip, PS5 Dump Forge extracts it.
+      - Formats are grouped (space savers first) and "Which one?"
+        compares the pros and cons of each.
+      - Time left (and rough finish time) when sending, extracting and
+        converting. On the phone, a big alert with vibration and a beep
+        when something finishes or fails (with the page open).
+      - Library: LZ4-packed folders are tagged LZ4 (plus an LZ4 filter).
+      - Fixed: resuming a transfer asked "Already on the console" about
+        its own half-sent copy.
+      - Fixed: the phone page was blank in some Android Chrome versions.
+      - Open on phone: the page is sent compressed and the dialog shows
+        "What arrives from the phone" to tell whether it gets there.
+      - Firmware warning (set yours in Settings), backport-aware.
+      - Asks before sending something that's already on the console.
+      - .sfv / .md5 / .sha1 checks while sending.
+      - "Make room": suggests what to delete when space runs out.
+      - Load ftpsrv and BFpilot on the PS5 from the app (port 9021).
+      - "Why is it slow?" network diagnostics.
+      - Open from your phone with a QR code.
+      - Schedule the queue, sleep or shut down when done, no sleep while
+        sending.
+      - Portable version with Python included.
+      - Fixed: with FTP only (no BFpilot), ftpsrv returned the console's root
+        when listing a folder; it affected the file browser and folder uploads.
+      - Phone access: a button to allow it in Windows Firewall if the page
+        stays blank.
+1.19.2 - Fixed "504 Option not supported" in Console files when BFpilot is
+        not loaded: the file browser now lists folders with ftpsrv alone
+        (and with FTP servers that have no MLSD).
 1.19.1 - Fixed: the queue stopped updating by itself (since 1.18.3), so
         "Remove" seemed to do nothing and then said "no existe". The file
         browser now relists the open folder when an upload to it finishes.
-        Fixed "Download to PC" for games: ftpsrv decrypted eboot.bin/.prx/
+        Fixed "Download to PC" for apps: ftpsrv decrypted eboot.bin/.prx/
         .sprx on the fly, so downloads came out incomplete. Files are now
         transferred exactly as stored (this also makes size comparisons
         when resuming folders correct). Thanks to RichyMX for finding it.
@@ -259,7 +385,7 @@ WHAT'S NEW
 1.18.1 - When deleting something big you see how much has been freed and how
         long it has taken, and the browser's free space updates meanwhile.
 1.18  - "Space" tab: a pie chart and list of everything that takes up space
-        on the console, by game name and size. It flags repeated games (for
+        on the console, by app name and size. It flags duplicate content (for
         example a folder and its converted version), half-sent transfers and
         leftovers, and deletes them from there. USB/external drives too.
       - Faster downloads: each connection is reused for many chunks in a row,

@@ -1,0 +1,48 @@
+# Publica una version: al subir una etiqueta vX.Y.Z crea la release de GitHub con dos .zip:
+#  - PS5Directo-X.Y.Z.zip                    la app (la que usa "Actualizar" dentro del programa)
+#  - PS5Directo-X.Y.Z-portable-windows.zip   la app + Python incluido: descomprimir y abrir, sin instalar nada
+name: Publicar version
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version de app.py
+        id: v
+        run: echo "ver=$(grep -oP 'VERSION = "\K[^"]+' app.py)" >> "$GITHUB_OUTPUT"
+
+      - name: La etiqueta tiene que coincidir con la version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: test "${GITHUB_REF_NAME#v}" = "${{ steps.v.outputs.ver }}"
+
+      - name: Paquete normal
+        run: |
+          mkdir -p dist/PS5Directo
+          git archive HEAD | tar -x -C dist/PS5Directo
+          rm -rf dist/PS5Directo/.github
+          (cd dist && zip -qr "PS5Directo-${{ steps.v.outputs.ver }}.zip" PS5Directo)
+
+      - name: Paquete portable (con Python para Windows)
+        run: |
+          PY=3.12.10
+          curl -fsSL -o py.zip "https://www.python.org/ftp/python/$PY/python-$PY-embed-amd64.zip"
+          mkdir -p dist/PS5Directo/python
+          unzip -q py.zip -d dist/PS5Directo/python
+          # que el Python incluido vea la carpeta del programa
+          for f in dist/PS5Directo/python/python*._pth; do printf '..\n' >> "$f"; done
+          (cd dist && zip -qr "PS5Directo-${{ steps.v.outputs.ver }}-portable-windows.zip" PS5Directo)
+
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: dist/*.zip

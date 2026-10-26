@@ -762,6 +762,110 @@ def make_source(text):
     return FileSource(text)
 
 
+_MONTHS = {m: i for i, m in enumerate(("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
+                                       "oct", "nov", "dec"), 1)}
+
+
+def _list_mode(perm):
+    """'drwxr-xr-x' -> 0o755 (None si no se entiende)."""
+    if len(perm) < 10:
+        return None
+    m = 0
+    for i, ch in enumerate(perm[1:10]):
+        if ch not in "-":
+            m |= 1 << (8 - i)
+    return m
+
+
+def _list_mtime(mon, day, yt):
+    import time as _t
+    try:
+        mo = _MONTHS[mon[:3].lower()]
+        d = int(day)
+        if ":" in yt:
+            hh, mm = (int(x) for x in yt.split(":"))
+            now = _t.localtime()
+            y = now.tm_year if (mo, d) <= (now.tm_mon, now.tm_mday) else now.tm_year - 1
+        else:
+            y, hh, mm = int(yt), 0, 0
+        return int(_t.mktime((y, mo, d, hh, mm, 0, 0, 0, -1)))
+    except Exception:
+        return None
+
+
+def ftp_listdir(f, path):
+    """[(nombre, {"type": "file"|"dir", "size": int, "mtime": int|None, "mode": int|None})].
+    Usa MLSD tal cual (sin OPTS MLST: ftpsrv responde "504 Option not supported") y, si el
+    servidor no tiene MLSD, LIST. Lanza ftplib.error_perm 550 si la carpeta no existe."""
+    import time as _t
+    out = []
+    # Primero se entra en la carpeta y se lista "lo de aqui": ftpsrv no hace caso a la ruta de
+    # MLSD/LIST y devolvia la carpeta actual (la raiz de la PS5). Si no existe, CWD da 550.
+    f.cwd(path)
+    try:
+        lines = []
+        f.retrlines("MLSD", lines.append)
+        for ln in lines:
+            facts_s, _, name = ln.partition(" ")
+            if not name or name in (".", ".."):
+                continue
+            facts = {}
+            for kv in facts_s.split(";"):
+                k, _, v = kv.partition("=")
+                if k:
+                    facts[k.lower()] = v
+            t = facts.get("type", "").lower()
+            if t not in ("file", "dir"):
+                continue
+            mt = facts.get("modify")
+            try:
+                mt = int(_t.mktime(_t.strptime(mt[:14], "%Y%m%d%H%M%S"))) if mt else None
+            except Exception:
+                mt = None
+            mode = facts.get("unix.mode")
+            try:
+                mode = int(mode, 8) if mode else None
+            except ValueError:
+                mode = None
+            try:
+                size = int(facts.get("size") or 0)
+            except ValueError:
+                size = 0
+            out.append((name, {"type": t, "size": size, "mtime": mt, "mode": mode}))
+        return out
+    except ftplib.error_perm as e:
+        if str(e).startswith("550"):
+            raise
+    finally:
+        try:
+            f.voidcmd("TYPE I")
+        except Exception:
+            pass
+    # servidor sin MLSD: LIST al estilo "ls -l"
+    lines = []
+    try:
+        f.retrlines("LIST", lines.append)
+    finally:
+        try:
+            f.voidcmd("TYPE I")
+        except Exception:
+            pass
+    for ln in lines:
+        parts = ln.split(None, 8)
+        if len(parts) < 9 or parts[8] in (".", ".."):
+            continue
+        kind = "dir" if ln.startswith("d") else ("file" if ln.startswith("-") else None)
+        if not kind:
+            continue
+        try:
+            size = int(parts[4])
+        except ValueError:
+            size = 0
+        out.append((parts[8], {"type": kind, "size": size, "mtime": _list_mtime(parts[5], parts[6], parts[7]),
+                               "mode": _list_mode(parts[0])}))
+    return out
+
+
 def ftp_sizes(f, path):
     """{nombre: tamano} de los archivos de una carpeta remota (None si no existe)."""
     try:
@@ -774,31 +878,11 @@ def ftp_sizes(f, path):
 
 
 def _ftp_sizes(f, path):
-    out = {}
     try:
-        for name, facts in f.mlsd(path, facts=["type", "size"]):
-            if facts.get("type") == "file":
-                out[name] = int(facts.get("size") or 0)
-        return out
-    except ftplib.error_perm as e:
-        if str(e).startswith("550"):
-            return None
-    except Exception:
-        pass
-    # servidor sin MLSD: LIST y leer el tamano de cada linea
-    lines = []
-    try:
-        f.retrlines("LIST " + path, lines.append)
+        ents = ftp_listdir(f, path)
     except ftplib.error_perm:
         return None
-    for ln in lines:
-        parts = ln.split(None, 8)
-        if len(parts) == 9 and not ln.startswith("d"):
-            try:
-                out[parts[8]] = int(parts[4])
-            except ValueError:
-                pass
-    return out
+    return {n: x["size"] for n, x in ents if x["type"] == "file"}
 
 
 def upload_tree(cfg, src, remote_root, cancel, log, progress, workers=None, on_plan=None):
