@@ -31,7 +31,7 @@ An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts
 
 ## Requirements
 
-- **PC:** Windows 10/11. Get the `-portable-windows.zip` (Python included, nothing to install), or the plain `.zip` with [Python 3.9+](https://www.python.org/downloads/) installed (tick "Add python.exe to PATH"). For extracting on the PC, also install [7-Zip](https://www.7-zip.org/).
+- **PC:** Windows 10/11. Get **`PS5Directo-X.Y.Z-Windows.zip`**: everything included, nothing else to install. (`-without-Python.zip` is only for people who already have [Python 3.9+](https://www.python.org/downloads/).) For extracting on the PC, also install [7-Zip](https://www.7-zip.org/).
 - **Jailbroken PS5:**
   - An FTP server, for example [ftpsrv](https://github.com/ps5-payload-dev/ftpsrv) on port 2121.
   - [BFpilot](https://github.com/ItsBlurf/BFpilot) on port 5905.
@@ -40,7 +40,7 @@ An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts
 
 ## Getting started
 
-1. Download the `-portable-windows.zip` (or the plain `.zip` if you have Python) from the latest [release](../../releases) and extract it anywhere.
+1. Download **`PS5Directo-X.Y.Z-Windows.zip`** from the latest [release](../../releases) and extract it anywhere (for example in Documents).
 2. Run `Crear accesos directos.bat` ("create shortcuts"). It adds a desktop icon and a "Send to → PS5 Directo" entry.
 3. Open **PS5 Directo** from the desktop. The language follows Windows; switch it with the **English / Español** button at the top.
 4. Follow the welcome guide, enter your PS5's IP in Settings, then paste links or drop files.
@@ -51,7 +51,7 @@ The full guide is in [README_EN.txt](README_EN.txt) (Spanish: [LEEME.txt](LEEME.
 
 ## Publishing a release
 
-Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds both zips (plain and portable with Python) and creates the release.
+Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds both zips (`-Windows.zip` with Python and `-without-Python.zip`) and creates the release.
 
 ## Disclaimer
 
@@ -76,8 +76,8 @@ Herramienta todo en uno para Windows y PS5 con jailbreak: **descarga, convierte 
 
 **Cuando algo falla:** diagnóstico de errores con causa y solución, «Comprobar» si algo se cierra al abrirlo, informe de fallo en un clic y avisos automáticos de versiones y de bajadas de velocidad.
 
-**Requisitos:** Windows 10/11. Descarga el `-portable-windows.zip` (trae Python, no hay que instalar nada) o el `.zip` normal con [Python 3.9+](https://www.python.org/downloads/). Para descomprimir en el PC, [7-Zip](https://www.7-zip.org/). En la PS5: servidor FTP ([ftpsrv](https://github.com/ps5-payload-dev/ftpsrv)), [BFpilot](https://github.com/ItsBlurf/BFpilot) y [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus).
+**Requisitos:** Windows 10/11. Descarga **`PS5Directo-X.Y.Z-Windows.zip`**: lo trae todo, no hay que instalar nada más (`-without-Python.zip` es solo para quien ya tiene [Python 3.9+](https://www.python.org/downloads/)). Para descomprimir en el PC, [7-Zip](https://www.7-zip.org/). En la PS5: servidor FTP ([ftpsrv](https://github.com/ps5-payload-dev/ftpsrv)), [BFpilot](https://github.com/ItsBlurf/BFpilot) y [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus).
 
-**Uso:** descarga el `.zip` de la última [release](../../releases), ejecuta `Crear accesos directos.bat` y abre **PS5 Directo** desde el escritorio. La guía completa está en [LEEME.txt](LEEME.txt).
+**Uso:** descarga `PS5Directo-X.Y.Z-Windows.zip` de la última [release](../../releases), descomprímelo donde quieras, ejecuta `Crear accesos directos.bat` y abre **PS5 Directo** desde el escritorio. La guía completa está en [LEEME.txt](LEEME.txt).
 
 **Aviso:** proyecto independiente, sin relación con Sony ni con los autores de las herramientas citadas. No incluye contenido de terceros, claves ni archivos de Sony, ni enlaces a sitios de descargas. Úsalo solo con contenido que tengas derecho a usar (copias de seguridad propias y homebrew). No hace el jailbreak ni salta ninguna protección: solo copia archivos a una consola que ya has modificado tú. No se da ayuda para conseguir contenido sin licencia. Se ofrece tal cual, sin garantías, y lo que hagas con él es responsabilidad tuya.

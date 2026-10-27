@@ -6,7 +6,7 @@ QUICK START (5 MINUTES)
 You need: a PS5 that is already jailbroken (PS5 Directo doesn't do that)
 and a Windows 10/11 PC on the same network.
 
-1. Download PS5Directo-X.Y.Z-portable-windows.zip from the GitHub Releases
+1. Download PS5Directo-X.Y.Z-Windows.zip from the GitHub Releases
    page (nothing else to install) and extract it, e.g. into Documents.
 2. Double-click "PS5 Directo.vbs". If Windows asks whether to open a file
    downloaded from the internet, click "Open".
@@ -306,10 +306,11 @@ PAYLOADS, DIAGNOSTICS, PHONE AND SCHEDULE
 - "Schedule" (queue): start at a set time and sleep or shut down the PC when
   done. The PC doesn't go to sleep while transfers are running.
 
-PORTABLE VERSION
+WHAT TO DOWNLOAD
 ----------------
-Each release has PS5Directo-X.Y.Z.zip (needs Python installed) and
-PS5Directo-X.Y.Z-portable-windows.zip, which includes Python: extract and run.
+Each release has PS5Directo-X.Y.Z-Windows.zip, the recommended one with
+everything included (extract and run), and PS5Directo-X.Y.Z-without-Python.zip,
+only for people who already have Python.
 
 WHAT'S NEW
 ----------

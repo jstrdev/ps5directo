@@ -1,6 +1,6 @@
 # Publica una version: al subir una etiqueta vX.Y.Z crea la release de GitHub con dos .zip:
-#  - PS5Directo-X.Y.Z.zip                    la app (la que usa "Actualizar" dentro del programa)
-#  - PS5Directo-X.Y.Z-portable-windows.zip   la app + Python incluido: descomprimir y abrir, sin instalar nada
+#  - PS5Directo-X.Y.Z-Windows.zip          la app + Python incluido: descomprimir y abrir (la recomendada)
+#  - PS5Directo-X.Y.Z-without-Python.zip   solo la app, para quien ya tiene Python (la usa "Actualizar")
 name: Publicar version
 
 on:
@@ -30,7 +30,7 @@ jobs:
           mkdir -p dist/PS5Directo
           git archive HEAD | tar -x -C dist/PS5Directo
           rm -rf dist/PS5Directo/.github
-          (cd dist && zip -qr "PS5Directo-${{ steps.v.outputs.ver }}.zip" PS5Directo)
+          (cd dist && zip -qr "PS5Directo-${{ steps.v.outputs.ver }}-without-Python.zip" PS5Directo)
 
       - name: Paquete portable (con Python para Windows)
         run: |
@@ -40,9 +40,11 @@ jobs:
           unzip -q py.zip -d dist/PS5Directo/python
           # que el Python incluido vea la carpeta del programa
           for f in dist/PS5Directo/python/python*._pth; do printf '..\n' >> "$f"; done
-          (cd dist && zip -qr "PS5Directo-${{ steps.v.outputs.ver }}-portable-windows.zip" PS5Directo)
+          (cd dist && zip -qr "PS5Directo-${{ steps.v.outputs.ver }}-Windows.zip" PS5Directo)
 
+      # Con una etiqueta crea la release. Pulsando "Run workflow" en Actions, añade (o rehace) los zips de la
+      # release de la version que pone app.py, aunque ya exista.
       - uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: v${{ steps.v.outputs.ver }}
           files: dist/*.zip

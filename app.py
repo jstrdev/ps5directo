@@ -5634,7 +5634,10 @@ def github_latest(repo):
         j = json.load(r)
     url = None
     zips = [a for a in j.get("assets") or [] if a.get("name", "").lower().endswith(".zip")]
-    zips.sort(key=lambda a: "portable" in a.get("name", "").lower())
+    # el mas ligero primero: "without-Python" (o el normal de antes); el que trae Python, el ultimo
+    zips.sort(key=lambda a: (0 if "without-python" in a.get("name", "").lower() else
+                             2 if ("portable" in a.get("name", "").lower() or "-windows.zip" in a.get("name", "").lower())
+                             else 1))
     if zips:
         url = zips[0].get("browser_download_url")
     url = url or j.get("zipball_url")

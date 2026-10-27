@@ -10,8 +10,7 @@ Lo que necesitas antes:
 
 Paso 1. Descarga
   En la página de GitHub del programa, entra en "Releases" y descarga
-  PS5Directo-X.Y.Z-portable-windows.zip (trae todo, no hay que instalar
-  nada más). Descomprímelo en una carpeta, por ejemplo en Documentos.
+  PS5Directo-X.Y.Z-Windows.zip (trae todo, no hay que instalar nada más). Descomprímelo en una carpeta, por ejemplo en Documentos.
 
 Paso 2. Ábrelo
   Doble clic en "PS5 Directo.vbs". Se abre en su propia ventana y crea un
@@ -293,11 +292,11 @@ PAYLOADS, DIAGNÓSTICO, MÓVIL Y PROGRAMAR
   suspende solo.
 
 
-VERSIÓN PORTABLE
-----------------
-En cada versión hay dos descargas: PS5Directo-X.Y.Z.zip (necesita Python
-instalado) y PS5Directo-X.Y.Z-portable-windows.zip, que trae Python dentro:
-descomprimir y abrir, sin instalar nada.
+QUÉ DESCARGAR
+-------------
+En cada versión hay dos descargas: PS5Directo-X.Y.Z-Windows.zip, la
+recomendada, que lo trae todo (descomprimir y abrir), y
+PS5Directo-X.Y.Z-without-Python.zip, solo para quien ya tiene Python.
 
 
 NOVEDADES 1.20.3
