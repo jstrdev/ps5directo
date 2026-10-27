@@ -3,6 +3,8 @@
 #  - PS5Directo-X.Y.Z-Setup.exe     el instalador: doble clic, «Instalar» y listo. Es la descarga normal.
 #  - PS5Directo-X.Y.Z-Windows.zip   lo mismo sin instalar (con Python incluido). Tambien lo usa
 #                                   «Actualizar» dentro del programa, que solo copia los archivos.
+#  - PS5Directo-X.Y.Z-Linux.tar.gz  Linux x86-64, con Python y 7-Zip incluidos (se abre con ps5directo.sh).
+#  - PS5Directo-X.Y.Z-macOS.dmg     Mac (Apple Silicon e Intel), en pruebas: la app con Python y 7-Zip.
 name: Publicar version
 
 on:
@@ -47,6 +49,35 @@ jobs:
       - name: Zip para Windows
         run: (cd dist && zip -qr "PS5Directo-${{ steps.v.outputs.ver }}-Windows.zip" PS5Directo)
 
+      # Linux (x86-64): la app con Python y 7-Zip incluidos. Se abre con ps5directo.sh y la primera
+      # vez se añade sola al menu de aplicaciones.
+      - name: Paquete para Linux
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          L=build/linux/PS5Directo
+          mkdir -p "$L"
+          git archive HEAD | tar -x -C "$L"
+          rm -rf "$L/.github" "$L/installer" "$L"/*.bat "$L"/*.vbs
+          chmod +x "$L/ps5directo.sh"
+          PBS=20250604; PYV=3.12.11
+          curl -fsSL -o pyl.tgz "https://github.com/astral-sh/python-build-standalone/releases/download/$PBS/cpython-$PYV+$PBS-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+          tar -xzf pyl.tgz -C "$L"
+          P="$L/python/lib/python3.12"
+          rm -rf "$P/test" "$P/idlelib" "$P/ensurepip" "$P/lib2to3" "$P/pydoc_data" "$P/turtledemo" \
+                 "$P"/site-packages/pip* "$P/tkinter/test" "$L/python/share" "$L/python/include"
+          find "$L/python" -name __pycache__ -prune -exec rm -rf {} +
+          "$L/python/bin/python3" -c "import ssl, sqlite3, ftplib, tkinter, lzma, bz2, ctypes; print('python ok')"
+          url=$(gh api repos/ip7z/7zip/releases/latest --jq '.assets[] | select(.name | test("linux-x64\\.tar\\.xz$")) | .browser_download_url' | head -1)
+          mkdir -p "$L/bin" sz
+          curl -fsSL -o sz.tar.xz "$url"
+          tar -xJf sz.tar.xz -C sz
+          cp sz/7zz "$L/bin/7zz"
+          chmod +x "$L/bin/7zz"
+          (cd build/linux && tar -czf "../../dist/PS5Directo-${{ steps.v.outputs.ver }}-Linux.tar.gz" PS5Directo)
+          ls -la dist
+
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -73,6 +104,102 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           Get-ChildItem dist\*.exe, dist\*.zip | Format-Table Name, Length
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: setup
+          path: dist/PS5Directo-*-Setup.exe
+          retention-days: 3
+
+  # Mac: "PS5 Directo.app" con Python para Apple Silicon e Intel y 7-Zip, dentro de un .dmg.
+  # El lanzador (installer/macos/launcher.sh) copia el programa a ~/Library/Application Support
+  # para que «Actualizar» funcione. Firmada solo "ad hoc" (sin cuenta de desarrollador de Apple).
+  mac:
+    needs: build
+    runs-on: macos-latest
+    env:
+      VER: ${{ needs.build.outputs.ver }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Montar la app
+        run: |
+          set -e
+          A="build/PS5 Directo.app"; C="$A/Contents"; R="$C/Resources"
+          mkdir -p "$C/MacOS" "$R/app" "$R/bin"
+          git archive HEAD | tar -x -C "$R/app"
+          rm -rf "$R/app/.github" "$R/app/installer" "$R/app"/*.bat "$R/app"/*.vbs "$R/app/ps5directo.sh"
+          cp installer/macos/launcher.sh "$C/MacOS/PS5 Directo"
+          chmod +x "$C/MacOS/PS5 Directo"
+          sed "s/__VERSION__/$VER/g" installer/macos/Info.plist > "$C/Info.plist"
+          plutil -lint "$C/Info.plist"
+          # icono
+          mkdir -p ps5.iconset
+          for s in 16 32 128 256 512; do
+            sips -z $s $s web/icon-512.png --out "ps5.iconset/icon_${s}x${s}.png" >/dev/null
+            d=$((s*2)); sips -z $d $d web/icon-512.png --out "ps5.iconset/icon_${s}x${s}@2x.png" >/dev/null
+          done
+          iconutil -c icns ps5.iconset -o "$R/ps5directo.icns"
+          # Python para cada procesador
+          PBS=20250604; PYV=3.12.11
+          for pair in aarch64:arm64 x86_64:x86_64; do
+            src=${pair%%:*}; dst=${pair##*:}
+            curl -fsSL -o py.tgz "https://github.com/astral-sh/python-build-standalone/releases/download/$PBS/cpython-$PYV+$PBS-$src-apple-darwin-install_only_stripped.tar.gz"
+            rm -rf python && tar -xzf py.tgz
+            P=python/lib/python3.12
+            rm -rf "$P/test" "$P/idlelib" "$P/ensurepip" "$P/lib2to3" "$P/pydoc_data" "$P/turtledemo" \
+                   "$P"/site-packages/pip* "$P/tkinter/test" python/share python/include
+            find python -name __pycache__ -prune -exec rm -rf {} +
+            mv python "$R/python-$dst"
+          done
+          "$R/python-$(uname -m)/bin/python3" -c "import ssl, sqlite3, ftplib, lzma, bz2, ctypes; print('python ok')"
+          # 7-Zip
+          url=$(gh api repos/ip7z/7zip/releases/latest --jq '.assets[] | select(.name | test("mac\\.tar\\.xz$")) | .browser_download_url' | head -1)
+          mkdir -p sz && curl -fsSL -o sz.tar.xz "$url" && tar -xJf sz.tar.xz -C sz
+          cp sz/7zz "$R/bin/7zz" && chmod +x "$R/bin/7zz"
+          "$R/bin/7zz" | head -2
+          codesign --force --deep --sign - "$A"
+          codesign --verify --deep --verbose=1 "$A"
+
+      - name: Prueba de arranque en un Mac
+        run: |
+          export HOME="$RUNNER_TEMP/casa"; mkdir -p "$HOME"
+          "build/PS5 Directo.app/Contents/MacOS/PS5 Directo" --no-browser &
+          ok=""
+          for i in $(seq 1 30); do
+            sleep 1
+            if grep -q "PS5 Directo $VER" "$HOME/.ps5directo/ps5directo.log" 2>/dev/null; then ok=1; break; fi
+          done
+          cat "$HOME/.ps5directo/ps5directo.log" || true
+          cat "$HOME/Library/Application Support/PS5 Directo/lanzador.log" || true
+          pkill -f "PS5 Directo/app/app.py" || true
+          test -n "$ok"
+
+      - name: Crear el .dmg
+        run: |
+          set -e
+          mkdir -p dmg dist
+          cp -R "build/PS5 Directo.app" dmg/
+          ln -s /Applications dmg/Applications
+          cp installer/macos/LEEME-Mac.txt "dmg/Si no abre - LEEME.txt"
+          hdiutil create -volname "PS5 Directo" -srcfolder dmg -ov -format UDZO "dist/PS5Directo-$VER-macOS.dmg"
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: dist/PS5Directo-*-macOS.dmg
+          retention-days: 3
+
+  release:
+    needs: [build, setup, mac]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
       # Con una etiqueta crea la release. Pulsando "Run workflow" en Actions añade (o rehace) los archivos
       # de la release de la version que pone app.py, aunque ya exista.
       - uses: softprops/action-gh-release@v2
@@ -81,3 +208,5 @@ jobs:
           files: |
             dist/PS5Directo-*-Setup.exe
             dist/PS5Directo-*-Windows.zip
+            dist/PS5Directo-*-Linux.tar.gz
+            dist/PS5Directo-*-macOS.dmg

@@ -32,6 +32,8 @@ An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts
 ## Requirements
 
 - **PC:** Windows 10/11. Nothing else to install: the download includes everything it needs. Optional: [7-Zip](https://www.7-zip.org/), only if you want to extract on the PC instead of on the console.
+- **Mac (new, in testing — not tested on a real Mac yet, [feedback welcome](../../issues/new?template=mac.md)):** macOS 11 or later, Apple Silicon or Intel. Python and 7-Zip are included. Torrents need `aria2` (`brew install aria2`).
+- **Linux (new, x86-64):** any recent distro (glibc 2.35+, e.g. Ubuntu 22.04+). Python and 7-Zip are included. For the app window without tabs, Chrome, Chromium, Edge or Brave (otherwise it opens in your default browser). Torrents need `aria2` (`sudo apt install aria2`).
 - **Jailbroken PS5:**
   - An FTP server, for example [ftpsrv](https://github.com/ps5-payload-dev/ftpsrv) on port 2121.
   - [BFpilot](https://github.com/ItsBlurf/BFpilot) on port 5905.
@@ -48,13 +50,17 @@ An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts
 >
 > Rather not install? Download `PS5Directo-X.Y.Z-Windows.zip` instead, extract it anywhere and run `Crear accesos directos.bat`. Both update themselves the same way.
 
+**Mac (in testing):** download `PS5Directo-X.Y.Z-macOS.dmg`, open it and drag **PS5 Directo** into Applications. The app isn't signed by Apple, so the first time macOS blocks it: on macOS 15+ go to *System Settings → Privacy & Security → Open Anyway*; on older versions right-click the app → *Open*. **It hasn't been tested on a real Mac yet:** if something fails, click *Create problem report* in the program and attach it to an [issue](../../issues/new?template=mac.md). Thanks!
+
+**Linux:** download `PS5Directo-X.Y.Z-Linux.tar.gz`, extract it anywhere (for example in your home folder) and open it once with `./ps5directo.sh` in a terminal (or right-click → *Run as a Program*). That first time it adds **PS5 Directo** to your applications menu, so from then on you open it from there. It updates itself like on Windows.
+
 > **About BFpilot and permissions:** up to at least v0.4.4, BFpilot's archive extractor leaves files without the execute bit, so the PS5 refuses to launch them (CE-107750-0). This also happens when you extract from BFpilot's own web UI. PS5 Directo fixes it automatically after every extraction. For content you already have, use **Settings → Fix permissions**.
 
 The full guide is in [README_EN.txt](README_EN.txt) (Spanish: [LEEME.txt](LEEME.txt)).
 
 ## Publishing a release
 
-Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds the installer `PS5Directo-X.Y.Z-Setup.exe` and `PS5Directo-X.Y.Z-Windows.zip` (both with Python included) and creates the release. The installer script is `installer/PS5Directo.iss` (Inno Setup).
+Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds the installer `PS5Directo-X.Y.Z-Setup.exe`, `PS5Directo-X.Y.Z-Windows.zip`, `PS5Directo-X.Y.Z-Linux.tar.gz` and `PS5Directo-X.Y.Z-macOS.dmg` (all with Python included; the Mac app is built and smoke-tested on a GitHub macOS runner) and creates the release. The installer script is `installer/PS5Directo.iss` (Inno Setup).
 
 ## Disclaimer
 
@@ -87,5 +93,9 @@ Herramienta todo en uno para Windows y PS5 con jailbreak: **descarga, convierte 
 3. Sigue la ventana de bienvenida y pon la IP de tu PS5 en Ajustes.
 
 Si Windows dice «Windows protegió su PC», pulsa **Más información → Ejecutar de todos modos** (el instalador no está firmado, que cuesta dinero; es el aviso normal en programas pequeños y gratuitos). ¿Prefieres no instalar? Descarga el `.zip`, descomprímelo y ejecuta `Crear accesos directos.bat`. La guía completa está en [LEEME.txt](LEEME.txt).
+
+**Mac (nuevo, en pruebas):** descarga `PS5Directo-X.Y.Z-macOS.dmg`, ábrelo y arrastra **PS5 Directo** a Aplicaciones. No está firmada por Apple, así que la primera vez macOS la bloquea: en macOS 15 o posterior ve a *Ajustes del Sistema → Privacidad y seguridad → Abrir igualmente*; en versiones anteriores, clic derecho en la app → *Abrir*. **Todavía no se ha podido probar en un Mac de verdad:** si algo falla, pulsa *Crear informe de fallo* en el programa y adjúntalo en un [aviso](../../issues/new?template=mac.md). ¡Gracias!
+
+**Linux (nuevo):** descarga `PS5Directo-X.Y.Z-Linux.tar.gz`, descomprímelo donde quieras y ábrelo una vez con `./ps5directo.sh` en una terminal (o clic derecho → *Ejecutar como programa*). Esa primera vez se añade solo al menú de aplicaciones, y desde entonces lo abres desde ahí. Trae Python y 7-Zip; para los torrents hace falta `aria2` (`sudo apt install aria2`).
 
 **Aviso:** proyecto independiente, sin relación con Sony ni con los autores de las herramientas citadas. No incluye contenido de terceros, claves ni archivos de Sony, ni enlaces a sitios de descargas. Úsalo solo con contenido que tengas derecho a usar (copias de seguridad propias y homebrew). No hace el jailbreak ni salta ninguna protección: solo copia archivos a una consola que ya has modificado tú. No se da ayuda para conseguir contenido sin licencia. Se ofrece tal cual, sin garantías, y lo que hagas con él es responsabilidad tuya.

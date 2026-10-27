@@ -305,7 +305,37 @@ QUÉ DESCARGAR
   prefiera descomprimirlo en una carpeta. También lo usa "Actualizar".
 Para quitarlo: Configuración de Windows > Aplicaciones > PS5 Directo >
 Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
+- PS5Directo-X.Y.Z-macOS.dmg: para Mac (Apple Silicon e Intel, macOS 11
+  o posterior). EN PRUEBAS: todavía no se ha probado en un Mac de verdad.
+  Ábrelo y arrastra PS5 Directo a Aplicaciones. La primera vez macOS la
+  bloquea porque no está firmada por Apple: en macOS 15 o posterior,
+  Ajustes del Sistema > Privacidad y seguridad > "Abrir igualmente"; en
+  anteriores, clic derecho en la app > Abrir. Si algo falla, "Crear
+  informe de fallo" y adjúntalo en github.com/jstrdev/ps5directo/issues.
+- PS5Directo-X.Y.Z-Linux.tar.gz: para Linux (x86-64, distribuciones
+  recientes como Ubuntu 22.04 o posterior). Descomprímelo donde quieras
+  y ábrelo una vez con ./ps5directo.sh en una terminal (o clic derecho
+  > Ejecutar como programa). Esa vez se añade al menú de aplicaciones y
+  desde entonces lo abres desde ahí. Trae Python y 7-Zip.
+  Para la ventana sin pestañas usa Chrome, Chromium, Edge o Brave si los
+  tienes (si no, se abre en tu navegador). Para los torrents hace falta
+  aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
+  del cortafuegos de Windows.
 
+
+NOVEDADES 1.21.0
+- Versión para Mac EN PRUEBAS (PS5Directo-1.21.0-macOS.dmg), para Apple
+  Silicon e Intel, con Python y 7-Zip incluidos. Aún no se ha probado en
+  un Mac de verdad: se agradece cualquier aviso en GitHub.
+- El informe de fallo incluye ahora el registro técnico del programa
+  (sin el código de acceso de la sesión).
+- Arreglado: si cerrabas el programa en la Biblioteca, al abrirlo salía
+  marcada «Transferencias» con la Biblioteca vacía debajo.
+- Versión para Linux (PS5Directo-1.21.0-Linux.tar.gz), con Python y 7-Zip
+  incluidos. Se añade sola al menú de aplicaciones y se actualiza igual
+  que en Windows.
+- Las descargas al PC van a tu carpeta de Descargas real (en Linux puede
+  llamarse "Descargas").
 
 NOVEDADES 1.20.4
 - Icono propio en la barra de tareas: la ventana ya no se mete dentro del
@@ -314,6 +344,14 @@ NOVEDADES 1.20.4
   tenías en vez de abrir otra.
 - Si lo anclaste antes de esta versión, desáncla el icono viejo y ancla
   el nuevo (clic derecho en el icono de la barra > Anclar).
+- Capturas: salen también las hechas con la pantalla en HDR (.jxr), que se
+  ven convertidas a JPG (al bajarlas al PC se guarda el original). Cada una
+  dice de qué aplicación es y la fecha, los vídeos llevan la portada de la
+  aplicación y ya no salen las copias temporales que hace la consola al
+  compartir.
+- Arreglado: en «Archivos de la consola», calcular el tamaño de una
+  carpeta, borrarla, copiarla, arreglar sus permisos y «Reemplazar» una
+  carpeta que ya existía fallaban desde la 1.20.3.
 
 NOVEDADES 1.20.3
 - Instalador para Windows (PS5Directo-1.20.3-Setup.exe): doble clic,

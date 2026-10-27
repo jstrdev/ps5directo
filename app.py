@@ -24,7 +24,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "1.20.4"
+VERSION = "1.21.0"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -1238,7 +1238,7 @@ def fm_extract(src, folder, password="", exists="keepboth"):
 def fm_download(paths):
     cfg = cfg_snapshot()
     paths = [fm_clean(x) for x in paths]
-    root_local = os.path.join(os.path.expanduser("~"), "Downloads", "PS5 Directo")
+    root_local = os.path.join(downloads_dir(), "PS5 Directo")
 
     def walk(rpath):
         """[(ruta remota, ruta relativa, tamano)] de un archivo o carpeta."""
@@ -1535,8 +1535,7 @@ def fm_api(p, b):
         return {"path": fp, "name": os.path.basename(fp)}
     if p == "/api/report/open":
         os.makedirs(report_dir(), exist_ok=True)
-        if os.name == "nt":
-            os.startfile(report_dir())
+        _open_quiet(report_dir())
         return {"dir": report_dir()}
     if p == "/api/lib/check":
         return launch_check(str(b.get("path") or ""), int(b.get("minutes") or 30))
@@ -1597,14 +1596,16 @@ def fm_api(p, b):
     if p == "/api/bk/restore":
         if BK["busy"]:
             raise E.PipeError("Espera a que termine la copia en marcha")
-        threading.Thread(target=backup_restore, args=(str(b.get("path") or ""), b.get("ids") or []),
-                         daemon=True).start()
+        bpath = os.path.abspath(str(b.get("path") or ""))
+        if not bpath.startswith(os.path.abspath(backup_dir(cfg_snapshot()))) or not os.path.isfile(bpath):
+            raise E.PipeError("Esa copia ya no está en la carpeta de copias (¿la moviste o borraste?). "
+                              "Pulsa Actualizar en la lista de copias.")
+        threading.Thread(target=backup_restore, args=(bpath, b.get("ids") or []), daemon=True).start()
         return {}
     if p == "/api/bk/open":
         d = backup_dir()
         os.makedirs(d, exist_ok=True)
-        if os.name == "nt":
-            os.startfile(d)
+        _open_quiet(d)
         return {"dir": d}
     if p == "/api/gu/status":
         return gu_status()
@@ -1660,9 +1661,9 @@ def fm_api(p, b):
         FM_CANCEL.set()
         return {}
     if p == "/api/fm/open_local":
-        path = FMOP.get("local") or os.path.join(os.path.expanduser("~"), "Downloads", "PS5 Directo")
-        if os.name == "nt" and os.path.isdir(path):
-            os.startfile(path)
+        path = FMOP.get("local") or os.path.join(downloads_dir(), "PS5 Directo")
+        if os.path.isdir(path):
+            _open_quiet(path)
         return {"path": path}
     if p == "/api/pick":
         return {"paths": pick_paths(b.get("kind") or "files", b.get("title") or "")}
@@ -1707,14 +1708,49 @@ def fm_api(p, b):
     raise E.PipeError("no existe")
 
 
+_DL_DIR = []
+
+
+def downloads_dir():
+    """Carpeta de Descargas del usuario. En Linux puede llamarse "Descargas" (xdg-user-dir)."""
+    if _DL_DIR:
+        return _DL_DIR[0]
+    d = os.path.join(os.path.expanduser("~"), "Downloads")
+    if sys.platform.startswith("linux"):
+        try:
+            import subprocess
+            r = subprocess.run(["xdg-user-dir", "DOWNLOAD"], capture_output=True, timeout=5)
+            x = r.stdout.decode("utf-8", "replace").strip()
+            if r.returncode == 0 and x and x != os.path.expanduser("~") and os.path.isdir(x):
+                d = x
+        except Exception:
+            pass
+    _DL_DIR.append(d)
+    return d
+
+
+def _open_quiet(path):
+    try:
+        F.open_path(path)
+    except Exception as e:
+        print("No pude abrir %s: %s" % (path, e))
+
+
 def pick_paths(kind, title):
-    """Abre el dialogo de Windows para elegir archivos o una carpeta del PC."""
+    """Abre el dialogo del sistema para elegir archivos o una carpeta del PC."""
     import subprocess
     if os.name == "nt":
         try:
             return F.pick_windows(kind, title)
         except Exception as e:
             print("Selector de PowerShell:", e)
+    else:
+        try:
+            r = F.pick_native(kind, title)
+            if r is not None:
+                return r
+        except Exception as e:
+            print("Selector del sistema:", e)
     exe = sys.executable
     if os.name == "nt" and exe.lower().endswith("pythonw.exe"):
         alt = exe[:-len("pythonw.exe")] + "python.exe"
@@ -1848,6 +1884,7 @@ COVER_DIR = os.path.join(DATA_DIR, "covers")
 MEDIA_DIR = os.path.join(DATA_DIR, "media")
 MEDIA_ROOT = "/user/av_contents"
 MEDIA_TYPES = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp",
+               ".jxr": "image/vnd.ms-photo",   # capturas con la pantalla en HDR
                ".mp4": "video/mp4", ".webm": "video/webm", ".mov": "video/quicktime"}
 
 
@@ -1952,7 +1989,7 @@ def _job_name(j):
 
 
 def report_dir():
-    return os.path.join(os.path.expanduser("~"), "Downloads", "PS5 Directo", "Informes")
+    return os.path.join(downloads_dir(), "PS5 Directo", "Informes")
 
 
 def make_report(job_id=None):
@@ -1997,6 +2034,13 @@ def make_report(job_id=None):
             z.writestr("actividad.json", json.dumps(read_history()[-60:], ensure_ascii=False, indent=1))
             with NOTIF_LOCK:
                 z.writestr("avisos.json", json.dumps(NOTIFS[:60], ensure_ascii=False, indent=1))
+        try:   # registro tecnico del programa (sin el codigo de acceso de la sesion)
+            with open(os.path.join(DATA_DIR, "ps5directo.log"), encoding="utf-8", errors="replace") as fh:
+                lines = fh.readlines()[-400:]
+            z.writestr("registro_del_programa.txt",
+                       "".join(re.sub(r"([#?&]t=)[\w-]+", r"\1(oculto)", ln) for ln in lines))
+        except OSError:
+            pass
         z.writestr("LEEME.txt", "Informe de PS5 Directo %s (%s)\n\n%s\n\nNo lleva contraseñas. Pásaselo a quien te "
                    "ayude.\n" % (VERSION, info["date"], "\n".join(summary)))
     return fp
@@ -2281,23 +2325,64 @@ def col_icon(path):
 
 
 def media_list():
-    """Capturas y videos de la consola (los mas nuevos primero)."""
+    """Capturas y videos de la consola (los mas nuevos primero). La PS5 los guarda en
+    /user/av_contents/{photo,video}/NPXS40087/<Title ID>/<carpeta>/<fecha>.jpg|jxr|webm."""
     cfg = cfg_snapshot()
     out = []
-    files = E.Ftp(cfg).call(lambda f: _ftp_walk(f, MEDIA_ROOT, [], threading.Event()))
+    files = E.Ftp(cfg).call(lambda f: _ftp_walk_sizes(f, MEDIA_ROOT, [], threading.Event()))
+    titles = lib_load().get("titles") or {}
     for p, sz in files:
         ext = posixpath.splitext(p)[1].lower()
-        if ext not in MEDIA_TYPES or "/thumbnail" in p.lower():
+        low = p.lower()
+        # miniaturas y copias temporales que hace la consola al compartir
+        if ext not in MEDIA_TYPES or "/thumbnail" in low or "/content_tmp/" in low:
             continue
-        out.append({"path": p, "name": posixpath.basename(p), "size": sz,
-                    "video": MEDIA_TYPES[ext].startswith("video"),
-                    "folder": posixpath.basename(posixpath.dirname(p))})
-    out.sort(key=lambda x: x["name"], reverse=True)
+        name = posixpath.basename(p)
+        tids = [c for c in p.split("/") if re.match(r"^[A-Z]{4}\d{5}$", c) and c != "NPXS40087"]
+        tid = tids[-1] if tids else ""
+        m = re.search(r"(20\d{2})(\d{2})(\d{2})_?(\d{2})(\d{2})(\d{2})?", name)
+        when = "%s-%s-%sT%s:%s:%s" % (m.group(1), m.group(2), m.group(3), m.group(4), m.group(5),
+                                       m.group(6) or "00") if m else ""
+        out.append({"path": p, "name": name, "size": sz,
+                    "video": MEDIA_TYPES[ext].startswith("video"), "hdr": ext == ".jxr",
+                    "tid": tid, "app": (titles.get(tid) or {}).get("title") or "",
+                    "when": when, "folder": posixpath.basename(posixpath.dirname(p))})
+    out.sort(key=lambda x: (x["when"] or "", x["name"]), reverse=True)
     return out[:3000]
 
 
-def media_cached(path):
-    """Copia local (cache) de una captura o video, para verla en el navegador."""
+def _jxr_to_jpg(src, dst):
+    """Vista previa de una captura HDR (.jxr): Windows trae el decodificador de JPEG XR
+    (y en Mac se intenta con sips, la herramienta de imagenes del sistema)."""
+    if sys.platform == "darwin":
+        import subprocess
+        try:
+            r = subprocess.run(["sips", "-s", "format", "jpeg", src, "--out", dst], capture_output=True, timeout=60)
+            return r.returncode == 0 and os.path.isfile(dst) and os.path.getsize(dst) > 0
+        except Exception:
+            return False
+    if os.name != "nt":
+        return False
+    q = lambda t: "'" + t.replace("'", "''") + "'"
+    script = (
+        "Add-Type -AssemblyName PresentationCore;"
+        "$s=[IO.File]::OpenRead(%s);"
+        "try{ $d=[System.Windows.Media.Imaging.BitmapDecoder]::Create($s,"
+        " [System.Windows.Media.Imaging.BitmapCreateOptions]::None,"
+        " [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad) } finally { $s.Close() };"
+        "$c=New-Object System.Windows.Media.Imaging.FormatConvertedBitmap($d.Frames[0],"
+        " [System.Windows.Media.PixelFormats]::Bgr24, $null, 0);"
+        "$e=New-Object System.Windows.Media.Imaging.JpegBitmapEncoder; $e.QualityLevel=90;"
+        "$e.Frames.Add([System.Windows.Media.Imaging.BitmapFrame]::Create($c));"
+        "$o=[IO.File]::Create(%s); try{ $e.Save($o) } finally { $o.Close() }"
+    ) % (q(src), q(dst))
+    r = _powershell(script, timeout=60)
+    return r.returncode == 0 and os.path.isfile(dst) and os.path.getsize(dst) > 0
+
+
+def media_cached(path, preview=False):
+    """Copia local (cache) de una captura o video, para verla en el navegador. Con preview,
+    una captura HDR (.jxr, que los navegadores no abren) se da convertida a JPG."""
     import hashlib
     path = fm_clean(path)
     if not path.startswith(MEDIA_ROOT + "/"):
@@ -2311,6 +2396,10 @@ def media_cached(path):
         with open(fp + ".part", "wb") as fo:
             E.Ftp(cfg_snapshot()).call(lambda f: f.retrbinary("RETR " + path, fo.write, 1024 * 1024))
         os.replace(fp + ".part", fp)
+    if preview and ext == ".jxr":
+        jpg = fp[:-4] + "_vista.jpg"
+        if os.path.isfile(jpg) or _jxr_to_jpg(fp, jpg):
+            return jpg, "image/jpeg"
     return fp, MEDIA_TYPES[ext]
 FMT_LABEL = {"plain": "carpeta normal", "ffpkg": "imagen .ffpkg", "exfat": "imagen .exfat", "ffpfs": "imagen .ffpfs",
              "ffpfsc": "imagen comprimida .ffpfsc", "fpkg": "paquete .fpkg", "lz4": "carpeta LZ4",
@@ -2478,6 +2567,8 @@ def ensure_aria2(job, cfg):
     if w:
         return w
     if os.name != "nt":
+        if sys.platform == "darwin":
+            raise E.PipeError("Para bajar torrents hace falta aria2. Instálalo con Homebrew (brew.sh): brew install aria2")
         raise E.PipeError("Para bajar torrents hace falta aria2 (instálalo, por ejemplo: sudo apt install aria2)")
     with ARIA2_LOCK:
         if os.path.isfile(mine):
@@ -2975,7 +3066,7 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
 
 def pc_temp_root(cfg):
     d = (cfg.get("pc_temp_dir") or "").strip().strip('"')
-    return d or os.path.join(os.path.expanduser("~"), "Downloads", "PS5 Directo (temporal)")
+    return d or os.path.join(downloads_dir(), "PS5 Directo (temporal)")
 
 
 def _pcx_state(job):
@@ -4665,7 +4756,7 @@ def backup_dir(cfg=None):
     return d or os.path.join(os.path.expanduser("~"), "Documents", "PS5 Directo", "Copias")
 
 
-def _ftp_walk(f, root, out, cancel, limit=None):
+def _ftp_walk_sizes(f, root, out, cancel, limit=None):
     """[(ruta, tamano)] de todos los archivos bajo root (vacio si no existe)."""
     try:
         listing = E.ftp_listdir(f, root)
@@ -4676,7 +4767,7 @@ def _ftp_walk(f, root, out, cancel, limit=None):
             raise E.Cancelled()
         p = root.rstrip("/") + "/" + n
         if v["type"] == "dir":
-            _ftp_walk(f, p, out, cancel, limit)
+            _ftp_walk_sizes(f, p, out, cancel, limit)
         elif v["type"] == "file" and (limit is None or (v.get("size") or 0) <= limit):
             out.append((p, v.get("size") or 0))
     return out
@@ -4720,10 +4811,10 @@ def backup_run(sections=None, label="copia"):
             todo = []      # (seccion, ruta, tamano)
             if "saves" in sections:
                 for r in _save_roots(f):
-                    todo += [("saves", p, s) for p, s in _ftp_walk(f, r, [], BK_CANCEL)]
+                    todo += [("saves", p, s) for p, s in _ftp_walk_sizes(f, r, [], BK_CANCEL)]
             if "config" in sections:
                 for r in BK_CONFIG_DIRS:
-                    todo += [("config", p, s) for p, s in _ftp_walk(f, r, [], BK_CANCEL, BK_MAX_FILE)]
+                    todo += [("config", p, s) for p, s in _ftp_walk_sizes(f, r, [], BK_CANCEL, BK_MAX_FILE)]
             if "appdb" in sections:
                 for p in BK_APPDB:
                     try:
@@ -5461,7 +5552,7 @@ def health_check():
 # Actualizaciones: desde un .zip o desde GitHub
 # ---------------------------------------------------------------------------
 
-UPDATE_EXTS = (".py", ".html", ".txt", ".bat", ".vbs", ".ico", ".js", ".json", ".png", ".css", ".md", ".svg")
+UPDATE_EXTS = (".py", ".html", ".txt", ".bat", ".vbs", ".sh", ".ico", ".js", ".json", ".png", ".css", ".md", ".svg")
 
 
 def _ver_tuple(v):
@@ -5598,6 +5689,8 @@ def install_zip(data):
         with open(tmp, "wb") as fo:
             fo.write(z.read(n))
         os.replace(tmp, dst)
+        if dst.endswith(".sh") and os.name != "nt":
+            os.chmod(dst, 0o755)
     return new_ver
 
 
@@ -5608,6 +5701,8 @@ def restart_soon():
     kw = {"cwd": HERE}
     if os.name == "nt":
         kw["creationflags"] = 0x00000008 | 0x00000200   # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+    else:
+        kw["start_new_session"] = True
     def go():
         time.sleep(0.8)
         try:
@@ -5748,7 +5843,7 @@ class Handler(BaseHTTPRequestHandler):
             if not token_ok((q.get("t") or [""])[0]):
                 return self._send(403, {"ok": False})
             try:
-                fp, ctype = media_cached((q.get("p") or [""])[0])
+                fp, ctype = media_cached((q.get("p") or [""])[0], preview=bool((q.get("v") or [""])[0]))
             except Exception as e:
                 return self._send(404, {"ok": False, "error": str(e)})
             size = os.path.getsize(fp)
@@ -5826,7 +5921,8 @@ class Handler(BaseHTTPRequestHandler):
                       "unread": sum(1 for n in NOTIFS if not n.get("read")), "settings": dict(SETTINGS), "jobs": jobs,
                       "inbox": len(INBOX), "repo": SETTINGS.get("update_repo") or DEFAULT_REPO,
                       "sched": {"start": SCHED["start"], "after": SCHED["after"], "countdown": SCHED["countdown"]},
-                      "lan": bool(LAN["srv"]), "remote": self.lan, "os": os.name}
+                      "lan": bool(LAN["srv"]), "remote": self.lan, "os": os.name,
+                      "platform": sys.platform}
             st["settings"].pop("ftp_pass", None)
             if self.lan:
                 st["settings"].pop("lan_token", None)
@@ -5885,8 +5981,7 @@ class Handler(BaseHTTPRequestHandler):
         if p == "/api/open_ext_folder":
             folder = os.path.join(HERE, "extension")
             try:
-                if os.name == "nt":
-                    os.startfile(folder)
+                F.open_path(folder)
                 return self._send(200, {"ok": True, "path": folder})
             except Exception as e:
                 return self._send(200, {"ok": False, "path": folder, "error": str(e)})
@@ -6440,15 +6535,26 @@ def forward_to_running(ses, paths):
 
 
 def _find_app_browser():
-    """Edge (viene con Windows) o Chrome, para abrir la app en su propia ventana."""
-    if os.name != "nt":
-        return None
+    """Edge o Chrome (o Chromium/Brave), para abrir la app en su propia ventana sin pestañas."""
+    import shutil
     cands = []
-    for env in ("PROGRAMFILES(X86)", "PROGRAMFILES", "LOCALAPPDATA"):
-        root = os.environ.get(env)
-        if root:
-            cands.append(os.path.join(root, "Microsoft", "Edge", "Application", "msedge.exe"))
-            cands.append(os.path.join(root, "Google", "Chrome", "Application", "chrome.exe"))
+    if os.name == "nt":
+        for env in ("PROGRAMFILES(X86)", "PROGRAMFILES", "LOCALAPPDATA"):
+            root = os.environ.get(env)
+            if root:
+                cands.append(os.path.join(root, "Microsoft", "Edge", "Application", "msedge.exe"))
+                cands.append(os.path.join(root, "Google", "Chrome", "Application", "chrome.exe"))
+    elif sys.platform == "darwin":
+        for base in ("/Applications", os.path.expanduser("~/Applications")):
+            for app, exe in (("Google Chrome", "Google Chrome"), ("Microsoft Edge", "Microsoft Edge"),
+                             ("Brave Browser", "Brave Browser"), ("Chromium", "Chromium")):
+                cands.append(os.path.join(base, app + ".app", "Contents", "MacOS", exe))
+    else:
+        for n in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser", "microsoft-edge",
+                  "microsoft-edge-stable", "brave-browser", "brave"):
+            w = shutil.which(n)
+            if w:
+                cands.append(w)
     for c in cands:
         if os.path.isfile(c):
             return c
@@ -6567,6 +6673,16 @@ def taskbar_watch():
 
 def focus_window():
     """Si la ventana ya esta abierta, la trae al frente (en vez de abrir otra). True si habia."""
+    if os.name != "nt":
+        import shutil
+        import subprocess
+        if sys.platform.startswith("linux") and shutil.which("wmctrl"):
+            try:
+                return subprocess.run(["wmctrl", "-x", "-a", "PS5Directo"], capture_output=True,
+                                      timeout=5).returncode == 0
+            except Exception:
+                return False
+        return False
     try:
         import ctypes
         u32 = ctypes.windll.user32
@@ -6589,9 +6705,12 @@ def open_window(url):
         import subprocess
         profile = os.path.join(DATA_DIR, "ventana")
         try:
-            return subprocess.Popen([exe, "--app=" + url, "--user-data-dir=" + profile,
-                                     "--window-size=1150,900", "--no-first-run",
-                                     "--no-default-browser-check"])
+            args = [exe, "--app=" + url, "--user-data-dir=" + profile, "--window-size=1150,900",
+                    "--no-first-run", "--no-default-browser-check"]
+            if os.name != "nt" and sys.platform != "darwin":
+                args.append("--class=PS5Directo")   # en Linux agrupa la ventana con su icono del menu
+            return subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                    stderr=subprocess.DEVNULL, start_new_session=os.name != "nt")
         except Exception:
             pass
     webbrowser.open(url)
@@ -6605,9 +6724,41 @@ def _powershell(script, timeout=30):
                           creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
 
 
+def ensure_linux_menu():
+    """Linux: entrada "PS5 Directo" en el menu de aplicaciones (con su icono). Se rehace si el
+    programa cambia de carpeta. Tambien acepta archivos soltados encima (Exec ... %F)."""
+    launcher = os.path.join(HERE, "ps5directo.sh")
+    if not os.path.isfile(launcher):
+        return
+    try:
+        if not os.access(launcher, os.X_OK):
+            os.chmod(launcher, 0o755)
+        apps = os.path.join(os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share"), "applications")
+        fp = os.path.join(apps, "ps5directo.desktop")
+        q = lambda t: '"' + t.replace("\\", "\\\\").replace('"', '\\"') + '"'
+        body = ("[Desktop Entry]\nType=Application\nName=PS5 Directo\n"
+                "Comment=Descarga, convierte y envía a tu PS5\nComment[en]=Download, convert and send to your PS5\n"
+                "Exec=%s %%F\nIcon=%s\nTerminal=false\nCategories=Network;FileTransfer;\n"
+                "StartupWMClass=PS5Directo\n" % (q(launcher), os.path.join(HERE, "web", "icon-256.png")))
+        try:
+            with open(fp, encoding="utf-8") as f:
+                if f.read() == body:
+                    return
+        except OSError:
+            pass
+        os.makedirs(apps, exist_ok=True)
+        with open(fp, "w", encoding="utf-8") as f:
+            f.write(body)
+        print("Entrada en el menu de aplicaciones:", fp)
+    except Exception as e:
+        print("No se pudo crear la entrada del menu:", e)
+
+
 def ensure_shortcuts():
     """Acceso directo "PS5 Directo" en el escritorio y en "Enviar a", con el icono del programa.
     Se crea la primera vez; despues solo se corrige si apunta a otra carpeta (una copia vieja)."""
+    if sys.platform.startswith("linux"):
+        return ensure_linux_menu()
     if os.name != "nt":
         return
     try:

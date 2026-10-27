@@ -1,0 +1,64 @@
+PS5 DIRECTO PARA MAC (EN PRUEBAS)
+=================================
+
+Esta versión todavía no se ha podido probar en un Mac de verdad. Si algo
+falla, en el programa pulsa "Crear informe de fallo" y adjúntalo en un
+aviso en GitHub: https://github.com/jstrdev/ps5directo/issues
+Con eso se arregla rápido. ¡Gracias por probarla!
+
+INSTALAR
+1. Arrastra "PS5 Directo" a la carpeta Aplicaciones (Applications).
+2. Ábrelo desde Aplicaciones.
+
+SI MACOS NO TE DEJA ABRIRLO
+La app no está firmada por Apple (eso cuesta 99 $ al año), así que la
+primera vez macOS la bloquea. Es normal en programas gratuitos.
+- macOS 15 (Sequoia) o posterior: intenta abrirla, cierra el aviso y ve a
+  Ajustes del Sistema > Privacidad y seguridad. Abajo verás "Se ha
+  bloqueado PS5 Directo": pulsa "Abrir igualmente".
+- macOS 14 o anterior: clic derecho (o Control + clic) sobre la app >
+  Abrir > Abrir.
+- Si aun así no abre, en Terminal:
+    xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"
+
+NOTAS
+- Funciona en Mac con Apple Silicon (M1, M2...) e Intel, macOS 11 o
+  posterior. Trae Python y 7-Zip.
+- Para la ventana sin pestañas usa Chrome, Edge o Brave si los tienes; si
+  no, se abre en Safari.
+- Para los torrents hace falta aria2: instala Homebrew (brew.sh) y luego
+  "brew install aria2".
+- Se actualiza solo desde el propio programa, como en Windows.
+
+
+PS5 DIRECTO FOR MAC (TESTING)
+=============================
+
+This version hasn't been tested on a real Mac yet. If something fails,
+click "Create problem report" in the program and attach it to an issue
+on GitHub: https://github.com/jstrdev/ps5directo/issues
+That makes it quick to fix. Thanks for trying it!
+
+INSTALL
+1. Drag "PS5 Directo" into the Applications folder.
+2. Open it from Applications.
+
+IF MACOS WON'T OPEN IT
+The app isn't signed by Apple (that costs $99 a year), so macOS blocks it
+the first time. That's normal for free programs.
+- macOS 15 (Sequoia) or later: try to open it, close the warning and go
+  to System Settings > Privacy & Security. Near the bottom you'll see
+  "PS5 Directo was blocked": click "Open Anyway".
+- macOS 14 or earlier: right-click (or Control-click) the app > Open >
+  Open.
+- If it still won't open, in Terminal:
+    xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"
+
+NOTES
+- Works on Apple Silicon (M1, M2...) and Intel Macs, macOS 11 or later.
+  Python and 7-Zip are included.
+- For the window without tabs it uses Chrome, Edge or Brave if you have
+  one; otherwise it opens in Safari.
+- Torrents need aria2: install Homebrew (brew.sh), then
+  "brew install aria2".
+- It updates itself from the program, like on Windows.

@@ -1211,13 +1211,41 @@ def diagnose(ps5_ip, cfg, speed=None, active=0):
 # Energia: no dormir mientras hay trabajo y apagar/suspender al acabar
 # ---------------------------------------------------------------------------
 
+_AWAKE = {"proc": None}
+
+
 def keep_awake(on):
-    if os.name != "nt":
+    """Que el PC no se suspenda mientras hay envios. En Linux/Mac se hace con un proceso
+    (systemd-inhibit / caffeinate) que dura mientras haga falta."""
+    if os.name == "nt":
+        try:
+            import ctypes
+            ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
+            ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | (ES_SYSTEM_REQUIRED if on else 0))
+            return True
+        except Exception:
+            return False
+    p = _AWAKE["proc"]
+    if not on:
+        if p is not None:
+            try:
+                p.terminate()
+            except Exception:
+                pass
+            _AWAKE["proc"] = None
+        return True
+    if p is not None and p.poll() is None:
+        return True
+    if sys.platform == "darwin":
+        cmd = ["caffeinate", "-i", "-w", str(os.getpid())]
+    elif shutil.which("systemd-inhibit"):
+        cmd = ["systemd-inhibit", "--what=sleep:idle", "--who=PS5 Directo", "--why=Enviando a la PS5",
+               "--mode=block", "sleep", "infinity"]
+    else:
         return False
     try:
-        import ctypes
-        ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
-        ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | (ES_SYSTEM_REQUIRED if on else 0))
+        _AWAKE["proc"] = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                          stderr=subprocess.DEVNULL)
         return True
     except Exception:
         return False
@@ -1225,15 +1253,73 @@ def keep_awake(on):
 
 def power_action(kind):
     """'sleep' (suspender) o 'shutdown' (apagar). Devuelve un texto de lo hecho."""
-    if os.name != "nt":
-        return "Solo funciona en Windows"
-    if kind == "shutdown":
-        subprocess.Popen(["shutdown", "/s", "/t", "0", "/c", "PS5 Directo: cola terminada"], creationflags=NO_WINDOW)
-        return "Apagando el PC"
-    if kind == "sleep":
-        subprocess.Popen(["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"], creationflags=NO_WINDOW)
-        return "Suspendiendo el PC"
-    return ""
+    if os.name == "nt":
+        if kind == "shutdown":
+            subprocess.Popen(["shutdown", "/s", "/t", "0", "/c", "PS5 Directo: cola terminada"], creationflags=NO_WINDOW)
+            return "Apagando el PC"
+        if kind == "sleep":
+            subprocess.Popen(["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"], creationflags=NO_WINDOW)
+            return "Suspendiendo el PC"
+        return ""
+    keep_awake(False)
+    if sys.platform == "darwin":
+        cmd = {"shutdown": ["osascript", "-e", 'tell application "System Events" to shut down'],
+               "sleep": ["pmset", "sleepnow"]}.get(kind)
+    else:
+        cmd = {"shutdown": ["systemctl", "poweroff"], "sleep": ["systemctl", "suspend"]}.get(kind)
+    if not cmd:
+        return ""
+    try:
+        subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception as e:
+        return "No pude: %s" % e
+    return "Apagando el PC" if kind == "shutdown" else "Suspendiendo el PC"
+
+
+def open_path(path):
+    """Abre una carpeta o archivo del PC con el programa del sistema (Explorador, Finder...)."""
+    if os.name == "nt":
+        os.startfile(path)
+        return
+    cmd = ["open", path] if sys.platform == "darwin" else ["xdg-open", path]
+    subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def pick_native(kind, title):
+    """Selector de archivos/carpeta del sistema en Linux (zenity/kdialog) o Mac (osascript).
+    Devuelve la lista elegida ([] si se cancela) o None si no hay ninguno disponible."""
+    title = title or "PS5 Directo"
+    if sys.platform == "darwin":
+        if kind == "folder":
+            script = 'POSIX path of (choose folder with prompt %s)' % _as_str(title)
+        else:
+            script = ('set l to choose file with prompt %s with multiple selections allowed\n'
+                      'set o to ""\nrepeat with f in l\nset o to o & POSIX path of f & linefeed\nend repeat\nreturn o'
+                      % _as_str(title))
+        args = ["osascript"]
+        for ln in script.split("\n"):
+            args += ["-e", ln]
+        p = subprocess.run(args, capture_output=True, timeout=3600)
+        if p.returncode != 0:
+            return []
+        return [x.rstrip("/") or "/" for x in p.stdout.decode("utf-8", "replace").splitlines() if x.strip()]
+    if shutil.which("zenity"):
+        cmd = ["zenity", "--file-selection", "--title=" + title, "--separator=\n"]
+        cmd += ["--directory"] if kind == "folder" else ["--multiple"]
+    elif shutil.which("kdialog"):
+        home = os.path.expanduser("~")
+        cmd = (["kdialog", "--title", title, "--getexistingdirectory", home] if kind == "folder" else
+               ["kdialog", "--title", title, "--getopenfilename", home, "--multiple", "--separate-output"])
+    else:
+        return None
+    p = subprocess.run(cmd, capture_output=True, timeout=3600)
+    if p.returncode != 0:
+        return []
+    return [x for x in p.stdout.decode("utf-8", "replace").splitlines() if x.strip()]
+
+
+def _as_str(t):
+    return '"' + str(t).replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
 # ---------------------------------------------------------------------------

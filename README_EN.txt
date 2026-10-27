@@ -319,15 +319,50 @@ WHAT TO DOWNLOAD
   rather extract it to a folder. "Update" uses it too.
 To remove it: Windows Settings > Apps > PS5 Directo > Uninstall. Your
 settings are kept in case you install it again.
+- PS5Directo-X.Y.Z-macOS.dmg: for Mac (Apple Silicon and Intel, macOS 11
+  or later). IN TESTING: not tested on a real Mac yet. Open it and drag
+  PS5 Directo into Applications. The first time macOS blocks it because
+  it isn't signed by Apple: on macOS 15 or later, System Settings >
+  Privacy & Security > "Open Anyway"; on older ones, right-click the app
+  > Open. If something fails, "Create problem report" and attach it at
+  github.com/jstrdev/ps5directo/issues.
+- PS5Directo-X.Y.Z-Linux.tar.gz: for Linux (x86-64, recent distros such
+  as Ubuntu 22.04 or later). Extract it anywhere and open it once with
+  ./ps5directo.sh in a terminal (or right-click > Run as a Program).
+  That first time it adds itself to the applications menu, so from then
+  on you open it from there. Python and 7-Zip are included.
+  For the window without tabs it uses Chrome, Chromium, Edge or Brave if
+  you have one (otherwise your browser). Torrents need aria2:
+  sudo apt install aria2. Linux has no "Send to" and no Windows firewall
+  prompt.
 
 WHAT'S NEW
 ----------
+1.21.0 - Mac version IN TESTING (PS5Directo-1.21.0-macOS.dmg), for Apple
+        Silicon and Intel, with Python and 7-Zip included. Not tested on
+        a real Mac yet: any report on GitHub is welcome.
+      - The problem report now includes the program's technical log
+        (without the session access code).
+      - Fixed: if you closed the program on the Library tab, on reopening
+        it showed "Transfers" selected with an empty Library below.
+      - Linux version (PS5Directo-1.21.0-Linux.tar.gz), with Python and
+        7-Zip included. It adds itself to the applications menu and
+        updates itself like on Windows.
+      - Downloads to the PC go to your real Downloads folder (on Linux it
+        may have another name).
+
 1.20.4 - Its own taskbar icon: the window no longer hides inside the Edge
         or Chrome icon, and pinning it pins PS5 Directo.
       - If it's already open and you open it again, it brings the existing
         window to the front instead of opening another one.
       - If you pinned it before this version, unpin the old icon and pin
         the new one (right-click the taskbar icon > Pin).
+      - Captures: screenshots taken with HDR on (.jxr) now show up,
+        previewed as JPG (downloading keeps the original). Each one shows
+        the app and the date, videos show the app's cover, and the
+        temporary copies the console makes when sharing are hidden.
+      - Fixed: in "Console files", folder size, deleting, copying, fixing
+        permissions and "Replace" on an existing folder failed since 1.20.3.
 
 1.20.3 - Windows installer (PS5Directo-1.20.3-Setup.exe): double-click,
         "Install", done, everything included. The .zip is still there if
