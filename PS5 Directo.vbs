@@ -17,7 +17,7 @@ ElseIf sh.Run("cmd /c where pythonw >nul 2>nul", 0, True) = 0 Then
   py = "pythonw"
 End If
 If py = "" Then
-  MsgBox "No encuentro Python. Descarga la version portable (trae Python) o instala Python 3 (marca 'Add to PATH').", 48, "PS5 Directo"
+  MsgBox "Faltan archivos de PS5 Directo (la carpeta python). Vuelve a instalarlo con PS5Directo-Setup.exe desde github.com/jstrdev/ps5directo/releases", 48, "PS5 Directo"
 Else
   sh.Run py & " """ & dir & "\app.py""" & args, 0, False
 End If

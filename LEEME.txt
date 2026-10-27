@@ -119,8 +119,7 @@ lo tiene y que sabes cargar payloads (.elf).
 
 EN EL PC
 - Windows 10 u 11.
-- Python 3.9 o superior: https://www.python.org/downloads/
-  Al instalarlo marca "Add python.exe to PATH".
+- Nada más: el instalador lo trae todo (también Python).
 - 7-Zip (solo si usas "Descomprimir en el PC"): https://www.7-zip.org/
 
 EN LA PS5 (se cargan como payloads, por ejemplo con Payload Manager:
@@ -154,9 +153,15 @@ BFpilot, sin PS5 Directo.
 
 PRIMERA VEZ
 -----------
-Doble clic en "Crear accesos directos.bat". Crea:
-  - Un icono "PS5 Directo" en el escritorio.
+Abre PS5Directo-X.Y.Z-Setup.exe y pulsa "Instalar". No pide permisos de
+administrador. Crea:
+  - Un icono "PS5 Directo" en el escritorio y en el menú Inicio.
   - "Enviar a > PS5 Directo" en el clic derecho de los archivos.
+Si Windows dice "Windows protegió su PC": "Más información" > "Ejecutar
+de todos modos" (el instalador no está firmado; es el aviso normal en
+programas pequeños y gratuitos).
+Con el .zip en vez del instalador: descomprímelo donde quieras y haz
+doble clic en "Crear accesos directos.bat".
 Desde entonces abre PS5 Directo con el icono del escritorio: sale en su
 propia ventana, sin pestañas y sin ventana negra.
 
@@ -294,12 +299,18 @@ PAYLOADS, DIAGNÓSTICO, MÓVIL Y PROGRAMAR
 
 QUÉ DESCARGAR
 -------------
-En cada versión hay dos descargas: PS5Directo-X.Y.Z-Windows.zip, la
-recomendada, que lo trae todo (descomprimir y abrir), y
-PS5Directo-X.Y.Z-without-Python.zip, solo para quien ya tiene Python.
+- PS5Directo-X.Y.Z-Setup.exe: el instalador. Es el que debes bajar. Lo
+  trae todo (también Python): ábrelo, pulsa "Instalar" y listo.
+- PS5Directo-X.Y.Z-Windows.zip: lo mismo sin instalar, para quien
+  prefiera descomprimirlo en una carpeta. También lo usa "Actualizar".
+Para quitarlo: Configuración de Windows > Aplicaciones > PS5 Directo >
+Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
 
 
 NOVEDADES 1.20.3
+- Instalador para Windows (PS5Directo-1.20.3-Setup.exe): doble clic,
+  "Instalar" y listo, con todo incluido. Sigue habiendo .zip para quien
+  no quiera instalar.
 - Biblioteca: «Comprobar» en cada aplicación, para cuando no abre o se
   cierra al arrancar. Revisa la carpeta (ejecutable, param.json, permisos,
   firmware, backports y el empaquetado LZ4), muestra los registros (.log) y

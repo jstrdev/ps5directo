@@ -31,7 +31,7 @@ An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts
 
 ## Requirements
 
-- **PC:** Windows 10/11. Get **`PS5Directo-X.Y.Z-Windows.zip`**: everything included, nothing else to install. (`-without-Python.zip` is only for people who already have [Python 3.9+](https://www.python.org/downloads/).) For extracting on the PC, also install [7-Zip](https://www.7-zip.org/).
+- **PC:** Windows 10/11. Nothing else to install: the download includes everything it needs. Optional: [7-Zip](https://www.7-zip.org/), only if you want to extract on the PC instead of on the console.
 - **Jailbroken PS5:**
   - An FTP server, for example [ftpsrv](https://github.com/ps5-payload-dev/ftpsrv) on port 2121.
   - [BFpilot](https://github.com/ItsBlurf/BFpilot) on port 5905.
@@ -40,10 +40,13 @@ An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts
 
 ## Getting started
 
-1. Download **`PS5Directo-X.Y.Z-Windows.zip`** from the latest [release](../../releases) and extract it anywhere (for example in Documents).
-2. Run `Crear accesos directos.bat` ("create shortcuts"). It adds a desktop icon and a "Send to → PS5 Directo" entry.
-3. Open **PS5 Directo** from the desktop. The language follows Windows; switch it with the **English / Español** button at the top.
-4. Follow the welcome guide, enter your PS5's IP in Settings, then paste links or drop files.
+1. Download **`PS5Directo-X.Y.Z-Setup.exe`** from the latest [release](../../releases), open it and click **Install**. No admin rights needed, nothing else to install.
+2. Open **PS5 Directo** from the desktop or the Start menu. The language follows Windows; switch it with the **English / Español** button at the top.
+3. Follow the welcome guide, enter your PS5's IP in Settings, then paste links or drop files.
+
+> If Windows shows "Windows protected your PC", click **More info → Run anyway**. The installer isn't signed (signing costs money); it's the usual warning for small free programs.
+>
+> Rather not install? Download `PS5Directo-X.Y.Z-Windows.zip` instead, extract it anywhere and run `Crear accesos directos.bat`. Both update themselves the same way.
 
 > **About BFpilot and permissions:** up to at least v0.4.4, BFpilot's archive extractor leaves files without the execute bit, so the PS5 refuses to launch them (CE-107750-0). This also happens when you extract from BFpilot's own web UI. PS5 Directo fixes it automatically after every extraction. For content you already have, use **Settings → Fix permissions**.
 
@@ -51,7 +54,7 @@ The full guide is in [README_EN.txt](README_EN.txt) (Spanish: [LEEME.txt](LEEME.
 
 ## Publishing a release
 
-Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds both zips (`-Windows.zip` with Python and `-without-Python.zip`) and creates the release.
+Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds the installer `PS5Directo-X.Y.Z-Setup.exe` and `PS5Directo-X.Y.Z-Windows.zip` (both with Python included) and creates the release. The installer script is `installer/PS5Directo.iss` (Inno Setup).
 
 ## Disclaimer
 
@@ -76,8 +79,13 @@ Herramienta todo en uno para Windows y PS5 con jailbreak: **descarga, convierte 
 
 **Cuando algo falla:** diagnóstico de errores con causa y solución, «Comprobar» si algo se cierra al abrirlo, informe de fallo en un clic y avisos automáticos de versiones y de bajadas de velocidad.
 
-**Requisitos:** Windows 10/11. Descarga **`PS5Directo-X.Y.Z-Windows.zip`**: lo trae todo, no hay que instalar nada más (`-without-Python.zip` es solo para quien ya tiene [Python 3.9+](https://www.python.org/downloads/)). Para descomprimir en el PC, [7-Zip](https://www.7-zip.org/). En la PS5: servidor FTP ([ftpsrv](https://github.com/ps5-payload-dev/ftpsrv)), [BFpilot](https://github.com/ItsBlurf/BFpilot) y [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus).
+**Requisitos:** Windows 10/11, sin instalar nada más: la descarga lo trae todo. Opcional: [7-Zip](https://www.7-zip.org/), solo si quieres descomprimir en el PC en vez de en la consola. En la PS5: servidor FTP ([ftpsrv](https://github.com/ps5-payload-dev/ftpsrv)), [BFpilot](https://github.com/ItsBlurf/BFpilot) y [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus).
 
-**Uso:** descarga `PS5Directo-X.Y.Z-Windows.zip` de la última [release](../../releases), descomprímelo donde quieras, ejecuta `Crear accesos directos.bat` y abre **PS5 Directo** desde el escritorio. La guía completa está en [LEEME.txt](LEEME.txt).
+**Cómo instalarlo:**
+1. Descarga **`PS5Directo-X.Y.Z-Setup.exe`** de la última [release](../../releases), ábrelo y pulsa **Instalar**. No pide permisos de administrador ni hay que instalar nada más.
+2. Abre **PS5 Directo** desde el escritorio o el menú Inicio.
+3. Sigue la ventana de bienvenida y pon la IP de tu PS5 en Ajustes.
+
+Si Windows dice «Windows protegió su PC», pulsa **Más información → Ejecutar de todos modos** (el instalador no está firmado, que cuesta dinero; es el aviso normal en programas pequeños y gratuitos). ¿Prefieres no instalar? Descarga el `.zip`, descomprímelo y ejecuta `Crear accesos directos.bat`. La guía completa está en [LEEME.txt](LEEME.txt).
 
 **Aviso:** proyecto independiente, sin relación con Sony ni con los autores de las herramientas citadas. No incluye contenido de terceros, claves ni archivos de Sony, ni enlaces a sitios de descargas. Úsalo solo con contenido que tengas derecho a usar (copias de seguridad propias y homebrew). No hace el jailbreak ni salta ninguna protección: solo copia archivos a una consola que ya has modificado tú. No se da ayuda para conseguir contenido sin licencia. Se ofrece tal cual, sin garantías, y lo que hagas con él es responsabilidad tuya.

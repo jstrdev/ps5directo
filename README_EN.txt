@@ -96,8 +96,7 @@ jailbroken and that you know how to load payloads (.elf).
 
 ON THE PC
 - Windows 10 or 11.
-- Python 3.9 or newer: https://www.python.org/downloads/
-  When installing, tick "Add python.exe to PATH".
+- Nothing else: the installer includes everything (Python too).
 - 7-Zip (only for "Extract on the PC"): https://www.7-zip.org/
 
 ON THE PS5 (loaded as payloads, for example with Payload Manager:
@@ -130,9 +129,15 @@ BFpilot's own web page, without PS5 Directo.
 
 FIRST TIME
 ----------
-Double-click "Crear accesos directos.bat" ("create shortcuts"). It adds:
-  - A "PS5 Directo" icon on the desktop.
+Open PS5Directo-X.Y.Z-Setup.exe and click "Install". No admin rights
+needed. It adds:
+  - A "PS5 Directo" icon on the desktop and in the Start menu.
   - "Send to > PS5 Directo" in the right-click menu of your files.
+If Windows says "Windows protected your PC": "More info" > "Run anyway"
+(the installer isn't signed; it's the usual warning for small free
+programs).
+With the .zip instead of the installer: extract it anywhere and
+double-click "Crear accesos directos.bat" ("create shortcuts").
 From then on, open PS5 Directo from the desktop icon: it runs in its own
 window, with no tabs and no black console window.
 
@@ -308,13 +313,19 @@ PAYLOADS, DIAGNOSTICS, PHONE AND SCHEDULE
 
 WHAT TO DOWNLOAD
 ----------------
-Each release has PS5Directo-X.Y.Z-Windows.zip, the recommended one with
-everything included (extract and run), and PS5Directo-X.Y.Z-without-Python.zip,
-only for people who already have Python.
+- PS5Directo-X.Y.Z-Setup.exe: the installer. This is the one to get.
+  Everything included (Python too): open it, click "Install", done.
+- PS5Directo-X.Y.Z-Windows.zip: the same without installing, if you'd
+  rather extract it to a folder. "Update" uses it too.
+To remove it: Windows Settings > Apps > PS5 Directo > Uninstall. Your
+settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
-1.20.3 - Library: "Check" on each app, for when it won't open or closes on
+1.20.3 - Windows installer (PS5Directo-1.20.3-Setup.exe): double-click,
+        "Install", done, everything included. The .zip is still there if
+        you'd rather not install.
+      - Library: "Check" on each app, for when it won't open or closes on
         launch. It checks the folder (executable, param.json, permissions,
         firmware, backports and LZ4 packing), shows logs (.log) and captures
         from the last minutes, explains the error code shown on the TV and
