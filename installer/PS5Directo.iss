@@ -57,9 +57,9 @@ Source: "{#SrcDir}\*"; DestDir: "{app}"; Excludes: "Crear accesos directos.bat,_
 Type: files; Name: "{app}\Crear accesos directos.bat"
 
 [Icons]
-Name: "{autoprograms}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
-Name: "{autodesktop}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
-Name: "{usersendto}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
+Name: "{autoprograms}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"; AppUserModelID: "PS5Directo.App"
+Name: "{autodesktop}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"; AppUserModelID: "PS5Directo.App"
+Name: "{usersendto}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"; AppUserModelID: "PS5Directo.App"
 
 [Run]
 Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,PS5 Directo}"; Flags: postinstall nowait skipifsilent

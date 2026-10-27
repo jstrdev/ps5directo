@@ -307,6 +307,14 @@ Para quitarlo: Configuración de Windows > Aplicaciones > PS5 Directo >
 Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
 
 
+NOVEDADES 1.20.4
+- Icono propio en la barra de tareas: la ventana ya no se mete dentro del
+  icono de Edge o Chrome, y al anclarla se ancla PS5 Directo.
+- Si ya está abierto y lo vuelves a abrir, trae al frente la ventana que
+  tenías en vez de abrir otra.
+- Si lo anclaste antes de esta versión, desáncla el icono viejo y ancla
+  el nuevo (clic derecho en el icono de la barra > Anclar).
+
 NOVEDADES 1.20.3
 - Instalador para Windows (PS5Directo-1.20.3-Setup.exe): doble clic,
   "Instalar" y listo, con todo incluido. Sigue habiendo .zip para quien

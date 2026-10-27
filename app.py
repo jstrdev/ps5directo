@@ -24,7 +24,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "1.20.3"
+VERSION = "1.20.4"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -6455,6 +6455,133 @@ def _find_app_browser():
     return None
 
 
+APP_USER_MODEL_ID = "PS5Directo.App"
+_TITLE_RX = re.compile(r"^PS5 Directo( v[\d.]+)?$")
+
+
+def _app_windows():
+    """Ventanas de la interfaz (modo aplicacion de Edge/Chrome). En una pestaña normal del
+    navegador el titulo lleva " - Microsoft Edge" detras, asi que no se confunden."""
+    if os.name != "nt":
+        return []
+    import ctypes
+    from ctypes import wintypes
+    u32 = ctypes.windll.user32
+    found = []
+    proto = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+    def cb(hwnd, _):
+        try:
+            if not u32.IsWindowVisible(hwnd):
+                return True
+            cls = ctypes.create_unicode_buffer(64)
+            u32.GetClassNameW(hwnd, cls, 64)
+            if cls.value != "Chrome_WidgetWin_1":
+                return True
+            buf = ctypes.create_unicode_buffer(256)
+            u32.GetWindowTextW(hwnd, buf, 256)
+            if _TITLE_RX.match(buf.value.strip()):
+                found.append(hwnd)
+        except Exception:
+            pass
+        return True
+    u32.EnumWindows(proto(cb), 0)
+    return found
+
+
+def _set_window_identity(hwnd):
+    """Le dice a Windows que esa ventana es "PS5 Directo" y no Edge: icono propio en la
+    barra de tareas, y al anclarla se ancla PS5 Directo (con su icono y su acceso)."""
+    import ctypes
+    import uuid
+    from ctypes import wintypes
+
+    class GUID(ctypes.Structure):
+        _fields_ = [("d1", ctypes.c_ulong), ("d2", ctypes.c_ushort), ("d3", ctypes.c_ushort),
+                    ("d4", ctypes.c_ubyte * 8)]
+
+    def guid(s):
+        b = uuid.UUID(s).bytes_le
+        g = GUID()
+        ctypes.memmove(ctypes.byref(g), b, 16)
+        return g
+
+    class PROPERTYKEY(ctypes.Structure):
+        _fields_ = [("fmtid", GUID), ("pid", ctypes.c_ulong)]
+
+    class PROPVARIANT(ctypes.Structure):
+        _fields_ = [("vt", ctypes.c_ushort), ("r1", ctypes.c_ushort), ("r2", ctypes.c_ushort),
+                    ("r3", ctypes.c_ushort), ("p", ctypes.c_void_p), ("p2", ctypes.c_void_p)]
+
+    fmt = "9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"   # PKEY_AppUserModel_*
+    vbs = os.path.join(HERE, "PS5 Directo.vbs")
+    wscript = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "System32", "wscript.exe")
+    props = []
+    if os.path.isfile(vbs):
+        props += [(2, '"%s" "%s"' % (wscript, vbs)),                       # RelaunchCommand
+                  (3, os.path.join(HERE, "web", "ps5directo.ico")),           # RelaunchIconResource
+                  (4, "PS5 Directo")]                                         # RelaunchDisplayName
+    props.append((5, APP_USER_MODEL_ID))                                      # ID (el ultimo)
+
+    shell32 = ctypes.windll.shell32
+    shell32.SHGetPropertyStoreForWindow.argtypes = [wintypes.HWND, ctypes.POINTER(GUID),
+                                                    ctypes.POINTER(ctypes.c_void_p)]
+    store = ctypes.c_void_p()
+    iid = guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99")   # IPropertyStore
+    if shell32.SHGetPropertyStoreForWindow(hwnd, ctypes.byref(iid), ctypes.byref(store)) != 0 or not store:
+        return False
+    vtbl = ctypes.cast(store, ctypes.POINTER(ctypes.POINTER(ctypes.c_void_p)))[0]
+    set_value = ctypes.WINFUNCTYPE(ctypes.c_long, ctypes.c_void_p, ctypes.POINTER(PROPERTYKEY),
+                                   ctypes.POINTER(PROPVARIANT))(vtbl[6])
+    commit = ctypes.WINFUNCTYPE(ctypes.c_long, ctypes.c_void_p)(vtbl[7])
+    release = ctypes.WINFUNCTYPE(ctypes.c_ulong, ctypes.c_void_p)(vtbl[2])
+    ok = True
+    try:
+        for pid, text in props:
+            key = PROPERTYKEY(guid(fmt), pid)
+            s = ctypes.create_unicode_buffer(text)
+            pv = PROPVARIANT()
+            pv.vt = 31   # VT_LPWSTR (SetValue hace su propia copia)
+            pv.p = ctypes.cast(s, ctypes.c_void_p).value
+            ok = set_value(store, ctypes.byref(key), ctypes.byref(pv)) == 0 and ok
+        commit(store)
+    finally:
+        release(store)
+    return ok
+
+
+def taskbar_watch():
+    """Pone la identidad de PS5 Directo a cada ventana nueva de la interfaz."""
+    done = set()
+    while True:
+        try:
+            for h in _app_windows():
+                if h not in done:
+                    if _set_window_identity(h):
+                        done.add(h)
+        except Exception as e:
+            print("Barra de tareas:", e)
+            return
+        time.sleep(2)
+
+
+def focus_window():
+    """Si la ventana ya esta abierta, la trae al frente (en vez de abrir otra). True si habia."""
+    try:
+        import ctypes
+        u32 = ctypes.windll.user32
+        wins = _app_windows()
+        if not wins:
+            return False
+        h = wins[0]
+        if u32.IsIconic(h):
+            u32.ShowWindow(h, 9)   # SW_RESTORE
+        u32.SetForegroundWindow(h)
+        return True
+    except Exception:
+        return False
+
+
 def open_window(url):
     """Abre la interfaz como ventana de aplicacion. Devuelve el proceso o None."""
     exe = _find_app_browser()
@@ -6593,7 +6720,7 @@ def main():
         if paths:
             forward_to_running(ses, paths)
             print("Anadido a la cola de PS5 Directo (ya estaba abierto)")
-        else:
+        elif "--browser" in sys.argv or not focus_window():
             open_window(ses[0] + "/#t=" + ses[1])   # ya funcionaba: solo enseno la ventana
         sys.exit(3)
     load_state()
@@ -6625,6 +6752,8 @@ def main():
     if "--no-browser" not in sys.argv:
         threading.Timer(0.5, lambda: open_window(url)).start()
         threading.Thread(target=watch_ui, daemon=True).start()
+    if os.name == "nt":
+        threading.Thread(target=taskbar_watch, daemon=True).start()
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

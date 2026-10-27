@@ -322,6 +322,13 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+1.20.4 - Its own taskbar icon: the window no longer hides inside the Edge
+        or Chrome icon, and pinning it pins PS5 Directo.
+      - If it's already open and you open it again, it brings the existing
+        window to the front instead of opening another one.
+      - If you pinned it before this version, unpin the old icon and pin
+        the new one (right-click the taskbar icon > Pin).
+
 1.20.3 - Windows installer (PS5Directo-1.20.3-Setup.exe): double-click,
         "Install", done, everything included. The .zip is still there if
         you'd rather not install.
