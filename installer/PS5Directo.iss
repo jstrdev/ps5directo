@@ -11,7 +11,6 @@
 #ifndef SrcDir
   #define SrcDir "..\dist\PS5Directo"
 #endif
-#define Launch """{app}\PS5 Directo.vbs"""
 
 [Setup]
 AppId={{BD789BF5-0254-4A4C-92CB-332BB22CEE42}
@@ -58,12 +57,12 @@ Source: "{#SrcDir}\*"; DestDir: "{app}"; Excludes: "Crear accesos directos.bat,_
 Type: files; Name: "{app}\Crear accesos directos.bat"
 
 [Icons]
-Name: "{autoprograms}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: {#Launch}; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
-Name: "{autodesktop}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: {#Launch}; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
-Name: "{usersendto}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: {#Launch}; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
+Name: "{autoprograms}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
+Name: "{autodesktop}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
+Name: "{usersendto}\PS5 Directo"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\web\ps5directo.ico"; Comment: "PS5 Directo"
 
 [Run]
-Filename: "{sys}\wscript.exe"; Parameters: {#Launch}; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,PS5 Directo}"; Flags: postinstall nowait skipifsilent
+Filename: "{sys}\wscript.exe"; Parameters: """{app}\PS5 Directo.vbs"""; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,PS5 Directo}"; Flags: postinstall nowait skipifsilent
 
 [UninstallRun]
 ; cierra PS5 Directo si sigue abierto, para poder borrar sus archivos
