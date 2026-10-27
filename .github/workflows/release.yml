@@ -19,7 +19,7 @@ jobs:
 
       - name: Version de app.py
         id: v
-        run: echo "ver=$(grep -oP 'VERSION = "\K[^"]+' app.py)" >> "$GITHUB_OUTPUT"
+        run: echo "ver=$(grep -m1 -oP '^VERSION = "\K[^"]+' app.py)" >> "$GITHUB_OUTPUT"
 
       - name: La etiqueta tiene que coincidir con la version
         if: startsWith(github.ref, 'refs/tags/')
