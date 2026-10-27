@@ -2,14 +2,14 @@
 
 **English** · [Español](#español)
 
-A Windows file-transfer tool for jailbroken PS5 consoles. It sends files to the console over FTP **while they download**, without storing them on your PC. It then extracts them, either on the console with BFpilot or on the PC with 7-Zip, and places apps in `/data/homebrew` so ShadowMountPlus shows them in the menu.
+An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts and sends** in a single step. Sent as is, files go to the console over FTP **while they download**, without storing them on your PC; or it **converts them on the fly** (LZ4, `.exfat`, folder, `.ffpfsc`…) as part of the same job, no second program needed. It extracts on the console (BFpilot) or on the PC (7-Zip), places apps in `/data/homebrew` so ShadowMountPlus shows them in the menu, and lets you browse your console's library with covers and control everything from your phone.
 
-![PS5 Directo: paste a link, it's sent, extracted and shows up in the library](docs/demo_en.gif)
+![PS5 Directo: paste a link, send it as is or convert it, and it shows up in the library](docs/demo_en.gif)
 
 <sub>Demo with a sample homebrew app served from a NAS on the local network.</sub>
 
 - ✅ Streams downloads straight to the console: nothing is saved on the PC
-- ✅ Works from download links, ftp:// links (e.g. a NAS) or files on your PC
+- ✅ Works from download links, ftp:// links (e.g. a NAS), torrents (magnet or .torrent) or files on your PC
 - ✅ Joins split parts (.part1, .part2… / .001, .002…) and extracts RAR, 7z, ZIP and tar (.gz/.bz2/.xz)
 - ✅ Extracts on the console (BFpilot) or on the PC (7-Zip, every file CRC-checked)
 - ✅ Fixes the file permissions that stop BFpilot-extracted content from launching (CE-107750-0)
@@ -24,8 +24,13 @@ A Windows file-transfer tool for jailbroken PS5 consoles. It sends files to the 
 - ✅ Optional browser extension: links arrive by themselves with your browser session (same speed and access as the browser)
 - ✅ Drag and drop, or "Send to" from Explorer
 - ✅ Welcome guide, one-click updates, English and Spanish
-- ✅ **Library tab**: covers, versions and the firmware each app needs, flagging what won't launch on your console (backport-aware), duplicates and incomplete folders
-- ✅ **Images and LZ4** with [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge) (optional): send an app as a single `.ffpkg` / `.ffpfsc` image or LZ4-packed, prepared on the PC
+- ✅ **Library tab**: covers, versions and the firmware each app needs, flagging what won't launch on your console (backport-aware), duplicates and incomplete folders. Also shows what's installed (PS4 and PS5), your PC/NAS collection with what's missing on the console, and links to each title's public update list
+- ✅ **Backup tab**: saved data, ShadowMountPlus/payload settings and the app database copied to the PC, manually or daily; restore saved data to the same console
+- ✅ **Captures tab**: view the console's screenshots and videos and download them
+- ✅ **Diagnosis** on failed transfers (cause, codes and fixes) and a one-click problem report (.zip, no passwords)
+- ✅ **Format converter** with [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge) (optional): send it as is, or turn it on the PC into a plain folder, `.exfat`, LZ4, `.ffpfsc`, `.ffpkg`, `.ffpfs` or `.fpkg`, with a "Which one?" guide by need. Archives with a normal version plus a backport are split automatically
+- ✅ Shows your PS5 firmware at the top and tells you which formats and apps will work on it
+- ✅ "Download again" from the queue or the history, without pasting the link
 - ✅ Asks before sending something that's already on the console (send anyway, replace or cancel)
 - ✅ Checks every part against its `.sfv` / `.md5` / `.sha1` while sending
 - ✅ "Make room": suggests what to delete when space runs out
@@ -55,7 +60,7 @@ The full guide is in [README_EN.txt](README_EN.txt) (Spanish: [LEEME.txt](LEEME.
 
 ## Publishing a release
 
-Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.0 && git push --tags`). The GitHub Action builds both zips (plain and portable with Python) and creates the release.
+Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds both zips (plain and portable with Python) and creates the release.
 
 ## Disclaimer
 
@@ -70,11 +75,13 @@ Independent project, not affiliated with Sony or with the authors of the tools m
 
 ## Español
 
-![PS5 Directo: pegas un enlace, se envía, se descomprime y aparece en la biblioteca](docs/demo_es.gif)
+![PS5 Directo: pegas un enlace, lo envías tal cual o lo conviertes, y aparece en la biblioteca](docs/demo_es.gif)
 
-Herramienta de transferencia de archivos para Windows: envía archivos a una PS5 con jailbreak por FTP **mientras se descargan**, sin pasar por el disco del PC. Después los descomprime (en la consola con BFpilot, o en el PC con 7-Zip) y coloca las aplicaciones en `/data/homebrew` para que ShadowMountPlus las muestre en el menú.
+Herramienta todo en uno para Windows y PS5 con jailbreak: **descarga, convierte y envía** en un solo paso. Tal cual, los archivos van a la consola por FTP **mientras se descargan**, sin pasar por el disco del PC; o los **convierte sobre la marcha** (LZ4, `.exfat`, carpeta, `.ffpfsc`…) dentro del mismo trabajo, sin usar otro programa. Descomprime en la consola (BFpilot) o en el PC (7-Zip), coloca las aplicaciones en `/data/homebrew` para que ShadowMountPlus las muestre en el menú, y te deja ver la biblioteca de la consola con portadas y controlarlo todo desde el móvil.
 
-**Novedades 1.20:** pestaña Biblioteca con portadas y aviso de firmware, imágenes `.ffpkg`/`.ffpfsc` y LZ4 con [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge), pregunta si ya está en la consola, comprobación con `.sfv`/`.md5`, "Hacer sitio", cargar ftpsrv/BFpilot desde el programa, diagnóstico de red, acceso desde el móvil con QR y programar la cola.
+**Novedades 1.20.3:** ventana de bienvenida, Biblioteca con lo instalado (PS4 y PS5) y con tu colección del PC/NAS, copias de seguridad de partidas y ajustes, capturas y vídeos, diagnóstico de errores con informe, torrents y avisos de actualización automáticos.
+
+**Novedades 1.20:** pestaña Biblioteca con portadas y aviso de firmware, convertidor de formatos con [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge) (carpeta, `.exfat`, LZ4, `.ffpfsc`, `.ffpkg`, `.ffpfs` y `.fpkg`), firmware de tu PS5 siempre a la vista, «Descargar de nuevo», pregunta si ya está en la consola, comprobación con `.sfv`/`.md5`, "Hacer sitio", cargar ftpsrv/BFpilot desde el programa, diagnóstico de red, acceso desde el móvil con QR y programar la cola.
 
 **Requisitos:** Windows 10/11. Descarga el `-portable-windows.zip` (trae Python, no hay que instalar nada) o el `.zip` normal con [Python 3.9+](https://www.python.org/downloads/). Para descomprimir en el PC, [7-Zip](https://www.7-zip.org/). En la PS5: servidor FTP ([ftpsrv](https://github.com/ps5-payload-dev/ftpsrv)), [BFpilot](https://github.com/ItsBlurf/BFpilot) y [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus).
 

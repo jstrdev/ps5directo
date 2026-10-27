@@ -547,7 +547,30 @@ def ftp_read(f, path, offset=0, n=256 * 1024):
         f.voidresp()
     except ftplib.all_errors:
         pass
+    if len(buf) >= n:
+        _ftp_resync(f)
     return bytes(buf)
+
+
+def _ftp_resync(f):
+    """Al cortar una descarga a medias algunos servidores mandan una respuesta de mas (426 y luego 226),
+    y la siguiente orden recibiria la respuesta equivocada. Manda un NOOP y lee hasta su 200."""
+    old = None
+    try:
+        old = f.sock.gettimeout()
+        f.sock.settimeout(5)
+        f.putcmd("NOOP")
+        for _ in range(4):
+            line = f.getmultiline()
+            if line.startswith("200"):
+                break
+    except Exception:
+        pass
+    finally:
+        try:
+            f.sock.settimeout(old)
+        except Exception:
+            pass
 
 
 def title_from_param(text):
@@ -585,6 +608,40 @@ def param_facts(text):
     }
 
 
+def parse_sfo(data):
+    """param.sfo (PS4): diccionario con sus claves (TITLE, TITLE_ID, APP_VER, SYSTEM_VER, CATEGORY...)."""
+    import struct
+    out = {}
+    if len(data) < 20 or data[:4] != b"\0PSF":
+        return out
+    _, _, key_off, data_off, n = struct.unpack_from("<4sIIII", data, 0)
+    for i in range(min(n, 256)):
+        e = 20 + i * 16
+        if e + 16 > len(data):
+            break
+        k_off, fmt, ln, _mx, d_off = struct.unpack_from("<HHIII", data, e)
+        ks = key_off + k_off
+        key = data[ks:data.find(b"\0", ks)].decode("ascii", "replace")
+        raw = data[data_off + d_off:data_off + d_off + ln]
+        if fmt == 0x0404 and len(raw) >= 4:
+            out[key] = struct.unpack_from("<I", raw)[0]
+        else:
+            out[key] = raw.split(b"\0", 1)[0].decode("utf-8", "replace")
+    return out
+
+
+def sfo_facts(data):
+    s = parse_sfo(data)
+    sv = s.get("SYSTEM_VER")
+    fw = None
+    if isinstance(sv, int) and sv:
+        fw = "%x.%02x" % (sv >> 24, (sv >> 16) & 0xFF)
+    cat = str(s.get("CATEGORY") or "")
+    return {"title": s.get("TITLE") or None, "tid": s.get("TITLE_ID") or None,
+            "version": s.get("APP_VER") or s.get("VERSION") or None, "fw_param": fw, "need_fw": fw,
+            "extra": cat in ("ac", "gp", "sd")}
+
+
 def inspect_remote_game(f, path, listing=None):
     """Datos de una aplicacion en carpeta en la consola, por FTP. listing: entradas de 'path'."""
     names = {n: x for n, x in (listing if listing is not None else E.ftp_listdir(f, path))}
@@ -597,7 +654,11 @@ def inspect_remote_game(f, path, listing=None):
     out["icon"] = "icon0.png" in sce
     if "param.json" in sce:
         raw = ftp_read(f, path + "/sce_sys/param.json", 0, 512 * 1024)
-        out.update(param_facts(raw.decode("utf-8", "replace")))
+        out.update(param_facts(raw.decode("utf-8-sig", "replace")))
+        if not out.get("tid"):
+            out["param_err"] = "param.json: %d bytes leídos (%r)" % (len(raw), raw[:60])
+    elif sce:
+        out["param_err"] = "sce_sys no tiene param.json"
     if out["has_eboot"]:
         try:
             out["fw_exe"] = exe_firmware(lambda off, n: ftp_read(f, path + "/eboot.bin", off, n))
@@ -763,7 +824,25 @@ def forge_cli_name():
     return "ps5-dump-forge.exe" if os.name == "nt" else "ps5-dump-forge"
 
 
-def find_forge(custom, data_dir):
+FORGE_NEEDED_FLAGS = ("--to", "--lz4-pack", "--lz4-unpack", "--kraken", "--level")
+
+
+def forge_cli_ok(exe):
+    """Comprueba que una version de Forge sigue entendiendo las opciones que usa PS5 Directo.
+    True = vale, False = le faltan opciones, None = no se ha podido saber."""
+    import subprocess
+    try:
+        p = subprocess.run([exe, "convert", "--help"], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT, timeout=60, creationflags=E._NOWIN)
+    except Exception:
+        return None
+    out = p.stdout.decode("utf-8", "replace")
+    if "--to" not in out:
+        return None
+    return all(f in out for f in FORGE_NEEDED_FLAGS)
+
+
+def find_forge(custom, data_dir, skip=()):
     custom = (custom or "").strip().strip('"')
     if custom and os.path.isfile(custom):
         return custom
@@ -771,6 +850,8 @@ def find_forge(custom, data_dir):
     best = None
     if os.path.isdir(root):
         for d in os.listdir(root):
+            if d in skip:
+                continue
             p = os.path.join(root, d, forge_cli_name())
             if os.path.isfile(p) and (best is None or os.path.getmtime(p) > os.path.getmtime(best)):
                 best = p
@@ -794,8 +875,8 @@ def _forge_asset(assets):
     return None
 
 
-def download_forge(data_dir, log=None, progress=None):
-    tag, assets = github_release(FORGE_REPO)
+def download_forge(data_dir, log=None, progress=None, release=None):
+    tag, assets = release or github_release(FORGE_REPO)
     a = _forge_asset(assets)
     if not a:
         raise E.PipeError("La última versión de PS5 Dump Forge no trae descarga para este sistema")

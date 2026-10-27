@@ -300,6 +300,74 @@ instalado) y PS5Directo-X.Y.Z-portable-windows.zip, que trae Python dentro:
 descomprimir y abrir, sin instalar nada.
 
 
+NOVEDADES 1.20.3
+- Biblioteca: «Comprobar» en cada aplicación, para cuando no abre o se
+  cierra al arrancar. Revisa la carpeta (ejecutable, param.json, permisos,
+  firmware, backports y el empaquetado LZ4), muestra los registros (.log) y
+  las capturas de los últimos minutos, explica el código de error que salió
+  en la tele y guarda un informe .zip. Solo lee: no cambia nada.
+- Ventana de bienvenida la primera vez: resume qué es PS5 Directo y qué hace.
+- Biblioteca: también lo instalado en la consola (PS4 y PS5), con portada,
+  versión y firmware, y filtro para verlo.
+- Biblioteca, «En tu PC»: eliges carpetas del PC o del NAS, marca lo que ya
+  está en la consola y lo que no, y lo envías con un clic.
+- Biblioteca: «Ver actualizaciones» abre en el navegador la lista pública de
+  actualizaciones oficiales de cada título (Prospero Patches). Avisa de que
+  las que piden firmware 14.00 o más no se pueden instalar. El programa no
+  descarga nada.
+- Biblioteca: si tienes PS5 Game Updater en la consola, un botón lo abre; si
+  su carpeta está mal colocada, lo detecta y la coloca bien.
+- Biblioteca: las imágenes y las carpetas sin param.json salen con nombre,
+  portada y firmware.
+- Nueva pestaña «Copia de seguridad»: guarda en el PC las partidas, los
+  ajustes de ShadowMountPlus y de los payloads y la base de datos de
+  aplicaciones, a mano o una vez al día. Las partidas se pueden restaurar en
+  la misma consola (antes guarda las de ahora).
+- Nueva pestaña «Capturas»: capturas y vídeos de la consola con miniaturas,
+  para verlos y bajarlos al PC.
+- «Diagnóstico» en las transferencias con error: qué ha pasado, códigos y cómo
+  arreglarlo, y un informe .zip (sin contraseñas) para pasar a quien te ayude.
+  En Ajustes, «Crear informe de fallo».
+- Torrents: pega un magnet o un .torrent. Se baja primero al PC con aria2 (se
+  descarga solo) y luego se envía, descomprime o convierte. No comparte al
+  terminar y lo borra del PC.
+- PS5 Dump Forge se actualiza solo (una vez al día como mucho), comprobando
+  antes que la versión nueva funciona; si no, sigue con la anterior.
+- Las versiones nuevas de PS5 Directo se avisan solas con una ventana y sus
+  novedades.
+- Avisa si la velocidad hacia la PS5 cae de golpe (suele ser la consola
+  inactiva: pulsa un botón del mando).
+- «Formato en la PS5» empieza plegado y dice cuánto tarda: sin convertir,
+  descarga y envío a la vez; convirtiendo, 3 pasos. Tarjetas ordenadas por lo
+  más usado y «¿Cuál elijo?» por necesidades.
+- Firmware de tu PS5 junto al título (se guarda solo) y la tarjeta .fpkg dice
+  si te vale.
+- En la cola, «Convertir a …» dice a qué formato, y avisa si algo no se pudo
+  convertir.
+- Arreglado: un comprimido con versión normal y backport no se convertía;
+  ahora separa la que toca.
+- Arreglado: lo convertido se mezclaba con una carpeta anterior del mismo
+  nombre.
+- Arreglado: muchas carpetas de la Biblioteca salían sin nombre.
+
+NOVEDADES 1.20.1
+- Si no conecta y el PC y la PS5 están en redes distintas (por ejemplo
+  192.168.50.x y 192.168.1.x), lo dice y explica cómo arreglarlo.
+- Botones «Usar en el móvil» y «Extensión del navegador» más visibles, y el
+  asistente de inicio los ofrece al final.
+- «Descargar de nuevo» en la cola (terminados, con error o cancelados) y en
+  Actividad: vuelve a empezar desde cero sin tener que pegar el enlace.
+- Si al colocar ya existe esa carpeta, pregunta (colocar igualmente con otro
+  nombre, reemplazar o cancelar) en vez de dar error.
+- Arreglado: si el comprimido trae la versión normal y un «backport», ya no
+  da «Ya existe»: coloca la normal y aparta el backport (o lo descarta si tu
+  firmware no lo necesita). Y si en el destino hay un envío anterior a
+  medias, lo sustituye.
+- «Guía de uso» renovada: explica el convertidor de formatos, cada pestaña,
+  el uso desde el móvil y la extensión del navegador.
+- La ventana «¿Cuál elijo?» añade velocidades estimadas donde no había datos
+  y textos más claros sobre LZ4 y .ffpfsc.
+
 NOVEDADES 1.20.0
 - Asistente de primeros pasos (IP, comprobar la conexión y cargar lo que
   falta, firmware) y una guía más corta y sencilla.
@@ -438,7 +506,7 @@ NOVEDADES 1.14.1
 
 NOVEDADES 1.14
 - Guía de bienvenida la primera vez que se abre: enseña para qué es cada
-  parte. Se puede volver a ver con el botón "Guía" de arriba.
+  parte. Se puede volver a ver con el botón "Guía de uso" de arriba.
 
 NOVEDADES 1.13.1
 - El logo de la cabecera va dentro de la página (al actualizar desde una

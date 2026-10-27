@@ -152,7 +152,7 @@ HOW TO USE IT
 -------------
 1. Extract this folder anywhere you like.
 2. Open PS5 Directo from the desktop icon. A short welcome guide explains
-   each part (you can see it again with the "Guide" button).
+   each part (you can see it again with the "User guide" button).
 3. The first time, Settings opens: enter your PS5's IP (on the PS5:
    Settings > Network > View Connection Status), click "Save" and then
    "Test connection". Both dots at the top should turn green.
@@ -313,20 +313,81 @@ PS5Directo-X.Y.Z-portable-windows.zip, which includes Python: extract and run.
 
 WHAT'S NEW
 ----------
+1.20.3 - Library: "Check" on each app, for when it won't open or closes on
+        launch. It checks the folder (executable, param.json, permissions,
+        firmware, backports and LZ4 packing), shows logs (.log) and captures
+        from the last minutes, explains the error code shown on the TV and
+        saves a .zip report. Read-only: it changes nothing.
+      - Welcome window on first launch: sums up what PS5 Directo is and does.
+      - Library: also what's installed on the console (PS4 and PS5), with
+        cover, version and firmware, and a filter for it.
+      - Library, "On your PC": pick PC or NAS folders, see what's already on
+        the console and what isn't, and send it with one click.
+      - Library: "See updates" opens each title's public official update list
+        in your browser (Prospero Patches). Warns that updates needing
+        firmware 14.00 or higher can't be installed. The program downloads
+        nothing.
+      - Library: if PS5 Game Updater is on the console, a button opens it; if
+        its folder is misplaced, it detects and fixes it.
+      - Library: images and folders without param.json show name, cover and
+        firmware.
+      - New "Backup" tab: saves saved data, ShadowMountPlus and payload
+        settings and the app database to the PC, manually or daily. Saved data
+        can be restored to the same console (current data is backed up first).
+      - New "Captures" tab: the console's screenshots and videos with
+        thumbnails, to view and download to the PC.
+      - "Diagnosis" on failed transfers: what happened, codes and how to fix
+        it, plus a .zip report (no passwords) to send to whoever helps you. In
+        Settings, "Create problem report".
+      - Torrents: paste a magnet or a .torrent. It's downloaded to the PC
+        first with aria2 (fetched automatically) and then sent, extracted or
+        converted. No seeding afterwards; deleted from the PC.
+      - PS5 Dump Forge updates itself (at most daily), checking first the new
+        version works; otherwise it keeps the previous one.
+      - New PS5 Directo versions are announced by themselves in a window with
+        what's new.
+      - Warns if the speed to the PS5 suddenly drops (usually the console
+        idling: press a controller button).
+      - "Format on the PS5" starts folded and says how long it takes: no
+        conversion downloads and sends at once; converting takes 3 steps.
+        Cards sorted by most used and "Which one?" by need.
+      - Your PS5 firmware next to the title (saves automatically) and the
+        .fpkg card tells you if it works.
+      - In the queue, "Convert to …" names the format, and it warns if
+        something couldn't be converted.
+      - Fixed: an archive with a normal version plus a backport wasn't
+        converted; now it picks the right one.
+      - Fixed: converted files got mixed into an older folder with the same
+        name.
+      - Fixed: many Library folders showed no name.
+1.20.1 - If it can't connect and the PC and PS5 are on different networks,
+        it says so and explains how to fix it.
+      - Clearer "Use on your phone" and "Browser extension" buttons, also
+        offered at the end of the first-steps wizard.
+      - "Download again" in the queue and in Activity: starts over without
+        pasting the link again. If the target already exists when placing,
+        it asks (keep both, replace or cancel) instead of failing.
+      - Fixed: archives with the normal app plus a "backport" folder no
+        longer fail with "Already exists"; half-sent leftovers are
+        replaced.
+      - Updated "User guide": explains the format converter, every tab,
+        phone access and the browser extension.
+      - The "Which one?" window adds estimated speeds where there was no
+        data, with clearer notes on LZ4 and .ffpfsc.
 1.20.0 - First-steps wizard (IP, connection check and loading what's
         missing, firmware) and a shorter, simpler guide.
       - New Library tab: what's on the console with cover, version, format
         and required firmware, flagging what won't launch on yours.
       - .ffpkg / .ffpfsc images and LZ4 with PS5 Dump Forge (optional):
-        prepared on the PC and sent as a single file. Picked with cards under
-        the destination, each explained, with the room needed on the PC; the
-        first time it warns that converting takes PC space until it's done.
-        A download that's already an image is sent as is or converted to
-        the chosen format, and placed even without BFpilot.
+        prepared on the PC and sent as a single file. Picked with cards
+        under the destination, each explained, with the room needed on the
+        PC; the first time it warns that converting takes PC space until
+        it's done. A download that's already an image is sent as is or
+        converted to the chosen format, and placed even without BFpilot.
       - New formats: plain folder, .exfat, .ffpfs and .fpkg (with a
         compression choice). Without 7-Zip, PS5 Dump Forge extracts it.
-      - Formats are grouped (space savers first) and "Which one?"
-        compares the pros and cons of each.
+      - Formats are grouped (space savers first) and "Which one?" compares
+        the pros and cons of each.
       - Time left (and rough finish time) when sending, extracting and
         converting. On the phone, a big alert with vibration and a beep
         when something finishes or fails (with the page open).
@@ -346,8 +407,9 @@ WHAT'S NEW
       - Schedule the queue, sleep or shut down when done, no sleep while
         sending.
       - Portable version with Python included.
-      - Fixed: with FTP only (no BFpilot), ftpsrv returned the console's root
-        when listing a folder; it affected the file browser and folder uploads.
+      - Fixed: with FTP only (no BFpilot), ftpsrv returned the console's
+        root when listing a folder; it affected the file browser and
+        folder uploads.
       - Phone access: a button to allow it in Windows Firewall if the page
         stays blank.
 1.19.2 - Fixed "504 Option not supported" in Console files when BFpilot is
