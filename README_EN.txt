@@ -338,6 +338,37 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+1.21.1 - Library: "Download to PC" button on each title (folder or image),
+        with its progress right there. It goes to the PS5 Directo folder
+        on the PC (by default Downloads > PS5 Directo > Biblioteca, you
+        can change it in "On your PC") and shows up in "On your PC" by
+        itself, ready to send again.
+      - Automatic payloads with Payload Manager: if it's open on the
+        console, ftpsrv and BFpilot start by themselves when PS5 Directo
+        opens if they're missing (can be turned off). The "Console status"
+        window (click the FTP or BFpilot dots at the top) says what's
+        missing, why and what you can't use, and fixes it with one click:
+        Start, Install and start (if Payload Manager doesn't have them) or
+        Restart (if one hung or was loaded twice). It can also add them to
+        Payload Manager's autoload so they load when the console starts.
+        It never loads the same one twice.
+      - Asking for LZ4 from an image (.exfat...) whose title doesn't use
+        AMPR said "as a plain folder" although the image is sent as is.
+        Now it says so, and the queue step shows "No conversion".
+      - Mac: if the app didn't open, it said nothing. It now removes the
+        "downloaded from the internet" flag that can block the Python it
+        includes, checks that it starts and, if something fails, shows a
+        message with the error and what to do.
+      - The program always opens on "Transfers" (it used to go back to
+        the last tab you used, which could be confusing).
+      - With no connection to the console, the tabs say clearly what's
+        going on and what to check, instead of a Windows error such as
+        "WinError 10054".
+      - Captures: tips so your clips are recorded as MP4 (they play right
+        inside Telegram, WhatsApp and websites) and so HDR recordings don't
+        look washed out when shared (turn off HDR in the PS5's capture
+        settings). They can be dismissed with "Got it".
+
 1.21.0 - Mac version IN TESTING (PS5Directo-1.21.0-macOS.dmg), for Apple
         Silicon and Intel, with Python and 7-Zip included. Not tested on
         a real Mac yet: any report on GitHub is welcome.

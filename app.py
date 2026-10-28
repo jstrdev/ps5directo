@@ -24,7 +24,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "1.21.0"
+VERSION = "1.21.1"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -62,6 +62,7 @@ DEFAULTS = {
     "icon_ver": "",           # version cuyo icono ya se dejo en la cache de la ventana
     # 1.20
     "elf_port": 9021,         # cargador de payloads de la consola (etaHEN / elfldr)
+    "auto_payloads": True,    # al abrir, iniciar solos ftpsrv/BFpilot con Payload Manager si faltan
     "console_fw": "",         # firmware de tu PS5 (p. ej. 13.60) para avisar de lo que no arrancara
     "dup_check": True,        # preguntar antes de enviar algo que ya esta en la consola
     "verify_sums": True,      # comprobar .sfv/.md5/.sha1 si vienen con las partes
@@ -70,6 +71,7 @@ DEFAULTS = {
     "keep_awake": True,       # que el PC no se suspenda mientras hay envios
     "welcome_seen": False,    # la ventana de bienvenida ya se ha visto
     "pc_collection": [],      # carpetas del PC o del NAS con contenido para la consola (pestana Biblioteca > Tu PC)
+    "pc_library_dir": "",     # donde llega lo que bajas de la consola desde la Biblioteca (vacio = Descargas/PS5 Directo/Biblioteca)
     "backup_dir": "",         # copias de seguridad de la consola (vacio = Documentos\\PS5 Directo\\Copias)
     "backup_auto": False,     # una copia al dia, sola, si la consola esta encendida
     "backup_keep": 10,        # cuantas copias guardar
@@ -1006,7 +1008,7 @@ def _fm_start(op, items_total, fn, where=None, names=None):
         except Exception as e:
             traceback.print_exc()
             with LOCK:
-                FMOP["error"] = str(e)
+                FMOP["error"] = conn_error_text(e)
             notify("err", "%s: %s" % (OP_FAIL.get(op, op), what) if what else OP_FAIL.get(op, op),
                    str(e), link)
         finally:
@@ -1235,10 +1237,17 @@ def fm_extract(src, folder, password="", exists="keepboth"):
     _fm_start("extract", 1, work, where=parent, names=[first])
 
 
-def fm_download(paths):
+def pc_library_dir():
+    """Carpeta del PC donde llega lo que bajas de la consola desde la Biblioteca. Siempre sale en
+    Biblioteca > En tu PC."""
+    d = (SETTINGS.get("pc_library_dir") or "").strip().strip('"')
+    return d or os.path.join(downloads_dir(), "PS5 Directo", "Biblioteca")
+
+
+def fm_download(paths, dest=None):
     cfg = cfg_snapshot()
     paths = [fm_clean(x) for x in paths]
-    root_local = os.path.join(downloads_dir(), "PS5 Directo")
+    root_local = dest or os.path.join(downloads_dir(), "PS5 Directo")
 
     def walk(rpath):
         """[(ruta remota, ruta relativa, tamano)] de un archivo o carpeta."""
@@ -1290,6 +1299,8 @@ def fm_download(paths):
         with LOCK:
             FMOP.update(items_done=len(files), bytes_done=done,
                         message="Guardado en %s" % root_local)
+        if dest:   # bajado a la carpeta de la Biblioteca: que salga ya en «En tu PC»
+            threading.Thread(target=collection_scan, daemon=True).start()
     _fm_start("download", len(paths), work, names=[posixpath.basename(x) for x in paths])
 
 
@@ -1465,7 +1476,7 @@ def space_start(root):
         except Exception as e:
             traceback.print_exc()
             with LOCK:
-                SPACE["error"] = str(e)
+                SPACE["error"] = conn_error_text(e)
         finally:
             with LOCK:
                 SPACE["busy"] = False
@@ -1559,7 +1570,31 @@ def fm_api(p, b):
         return {"path": fp, "name": os.path.basename(fp)}
     if p == "/api/col/state":
         with LOCK:
-            return {"col": dict(COL), "roots": list(SETTINGS.get("pc_collection") or [])}
+            return {"col": dict(COL), "roots": list(SETTINGS.get("pc_collection") or []),
+                    "libdir": pc_library_dir(), "libdir_custom": bool(SETTINGS.get("pc_library_dir"))}
+    if p == "/api/col/libdir":
+        d = str(b.get("path") or "").strip().strip('"')
+        if d and not os.path.isabs(d):
+            raise E.PipeError("Pon una ruta completa, por ejemplo D:\\PS5")
+        with LOCK:
+            SETTINGS["pc_library_dir"] = d
+        save_settings()
+        with LOCK:
+            COL["items"] = None
+        return {"libdir": pc_library_dir()}
+    if p == "/api/col/openlibdir":
+        d = pc_library_dir()
+        os.makedirs(d, exist_ok=True)
+        _open_quiet(d)
+        return {"dir": d}
+    if p == "/api/lib/download":
+        paths = [str(x) for x in (b.get("paths") or []) if str(x).startswith(("/data/", "/mnt/"))]
+        if not paths:
+            raise E.PipeError("No hay nada que bajar")
+        d = pc_library_dir()
+        os.makedirs(d, exist_ok=True)
+        fm_download(paths, dest=d)
+        return {"dir": d}
     if p == "/api/col/scan":
         if not COL["busy"]:
             threading.Thread(target=collection_scan, daemon=True).start()
@@ -1891,6 +1926,21 @@ MEDIA_TYPES = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
 # ---------------------------------------------------------------------------
 # Diagnostico e informe de fallo
 # ---------------------------------------------------------------------------
+
+_CONN_RX = re.compile(r"(?i)10054|10053|10060|10061|10065|connection (reset|refused|aborted)|timed out|"
+                      r"no route|unreachable|broken pipe|forzado la interrupci|denegado expresamente|"
+                      r"no respondi|errno (32|54|60|61|64|65|104|110|111|113)")
+
+
+def conn_error_text(e):
+    """Los errores de red de Windows ("[WinError 10054] Se ha forzado la interrupción...") dicen poco:
+    se cambian por un mensaje claro sobre la conexión con la consola."""
+    t = str(e) or e.__class__.__name__
+    if isinstance(e, (ConnectionError, TimeoutError, socket.timeout)) or _CONN_RX.search(t):
+        return ("No hay conexión con la consola. Comprueba que la PS5 está encendida, que el FTP está cargado "
+                "(arriba el punto «FTP» tiene que estar en verde) y pulsa Actualizar. (%s)" % t)
+    return t
+
 
 DIAG_RULES = [
     (r"(?i)10061|refused|rechaz|No route|timed out|unreachable|No puedo conectar con el FTP|conexi[oó]n con la PS5",
@@ -2249,12 +2299,16 @@ def _local_dir_size(path, limit_s=8.0):
 
 def collection_scan():
     """Lee las carpetas de la coleccion del PC: aplicaciones en carpeta (sce_sys), imagenes, .pkg y comprimidos."""
-    roots = [r for r in (SETTINGS.get("pc_collection") or []) if r]
+    lib = pc_library_dir()
+    roots = [lib] + [r for r in (SETTINGS.get("pc_collection") or [])
+                     if r and os.path.normcase(os.path.abspath(r)) != os.path.normcase(os.path.abspath(lib))]
     with LOCK:
         COL.update(busy=True, error="", current="")
     items = []
     try:
         for root in roots:
+            if root == lib and not os.path.isdir(root):
+                continue   # la carpeta de la Biblioteca se crea al bajar lo primero
             if not os.path.isdir(root):
                 items.append({"path": root, "kind": "missing", "name": root})
                 continue
@@ -2307,7 +2361,7 @@ def collection_scan():
     except Exception as e:
         traceback.print_exc()
         with LOCK:
-            COL["error"] = str(e)
+            COL["error"] = conn_error_text(e)
     finally:
         with LOCK:
             COL.update(busy=False, current="")
@@ -2944,10 +2998,13 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
     if fmt in ("lz4", "lz4ffpkg") and not lz4.get("imports_ampr"):
         jlog(job, "Este título no usa AMPR, así que LZ4 no sirve con él")
         if fmt == "lz4":
+            img = len(srcs) == 1 and IMAGE_RE.search(srcs[0].name or "")
             msg = ("PS5 Dump Forge dice que este título no usa AMPR, así que no se puede pasar a LZ4: "
-                   "se envía sin convertir, como carpeta normal.")
+                   + ("se envía sin convertir, tal cual (%s)." % srcs[0].name if img else
+                      "se envía sin convertir, como carpeta normal."))
             with LOCK:
                 job["warning"] = msg
+            setj(job, fmt_real="none")
             jlog(job, msg)
             return None
         fmt = "ffpkg"
@@ -4319,7 +4376,8 @@ def gu_status():
     try:
         port = E.Ftp(cfg).call(look)
     except Exception as e:
-        out["problem"] = "No pude mirarlo: %s" % e
+        if conn_error_text(e) == str(e):   # sin conexion ya lo dice la Biblioteca: aqui no se repite
+            out["problem"] = "No pude mirarlo: %s" % e
         return out
     out["url"] = "http://%s:%d/" % (cfg["ps5_ip"], port)
     try:
@@ -4652,7 +4710,7 @@ def library_start(refresh=False):
         except Exception as e:
             traceback.print_exc()
             with LOCK:
-                LIB["error"] = str(e)
+                LIB["error"] = conn_error_text(e)
         finally:
             with LOCK:
                 LIB["busy"] = False
@@ -4883,7 +4941,7 @@ def backup_run(sections=None, label="copia"):
     except Exception as e:
         traceback.print_exc()
         with LOCK:
-            BK["error"] = str(e)
+            BK["error"] = conn_error_text(e)
         notify("err", "No se pudo hacer la copia de seguridad", str(e))
     finally:
         try:
@@ -4982,7 +5040,7 @@ def backup_restore(path, ids):
             BK["error"] = "Cancelado"
     except Exception as e:
         with LOCK:
-            BK["error"] = str(e)
+            BK["error"] = conn_error_text(e)
         notify("err", "No se pudieron restaurar las partidas", str(e))
     finally:
         with LOCK:
@@ -5080,8 +5138,167 @@ def wait_service(pid, cfg, secs=20):
     return False
 
 
+LOST = {"ftpsrv": "Sin el FTP no funciona casi nada: enviar, Biblioteca, Archivos de la consola, Copia de "
+                  "seguridad ni Capturas.",
+        "bfpilot": "Sin BFpilot no se puede descomprimir en la consola, ver lo que ocupa cada carpeta, la "
+                   "pestaña Espacio ni copiar o mover rápido dentro de la consola. Sí se puede enviar "
+                   "descomprimiendo en el PC."}
+CONSOLE = {"auto": None}      # lo que hizo el arranque automatico (para ensenarlo en la ventana)
+
+
+def _port_open(host, port, timeout=1.5):
+    host = E.clean_host(host or "")[0]
+    if not host:
+        return False
+    try:
+        socket.create_connection((host, int(port)), timeout=timeout).close()
+        return True
+    except OSError:
+        return False
+
+
+def _svc_ok(pid, cfg):
+    if pid == "ftpsrv":
+        try:
+            E.Ftp(cfg).connect().quit()
+            return True, ""
+        except Exception as e:
+            return False, str(e)
+    v = E.BFpilot(cfg).alive()
+    return bool(v), "" if v else "no responde"
+
+
+def console_status():
+    """Que hay en la consola: FTP, BFpilot, Payload Manager (y si los tiene instalados y en marcha)
+    y el cargador de ELF por red (9021)."""
+    cfg = cfg_snapshot()
+    pm = F.PayloadManager(cfg["ps5_ip"])
+    ver = pm.version()
+    items, procs, autoload = [], [], []
+    pm_err = ""
+    if ver:
+        try:
+            items = pm.payloads()
+            procs = pm.processes()
+            autoload = [x.strip() for x in re.split(r"[,\n]", pm.config().get("AUTOLOAD_LIST") or "") if x.strip()]
+        except Exception as e:
+            pm_err = str(e)
+    out = {"ip": cfg["ps5_ip"], "pm": {"present": bool(ver), "version": ver, "error": pm_err},
+           "loader": _port_open(cfg["ps5_ip"], cfg.get("elf_port") or 9021), "items": [], "auto": CONSOLE["auto"]}
+    for p in F.PAYLOADS:
+        ok, err = _svc_ok(p["id"], cfg)
+        slot = pm.find(p["id"], items) if ver else None
+        run = pm.running(p["id"], procs) if ver else []
+        # colgado: Payload Manager lo tiene en marcha, o su puerto acepta conexiones pero no contesta bien
+        # (por ejemplo un ftpsrv cargado dos veces da "WinError 10054")
+        port = 2121 if p["id"] == "ftpsrv" else 5905
+        state = "ok" if ok else ("stuck" if (run or _port_open(cfg["ps5_ip"], port, 1.5)) else "off")
+        out["items"].append({"id": p["id"], "name": p["name"], "ok": ok, "error": conn_error_text(Exception(err)) if err else "",
+                             "state": state, "installed": bool(slot), "slot": (slot or {}).get("slot"),
+                             "file": (slot or {}).get("filename"), "pids": [x.get("pid") for x in run],
+                             "autoload": bool(slot and slot.get("slot") in autoload), "lost": LOST[p["id"]]})
+    out["reachable"] = bool(ver or out["loader"] or any(i["ok"] for i in out["items"]) or
+                            _port_open(cfg["ps5_ip"], 2121, 1) or _port_open(cfg["ps5_ip"], 5905, 1))
+    return out
+
+
+def console_fix(pid, action):
+    """Arregla un payload con Payload Manager: 'start' (iniciarlo), 'install' (instalarlo e iniciarlo),
+    'restart' (cerrar el que esta colgado o repetido y volver a iniciarlo) o 'autoload'."""
+    cfg = cfg_snapshot()
+    pm = F.PayloadManager(cfg["ps5_ip"])
+    if not pm.version():
+        if action in ("start", "install") and _port_open(cfg["ps5_ip"], cfg.get("elf_port") or 9021):
+            return payload_send(pid=pid)
+        raise E.PipeError("Abre Payload Manager en la consola (es una aplicación del menú de inicio de la PS5) "
+                          "y vuelve a intentarlo: PS5 Directo lo usa para cargar los payloads.")
+    if action == "autoload":
+        st = console_status()
+        slots = [i["slot"] for i in st["items"] if i["slot"]]
+        if not slots:
+            raise E.PipeError("Primero instala ftpsrv y BFpilot en Payload Manager")
+        pm.add_autoload(slots)
+        return {"done": "autoload"}
+    p = next((x for x in F.PAYLOADS if x["id"] == pid), None)
+    if not p:
+        raise E.PipeError("Payload desconocido")
+    slot = pm.find(pid)
+    if action == "install" or not slot:
+        path, tag = F.fetch_payload(pid, DATA_DIR, log=print)
+        with open(path, "rb") as fh:
+            pm.upload("%s_%s.elf" % (p["name"], re.sub(r"[^\w.-]", "_", tag or "")), fh.read(64 * 1024 * 1024))
+        slot = pm.find(pid)
+        if not slot:
+            raise E.PipeError("Payload Manager no muestra %s después de instalarlo" % p["name"])
+    port = 2121 if pid == "ftpsrv" else 5905
+    if action == "restart":
+        if not pm.running(pid):
+            raise E.PipeError("No encuentro el proceso de %s en Payload Manager para cerrarlo. Ciérralo desde "
+                              "Payload Manager en la consola (Procesos activos) o reinicia la consola, y luego "
+                              "pulsa «Iniciar»." % p["name"])
+        for x in pm.running(pid):
+            try:
+                pm.kill(x["pid"])
+            except Exception as e:
+                print("No pude cerrar %s (%s): %s" % (x.get("name"), x.get("pid"), e))
+        time.sleep(2)
+    elif (pm.running(pid) or _port_open(cfg["ps5_ip"], port, 1.5)) and not _svc_ok(pid, cfg)[0]:
+        raise E.PipeError("%s ya está en marcha pero no responde: pulsa «Reiniciar»" % p["name"])
+    pm.launch(slot["slot"])
+    up = wait_service(pid, cfg)
+    try:
+        test_connection(cfg)
+    except Exception:
+        pass
+    return {"name": p["name"], "up": up}
+
+
+def console_auto():
+    """Al abrir PS5 Directo: si falta ftpsrv o BFpilot y Payload Manager esta abierto en la consola,
+    los inicia solo (solo los que no esten ya en marcha: nunca dos veces lo mismo)."""
+    with LOCK:
+        on = SETTINGS.get("auto_payloads", True)
+    if not on:
+        return
+    try:
+        st = console_status()
+    except Exception as e:
+        print("Comprobación de la consola:", e)
+        return
+    done = []
+    if st["pm"]["present"]:
+        for it in st["items"]:
+            if it["ok"] or it["state"] != "off" or not it["installed"]:
+                continue
+            try:
+                r = console_fix(it["id"], "start")
+                done.append({"id": it["id"], "name": it["name"], "up": r.get("up")})
+            except Exception as e:
+                done.append({"id": it["id"], "name": it["name"], "error": str(e)})
+    CONSOLE["auto"] = {"t": time.time(), "done": done}
+    if done:
+        ok = [d["name"] for d in done if d.get("up")]
+        if ok:
+            notify("info", "Iniciado desde Payload Manager: %s" % ", ".join(ok), "")
+
+
 def payload_send(pid=None, path=None):
     cfg = cfg_snapshot()
+    if pid and F.PayloadManager(cfg["ps5_ip"]).version():
+        # con Payload Manager abierto en la consola, lo carga el (el cargador 9021 suele ser solo local)
+        r = console_fix(pid, "start")
+        return {"name": r.get("name") or pid, "tag": "", "up": r.get("up")}
+    if path and F.PayloadManager(cfg["ps5_ip"]).version():
+        pm = F.PayloadManager(cfg["ps5_ip"])
+        if not os.path.isfile(path):
+            raise E.PipeError("No existe ese archivo")
+        name = os.path.basename(path)
+        with open(path, "rb") as fh:
+            pm.upload(name, fh.read(64 * 1024 * 1024))
+        hit = next((x for x in pm.payloads() if x.get("filename") == name), None)
+        if hit:
+            pm.launch(hit["slot"])
+        return {"name": name, "tag": "", "up": None}
     if pid:
         path, tag = F.fetch_payload(pid, DATA_DIR, log=print)
         name = next(p["name"] for p in F.PAYLOADS if p["id"] == pid)
@@ -5106,9 +5323,10 @@ def payload_send(pid=None, path=None):
 
 LAN = {"srv": None, "port": None, "error": ""}
 LAN_HITS = []        # lo ultimo que ha pedido el movil: para saber si llega y si se corta
-LAN_DENY = {"/api/bk/restore", "/api/bk/open", "/api/report/open", "/api/col/set", "/api/lan/firewall", "/api/lan/hits", "/api/update/zip", "/api/update/github", "/api/quit", "/api/pick", "/api/open_ext_folder",
+LAN_DENY = {"/api/bk/restore", "/api/bk/open", "/api/report/open", "/api/col/set", "/api/col/libdir",
+            "/api/col/openlibdir", "/api/lan/firewall", "/api/lan/hits", "/api/update/zip", "/api/update/github", "/api/quit", "/api/pick", "/api/open_ext_folder",
             "/api/fm/open_local", "/api/lan", "/api/forge/download", "/api/payload/file", "/api/fixperms"}
-LAN_LOCKED = {"sevenzip_path", "forge_path", "pc_temp_dir", "update_repo", "lan_access", "lan_port", "lan_token"}
+LAN_LOCKED = {"sevenzip_path", "forge_path", "pc_temp_dir", "pc_library_dir", "update_repo", "lan_access", "lan_port", "lan_token"}
 
 
 def token_ok(tok):
@@ -6072,22 +6290,22 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, {"ok": False, "error": str(e)})
             except Exception as e:
                 traceback.print_exc()
-                return self._send(200, {"ok": False, "error": str(e)})
+                return self._send(200, {"ok": False, "error": conn_error_text(e)})
         if p == "/api/fixperms":
             try:
                 return self._send(200, {"ok": True, "results": fix_all_perms()})
             except Exception as e:
-                return self._send(500, {"ok": False, "error": str(e)})
+                return self._send(500, {"ok": False, "error": conn_error_text(e)})
         if p == "/api/cleanup/scan":
             try:
                 return self._send(200, {"ok": True, "items": cleanup_scan()})
             except Exception as e:
-                return self._send(500, {"ok": False, "error": str(e)})
+                return self._send(500, {"ok": False, "error": conn_error_text(e)})
         if p == "/api/cleanup/delete":
             try:
                 return self._send(200, {"ok": True, "deleted": cleanup_delete(b.get("paths") or [])})
             except Exception as e:
-                return self._send(500, {"ok": False, "error": str(e)})
+                return self._send(500, {"ok": False, "error": conn_error_text(e)})
         if p == "/api/speedtest":
             if SPEEDTEST["running"]:
                 return self._send(409, {"ok": False, "error": "Ya hay un test en marcha"})
@@ -6230,6 +6448,10 @@ def extra_api(h, p, b):
             return dict(ok=True, **payload_send(pid=str(b.get("id") or "")))
         if p == "/api/payload/file":
             return dict(ok=True, **payload_send(path=str(b.get("path") or "")))
+        if p == "/api/console/status":
+            return dict(ok=True, **console_status())
+        if p == "/api/console/fix":
+            return dict(ok=True, **console_fix(str(b.get("id") or ""), str(b.get("action") or "start")))
         if p == "/api/library/scan":
             library_start(bool(b.get("refresh")))
             return {"ok": True}
@@ -6891,6 +7113,7 @@ def main():
     except Exception:
         pass
     threading.Thread(target=ensure_shortcuts, daemon=True).start()
+    threading.Thread(target=console_auto, daemon=True).start()   # payloads que falten, con Payload Manager
     refresh_window_icon()
     if SETTINGS.get("lan_access"):
         try:

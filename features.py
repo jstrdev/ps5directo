@@ -772,6 +772,92 @@ def fetch_payload(pid, data_dir, log=None):
     return dest, tag
 
 
+PLDMGR_PORT = 8084
+PAYLOAD_RX = {"ftpsrv": re.compile(r"ftpsrv", re.I), "bfpilot": re.compile(r"bfpilot", re.I)}
+
+
+class PayloadManager:
+    """Panel web de Payload Manager (itsPLK/ps5-payload-manager) en la consola, puerto 8084.
+    Es lo que usa casi todo el mundo para cargar payloads: desde el PC se le puede pedir que
+    instale, lance o cierre payloads y que los cargue solos al encender (su lista de autoload).
+    Sus acciones son POST y piden la cabecera X-PLDMGR-Request: 1 (su proteccion anti-CSRF)."""
+
+    def __init__(self, host, port=PLDMGR_PORT):
+        self.host = E.clean_host(host or "")[0]
+        self.port = int(port or PLDMGR_PORT)
+
+    def _req(self, method, path, body=None, ctype=None, timeout=8):
+        if not self.host:
+            raise E.PipeError("Falta la IP de la PS5: ponla en Ajustes")
+        url = "http://%s:%d%s" % (self.host, self.port, path)
+        headers = {"User-Agent": "PS5Directo"}
+        if method == "POST":
+            headers["X-PLDMGR-Request"] = "1"
+        if ctype:
+            headers["Content-Type"] = ctype
+        req = urllib.request.Request(url, data=body if method == "POST" else None, method=method,
+                                     headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read(8 * MiB)
+        except urllib.error.HTTPError as e:
+            msg = e.read(2000).decode("utf-8", "replace").strip()
+            raise E.PipeError("Payload Manager respondió %d: %s" % (e.code, msg[:200]))
+
+    def _json(self, path, timeout=8):
+        return json.loads(self._req("GET", path, timeout=timeout).decode("utf-8", "replace") or "{}")
+
+    def version(self, timeout=3):
+        """Version de Payload Manager, o None si no esta abierto en la consola."""
+        try:
+            v = self._req("GET", "/version", timeout=timeout).decode("utf-8", "replace").strip()
+            return v or "?"
+        except Exception:
+            return None
+
+    def payloads(self):
+        return self._json("/list_payloads").get("items") or []
+
+    def processes(self):
+        return self._json("/processes_list").get("processes") or []
+
+    def config(self):
+        return self._json("/get_config")
+
+    def find(self, pid, items=None):
+        """El payload instalado que corresponde a 'ftpsrv' o 'bfpilot' (el mas nuevo si hay varios)."""
+        rx = PAYLOAD_RX[pid]
+        items = self.payloads() if items is None else items
+        hits = [x for x in items if rx.search(x.get("filename") or "") or rx.search(x.get("name") or "")]
+        if pid == "ftpsrv":   # el ftpsrv "normal" antes que otras versiones
+            hits.sort(key=lambda x: "drakmor" in (x.get("filename") or "").lower())
+        return hits[0] if hits else None
+
+    def running(self, pid, procs=None):
+        rx = PAYLOAD_RX[pid]
+        procs = self.processes() if procs is None else procs
+        return [p for p in procs if rx.search(p.get("name") or "")]
+
+    def launch(self, slot):
+        self._req("POST", "/loadpayload:" + urllib.parse.quote(slot, safe="/:"), timeout=30)
+
+    def kill(self, pid):
+        self._req("POST", "/process_kill?pid=%d" % int(pid), timeout=15)
+
+    def upload(self, filename, data):
+        q = urllib.parse.urlencode({"filename": filename, "mode": "new"})
+        self._req("POST", "/manage:upload?" + q, body=data, ctype="application/octet-stream", timeout=60)
+
+    def add_autoload(self, slots):
+        """Anade esos payloads a su lista de carga automatica (sin quitar lo que ya tuviera) y la activa."""
+        cfg = self.config()
+        cur = [x.strip() for x in re.split(r"[,\n]", cfg.get("AUTOLOAD_LIST") or "") if x.strip()]
+        new = cur + [s for s in slots if s and s not in cur]
+        body = json.dumps({"AUTOLOAD_LIST": ",".join(new), "AUTOLOAD_ENABLED": True}).encode()
+        self._req("POST", "/set_config", body=body, ctype="application/json", timeout=15)
+        return new
+
+
 def send_elf(host, port, data, timeout=15):
     """Manda un payload al cargador de ELF de la consola (elfldr/etaHEN, puerto 9021)."""
     host = E.clean_host(host)[0]

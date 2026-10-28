@@ -323,6 +323,36 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   del cortafuegos de Windows.
 
 
+NOVEDADES 1.21.1
+- Biblioteca: botón «Bajar al PC» en cada título (carpeta o imagen), con
+  su progreso ahí mismo. Llega a la carpeta de PS5 Directo en el PC
+  (por defecto Descargas > PS5 Directo > Biblioteca, se puede cambiar en
+  «En tu PC») y sale solo en «En tu PC», listo para volver a enviarlo.
+- Al pedir LZ4 de una imagen (.exfat...) cuyo título no usa AMPR, el
+  aviso decía «como carpeta normal» aunque se envía la imagen tal cual.
+  Ahora lo dice bien y el paso de la cola pone «Sin convertir».
+- Payloads automáticos con Payload Manager: si lo tienes abierto en la
+  consola, al abrir PS5 Directo se inician solos ftpsrv y BFpilot si
+  faltan (se puede desactivar). La ventana «Estado de la consola» (pulsa
+  los puntos FTP o BFpilot de arriba) dice qué falta, por qué y qué no
+  podrás usar, y lo arregla con un clic: Iniciar, Instalar e iniciar (si
+  no los tienes en Payload Manager) o Reiniciar (si uno se ha colgado o
+  está cargado dos veces). También puede añadirlos a la carga automática
+  de Payload Manager para que se carguen solos al encender la consola.
+  Nunca carga dos veces el mismo.
+- Mac: si la app no llegaba a abrirse, no decía nada. Ahora se quita sola
+  la marca de "descargado de internet" que puede bloquear el Python que
+  trae dentro, comprueba que arranca y, si algo falla, muestra un aviso
+  con el error y qué hacer.
+- El programa se abre siempre en «Transferencias» (antes volvía a la
+  última pestaña que usaste y podía confundir).
+- Sin conexión con la consola, las pestañas dicen claramente qué pasa y
+  qué revisar, en vez de un error de Windows como «WinError 10054».
+- Capturas: consejos para que tus clips se graben en MP4 (se ven
+  directamente en Telegram, WhatsApp y las webs) y para que lo grabado en
+  HDR no se vea lavado al compartirlo (desactivar HDR en las capturas de
+  la PS5). Se pueden cerrar con «Entendido».
+
 NOVEDADES 1.21.0
 - Versión para Mac EN PRUEBAS (PS5Directo-1.21.0-macOS.dmg), para Apple
   Silicon e Intel, con Python y 7-Zip incluidos. Aún no se ha probado en

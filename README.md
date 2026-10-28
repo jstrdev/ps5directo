@@ -27,6 +27,7 @@ An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts
 - ✅ **Launch check:** if an app closes on launch, it checks the folder (executable, permissions, firmware, backports, LZ4 packing) and shows recent logs and captures
 - ✅ **Problem report** in one click (.zip, no passwords) to share when asking for help
 - ✅ **Warnings:** your PS5 firmware always visible, speed-drop alerts, "Why is it slow?" network check, and it loads ftpsrv/BFpilot from the app
+- ✅ **Payloads on autopilot:** with Payload Manager open on the console, it starts ftpsrv and BFpilot when they're missing, restarts them if they hang, installs them if needed and can add them to Payload Manager's autoload
 - ✅ **Self-updating**, with a welcome window and a user guide, in English and Spanish
 
 ## Requirements
