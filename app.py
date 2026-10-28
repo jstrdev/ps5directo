@@ -24,7 +24,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "1.21.1"
+VERSION = "1.22.1"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -1607,6 +1607,31 @@ def fm_api(p, b):
         return {"roots": roots}
     if p == "/api/media/list":
         return {"items": media_list()}
+    if p == "/api/media/tools":
+        return {"ffmpeg": bool(ffmpeg_path()), "can_install": os.name == "nt",
+                "hint": "" if os.name == "nt" else ffmpeg_hint()}
+    if p == "/api/media/convert":
+        paths = [fm_clean(str(x)) for x in (b.get("paths") or [])]
+        paths = [x for x in paths if x.startswith(MEDIA_ROOT + "/") and re.search(r"(?i)\.(webm|mp4|mkv|mov)$", x)]
+        if not paths:
+            raise E.PipeError("Elige algún vídeo")
+        media_convert(paths)
+        return {}
+    if p == "/api/media/convstate":
+        with LOCK:
+            return {"conv": json.loads(json.dumps(CONV))}
+    if p == "/api/media/convcancel":
+        CONV_CANCEL.set()
+        return {}
+    if p == "/api/media/opendir":
+        d = MEDIA_CONV_DIR()
+        os.makedirs(d, exist_ok=True)
+        _open_quiet(d)
+        return {"dir": d}
+    if p == "/api/residue/scan":
+        return residue_scan()
+    if p == "/api/residue/delete":
+        return residue_delete([str(x) for x in (b.get("ids") or [])])
     if p == "/api/media/clearcache":
         import shutil
         shutil.rmtree(MEDIA_DIR, ignore_errors=True)
@@ -1932,10 +1957,31 @@ _CONN_RX = re.compile(r"(?i)10054|10053|10060|10061|10065|connection (reset|refu
                       r"no respondi|errno (32|54|60|61|64|65|104|110|111|113)")
 
 
+MAC_LAN_MSG = ("macOS no deja a PS5 Directo usar la red local. Ve a Ajustes del Sistema → Privacidad y seguridad → Red local, activa «PS5 Directo» (o «python3») y vuelve a abrir el programa.")
+
+
+def mac_lan_blocked(host=None):
+    """En macOS 15+ hace falta el permiso «Red local». Si no lo tiene, conectar con la consola falla al
+    instante con "No route to host" (errno 65), aunque la PS5 este encendida."""
+    if sys.platform != "darwin":
+        return False
+    host = E.clean_host(host or cfg_snapshot().get("ps5_ip") or "")[0]
+    if not host:
+        return False
+    t0 = time.time()
+    try:
+        socket.create_connection((host, 2121), timeout=2).close()
+        return False
+    except OSError as e:
+        return getattr(e, "errno", None) == 65 and time.time() - t0 < 0.5
+
+
 def conn_error_text(e):
     """Los errores de red de Windows ("[WinError 10054] Se ha forzado la interrupción...") dicen poco:
     se cambian por un mensaje claro sobre la conexión con la consola."""
     t = str(e) or e.__class__.__name__
+    if sys.platform == "darwin" and re.search(r"(?i)no route to host|errno 65", t):
+        return MAC_LAN_MSG + " (%s)" % t
     if isinstance(e, (ConnectionError, TimeoutError, socket.timeout)) or _CONN_RX.search(t):
         return ("No hay conexión con la consola. Comprueba que la PS5 está encendida, que el FTP está cargado "
                 "(arriba el punto «FTP» tiene que estar en verde) y pulsa Actualizar. (%s)" % t)
@@ -5199,6 +5245,7 @@ def console_status():
                              "autoload": bool(slot and slot.get("slot") in autoload), "lost": LOST[p["id"]]})
     out["reachable"] = bool(ver or out["loader"] or any(i["ok"] for i in out["items"]) or
                             _port_open(cfg["ps5_ip"], 2121, 1) or _port_open(cfg["ps5_ip"], 5905, 1))
+    out["mac_lan"] = MAC_LAN_MSG if (not out["reachable"] and mac_lan_blocked(cfg["ps5_ip"])) else ""
     return out
 
 
@@ -5500,6 +5547,316 @@ def cleanup_delete(paths):
         bf.delete(p)
         done.append(p)
     return done
+
+
+# ---------------------------------------------------------------------------
+# Limpiar restos (menu Espacio): envios a medias y archivos temporales que ocupan sitio
+# en la consola y en el PC. Solo se puede borrar lo que salio en la ultima busqueda.
+# ---------------------------------------------------------------------------
+
+RESIDUE_RX = re.compile(r"(?i)\.(ps5part|ava-part|part|tmp|convirtiendo\.mp4)$")
+RESIDUE_LAST = {}          # id -> elemento de la ultima busqueda
+
+
+def _local_size(path):
+    if os.path.isfile(path):
+        return os.path.getsize(path)
+    n = 0
+    for r, _ds, fs in os.walk(path):
+        for f in fs:
+            try:
+                n += os.path.getsize(os.path.join(r, f))
+            except OSError:
+                pass
+    return n
+
+
+def residue_scan():
+    cfg = cfg_snapshot()
+    items, warn = [], []
+    with LOCK:
+        pending = [j.get("title") or "transferencia" for j in JOBS if j["status"] not in ("hecho", "cancelado")]
+        fm_busy = FMOP.get("busy")
+
+    def add(where, path, label, size, checked=True, in_use=None, note=""):
+        items.append({"id": "%s:%s" % (where, path), "where": where, "path": path, "label": label,
+                      "size": int(size or 0), "checked": checked and not in_use, "in_use": in_use, "note": note})
+
+    # --- en el PC
+    pc_dirs = [(pc_library_dir(), "Bajado de la Biblioteca"), (os.path.join(downloads_dir(), "PS5 Directo"), "Descargas"),
+               (MEDIA_CONV_DIR(), "Capturas")]
+    seen = set()
+    for d, lab in pc_dirs:
+        if not os.path.isdir(d) or d in seen:
+            continue
+        seen.add(d)
+        for r, ds, fs in os.walk(d):
+            if r.count(os.sep) - d.count(os.sep) > 3:
+                ds[:] = []
+            for f in fs:
+                fp = os.path.join(r, f)
+                if RESIDUE_RX.search(f) and os.path.normcase(fp) not in seen:
+                    seen.add(os.path.normcase(fp))
+                    add("pc", fp, "Bajada a medias (%s): %s" % (lab, f), _local_size(fp),
+                        in_use="algo se está bajando ahora" if fm_busy else None)
+    tmp = pc_temp_root(cfg)
+    if os.path.isdir(tmp):
+        for n in sorted(os.listdir(tmp)):
+            fp = os.path.join(tmp, n)
+            add("pc", fp, "Temporal de transferencias por el PC: " + n, _local_size(fp),
+                in_use=("puede que lo use «%s» de la cola" % pending[0]) if pending else None)
+    if os.path.isdir(PCX_DIR):
+        for n in os.listdir(PCX_DIR):
+            fp = os.path.join(PCX_DIR, n)
+            if os.path.isdir(fp):
+                add("pc", fp, "Descompresión a medias en el PC: " + n, _local_size(fp),
+                    in_use=("puede que lo use «%s» de la cola" % pending[0]) if pending else None)
+    if os.path.isdir(MEDIA_DIR):
+        sz = _local_size(MEDIA_DIR)
+        if sz:
+            add("pc", MEDIA_DIR, "Copias guardadas para ver las capturas (se vuelven a bajar al abrirlas)", sz)
+
+    # --- en la consola
+    try:
+        bf = fm_bf_opt()
+        if bf is not None:
+            for it in cleanup_scan():
+                add("ps5", it["path"], it["label"], it["size"],
+                    in_use=("lo usa «%s» de la cola" % it["in_use"]) if it.get("in_use") else None)
+        else:
+            warn.append("BFpilot no responde: en la consola solo miro los archivos a medias, no la carpeta de trabajo.")
+        for root in ("/data/homebrew", "/data/pkg", "/data/etaHEN/games", "/mnt/usb0/homebrew", "/mnt/ext0/homebrew"):
+            try:
+                ents = fm_list(root)["entries"]
+            except Exception:
+                continue
+            for e in ents:
+                path = root + "/" + e["name"]
+                if not e["dir"] and RESIDUE_RX.search(e["name"]):
+                    add("ps5", path, "Envío a medias: " + e["name"], e.get("size"),
+                        in_use=("puede que lo use «%s» de la cola" % pending[0]) if pending else None)
+                elif e["dir"] and root.endswith("homebrew") and bf is not None and not bf.exists(path + "/sce_sys/param.json"):
+                    add("ps5", path, "Carpeta sin sce_sys (¿envío cortado?): " + e["name"], bf.du(path) or 0,
+                        checked=False, note="No es una aplicación completa. Márcala solo si sabes que es un envío que se cortó.")
+    except Exception as e:
+        warn.append("No pude revisar la consola: %s" % conn_error_text(e))
+    items = [x for x in items if x["size"] or x["where"] == "ps5"]
+    items.sort(key=lambda x: (x["where"] != "ps5", -x["size"]))
+    with LOCK:
+        RESIDUE_LAST.clear()
+        RESIDUE_LAST.update({x["id"]: x for x in items})
+    return {"items": items, "warn": warn}
+
+
+def residue_delete(ids):
+    import shutil
+    with LOCK:
+        sel = [RESIDUE_LAST[i] for i in ids if i in RESIDUE_LAST]
+    freed, errs = 0, []
+    con = [x for x in sel if x["where"] == "ps5"]
+    bf = fm_bf_opt() if con else None
+    for x in sel:
+        try:
+            if x["where"] == "pc":
+                if os.path.isdir(x["path"]):
+                    shutil.rmtree(x["path"])
+                elif os.path.exists(x["path"]):
+                    os.remove(x["path"])
+            elif x["path"].startswith(WORK_ROOT + "/"):
+                cleanup_delete([x["path"]])
+            elif bf is not None:
+                bf.delete(x["path"])
+            else:
+                ftp_rmtree(cfg_snapshot(), x["path"], threading.Event())
+            freed += x["size"]
+            with LOCK:
+                RESIDUE_LAST.pop(x["id"], None)
+        except Exception as e:
+            errs.append("%s: %s" % (x["label"], conn_error_text(e)))
+    return {"freed": freed, "errors": errs}
+
+
+# ---------------------------------------------------------------------------
+# Convertir capturas para compartir: videos a MP4 (H.264) y, si estan en HDR, a SDR para que no
+# se vean lavados. Usa FFmpeg: en Windows se descarga solo la primera vez (33 MB).
+# ---------------------------------------------------------------------------
+
+FFMPEG_URL = "https://github.com/GyanD/codexffmpeg/releases/download/8.1/ffmpeg-8.1-essentials_build.7z"
+FFMPEG_LOCK = threading.Lock()
+CONV = {"busy": False, "phase": "", "i": 0, "n": 0, "pct": 0, "current": "", "done": [], "errors": [], "dir": ""}
+CONV_CANCEL = threading.Event()
+
+
+def MEDIA_CONV_DIR():
+    return os.path.join(downloads_dir(), "PS5 Directo", "Capturas")
+
+
+def ffmpeg_path():
+    import shutil
+    mine = os.path.join(DATA_DIR, "tools", "ffmpeg", "ffmpeg.exe" if os.name == "nt" else "ffmpeg")
+    if os.path.isfile(mine):
+        return mine
+    w = shutil.which("ffmpeg")
+    if w:
+        return w
+    for c in ("/opt/homebrew/bin/ffmpeg", "/usr/local/bin/ffmpeg", "/usr/bin/ffmpeg"):
+        if os.name != "nt" and os.path.isfile(c):
+            return c
+    return None
+
+
+def ffmpeg_hint():
+    if sys.platform == "darwin":
+        return "Para convertir hace falta FFmpeg. Instálalo con Homebrew (brew.sh): brew install ffmpeg"
+    return "Para convertir hace falta FFmpeg. Instálalo (por ejemplo: sudo apt install ffmpeg) y vuelve a probar."
+
+
+def ffmpeg_install():
+    """Solo Windows: baja FFmpeg (compilacion de gyan.dev publicada en GitHub) y guarda ffmpeg.exe."""
+    import subprocess
+    mine = os.path.join(DATA_DIR, "tools", "ffmpeg", "ffmpeg.exe")
+    with FFMPEG_LOCK:
+        if os.path.isfile(mine):
+            return mine
+        d = os.path.dirname(mine)
+        os.makedirs(d, exist_ok=True)
+        tmp = os.path.join(d, "ffmpeg.7z.part")
+        total = 33541925
+
+        def prog(got):
+            with LOCK:
+                CONV.update(pct=min(99, int(got * 100 / total)))
+            if CONV_CANCEL.is_set():
+                raise E.Cancelled()
+        with LOCK:
+            CONV.update(phase="Instalando el convertidor (FFmpeg, 33 MB, solo la primera vez)", pct=0)
+        try:
+            F.http_get(FFMPEG_URL, limit=200 * 1024 * 1024, timeout=120, dest=tmp, progress=prog)
+            exe = E.find_7z(cfg_snapshot().get("sevenzip_path") or "")
+            if not exe:
+                raise E.PipeError("falta 7-Zip para abrir el paquete de FFmpeg")
+            r = subprocess.run([exe, "e", "-y", "-o" + d, tmp, "ffmpeg.exe", "-r"], capture_output=True,
+                               timeout=300, **({"creationflags": 0x08000000} if os.name == "nt" else {}))
+            if r.returncode != 0 or not os.path.isfile(mine):
+                raise E.PipeError("no pude sacar ffmpeg.exe del paquete")
+        except E.Cancelled:
+            raise
+        except Exception as e:
+            raise E.PipeError("No pude instalar FFmpeg (%s). Puedes bajarlo de gyan.dev/ffmpeg y copiar ffmpeg.exe en %s"
+                              % (conn_error_text(e), d))
+        finally:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+        return mine
+
+
+def _ff_probe(ff, src):
+    import subprocess
+    r = subprocess.run([ff, "-hide_banner", "-nostdin", "-i", src], capture_output=True, timeout=60,
+                       **({"creationflags": 0x08000000} if os.name == "nt" else {}))
+    txt = r.stderr.decode("utf-8", "replace")
+    m = re.search(r"Duration:\s*(\d+):(\d+):([\d.]+)", txt)
+    dur = int(m.group(1)) * 3600 + int(m.group(2)) * 60 + float(m.group(3)) if m else 0
+    vline = next((ln for ln in txt.splitlines() if "Video:" in ln), "")
+    hdr = bool(re.search(r"smpte2084|arib-std-b67|bt2020", vline))
+    h = re.search(r"\b\d{2,5}x(\d{2,5})\b", vline)
+    return dur, hdr, int(h.group(1)) if h else 0, "Audio:" in txt
+
+
+def _ff_convert(ff, src, dst, dur, hdr, height, audio):
+    import subprocess
+    vf = []
+    if height > 1080:
+        vf.append("scale=-2:1080")
+    if hdr:
+        vf.append("zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,"
+                  "zscale=t=bt709:m=bt709:r=tv")
+    vf.append("format=yuv420p")
+    cmd = [ff, "-hide_banner", "-nostdin", "-y", "-i", src, "-map", "0:v:0", "-map", "0:a:0?", "-vf", ",".join(vf),
+           "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-color_primaries", "bt709",
+           "-color_trc", "bt709", "-colorspace", "bt709"]
+    cmd += ["-c:a", "aac", "-b:a", "192k"] if audio else []
+    cmd += ["-movflags", "+faststart", "-f", "mp4", "-progress", "pipe:1", "-nostats", dst]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         **({"creationflags": 0x08000000} if os.name == "nt" else {}))
+    err = []
+    threading.Thread(target=lambda: err.extend(p.stderr.read().decode("utf-8", "replace").splitlines()[-8:]),
+                     daemon=True).start()
+    for ln in p.stdout:
+        if CONV_CANCEL.is_set():
+            p.kill()
+            break
+        m = re.match(rb"out_time_(?:us|ms)=(\d+)", ln)
+        if m and dur:
+            with LOCK:
+                CONV["pct"] = max(0, min(99, int(int(m.group(1)) / 1e6 * 100 / dur)))
+    rc = p.wait()
+    if CONV_CANCEL.is_set():
+        raise E.Cancelled()
+    if rc != 0:
+        raise E.PipeError("FFmpeg falló: " + (" ".join(err[-2:]) or "código %d" % rc))
+
+
+def media_convert(paths):
+    with LOCK:
+        if CONV["busy"]:
+            raise E.PipeError("Ya se está convirtiendo")
+        CONV.update(busy=True, phase="", i=0, n=len(paths), pct=0, current="", done=[], errors=[],
+                    dir=MEDIA_CONV_DIR())
+    CONV_CANCEL.clear()
+
+    def run():
+        try:
+            ff = ffmpeg_path()
+            if not ff:
+                if os.name != "nt":
+                    raise E.PipeError(ffmpeg_hint())
+                ff = ffmpeg_install()
+            out_dir = MEDIA_CONV_DIR()
+            os.makedirs(out_dir, exist_ok=True)
+            for k, path in enumerate(paths, 1):
+                name = posixpath.basename(path)
+                stem = os.path.splitext(name)[0]
+                with LOCK:
+                    CONV.update(i=k, current=name, pct=0, phase="Bajando de la consola")
+                try:
+                    src, _ = media_cached(path)
+                    dst = os.path.join(out_dir, stem + ".mp4")
+                    with LOCK:
+                        CONV.update(phase="Convirtiendo a MP4")
+                    dur, hdr, height, audio = _ff_probe(ff, src)
+                    if hdr:
+                        with LOCK:
+                            CONV.update(phase="Convirtiendo a MP4 y quitando el HDR (tarda un poco más)")
+                    tmp = os.path.join(out_dir, stem + ".convirtiendo.mp4")
+                    _ff_convert(ff, src, tmp, dur, hdr, height, audio)
+                    os.replace(tmp, dst)
+                    with LOCK:
+                        CONV["done"].append(os.path.basename(dst))
+                except E.Cancelled:
+                    try:
+                        os.remove(os.path.join(out_dir, stem + ".convirtiendo.mp4"))
+                    except OSError:
+                        pass
+                    raise
+                except Exception as e:
+                    with LOCK:
+                        CONV["errors"].append("%s: %s" % (name, conn_error_text(e)))
+            with LOCK:
+                CONV.update(pct=100, phase="Hecho")
+        except E.Cancelled:
+            with LOCK:
+                CONV.update(phase="Cancelado")
+        except Exception as e:
+            with LOCK:
+                CONV["errors"].append(conn_error_text(e))
+                CONV.update(phase="Error")
+        finally:
+            with LOCK:
+                CONV["busy"] = False
+    threading.Thread(target=run, daemon=True).start()
 
 
 # ---------------------------------------------------------------------------
@@ -6283,7 +6640,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
+        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
             try:
                 return self._send(200, dict(ok=True, **fm_api(p, b)))
             except E.PipeError as e:

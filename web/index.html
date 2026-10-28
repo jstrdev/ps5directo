@@ -338,6 +338,14 @@ tr:hover .dots{opacity:1}
 .collib .mono{word-break:break-all}
 #libDl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:8px 0;font-size:13px}
 #libDl .bar{flex:1 1 160px;min-width:120px}
+#mdConvBox{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:8px 0;font-size:13px}
+#mdConvBox .bar{flex:1 1 160px;min-width:120px}#mdConvBox .err{flex-basis:100%}
+.rsd-g{font-weight:600;margin:12px 0 4px;font-size:13px}
+.rsd-row{display:flex;gap:10px;align-items:flex-start;padding:6px 4px;margin:0;border-bottom:1px solid var(--line);font-size:13px;color:var(--text)}
+.rsd-row input{width:auto;flex:none;margin-top:3px}
+.rsd-row>div{flex:1;min-width:0;overflow-wrap:anywhere}.rsd-row .num{flex:none;font-variant-numeric:tabular-nums;font-weight:600}
+.rsd-row.off{opacity:.6}
+.rsd-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
 .colroot{display:inline-flex;align-items:center;gap:6px;padding:4px 6px 4px 11px;border-radius:999px;border:1px solid var(--line);font-size:13px;background:var(--panel)}
 .colroot button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px}
 .lcrow{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
@@ -365,6 +373,10 @@ tr:hover .dots{opacity:1}
 .gupd{display:block;width:fit-content;margin:2px 0 6px;font-size:12.5px;color:#8fb6ff;text-decoration:none;border-bottom:1px dashed rgba(143,182,255,.45)}
 .gupd:hover{color:#b8d0ff;border-bottom-style:solid}
 .gcov img{width:100%;height:100%;object-fit:cover;display:block}
+.gcov .sizeb{position:absolute;right:7px;bottom:7px;font-size:11px;font-weight:700;padding:2px 7px;border-radius:7px;background:rgba(0,0,0,.68);color:#e8eef8;letter-spacing:.02em}
+.gcov .dlveil{position:absolute;left:0;right:0;top:0;height:calc(100% - var(--p,0%));backdrop-filter:grayscale(1) brightness(.42);-webkit-backdrop-filter:grayscale(1) brightness(.42);transition:height .8s ease;pointer-events:none}
+.gcov .dlpct{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:800 26px/1 system-ui,sans-serif;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.9);pointer-events:none}
+.gcard.dling{border-color:#4a7bd6}
 .gcov .ph{font:700 22px/1.1 "Segoe UI",system-ui,sans-serif;color:#9fb3d1;letter-spacing:.04em;text-align:center;padding:10px}
 .gcov .fmtb{position:absolute;left:8px;top:8px;font-size:11px;padding:2px 7px;border-radius:6px;background:rgba(10,12,16,.78);color:#dbe7ff;border:1px solid rgba(255,255,255,.12)}
 .gbody{padding:10px 11px 11px;display:flex;flex-direction:column;gap:5px;flex:1}
@@ -669,6 +681,12 @@ body.notwin .winonly{display:none!important}
       <button class="small" id="spCancel" style="margin-top:8px">Cancelar</button></div>
     <div id="spOut"></div>
   </section>
+  <section class="card" id="rsdCard">
+    <div class="fm-head"><h2>🧹 Limpiar restos</h2><div class="spacer"></div>
+      <button class="primary small" id="rsdScan">Buscar restos</button></div>
+    <p class="hint">Envíos y bajadas que se quedaron a medias, carpetas temporales y copias que ya no hacen falta, en la consola y en el PC. Te enseño lo que ocupa cada cosa y no se borra nada sin que lo confirmes.</p>
+    <div id="rsdOut"></div>
+  </section>
   <section class="card" id="mrCard">
     <div class="fm-head"><h2>Hacer sitio</h2></div>
     <p class="hint">Di cuánto necesitas liberar y te propongo qué borrar: primero restos y envíos a medias, luego copias repetidas de lo mismo y luego instaladores .pkg. Las aplicaciones solo salen como opción, sin marcar. Nada se borra sin que lo confirmes.</p>
@@ -707,11 +725,13 @@ body.notwin .winonly{display:none!important}
   <section class="card">
     <div class="fm-head"><h2>Capturas y vídeos</h2><div class="spacer"></div>
       <button class="small" id="mdSel">Seleccionar todo</button>
+      <button class="small" id="mdConv" disabled title="Vídeos a MP4, y sin HDR para que no se vean lavados">🎬 Convertir a MP4</button>
       <button class="small" id="mdDown" disabled>Bajar al PC</button>
       <button class="primary small" id="mdLoad">Actualizar</button></div>
     <p class="hint">Las capturas de pantalla y los vídeos guardados en la consola. Pulsa una para verla grande; marca las que quieras y «Bajar al PC» las guarda en Descargas › PS5 Directo.</p>
     <div class="hint" id="mdSum"></div>
     <div id="mdTips"></div>
+    <div id="mdConvBox" hidden></div>
     <div class="mdgrid" id="mdGrid"></div>
   </section>
 </main>
@@ -1000,7 +1020,7 @@ body.notwin .winonly{display:none!important}
       </div>
       <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
         <b>Limpieza de la PS5</b>
-        <p class="hint">Busca en /data/ps5directo restos que ya no usa ninguna transferencia de la cola (partes de trabajos quitados, descompresiones a medias...). Te enseña cuánto ocupa cada cosa antes de borrar.</p>
+        <p class="hint">Busca envíos y bajadas a medias y restos que ya no usa ninguna transferencia de la cola, en la consola y en el PC. Te enseña cuánto ocupa cada cosa antes de borrar. También está en Espacio.</p>
         <button id="btnScan" class="small">Buscar restos</button>
         <div id="cleanOut" style="margin-top:8px"></div>
       </div>
@@ -1066,7 +1086,12 @@ I18N_RX.push(['^No hay conexión con la consola\\. Comprueba que la PS5 está en
 Object.assign(I18N_EXACT,{"Estado de la consola": "Console status", "Volver a mirar": "Check again", "Al abrir PS5 Directo, iniciar solos con Payload Manager los que falten": "When PS5 Directo opens, start any missing ones automatically with Payload Manager", "Mirando la consola…": "Checking the console…", "No encuentro la consola en {0}. ¿Está encendida y con el jailbreak hecho? Revisa la IP en Ajustes.": "I can't find the console at {0}. Is it on and jailbroken? Check the IP in Settings.", "Payload Manager está abierto en la consola: PS5 Directo puede iniciar, instalar y reiniciar los payloads desde aquí.": "Payload Manager is open on the console: PS5 Directo can start, install and restart the payloads from here.", "Payload Manager no está abierto en la consola. Ábrelo (es la aplicación «Payload Manager» del menú de inicio de la PS5) y pulsa «Volver a mirar»: así PS5 Directo puede iniciar los payloads desde aquí. Mientras tanto, cárgalos desde Payload Manager en la consola.": "Payload Manager isn't open on the console. Open it (it's the \"Payload Manager\" app on the PS5 home screen) and click \"Check again\": then PS5 Directo can start the payloads from here. Meanwhile, load them from Payload Manager on the console.", "Funciona": "Working", "No está iniciado": "Not started", "En marcha, pero no responde": "Running, but not responding", "Reiniciar": "Restart", "Iniciar": "Start", "Instalar e iniciar": "Install and start", "Está en marcha pero no contesta: se ha colgado o está cargado dos veces. «Reiniciar» lo cierra y lo vuelve a iniciar.": "It's running but not answering: it hung or was loaded twice. \"Restart\" closes it and starts it again.", "No está instalado en Payload Manager: «Instalar e iniciar» baja la última versión de GitHub, la instala allí y la inicia.": "It isn't installed in Payload Manager: \"Install and start\" downloads the latest version from GitHub, installs it there and starts it.", "Sin el FTP no funciona casi nada: enviar, Biblioteca, Archivos de la consola, Copia de seguridad ni Capturas.": "Without FTP almost nothing works: sending, Library, Console files, Backup or Captures.", "Sin BFpilot no se puede descomprimir en la consola, ver lo que ocupa cada carpeta, la pestaña Espacio ni copiar o mover rápido dentro de la consola. Sí se puede enviar descomprimiendo en el PC.": "Without BFpilot you can't extract on the console, see each folder's size, use the Space tab or copy/move quickly inside the console. You can still send by extracting on the PC.", "ftpsrv y BFpilot se cargan solos cada vez que se abre Payload Manager.": "ftpsrv and BFpilot load automatically every time Payload Manager opens.", "¿Quieres que ftpsrv y BFpilot se carguen solos cada vez que enciendas la consola (al abrirse Payload Manager)? Se añaden a su lista de carga automática, sin quitar lo que ya tengas.": "Do you want ftpsrv and BFpilot to load automatically every time you turn on the console (when Payload Manager opens)? They're added to its autoload list, without removing what you already have.", "Cargarlos solos al encender": "Load them automatically at startup", "Iniciando… (unos segundos)": "Starting… (a few seconds)", "Bajando de GitHub, instalando en Payload Manager e iniciando…": "Downloading from GitHub, installing in Payload Manager and starting…", "Cerrando el que estaba colgado y volviendo a iniciarlo…": "Closing the hung one and starting it again…", "Guardando en Payload Manager…": "Saving in Payload Manager…", "Listo: se cargarán solos al encender la consola.": "Done: they'll load automatically when the console starts.", "Estado de la consola y payloads…": "Console status and payloads…", "Pulsa para ver el estado de la consola y arreglar lo que falte": "Click to see the console status and fix what's missing", "Abre Payload Manager en la consola (es una aplicación del menú de inicio de la PS5) y vuelve a intentarlo: PS5 Directo lo usa para cargar los payloads.": "Open Payload Manager on the console (it's an app on the PS5 home screen) and try again: PS5 Directo uses it to load the payloads.", "Primero instala ftpsrv y BFpilot en Payload Manager": "First install ftpsrv and BFpilot in Payload Manager", "Enviar a la PS5": "Send to the PS5"});
 I18N_RX.push(...[["^([\\s\\S]*?) iniciado, pero todavía no responde\\. Espera unos segundos y pulsa «Volver a mirar»\\.$", "{0} started, but it isn't responding yet. Wait a few seconds and click \"Check again\"."], ["^([\\s\\S]*?) funcionando\\.$", "{0} working."], ["^([\\s\\S]*?) ya está en marcha pero no responde: pulsa «Reiniciar»$", "{0} is already running but not responding: click \"Restart\""], ["^Iniciado desde Payload Manager: ([\\s\\S]*?)$", "Started from Payload Manager: {0}"]]);
 I18N_RX.push(...[["^No encuentro el proceso de ([\\s\\S]*?) en Payload Manager para cerrarlo\\. Ciérralo desde Payload Manager en la consola \\(Procesos activos\\) o reinicia la consola, y luego pulsa «Iniciar»\\.$", "I can't find {0}'s process in Payload Manager to close it. Close it from Payload Manager on the console (Active processes) or restart the console, then click \"Start\"."]]);
-Object.assign(I18N_EXACT,{"🎬 Tus clips están en WEBM: Telegram, WhatsApp y muchas webs no los reproducen directamente. Para que los nuevos se graben en MP4, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas → Formato de los videoclips → Tipo de archivo y elige «Más compatible (MP4)» (con la resolución de grabación en 1920 × 1080; en 4K solo hay WebM).": "🎬 Your clips are WEBM: Telegram, WhatsApp and many websites don't play them directly. To record new ones as MP4, on the PS5 go to Settings → Captures and Broadcasts → Captures → Video Clip Format → File Type and choose \"Most Compatible (MP4)\" (with the recording resolution at 1920 × 1080; 4K only offers WebM).", "🌗 ¿Se ven lavados (sin contraste) al compartirlos? Pasa con las capturas y clips grabados en HDR, que el móvil, Telegram o las webs no saben mostrar. Para que se vean bien en todas partes, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas y desactiva «HDR» en el formato de las capturas de pantalla y de los videoclips.": "🌗 Do they look washed out (no contrast) when you share them? It happens with screenshots and clips recorded in HDR, which phones, Telegram and websites can't display properly. To make them look right everywhere, on the PS5 go to Settings → Captures and Broadcasts → Captures and turn off \"HDR\" in the screenshot and video clip formats.", "Entendido": "Got it"});
+Object.assign(I18N_EXACT,{"🎬 Tus clips están en WEBM: Telegram, WhatsApp y muchas webs no los reproducen directamente. Para que los nuevos se graben en MP4, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas → Formato de los videoclips → Tipo de archivo y elige «Más compatible (MP4)» (con la resolución de grabación en 1920 × 1080; en 4K solo hay WebM). Para los que ya tienes, márcalos y pulsa «Convertir a MP4».": "🎬 Your clips are WEBM: Telegram, WhatsApp and many websites don't play them directly. To record new ones as MP4, on the PS5 go to Settings → Captures and Broadcasts → Captures → Video Clip Format → File Type and choose \"Most Compatible (MP4)\" (with the recording resolution at 1920 × 1080; 4K only offers WebM). For the ones you already have, tick them and click \"Convert to MP4\".", "🌗 ¿Se ven lavados (sin contraste) al compartirlos? Pasa con las capturas y clips grabados en HDR, que el móvil, Telegram o las webs no saben mostrar. Para que se vean bien en todas partes, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas y desactiva «HDR» en el formato de las capturas de pantalla y de los videoclips. Los vídeos que ya tienes en HDR, «Convertir a MP4» los deja con colores normales.": "🌗 Do they look washed out (no contrast) when you share them? It happens with screenshots and clips recorded in HDR, which phones, Telegram and websites can't display properly. To make them look right everywhere, on the PS5 go to Settings → Captures and Broadcasts → Captures and turn off \"HDR\" in the screenshot and video clip formats. For HDR videos you already have, \"Convert to MP4\" gives them normal colours.", "Entendido": "Got it"});
+Object.assign(I18N_EXACT,{"Lo que ocupa en la consola": "Size on the console"});
+Object.assign(I18N_EXACT,{"Busca envíos y bajadas a medias y restos que ya no usa ninguna transferencia de la cola, en la consola y en el PC. Te enseña cuánto ocupa cada cosa antes de borrar. También está en Espacio.": "Finds half-finished sends and downloads and leftovers no transfer in the queue uses anymore, on the console and on the PC. It shows how much each one takes before deleting. It's also in Space.", "Vídeos a MP4, y sin HDR para que no se vean lavados": "Videos to MP4, without HDR so they don't look washed out", "🎬 Convertir a MP4": "🎬 Convert to MP4", "Convertir a MP4": "Convert to MP4", "Convertir a MP4 ({0})": "Convert to MP4 ({0})", "Marca algún vídeo": "Tick a video first", "Elige algún vídeo": "Choose a video", "Para convertir hace falta FFmpeg, un programa gratuito de vídeo. Se descarga una sola vez (33 MB, de GitHub) y se guarda en la carpeta de PS5 Directo. ¿Instalarlo y convertir?": "Converting needs FFmpeg, a free video program. It's downloaded only once (33 MB, from GitHub) and kept in the PS5 Directo folder. Install it and convert?", "Para convertir hace falta FFmpeg. Instálalo con Homebrew (brew.sh): brew install ffmpeg": "Converting needs FFmpeg. Install it with Homebrew (brew.sh): brew install ffmpeg", "Para convertir hace falta FFmpeg. Instálalo (por ejemplo: sudo apt install ffmpeg) y vuelve a probar.": "Converting needs FFmpeg. Install it (for example: sudo apt install ffmpeg) and try again.", "Convirtiendo {0} de {1}": "Converting {0} of {1}", "Bajando de la consola": "Downloading from the console", "Convirtiendo a MP4": "Converting to MP4", "Convirtiendo a MP4 y quitando el HDR (tarda un poco más)": "Converting to MP4 and removing HDR (takes a bit longer)", "Instalando el convertidor (FFmpeg, 33 MB, solo la primera vez)": "Installing the converter (FFmpeg, 33 MB, first time only)", "Conversión cancelada": "Conversion cancelled", "{0} vídeos en MP4 en Descargas › PS5 Directo › Capturas, listos para compartir.": "{0} videos as MP4 in Downloads › PS5 Directo › Capturas, ready to share.", "No se pudo convertir": "Couldn't convert", "Ya se está convirtiendo": "Already converting", "🧹 Limpiar restos": "🧹 Clean up leftovers", "Buscar restos": "Find leftovers", "Envíos y bajadas que se quedaron a medias, carpetas temporales y copias que ya no hacen falta, en la consola y en el PC. Te enseño lo que ocupa cada cosa y no se borra nada sin que lo confirmes.": "Sends and downloads that were left half-finished, temporary folders and copies that aren't needed anymore, on the console and on the PC. I show you how much each one takes and nothing is deleted without your confirmation.", "Buscando restos en la consola y en el PC… (puede tardar unos segundos)": "Looking for leftovers on the console and on the PC… (may take a few seconds)", "No hay restos: todo limpio.": "No leftovers: all clean.", "En la consola": "On the console", "En el PC": "On the PC", "No se puede borrar ahora: {0}": "Can't delete it now: {0}", "Borrar marcados ({0})": "Delete ticked ({0})", "¿Borrar {0} elementos ({1})? No se puede deshacer.": "Delete {0} items ({1})? This can't be undone.", "Borrando…": "Deleting…", "Liberados {0}": "{0} freed", "algo se está bajando ahora": "something is downloading right now", "Copias guardadas para ver las capturas (se vuelven a bajar al abrirlas)": "Copies kept to view captures (downloaded again when you open them)", "BFpilot no responde: en la consola solo miro los archivos a medias, no la carpeta de trabajo.": "BFpilot isn't responding: on the console I only check half-sent files, not the work folder.", "No es una aplicación completa. Márcala solo si sabes que es un envío que se cortó.": "It isn't a complete app. Tick it only if you know it's a send that got cut off."});
+I18N_RX.push(...[["^Bajada a medias \\(Bajado de la Biblioteca\\): ([\\s\\S]*?)$", "Half-finished download (from the Library): {0}"], ["^Bajada a medias \\(Descargas\\): ([\\s\\S]*?)$", "Half-finished download (Downloads): {0}"], ["^Bajada a medias \\(Capturas\\): ([\\s\\S]*?)$", "Half-finished file (Captures): {0}"], ["^Temporal de transferencias por el PC: ([\\s\\S]*?)$", "Temporary files of transfers through the PC: {0}"], ["^Descompresión a medias en el PC: ([\\s\\S]*?)$", "Half-finished extraction on the PC: {0}"], ["^Envío a medias: ([\\s\\S]*?)$", "Half-sent: {0}"], ["^Carpeta sin sce_sys \\(¿envío cortado\\?\\): ([\\s\\S]*?)$", "Folder without sce_sys (send cut off?): {0}"], ["^puede que lo use «([\\s\\S]*?)» de la cola$", "\"{0}\" in the queue may be using it"], ["^lo usa «([\\s\\S]*?)» de la cola$", "used by \"{0}\" in the queue"], ["^No pude revisar la consola: ([\\s\\S]*?)$", "Couldn't check the console: {0}"], ["^FFmpeg falló: ([\\s\\S]*?)$", "FFmpeg failed: {0}"], ["^No pude instalar FFmpeg \\(([\\s\\S]*?)\\)\\. Puedes bajarlo de gyan\\.dev\\/ffmpeg y copiar ffmpeg\\.exe en ([\\s\\S]*?)$", "Couldn't install FFmpeg ({0}). You can download it from gyan.dev/ffmpeg and copy ffmpeg.exe into {1}"]]);
+Object.assign(I18N_EXACT,{"macOS no deja a PS5 Directo usar la red local. Ve a Ajustes del Sistema → Privacidad y seguridad → Red local, activa «PS5 Directo» (o «python3») y vuelve a abrir el programa.": "macOS isn't letting PS5 Directo use the local network. Go to System Settings → Privacy & Security → Local Network, turn on \"PS5 Directo\" (or \"python3\") and open the program again."});
+I18N_RX.push(...[["^macOS\\ no\\ deja\\ a\\ PS5\\ Directo\\ usar\\ la\\ red\\ local\\.\\ Ve\\ a\\ Ajustes\\ del\\ Sistema\\ →\\ Privacidad\\ y\\ seguridad\\ →\\ Red\\ local,\\ activa\\ «PS5\\ Directo»\\ \\(o\\ «python3»\\)\\ y\\ vuelve\\ a\\ abrir\\ el\\ programa\\. \\(([\\s\\S]*?)\\)$", "macOS isn't letting PS5 Directo use the local network. Go to System Settings → Privacy & Security → Local Network, turn on \"PS5 Directo\" (or \"python3\") and open the program again. ({0})"]]);
 // --- idioma: español (original) o inglés. Traduce el texto de la página y los mensajes del programa.
 const LANG=(()=>{try{const v=localStorage.getItem('ps5d_lang');if(v==='es'||v==='en')return v}catch(e){}
   return (navigator.language||'es').toLowerCase().startsWith('es')?'es':'en'})();
@@ -1521,24 +1546,8 @@ $('btnPerms').onclick=async()=>{
       `${esc(x.path)}: ${x.changed?`<b>arreglados ${x.changed}</b> de ${x.seen}${x.eboot.length?` (eboot.bin tenía ${esc(x.eboot[0])})`:''}`:'ya estaba bien'}`).join('<br>');
   }catch(e){o.textContent=e.message}
 };
-// --- limpieza
-let cleanItems=[];
-$('btnScan').onclick=async()=>{
-  const o=$('cleanOut'); o.textContent='Buscando… (puede tardar unos segundos)';
-  try{const r=await api('/api/cleanup/scan',{}); cleanItems=r.items;
-    if(!cleanItems.length){o.textContent='No hay nada que limpiar.';return}
-    o.innerHTML=cleanItems.map((it,i)=>`<label class="chk"><input type="checkbox" data-i="${i}" ${it.in_use?'':'checked'}><div>${esc(it.label)} — <b>${human(it.size)}</b>${it.in_use?`<div class="hint">Lo usa "${esc(it.in_use)}" de la cola: si lo borras, esa transferencia tendrá que enviarse otra vez.</div>`:''}</div></label>`).join('')
-      +`<button id="btnClean" class="small danger" style="margin-top:8px">Borrar seleccionados</button>`;
-    $('btnClean').onclick=async()=>{
-      const sel=[...o.querySelectorAll('input[data-i]:checked')].map(x=>cleanItems[+x.dataset.i]);
-      if(!sel.length) return;
-      const tot=sel.reduce((a,b)=>a+(b.size||0),0);
-      if(!confirm(`¿Borrar ${sel.length} elemento(s) de la PS5 (${human(tot)})? No se puede deshacer.`)) return;
-      o.textContent='Borrando…';
-      try{const d=await api('/api/cleanup/delete',{paths:sel.map(x=>x.path)}); o.textContent=`Borrado: ${d.deleted.length} elemento(s), ${human(tot)} liberados.`; checkConn()}catch(e){o.textContent=e.message}
-    };
-  }catch(e){o.textContent=e.message}
-};
+// --- limpieza: ahora en Espacio
+$('btnScan').onclick=()=>{ try{$('dlg').close()}catch(e){} showTab('Space'); rsdScan(); setTimeout(()=>$('rsdCard').scrollIntoView({behavior:'smooth',block:'start'}),50) };
 // --- destinos segun unidades montadas
 async function loadDests(){try{const r=await api('/api/places',{});$('destList').innerHTML=r.dests.map(d=>`<option value="${esc(d)}">`).join('')}catch(e){}}
 loadDests(); setInterval(loadDests, 60000);
@@ -1770,7 +1779,7 @@ $('rsGo').onclick=async()=>{
 
 // ===================== capturas y videos =====================
 let md={items:[],sel:new Set(),loaded:false};
-function mdEnter(){ if(!md.loaded) mdLoad(); }
+function mdEnter(){ if(!md.loaded) mdLoad(); mdConvWatch(); }
 async function mdLoad(){
   md.loaded=true; $('mdSum').textContent=tr('Leyendo la consola…'); $('mdGrid').innerHTML='';
   try{const r=await api('/api/media/list',{}); if(!r.ok) throw new Error(r.error); md.items=r.items; md.sel.clear(); mdPaint()}catch(e){$('mdSum').textContent=e.message}
@@ -1780,8 +1789,8 @@ function mdTipsPaint(){
   let hid={}; try{hid=JSON.parse(localStorage.getItem('ps5d_md_tips')||'{}')}catch(e){}
   const webm=md.items.some(x=>/\.webm$/i.test(x.name)), any=md.items.length>0;
   const tips=[];
-  if(webm&&!hid.mp4) tips.push(['mp4','🎬 '+tr('Tus clips están en WEBM: Telegram, WhatsApp y muchas webs no los reproducen directamente. Para que los nuevos se graben en MP4, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas → Formato de los videoclips → Tipo de archivo y elige «Más compatible (MP4)» (con la resolución de grabación en 1920 × 1080; en 4K solo hay WebM).')]);
-  if(any&&!hid.hdr) tips.push(['hdr','🌗 '+tr('¿Se ven lavados (sin contraste) al compartirlos? Pasa con las capturas y clips grabados en HDR, que el móvil, Telegram o las webs no saben mostrar. Para que se vean bien en todas partes, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas y desactiva «HDR» en el formato de las capturas de pantalla y de los videoclips.')]);
+  if(webm&&!hid.mp4) tips.push(['mp4','🎬 '+tr('Tus clips están en WEBM: Telegram, WhatsApp y muchas webs no los reproducen directamente. Para que los nuevos se graben en MP4, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas → Formato de los videoclips → Tipo de archivo y elige «Más compatible (MP4)» (con la resolución de grabación en 1920 × 1080; en 4K solo hay WebM). Para los que ya tienes, márcalos y pulsa «Convertir a MP4».')]);
+  if(any&&!hid.hdr) tips.push(['hdr','🌗 '+tr('¿Se ven lavados (sin contraste) al compartirlos? Pasa con las capturas y clips grabados en HDR, que el móvil, Telegram o las webs no saben mostrar. Para que se vean bien en todas partes, en la PS5 ve a Ajustes → Capturas y emisiones → Capturas y desactiva «HDR» en el formato de las capturas de pantalla y de los videoclips. Los vídeos que ya tienes en HDR, «Convertir a MP4» los deja con colores normales.')]);
   $('mdTips').innerHTML=tips.map(([k,t])=>`<div class="md-tip"><div>${esc(t)}</div><button class="small" data-tip="${k}">${esc(tr('Entendido'))}</button></div>`).join('');
   $('mdTips').querySelectorAll('[data-tip]').forEach(b=>b.onclick=()=>{hid[b.dataset.tip]=1; try{localStorage.setItem('ps5d_md_tips',JSON.stringify(hid))}catch(e){} mdTipsPaint()});
 }
@@ -1794,15 +1803,70 @@ function mdPaint(){
     const pic=x.video?cov+'<span class="vd">▶</span>':`<img loading="lazy" src="${u}" alt="" onerror="this.replaceWith(document.createTextNode('🖼'))">`;
     const label=(x.app||x.tid||x.folder)+(x.when?' · '+mdWhen(x.when):'');
     return `<div class="mdt ${md.sel.has(i)?'on':''}" data-i="${i}" title="${esc(x.name)} · ${human(x.size)}">${pic}${x.hdr?'<span class="hb">HDR</span>':''}<input type="checkbox" ${md.sel.has(i)?'checked':''}><span class="nm" data-noi18n>${esc(label)}</span></div>`}).join('');
-  $('mdDown').disabled=!md.sel.size; $('mdDown').textContent=md.sel.size?tr('Bajar al PC ({0})').replace('{0}',md.sel.size):tr('Bajar al PC');
+  mdBtns();
 }
 $('mdGrid').addEventListener('click',e=>{const t=e.target.closest('.mdt'); if(!t) return; const i=+t.dataset.i;
-  if(e.target.tagName==='INPUT'){ e.target.checked?md.sel.add(i):md.sel.delete(i); t.classList.toggle('on',e.target.checked); $('mdDown').disabled=!md.sel.size; $('mdDown').textContent=md.sel.size?tr('Bajar al PC ({0})').replace('{0}',md.sel.size):tr('Bajar al PC'); return }
+  if(e.target.tagName==='INPUT'){ e.target.checked?md.sel.add(i):md.sel.delete(i); t.classList.toggle('on',e.target.checked); mdBtns(); return }
   window.open(`/api/media/file?p=${encodeURIComponent(md.items[i].path)}&t=${encodeURIComponent(TOKEN)}&v=1`,'_blank','noopener');});
 $('mdSel').onclick=()=>{ if(md.sel.size===md.items.length) md.sel.clear(); else md.items.forEach((_,i)=>md.sel.add(i)); mdPaint(); };
 $('mdLoad').onclick=mdLoad;
 $('mdDown').onclick=async()=>{ const paths=[...md.sel].map(i=>md.items[i].path);
   try{const r=await api('/api/fm/download',{paths}); if(!r.ok) throw new Error(r.error); toast(tr('Bajando {0} archivos a Descargas › PS5 Directo. El progreso sale en «Archivos de la consola».').replace('{0}',paths.length))}catch(e){toast(e.message)} };
+
+// --- convertir a MP4 para compartir
+let mdConv={poll:null};
+function mdSelVideos(){ return [...md.sel].map(i=>md.items[i]).filter(x=>x&&x.video) }
+function mdBtns(){ const n=md.sel.size, v=mdSelVideos().length;
+  $('mdDown').disabled=!n; $('mdDown').textContent=n?tr('Bajar al PC ({0})').replace('{0}',n):tr('Bajar al PC');
+  $('mdConv').disabled=!v||mdConv.poll!=null; $('mdConv').textContent='🎬 '+(v?tr('Convertir a MP4 ({0})').replace('{0}',v):tr('Convertir a MP4')); }
+$('mdConv').onclick=async()=>{ const vids=mdSelVideos(); if(!vids.length){toast(tr('Marca algún vídeo'));return}
+  let t; try{t=await api('/api/media/tools',{}); if(!t.ok) throw new Error(t.error)}catch(e){toast(e.message);return}
+  if(!t.ffmpeg){ if(!t.can_install){ alert(tr(t.hint)); return }
+    if(!confirm(tr('Para convertir hace falta FFmpeg, un programa gratuito de vídeo. Se descarga una sola vez (33 MB, de GitHub) y se guarda en la carpeta de PS5 Directo. ¿Instalarlo y convertir?'))) return }
+  try{const r=await api('/api/media/convert',{paths:vids.map(x=>x.path)}); if(!r.ok) throw new Error(r.error); mdConvWatch()}catch(e){toast(e.message)} };
+function mdConvWatch(){ if(mdConv.poll) return; mdConv.poll=setInterval(mdConvPoll,700); mdConvPoll(); mdBtns() }
+async function mdConvPoll(){
+  let r; try{r=await api('/api/media/convstate',{})}catch(e){return} const c=r.conv, box=$('mdConvBox'); if(!c) return;
+  const errs=(c.errors||[]).length?`<div class="err jderr">${c.errors.map(e=>esc(tr(e))).join('<br>')}</div>`:'';
+  if(c.busy){ box.hidden=false;
+    box.innerHTML=`<span>🎬 ${esc(tr('Convirtiendo {0} de {1}').replace('{0}',c.i).replace('{1}',c.n))}: <b data-noi18n>${esc(c.current||'')}</b> · ${esc(tr(c.phase||''))} · ${c.pct||0}%</span><div class="bar"><i style="width:${c.pct||0}%"></i></div><button class="small" id="mdConvX">${esc(tr('Cancelar'))}</button>${errs}`;
+    $('mdConvX').onclick=()=>api('/api/media/convcancel',{}); return }
+  clearInterval(mdConv.poll); mdConv.poll=null; mdBtns();
+  if(!c.n){ box.hidden=true; return }
+  const ok=(c.done||[]).length;
+  box.hidden=false;
+  box.innerHTML=`<span>${c.phase==='Cancelado'?'✖ '+esc(tr('Conversión cancelada')):ok?'✔ '+esc(tr('{0} vídeos en MP4 en Descargas › PS5 Directo › Capturas, listos para compartir.').replace('{0}',ok)):'✖ '+esc(tr('No se pudo convertir'))}</span><div class="spacer"></div>${ok?`<button class="small primary" id="mdConvOpen">${esc(tr('Abrir carpeta'))}</button>`:''}<button class="small" id="mdConvClose">${esc(tr('Cerrar'))}</button>${errs}`;
+  if($('mdConvOpen')) $('mdConvOpen').onclick=()=>api('/api/media/opendir',{});
+  $('mdConvClose').onclick=()=>{box.hidden=true};
+}
+
+// --- limpiar restos (Espacio)
+let rsd={items:[]};
+async function rsdScan(){
+  const o=$('rsdOut'); o.innerHTML=`<div class="hint">${esc(tr('Buscando restos en la consola y en el PC… (puede tardar unos segundos)'))}</div>`; $('rsdScan').disabled=true;
+  try{const r=await api('/api/residue/scan',{}); if(!r.ok) throw new Error(r.error); rsd.items=r.items; rsdPaint(r.warn||[])}catch(e){o.innerHTML=`<div class="jderr">${esc(tr(e.message))}</div>`}
+  $('rsdScan').disabled=false;
+}
+function rsdPaint(warn){
+  const o=$('rsdOut'), it=rsd.items;
+  const w=(warn||[]).map(x=>`<div class="hint">⚠ ${esc(tr(x))}</div>`).join('');
+  if(!it.length){ o.innerHTML=w+`<div class="hint">✔ ${esc(tr('No hay restos: todo limpio.'))}</div>`; return }
+  const row=(x,i)=>`<label class="rsd-row ${x.in_use?'off':''}"><input type="checkbox" data-i="${i}" ${x.checked?'checked':''} ${x.in_use?'disabled':''}><div>${esc(tr(x.label))}<div class="hint mono" data-noi18n>${esc(x.path)}</div>${x.in_use?`<div class="hint">${esc(tr('No se puede borrar ahora: {0}').replace('{0}',tr(x.in_use)))}</div>`:''}${x.note?`<div class="hint">${esc(tr(x.note))}</div>`:''}</div><span class="num">${x.size?esc(human(x.size)):'—'}</span></label>`;
+  const grp=(where,title)=>{const l=it.map((x,i)=>[x,i]).filter(([x])=>x.where===where); return l.length?`<div class="rsd-g">${esc(tr(title))}</div>`+l.map(([x,i])=>row(x,i)).join(''):''};
+  o.innerHTML=w+grp('ps5','En la consola')+grp('pc','En el PC')+`<div class="rsd-foot"><button class="danger small" id="rsdDel"></button><span class="hint" id="rsdSum"></span></div>`;
+  const upd=()=>{const sel=rsdSel(); $('rsdDel').disabled=!sel.length; $('rsdDel').textContent=tr('Borrar marcados ({0})').replace('{0}',human(sel.reduce((a,x)=>a+(x.size||0),0)))};
+  o.querySelectorAll('input[data-i]').forEach(c=>c.onchange=upd); upd();
+  $('rsdDel').onclick=async()=>{ const sel=rsdSel(); if(!sel.length) return;
+    const tot=sel.reduce((a,x)=>a+(x.size||0),0);
+    if(!confirm(tr('¿Borrar {0} elementos ({1})? No se puede deshacer.').replace('{0}',sel.length).replace('{1}',human(tot)))) return;
+    $('rsdDel').disabled=true; $('rsdSum').textContent=tr('Borrando…');
+    try{const r=await api('/api/residue/delete',{ids:sel.map(x=>x.id)}); if(!r.ok) throw new Error(r.error);
+      toast(tr('Liberados {0}').replace('{0}',human(r.freed||0))); await rsdScan();
+      if((r.errors||[]).length) $('rsdOut').insertAdjacentHTML('afterbegin',`<div class="jderr">${r.errors.map(e=>esc(tr(e))).join('<br>')}</div>`); checkConn()
+    }catch(e){$('rsdSum').textContent=tr(e.message)} };
+}
+function rsdSel(){ return [...$('rsdOut').querySelectorAll('input[data-i]:checked')].map(c=>rsd.items[+c.dataset.i]) }
+$('rsdScan').onclick=rsdScan;
 
 // ===================== biblioteca: en tu PC =====================
 let col={roots:[],items:null,poll:null};
@@ -2607,7 +2671,7 @@ async function openPayloads(highlight){
 function plPaint(highlight){
   const r=plSt, pm=r.pm||{};
   $('plPm').innerHTML=!r.reachable
-    ?`<div class="pl-box">✖ ${esc(tr('No encuentro la consola en {0}. ¿Está encendida y con el jailbreak hecho? Revisa la IP en Ajustes.').replace('{0}',r.ip||'?'))}</div>`
+    ?(r.mac_lan?`<div class="pl-box">✖ ${esc(tr(r.mac_lan))}</div>`:`<div class="pl-box">✖ ${esc(tr('No encuentro la consola en {0}. ¿Está encendida y con el jailbreak hecho? Revisa la IP en Ajustes.').replace('{0}',r.ip||'?'))}</div>`)
     :pm.present?`<div class="pl-box">✔ ${esc(tr('Payload Manager está abierto en la consola: PS5 Directo puede iniciar, instalar y reiniciar los payloads desde aquí.'))}</div>`
     :`<div class="pl-box">⚠ ${esc(tr('Payload Manager no está abierto en la consola. Ábrelo (es la aplicación «Payload Manager» del menú de inicio de la PS5) y pulsa «Volver a mirar»: así PS5 Directo puede iniciar los payloads desde aquí. Mientras tanto, cárgalos desde Payload Manager en la consola.'))}</div>`;
   $('plList').innerHTML=r.items.map(it=>{
@@ -2804,14 +2868,24 @@ function libRender(){
     if(!it.title&&it.param_err) b.push(`<span class="bdg warn" title="${esc(it.param_err)}">${esc(tr('Sin nombre'))}</span>`);
     const meta=[it.tid,it.version].filter(Boolean).join(' · ')||it.name;
     const ph=esc((it.tid||it.name||'?').slice(0,9));
-    return `<div class="gcard ${ok===false?'bad':''}" data-i="${i}">
-      <div class="gcov">${cov?`<img loading="lazy" src="${cov}" alt="" data-ph="${ph}" onerror="libImgErr(this)">`:`<div class="ph">${ph}</div>`}<span class="fmtb">${esc(fmt)}</span></div>
+    return `<div class="gcard ${ok===false?'bad':''}" data-i="${i}" data-path="${esc(it.path)}">
+      <div class="gcov">${cov?`<img loading="lazy" src="${cov}" alt="" data-ph="${ph}" onerror="libImgErr(this)">`:`<div class="ph">${ph}</div>`}<span class="fmtb">${esc(fmt)}</span>${it.size?`<span class="sizeb" title="${esc(tr('Lo que ocupa en la consola'))}">${esc(human(it.size))}</span>`:''}</div>
       <div class="gbody"><div class="gtitle" data-noi18n title="${esc(it.title||it.name)}">${esc(it.title||it.name)}</div>
-        <div class="gmeta" data-noi18n title="${esc(it.path)}">${esc(meta)}${it.size?' · '+esc(human(it.size)):''}</div>
+        <div class="gmeta" data-noi18n title="${esc(it.path)}">${esc(meta)}</div>
         <div class="badges">${b.join('')}</div>
         ${/^PPSA\d{5}$/i.test(it.tid||'')&&!it.extra&&!(it.need_fw&&parseFloat(it.need_fw)===0)?`<a class="gupd" href="https://prosperopatches.com/${esc(it.tid.toUpperCase())}" target="_blank" rel="noopener noreferrer" title="${esc(updHint())}">↗ ${esc(tr('Ver actualizaciones'))}</a>`:''}
         <div class="gact">${it.kind!=='installed'&&!it.incomplete?`<button data-g="check" title="${esc(tr('Si no abre o se cierra al arrancar: revisa la carpeta y busca registros y capturas'))}">${esc(tr('Comprobar'))}</button>`:''}${it.kind==='installed'&&!/^\/user\/app\//.test(it.path)?'':`<button data-g="open">${esc(tr('Abrir'))}</button>`}${(it.kind==='folder'||it.kind==='image')&&!it.incomplete&&/^\/(data|mnt)\//.test(it.path)?`<button data-g="dl" title="${esc(tr('Copia este título a la carpeta de PS5 Directo en tu PC (sale luego en «En tu PC»)'))}">${esc(tr('Bajar al PC'))}</button>`:''}${it.kind==='folder'&&!it.incomplete?`<button data-g="perm" title="${esc(tr('Permisos 777 (si da CE-107750-0)'))}">${esc(tr('Permisos'))}</button>`:''}${it.kind==='installed'?`<span class="hint" title="${esc(tr('Instalado por la consola: se desinstala desde su menú, no desde aquí.'))}">${esc(tr('Se gestiona desde la consola'))}</span>`:`<button class="danger" data-g="del">${esc(tr('Borrar'))}</button>`}</div></div></div>`;
   }).join('');
+  libDlMark(libDl.busy?libDl.pct:null);
+}
+function libDlMark(pct){
+  const c=libDl.path?document.querySelector(`#libGrid .gcard[data-path="${CSS.escape(libDl.path)}"]`):null;
+  document.querySelectorAll('#libGrid .gcard.dling').forEach(x=>{ if(x!==c||pct==null){x.classList.remove('dling'); x.querySelectorAll('.dlveil,.dlpct').forEach(e=>e.remove())} });
+  if(!c||pct==null) return;
+  c.classList.add('dling'); const cov=c.querySelector('.gcov');
+  let v=cov.querySelector('.dlveil'), t=cov.querySelector('.dlpct');
+  if(!v){ v=document.createElement('div'); v.className='dlveil'; cov.appendChild(v); t=document.createElement('div'); t.className='dlpct'; cov.appendChild(t) }
+  v.style.setProperty('--p',pct+'%'); t.textContent=pct+'%';
 }
 function updHint(){
   const mine=(state.settings||{}).console_fw;
@@ -2824,7 +2898,7 @@ $('libGrid').addEventListener('click',async e=>{
   const a=btn.dataset.g;
   if(a==='check'){openLaunch(it); return}
   if(a==='dl'){ if(!confirm(tr('¿Bajar al PC?')+'\n\n'+(it.title?it.title+' — ':'')+it.path+(it.size?' ('+human(it.size)+')':''))) return;
-    try{const r=await api('/api/lib/download',{paths:[it.path]}); if(!r.ok) throw new Error(r.error); libDlWatch(it.title||it.name)}catch(err){toast(err.message)} return}
+    try{const r=await api('/api/lib/download',{paths:[it.path]}); if(!r.ok) throw new Error(r.error); libDl.path=it.path; libDl.spd=null; libDl.last=null; libDlWatch(it.title||it.name)}catch(err){toast(err.message)} return}
   if(a==='open'){showTab('Files'); fmGo(it.kind==='folder'?it.path:parentOf(it.path)); return}
   if(a==='perm'){try{const r=await api('/api/fm/chmod',{paths:[it.path]}); if(!r.ok) throw new Error(r.error); toast(tr('Poniendo permisos 777…'))}catch(err){toast(err.message)} return}
   if(a==='del'){
@@ -2836,17 +2910,23 @@ $('libGrid').addEventListener('click',async e=>{
   }
 });
 // descarga al PC desde la Biblioteca: progreso aquí mismo (es la misma operación del explorador)
-let libDl={t:null,name:''};
+let libDl={t:null,name:'',path:'',busy:false,pct:0,spd:null,last:null};
 function libDlWatch(name){ libDl.name=name||libDl.name; clearInterval(libDl.t); libDl.t=setInterval(libDlPoll,1000); libDlPoll(); }
 async function libDlPoll(){
   let o; try{o=(await api('/api/fm/op',{})).op}catch(e){return}
   const box=$('libDl');
-  if(o.op!=='download'){ clearInterval(libDl.t); box.hidden=true; return }
+  if(o.op!=='download'){ clearInterval(libDl.t); libDl.busy=false; libDlMark(null); box.hidden=true; return }
   box.hidden=false;
-  if(o.busy){ const pct=o.bytes_total?Math.floor(o.bytes_done*100/o.bytes_total):0;
-    box.innerHTML=`<span>⬇ ${esc(tr('Bajando al PC:'))} <b data-noi18n>${esc(libDl.name)}</b> · ${pct}% (${human(o.bytes_done||0)} ${esc(tr('de'))} ${human(o.bytes_total||0)})</span><div class="bar"><i style="width:${pct}%"></i></div><button class="small" id="libDlCancel">${esc(tr('Cancelar'))}</button>`;
-    $('libDlCancel').onclick=()=>api('/api/fm/cancel',{}).catch(()=>{}); return }
-  clearInterval(libDl.t);
+  if(o.busy){
+    const done=o.bytes_done||0, tot=o.bytes_total||0, pct=tot?Math.min(100,Math.floor(done*100/tot)):0, now=Date.now()/1000;
+    // velocidad media de los últimos segundos (suavizada para que no baile)
+    if(libDl.last&&now>libDl.last.t){ const v=Math.max(0,(done-libDl.last.b)/(now-libDl.last.t)); libDl.spd=libDl.spd==null?v:libDl.spd*0.7+v*0.3 }
+    libDl.last={t:now,b:done}; libDl.busy=true; libDl.pct=pct;
+    const rest=libDl.spd>1?(tot-done)/libDl.spd:NaN;
+    box.innerHTML=`<span>⬇ ${esc(tr('Bajando al PC:'))} <b data-noi18n>${esc(libDl.name)}</b> · ${pct}% · ${human(done)} ${esc(tr('de'))} ${human(tot)}${libDl.spd>1?' · <b>'+human(libDl.spd)+'/s</b>':''}${isFinite(rest)&&rest>0?' · '+etaHtml(rest):''}</span><div class="bar"><i style="width:${pct}%"></i></div><button class="small" id="libDlCancel">${esc(tr('Cancelar'))}</button>`;
+    $('libDlCancel').onclick=()=>api('/api/fm/cancel',{}).catch(()=>{});
+    libDlMark(pct); return }
+  clearInterval(libDl.t); libDl.busy=false; libDlMark(null);
   box.innerHTML=o.error?`<span>✖ ${esc(tr(o.error))}</span><div class="spacer"></div><button class="small" id="libDlOk">${esc(tr('Cerrar'))}</button>`
     :`<span>✔ ${esc(tr('Bajado al PC:'))} <b data-noi18n>${esc(libDl.name)}</b>. ${esc(tr('Lo tienes en «En tu PC».'))}</span><div class="spacer"></div><button class="small" id="libDlFolder">${esc(tr('Abrir carpeta'))}</button><button class="small" id="libDlOk">${esc(tr('Cerrar'))}</button>`;
   if($('libDlFolder')) $('libDlFolder').onclick=()=>api('/api/col/openlibdir',{}).catch(()=>{});

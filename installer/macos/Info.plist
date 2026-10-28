@@ -13,6 +13,7 @@
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
   <key>LSMinimumSystemVersion</key><string>11.0</string>
   <key>NSHighResolutionCapable</key><true/>
+  <key>NSLocalNetworkUsageDescription</key><string>PS5 Directo se conecta a tu PS5 por la red local (FTP, BFpilot y Payload Manager). / PS5 Directo connects to your PS5 over the local network (FTP, BFpilot and Payload Manager).</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
 </dict>
 </plist>

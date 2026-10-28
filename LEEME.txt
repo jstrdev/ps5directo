@@ -323,6 +323,32 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   del cortafuegos de Windows.
 
 
+NOVEDADES 1.22.1
+- Mac: la app pide el permiso de «Red local» de macOS. Sin él no puede
+  hablar con la PS5 aunque esté encendida; ahora, si macOS la bloquea,
+  lo dice y explica dónde activarlo (Ajustes del Sistema > Privacidad y
+  seguridad > Red local).
+
+NOVEDADES 1.22.0
+- Capturas: botón «Convertir a MP4». Marca los vídeos y los deja en MP4
+  (H.264) en Descargas > PS5 Directo > Capturas, listos para Telegram,
+  WhatsApp o cualquier web. Si se grabaron en HDR, los pasa a colores
+  normales para que no se vean lavados. Usa FFmpeg: en Windows se instala
+  solo la primera vez (33 MB, pide permiso antes); en Linux y Mac usa el
+  del sistema (sudo apt install ffmpeg / brew install ffmpeg).
+- Espacio: nueva sección «Limpiar restos». Busca envíos y bajadas que se
+  quedaron a medias, descompresiones cortadas y carpetas temporales, en la
+  consola y en el PC, con lo que ocupa cada cosa. Lo que todavía usa una
+  transferencia de la cola sale bloqueado y las carpetas dudosas salen
+  sin marcar. No se borra nada sin confirmar.
+
+NOVEDADES 1.21.2
+- «Bajar al PC» en la Biblioteca: la barra de arriba ahora dice a qué
+  velocidad baja y cuánto queda.
+- La carátula del título que se está bajando se ve apagada y se va
+  llenando de color de abajo arriba, del 0 al 100 %, con el porcentaje.
+- Cada carátula de la Biblioteca lleva un chip pequeño con lo que ocupa.
+
 NOVEDADES 1.21.1
 - Biblioteca: botón «Bajar al PC» en cada título (carpeta o imagen), con
   su progreso ahí mismo. Llega a la carpeta de PS5 Directo en el PC

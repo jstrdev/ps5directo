@@ -338,6 +338,29 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+1.22.1 - Mac: the app asks for macOS "Local Network" permission. Without
+        it, it can't talk to the PS5 even when it's on; now, if macOS
+        blocks it, it says so and explains where to turn it on (System
+        Settings > Privacy & Security > Local Network).
+
+1.22.0 - Captures: "Convert to MP4" button. Tick the videos and they're
+        saved as MP4 (H.264) in Downloads > PS5 Directo > Capturas, ready
+        for Telegram, WhatsApp or any website. If they were recorded in
+        HDR, they get normal colours so they don't look washed out. Uses
+        FFmpeg: on Windows it's installed the first time only (33 MB, it
+        asks first); on Linux and Mac it uses the system one.
+      - Space: new "Clean up leftovers" section. Finds half-finished
+        sends and downloads, cut-off extractions and temporary folders on
+        the console and on the PC, with the size of each. Anything a
+        queued transfer still uses is locked and doubtful folders come
+        unticked. Nothing is deleted without confirmation.
+
+1.21.2 - Library "Download to PC": the bar at the top now shows the speed
+        and the time left.
+      - The cover of the title being downloaded turns dim and fills with
+        colour from bottom to top, 0 to 100 %, with the percentage.
+      - Each Library cover has a small chip with its size.
+
 1.21.1 - Library: "Download to PC" button on each title (folder or image),
         with its progress right there. It goes to the PS5 Directo folder
         on the PC (by default Downloads > PS5 Directo > Biblioteca, you
