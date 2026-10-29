@@ -323,6 +323,108 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   del cortafuegos de Windows.
 
 
+NOVEDADES 1.26.0
+- «🔎 Buscar mi PS5»: encuentra la consola en tu red (en Ajustes, junto a
+  la IP, y en el aviso de «No encuentro la PS5»), por si cambia de IP.
+- Biblioteca › Todo: cada título una sola vez, esté en la consola, en tu
+  PC o en los dos, con sus copias, actualizaciones y DLC juntos, y con
+  «Enviar a la consola» o «Bajar al PC» según dónde falte.
+- Biblioteca › En tu PC: «Enviar todo lo que falta» añade de golpe a la
+  cola todo lo de tu PC que no está en la consola.
+- «Abierto hace…» y tiempo de uso en cada tarjeta de la Biblioteca (del
+  registro de ShadowMountPlus, desde que PS5 Directo lo mira), y orden
+  «Abierto hace poco».
+- Botón «Partidas» en cada título: copia en el PC solo sus partidas (se
+  restauran desde Copia de seguridad).
+- Aviso de poco espacio en la consola (menos de 20 GB o del 10 %), con
+  «Hacer sitio».
+- Al pie de la página: «Informar de un fallo», la guía y GitHub, siempre
+  a la vista.
+
+NOVEDADES 1.25.2
+- La extensión del navegador se actualiza sola: PS5 Directo la deja en una
+  carpeta fija (en tu usuario, .ps5directo\extension) que no cambia aunque
+  lo actualices o lo muevas, y la extensión se recarga sola cuando hay una
+  versión nueva. Hay que cargarla desde esa carpeta una vez (Ajustes →
+  «Abrir la carpeta de la extensión»). Si el navegador la tiene cargada de
+  otra carpeta, la extensión y PS5 Directo lo avisan.
+
+NOVEDADES 1.25.1
+- «¿A dónde va?» y «¿Qué hago en tu PC?» son ahora tarjetas con icono,
+  como las de los formatos. Al elegir «convertir» en «Solo a mi PC» se
+  abren los formatos para escoger uno.
+
+NOVEDADES 1.25.0
+- Informe de fallo con formulario (Ajustes → «Crear informe de fallo», o
+  «Guardar informe» en el diagnóstico de una transferencia): eliges qué
+  estabas haciendo, cuentas qué salió mal y los pasos, y crea el .zip con
+  eso dentro. Después «Abrir aviso en GitHub» lo abre ya rellenado (solo
+  hay que arrastrar el .zip), o «Copiar texto» para el foro o Telegram.
+- Si una transferencia falla porque se pierde la consola (reposo,
+  reinicio, payload caído), se reanuda sola cuando la consola vuelve a
+  contestar, hasta 5 veces. La tarjeta lo indica.
+- Si pegas o sueltas un payload (.elf), avisa de que copiarlo no lo
+  inicia y ofrece iniciarlo en la consola con Payload Manager.
+
+NOVEDADES 1.24.0
+- Extensión del navegador (versión 1.2): clic derecho en un enlace o en un
+  texto seleccionado → «Enviar a PS5 Directo», a la caja de enlaces o
+  directo a la cola (a la PS5 o solo a tu PC). El icono enseña el
+  progreso de la cola y avisa cuando algo termina o falla, y su ventanita
+  tiene una mini cola con pausar, reanudar y cancelar y los puntos de FTP
+  y BFpilot. Si ya la tenías: en chrome://extensions pulsa ↻ en ella.
+- Móvil: en Capturas, «📲 Guardar en el móvil» guarda las capturas y los
+  clips en el teléfono (los WEBM se pasan antes a MP4 en el PC), para
+  compartirlos desde la galería. Pestañas abajo, más fáciles de pulsar, y
+  las capturas de dos en dos. Se puede poner como app en la pantalla de
+  inicio y se abre sin volver a escanear el QR.
+
+NOVEDADES 1.23.3
+- Aviso grande arriba cuando falta el FTP o BFpilot, en vez de solo los
+  puntos en rojo: dice qué pasa y qué hacer. Distingue si la consola está
+  apagada o en otra IP, si está encendida pero sin el jailbreak (al
+  reiniciarla), si falta abrir Payload Manager, si hay que instalar o
+  reiniciar un payload, y tiene un botón para arreglarlo.
+- Si Payload Manager se abre más tarde (por ejemplo, después de reiniciar
+  la consola y volver a hacer el jailbreak), PS5 Directo inicia solo
+  ftpsrv y BFpilot sin tener que cerrarlo y abrirlo.
+- Sin conexión ya no se queda el «Libre en PS5» antiguo.
+
+NOVEDADES 1.23.2
+- Fuera el botón «Varios enlaces a la vez»: lo que hacía va ahora en la
+  caja de siempre. Pega los enlaces uno por línea o dentro de cualquier
+  texto (un mensaje copiado) y al pulsar «Añadir a la cola» los comprueba:
+  si un enlace no funciona o falta una parte, te lo dice y eliges añadir
+  solo los que están bien, todo igualmente o cancelar. Si todo está bien,
+  se añade como siempre, sin pasos de más.
+- Comprobar arranque: avisa en rojo cuando un título está en LZ4 pero
+  alguno de sus ejecutables no usa AMPR (pasa en colecciones): con LZ4 se
+  cierra al abrirlo. Lee también los cierres que registra ShadowMountPlus
+  (SIGBUS, «general protection fault») y explica la causa. Los códigos
+  SIGBUS y SIGSEGV ya se pueden buscar en la ventana.
+
+NOVEDADES 1.23.1
+- Nuevo selector «¿A dónde va?» en Transferencias: «A la PS5» (como
+  siempre) o «Solo a mi PC». Con «Solo a mi PC» eliges qué hacer: solo
+  bajar los archivos, bajar y descomprimir (une las partes y usa la
+  contraseña), o bajar, descomprimir y convertir al formato que elijas
+  (.exfat, .ffpkg, LZ4…). No se manda nada a la consola.
+- «Revisar enlaces» ahora se llama «Varios enlaces a la vez», que se
+  entiende mejor: pegas muchos enlaces de golpe y los separa por paquetes.
+
+NOVEDADES 1.23.0
+- «📦 Revisar enlaces» (en Transferencias, al lado de «Añadir a la cola»):
+  pega una lista o cualquier texto con enlaces (un mensaje, una página
+  copiada…). Saca todos los enlaces, comprueba que estén en línea y los
+  agrupa en paquetes, con todas las partes de lo mismo juntas. Avisa de
+  los enlaces caídos y de las partes que faltan, y eliges qué paquetes
+  añadir a la cola.
+- Nueva opción «Solo bajar al PC (no se envía)» en «Dónde descomprimir»:
+  baja todo, une las partes y lo descomprime en una carpeta del PC (por
+  defecto Descargas > PS5 Directo > Biblioteca, se puede cambiar), sin
+  tocar la consola. Al terminar borra las partes bajadas y sale en
+  Biblioteca > En tu PC para enviarlo cuando quieras.
+
 NOVEDADES 1.22.1
 - Mac: la app pide el permiso de «Red local» de macOS. Sin él no puede
   hablar con la PS5 aunque esté encendida; ahora, si macOS la bloquea,

@@ -338,6 +338,100 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+1.26.0 - "🔎 Find my PS5": finds the console on your network (in Settings,
+        next to the IP, and in the "I can't find the PS5" notice).
+      - Library › All: each title once, whether it's on the console, on
+        your PC or both, with its copies, updates and DLC together, and
+        "Send to the console" or "Download to PC" depending on what's
+        missing.
+      - Library › On your PC: "Send everything missing" queues everything on
+        your PC that isn't on the console.
+      - "Opened … ago" and time used on each Library card (from the
+        ShadowMountPlus log, since PS5 Directo started watching), and a
+        "Recently opened" sort.
+      - "Saves" button on each title: copies only its saves to the PC
+        (restored from Backup).
+      - Low-space notice for the console (under 20 GB or 10 %), with "Make
+        room".
+      - At the bottom of the page: "Report a problem", the guide and GitHub,
+        always visible.
+
+1.25.2 - The browser extension updates itself: PS5 Directo keeps it in a
+        fixed folder (in your user folder, .ps5directo\extension) that
+        doesn't change when you update or move it, and the extension
+        reloads itself when there's a new version. Load it from that
+        folder once (Settings → "Open the extension folder"). If the browser
+        has it loaded from another folder, the extension and PS5 Directo
+        say so.
+
+1.25.1 - "Where does it go?" and "What should I do on your PC?" are now
+        cards with icons, like the format ones. Choosing "convert" under
+        "Only to my PC" opens the formats to pick one.
+
+1.25.0 - Bug report with a form (Settings → "Create bug report", or "Save
+        report" in a transfer's diagnosis): pick what you were doing, say
+        what went wrong and the steps, and it creates the .zip with that
+        inside. Then "Open issue on GitHub" opens it pre-filled (just drag
+        the .zip in), or "Copy text" for the forum or Telegram.
+      - If a transfer fails because the console was lost (rest mode,
+        restart, payload crashed), it resumes by itself when the console
+        answers again, up to 5 times. The card says so.
+      - If you paste or drop a payload (.elf), it warns that copying it
+        doesn't start it and offers to start it on the console with
+        Payload Manager.
+
+1.24.0 - Browser extension (version 1.2): right-click a link or selected text
+        → "Send to PS5 Directo", to the link box or straight to the queue (to
+        the PS5 or only to your PC). The icon shows the queue progress and
+        notifies you when something finishes or fails, and its popup has a
+        mini queue with pause, resume and cancel plus the FTP and BFpilot
+        dots. If you already had it: click ↻ on it in chrome://extensions.
+      - Phone: in Captures, "📲 Save to phone" saves screenshots and clips
+        to the phone (WEBM clips are converted to MP4 on the PC first), to
+        share them from the gallery. Tabs at the bottom, easier to tap, and
+        captures two per row. It can be added to the home screen as an app
+        and opens without scanning the QR again.
+
+1.23.3 - A big notice at the top when FTP or BFpilot is missing, instead of
+        just red dots: it says what's wrong and what to do. It tells apart
+        a console that's off or on another IP, one that's on but without
+        the jailbreak (after a restart), Payload Manager not open, or a
+        payload to install or restart, with a button to fix it.
+      - If Payload Manager is opened later (for example after restarting
+        the console and jailbreaking again), PS5 Directo starts ftpsrv and
+        BFpilot by itself without having to reopen it.
+
+1.23.2 - The "Several links at once" button is gone: what it did is now in
+        the usual box. Paste the links one per line or inside any text and,
+        when you click "Add to queue", it checks them: if a link doesn't
+        work or a part is missing, it tells you and you choose to add only
+        the good ones, everything anyway or cancel. If all is fine it's
+        added as always, with no extra steps.
+      - Launch check: flags in red when a title is in LZ4 but one of its
+        executables doesn't use AMPR (happens with collections): with LZ4
+        it closes when opened. It also reads the crashes ShadowMountPlus
+        logs (SIGBUS, "general protection fault") and explains the cause.
+
+1.23.1 - New "Where does it go?" switch in Transfers: "To the PS5" (as
+        always) or "Only to my PC". With "Only to my PC" you choose what to
+        do: just download the files, download and extract (joins the parts
+        and uses the password), or download, extract and convert to the
+        format you pick (.exfat, .ffpkg, LZ4…). Nothing is sent to the
+        console.
+      - "Review links" is now called "Several links at once", which is
+        clearer: paste many links at once and it splits them into packages.
+
+1.23.0 - "📦 Review links" (in Transfers, next to "Add to queue"): paste a
+        list or any text with links (a message, a copied page…). It pulls
+        out every link, checks they're online and groups them into
+        packages, all the parts of the same thing together. It flags dead
+        links and missing parts, and you choose which packages to queue.
+      - New "Download to PC only (not sent)" option in "Where to extract":
+        it downloads everything, joins the parts and extracts it into a PC
+        folder (Downloads > PS5 Directo > Biblioteca by default, can be
+        changed), without touching the console. When it's done it deletes
+        the downloaded parts and it shows up in Library > On your PC.
+
 1.22.1 - Mac: the app asks for macOS "Local Network" permission. Without
         it, it can't talk to the PS5 even when it's on; now, if macOS
         blocks it, it says so and explains where to turn it on (System

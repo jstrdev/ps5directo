@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "PS5 Directo - Capturar enlaces",
-  "version": "1.1.0",
-  "description": "Cuando descargas un .rar/.7z/.zip/.pkg, manda el enlace (con la sesion del navegador) a PS5 Directo en vez de bajarlo al PC.",
+  "name": "PS5 Directo",
+  "version": "1.2.1",
+  "description": "Manda enlaces a PS5 Directo: al descargar un .rar/.7z/.zip/.pkg, o con clic derecho en un enlace o un texto seleccionado. Muestra el progreso de la cola.",
   "permissions": [
     "downloads",
     "storage",
     "notifications",
-    "cookies"
+    "cookies",
+    "contextMenus",
+    "scripting",
+    "alarms"
   ],
   "host_permissions": [
     "http://127.0.0.1/*",

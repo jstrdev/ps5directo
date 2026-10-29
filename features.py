@@ -463,6 +463,62 @@ _PROCPARAM, _MODPARAM = 0x61000001, 0x61000002
 _PROC_MAGIC, _MOD_MAGIC = 0x4942524F, 0x3C13F4BF
 
 
+_DYNLIBDATA = 0x61000000
+
+
+def exe_uses_ampr(read_range):
+    """¿El ejecutable importa libSceAmpr (lee sus datos con AMPR)? True/False, o None si no se puede leer
+    (cifrado o formato raro). Lo que importa un ELF de PS4/PS5 esta en su segmento SCE_DYNLIBDATA."""
+    import struct
+    head = read_range(0, 0x10000)
+    if len(head) < 0x40:
+        return None
+    u16 = lambda a: struct.unpack_from("<H", head, a)[0] if a + 2 <= len(head) else None  # noqa: E731
+    u32 = lambda a: struct.unpack_from("<I", head, a)[0] if a + 4 <= len(head) else None  # noqa: E731
+    u64 = lambda a: struct.unpack_from("<Q", head, a)[0] if a + 8 <= len(head) else None  # noqa: E731
+    magic = head[:4]
+    if magic in (_SELF_PS5, _SELF_PS4):
+        nseg = u16(0x18) or 0
+        elf, segments = 0x20 + nseg * 0x20, nseg
+    elif magic == _ELF:
+        elf, segments = 0, 0
+    else:
+        return None
+    if head[elf:elf + 4] != _ELF:
+        return None
+    phoff, phentsize, phnum = u64(elf + 0x20), u16(elf + 0x36), u16(elf + 0x38)
+    if None in (phoff, phentsize, phnum):
+        return None
+    hit = None
+    for i in range(phnum):
+        ph = elf + phoff + i * phentsize
+        t, off, sz = u32(ph), u64(ph + 8), u64(ph + 0x20)
+        if None in (t, off, sz):
+            return None
+        if t == _DYNLIBDATA:
+            hit = (i, off, sz)
+    if not hit or not hit[2]:
+        return None
+    seg, at, size = hit
+    if segments:          # fSELF: buscar donde esta ese segmento dentro del archivo (sin cifrar)
+        at = None
+        for k in range(segments):
+            e = 0x20 + k * 0x20
+            props, s_off, s_size = u64(e), u64(e + 8), u64(e + 0x10)
+            if props is None:
+                continue
+            plain = props & ((1 << 1) | (1 << 3)) == 0
+            if plain and (props >> 20) & 0xFFFF == seg:
+                at, size = s_off, s_size
+                break
+        if at is None:
+            return None
+    data = read_range(at, min(size, 32 * 1024 * 1024))
+    if not data:
+        return None
+    return b"libSceAmpr" in data
+
+
 def exe_firmware(read_range):
     """Firmware minimo que pide un ejecutable (el SDK de su process/module param), como '7.00'.
     read_range(offset, n) -> bytes. Mismo formato que leen los backports y PS5 Dump Forge.

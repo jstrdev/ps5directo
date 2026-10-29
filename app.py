@@ -24,7 +24,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "1.22.1"
+VERSION = "1.26.0"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -151,12 +151,14 @@ def save_settings():
 COMP_LEVELS = ("fast", "balanced", "smallest", "stored")
 
 
-def new_job(lines, password, dest, title=None, where=None, raw=False, fmt=None, comp=None):
+def new_job(lines, password, dest, title=None, where=None, raw=False, fmt=None, comp=None, pcdir="", keep_steps=""):
     return {
+        "pcdir": pcdir or "",
+        "keep_steps": keep_steps if keep_steps in ("dl", "extract", "convert") else "",
         "raw": bool(raw),
         "fmt": fmt if fmt in F.FORGE_FORMATS else "",
         "comp": comp if comp in COMP_LEVELS else "",
-        "where": where if where in ("ps5", "pc") else "",
+        "where": where if where in ("ps5", "pc", "keep") else "",
         "id": secrets.token_hex(4),
         "created": time.time(),
         "title": title or "",
@@ -716,12 +718,12 @@ def record_history(job):
                 "status": job.get("status"), "size": job.get("total", -1),
                 "result": job.get("result") or [], "error": job.get("error") or "",
                 "secs": int(time.time() - float(job.get("started") or job.get("created") or time.time())),
-                "where": "raw" if job.get("raw") else ("pc" if (job.get("info") or {}).get("mode") == "pcx" else "ps5"),
+                "where": "raw" if job.get("raw") else "keep" if job.get("where") == "keep" else ("pc" if (job.get("info") or {}).get("mode") == "pcx" else "ps5"),
                 "dest": job.get("dest") or "",
                 # para "Descargar de nuevo" desde el historial
                 "redo": {"lines": list(job.get("orig_lines") or job.get("lines") or []), "where": job.get("where") or "",
                          "raw": bool(job.get("raw")), "fmt": job.get("fmt") or "", "comp": job.get("comp") or "",
-                         "fmt_set": bool(job.get("fmt_set"))},
+                         "fmt_set": bool(job.get("fmt_set")), "pcdir": job.get("pcdir") or "", "keep_steps": job.get("keep_steps") or ""},
             })
             _save_json(HISTORY_FILE, hist[-500:])
         if job.get("status") == "hecho":
@@ -1542,8 +1544,9 @@ def fm_api(p, b):
                  title=_job_name(j))
         return d
     if p == "/api/report/make":
-        fp = make_report(str(b.get("id") or "") or None)
-        return {"path": fp, "name": os.path.basename(fp)}
+        fp = make_report(str(b.get("id") or "") or None, b.get("form"))
+        return {"path": fp, "name": os.path.basename(fp), "repo": update_repo() or DEFAULT_REPO,
+                "os": __import__("platform").platform(terse=True), "fw": SETTINGS.get("console_fw") or ""}
     if p == "/api/report/open":
         os.makedirs(report_dir(), exist_ok=True)
         _open_quiet(report_dir())
@@ -1617,6 +1620,9 @@ def fm_api(p, b):
             raise E.PipeError("Elige algún vídeo")
         media_convert(paths)
         return {}
+    if p == "/api/media/mp4ready":
+        return {"ready": {x: bool(media_mp4_path(x) and os.path.isfile(media_mp4_path(x)))
+                          for x in [str(v) for v in (b.get("paths") or [])][:500]}}
     if p == "/api/media/convstate":
         with LOCK:
             return {"conv": json.loads(json.dumps(CONV))}
@@ -1628,6 +1634,21 @@ def fm_api(p, b):
         os.makedirs(d, exist_ok=True)
         _open_quiet(d)
         return {"dir": d}
+    if p == "/api/grab/start":
+        with LOCK:
+            if GRAB["busy"]:
+                raise E.PipeError("Ya estoy revisando enlaces")
+            GRAB.update(busy=True, done=0, total=0, packages=[], error="")
+        threading.Thread(target=grab_scan, args=(str(b.get("text") or "")[:500000],), daemon=True).start()
+        return {}
+    if p == "/api/grab/state":
+        with LOCK:
+            return {"grab": json.loads(json.dumps(GRAB))}
+    if p == "/api/discover":
+        return discover_ps5()
+    if p == "/api/played":
+        with PLAYED_LOCK:
+            return {"titles": played_load().get("titles") or {}}
     if p == "/api/residue/scan":
         return residue_scan()
     if p == "/api/residue/delete":
@@ -1648,6 +1669,22 @@ def fm_api(p, b):
         if BK["busy"]:
             raise E.PipeError("Ya hay una copia en marcha")
         secs = [x for x in (b.get("sections") or []) if x in ("saves", "config", "appdb", "list")] or None
+        tids = [str(x).upper() for x in (b.get("tids") or []) if re.match(r"^[A-Za-z]{4}\d{5}$", str(x))]
+        if tids:
+            def has_saves(f):
+                for r in _save_roots(f):
+                    try:
+                        if any(v["type"] == "dir" and n.upper()[:9] in tids for n, v in E.ftp_listdir(f, r)):
+                            return True
+                    except ftplib.all_errors:
+                        pass
+                return False
+            if not E.Ftp(cfg_snapshot()).call(has_saves):
+                raise E.PipeError("No encuentro partidas de %s en la consola (¿no lo has jugado todavía?)"
+                                  % ", ".join(tids))
+            threading.Thread(target=backup_run, args=(["saves"], "partidas-" + "-".join(tids[:3]), tids),
+                             daemon=True).start()
+            return {"tids": tids}
         threading.Thread(target=backup_run, args=(secs,), daemon=True).start()
         return {}
     if p == "/api/bk/cancel":
@@ -1735,7 +1772,8 @@ def fm_api(p, b):
         if not r or not r.get("lines"):
             raise E.PipeError("No sé qué enlaces tenía esa transferencia (es de una versión anterior)")
         nj = new_job(r["lines"], "", h.get("dest") or SETTINGS["dest"], title=h.get("title"), where=r.get("where"),
-                     raw=r.get("raw"), fmt=r.get("fmt"), comp=r.get("comp"))
+                     raw=r.get("raw"), fmt=r.get("fmt"), comp=r.get("comp"), pcdir=r.get("pcdir") or "",
+                     keep_steps=r.get("keep_steps") or "")
         nj["fmt_set"] = r.get("fmt_set", False)
         with WAKE:
             JOBS.append(nj)
@@ -2077,6 +2115,53 @@ def _clean_job(j):
     return d
 
 
+EXT_DIR = os.path.join(DATA_DIR, "extension")      # copia fija de la extension: el navegador la carga desde aqui
+EXT_SEEN = {"version": None, "t": 0}
+
+
+def _ext_version(folder):
+    try:
+        with open(os.path.join(folder, "manifest.json"), encoding="utf-8") as f:
+            return str(json.load(f).get("version") or "")
+    except Exception:
+        return ""
+
+
+def sync_extension():
+    """Copia la extension a una carpeta que no cambia (~/.ps5directo/extension). Asi, aunque PS5 Directo se
+    mueva o se actualice, el navegador siempre la carga del mismo sitio y basta recargarla (lo hace ella sola)."""
+    import shutil
+    src = os.path.join(HERE, "extension")
+    if not os.path.isdir(src):
+        return
+    if _ext_version(src) and _ext_version(src) == _ext_version(EXT_DIR):
+        return
+    try:
+        os.makedirs(EXT_DIR, exist_ok=True)
+        for n in os.listdir(src):
+            if os.path.isfile(os.path.join(src, n)):
+                shutil.copy2(os.path.join(src, n), os.path.join(EXT_DIR, n))
+    except Exception as e:
+        print("No pude copiar la extension:", e)
+
+
+def _vt(v):
+    return tuple(int(x) for x in re.findall(r"\d+", str(v or ""))[:3])
+
+
+def job_pct(j):
+    """Porcentaje de un trabajo para la extension (la fase que este haciendo)."""
+    st = j.get("status")
+    if st == "hecho":
+        return 100
+    if st == "extrayendo":
+        return int(j.get("extract_pct") or 0)
+    if st == "convirtiendo":
+        return int(j.get("conv_pct") or 0)
+    tot, sent = j.get("total") or 0, j.get("sent") or 0
+    return int(min(100, sent * 100 / tot)) if tot > 0 else 0
+
+
 def _job_name(j):
     if j.get("title"):
         return j["title"]
@@ -2088,7 +2173,7 @@ def report_dir():
     return os.path.join(downloads_dir(), "PS5 Directo", "Informes")
 
 
-def make_report(job_id=None):
+def make_report(job_id=None, form=None):
     """Un .zip para pasar a quien te ayuda: registro, ajustes (sin contraseñas), versiones y estado."""
     import zipfile
     import platform
@@ -2113,8 +2198,16 @@ def make_report(job_id=None):
     except Exception:
         pass
     summary = []
+    form = form if isinstance(form, dict) else {}
+    told = ""
+    if any(str(form.get(k) or "").strip() for k in ("doing", "what", "steps")):
+        told = ("Qué estaba haciendo: %s\n\nQué pasó:\n%s\n\nPasos para que vuelva a pasar:\n%s\n"
+                % (str(form.get("doing") or "-")[:200], str(form.get("what") or "-")[:5000],
+                   str(form.get("steps") or "-")[:5000]))
     with zipfile.ZipFile(fp, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("version_y_conexion.json", json.dumps(info, ensure_ascii=False, indent=1))
+        if told:
+            z.writestr("lo_que_paso.txt", told)
         z.writestr("ajustes_sin_contrasenas.json", json.dumps(_clean_settings(), ensure_ascii=False, indent=1))
         for j in jobs:
             name = re.sub(r"[^\w-]+", "_", (j.get("title") or j["id"]))[:40] + "_" + j["id"]
@@ -2137,8 +2230,8 @@ def make_report(job_id=None):
                        "".join(re.sub(r"([#?&]t=)[\w-]+", r"\1(oculto)", ln) for ln in lines))
         except OSError:
             pass
-        z.writestr("LEEME.txt", "Informe de PS5 Directo %s (%s)\n\n%s\n\nNo lleva contraseñas. Pásaselo a quien te "
-                   "ayude.\n" % (VERSION, info["date"], "\n".join(summary)))
+        z.writestr("LEEME.txt", "Informe de PS5 Directo %s (%s)\n\n%s%s\n\nNo lleva contraseñas. Pásaselo a quien te "
+                   "ayude.\n" % (VERSION, info["date"], (told + "\n") if told else "", "\n".join(summary)))
     return fp
 
 
@@ -2147,6 +2240,10 @@ def make_report(job_id=None):
 # ---------------------------------------------------------------------------
 
 LAUNCH_CODES = {
+    "SIGBUS": "La aplicación leyó memoria que no podía. Si está en LZ4, casi seguro que ese ejecutable no usa AMPR y "
+              "no es compatible: vuelve a ponerla sin LZ4 (carpeta o .exfat) o usa «Imagen comprimida .ffpfsc».",
+    "SIGSEGV": "La aplicación se ha cerrado por un fallo de memoria. Si está en LZ4, prueba la versión sin convertir. "
+               "Si no, puede faltar un backport para tu firmware o estar dañada: vuelve a enviarla.",
     "CE-107750-0": "La consola no puede abrir los archivos: suele ser un problema de permisos. Pulsa «Permisos» "
                    "en la tarjeta (pone 777) y prueba otra vez.",
     "CE-108255-1": "La aplicación se ha cerrado por un error al arrancar. Si es LZ4, prueba la versión sin convertir "
@@ -2299,6 +2396,32 @@ def launch_check(path, minutes=30):
                 else:
                     add("warn", "LZ4: no encuentro el emulador AMPR (libSceAmpr) en fakelib.",
                         "Sin él los datos empaquetados no se pueden leer. Vuelve a convertirla.")
+                info["lz4"] = True
+                # LZ4 solo funciona si cada ejecutable lee sus datos con AMPR (las colecciones llevan varios)
+                exes = [n for n in ls if not ls[n].get("type") == "dir" and
+                        (n.lower() == "eboot.bin" or n.lower().endswith((".elf", ".self")))]
+                no_ampr = []
+                for n in sorted(exes, key=lambda x: x.lower() != "eboot.bin")[:8]:
+                    try:
+                        r = F.exe_uses_ampr(lambda off, k, n=n: F.ftp_read(f, path + "/" + n, off, k))
+                    except Exception:
+                        r = None
+                    if r is False:
+                        no_ampr.append(n)
+                tid0 = (facts.get("tid") or E.title_id(posixpath.basename(path)) or "").upper()
+                forge_no = bool((lib_load()["titles"].get(tid0) or {}).get("no_ampr"))
+                if no_ampr or forge_no:
+                    who = ", ".join(no_ampr) if no_ampr else "el título"
+                    verb = "no leen" if len(no_ampr) > 1 else "no lee"
+                    add("bad", "LZ4 no sirve con este título: %s %s sus datos con AMPR, así que con LZ4 recibe "
+                        "los datos comprimidos sin descomprimir y se cierra (suele salir SIGBUS o «general "
+                        "protection fault»)." % (who, verb),
+                        "Vuelve a ponerlo sin LZ4 (carpeta o .exfat). Para ahorrar espacio con este título, usa "
+                        "«Imagen comprimida .ffpfsc», que no depende de AMPR.")
+                    info["lz4_bad"] = True
+                elif len(exes) > 1:
+                    add("info", "Tiene varios ejecutables (%s): en las colecciones, si uno no usa AMPR se cierra "
+                        "al elegirlo aunque el menú arranque bien." % ", ".join(exes[:5]))
         # backports de otras carpetas que pueden pisar los de esta
         tid = (info.get("tid") or E.title_id(posixpath.basename(path)) or "").upper()
         if tid:
@@ -2313,6 +2436,25 @@ def launch_check(path, minutes=30):
         since = _console_now(f) - minutes * 60
         info["logs"] = _recent_logs(f, ([path] if is_dir else []) + ["/data"], since)
     E.Ftp(cfg).call(run)
+    # cierres que ha visto ShadowMountPlus (signal / general protection fault) en los registros recientes
+    tid = (info.get("tid") or "").upper()
+    for lg in info.get("logs") or []:
+        m = None
+        for m in re.finditer(r"game error: ([A-Z]{4}\d{5})[^\n]*?: signal: (\d+) \((\w+)\)(?:\s*thread name: (\S+))?",
+                             lg.get("tail") or ""):
+            pass
+        if m and (not tid or m.group(1).upper() == tid):
+            sig, thread = m.group(3), m.group(4) or ""
+            if info.get("lz4") and sig in ("SIGBUS", "SIGSEGV"):
+                if not info.get("lz4_bad"):
+                    add("bad", "Se cerró con %s%s y está empaquetado en LZ4: lo más probable es que ese ejecutable no "
+                        "lea sus datos con AMPR y no sea compatible con LZ4." % (sig, " en " + thread if thread else ""),
+                        "Vuelve a ponerlo sin LZ4 (carpeta o .exfat), o usa «Imagen comprimida .ffpfsc» para ahorrar "
+                        "espacio.")
+            else:
+                add("warn", "ShadowMountPlus vio que se cerró con %s%s." % (sig, " en " + thread if thread else ""),
+                    "Mira el registro de abajo. Si acabas de convertirlo, prueba la versión sin convertir.")
+            break
     lib = (LIB.get("items") or {}).get("items") or []
     me = next((x for x in lib if x.get("path") == path), {})
     if me.get("dup"):
@@ -3043,6 +3185,7 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
                                        "stored": "sin compresión"}[comp])
     if fmt in ("lz4", "lz4ffpkg") and not lz4.get("imports_ampr"):
         jlog(job, "Este título no usa AMPR, así que LZ4 no sirve con él")
+        remember_title(tid, extra={"no_ampr": True})
         if fmt == "lz4":
             img = len(srcs) == 1 and IMAGE_RE.search(srcs[0].name or "")
             msg = ("PS5 Dump Forge dice que este título no usa AMPR, así que no se puede pasar a LZ4: "
@@ -3068,7 +3211,9 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
     base = tid or E.safe_name(E.display_name(srcs[0].name))[:50]
     name = (base + ext) if ext else (base + "-app")
     target = dest + "/" + name
-    check_duplicates_first(job, bf, tid, exclude=target)
+    keep = job.get("where") == "keep"
+    if not keep:
+        check_duplicates_first(job, bf, tid, exclude=target)
     total = int(info.get("total_bytes") or 0)
     work = os.path.join(pc_temp_root(cfg), "forge", job["id"])
     os.makedirs(work, exist_ok=True)
@@ -3081,7 +3226,7 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
             raise E.PipeError("No cabe en el PC: la %s ocupará hasta %s y en %s hay %s libres. Libera espacio, "
                               "cambia la carpeta temporal en Ajustes o elige 'Carpeta normal'."
                               % (FMT_LABEL[fmt], human(need_pc), work, human(free_pc)))
-        free = free_space(bf) if bf.alive() else None
+        free = free_space(bf) if (not keep and bf.alive()) else None
         est = int(total * (0.5 if fmt in ("ffpfsc", "lz4", "lz4ffpkg") else 0.9 if fmt == "fpkg" else 1.02))
         if free is not None and total and est + margin_bytes() > free:
             raise no_space(job, est, free, "Lo más probable es que no quepa en la PS5: la %s ocupará unos %s, hay "
@@ -3111,6 +3256,12 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
     jlog(job, "Listo en el PC: %s (%s)" % (name, human(size)))
     if total and size:
         jlog(job, "Ocupa %s frente a %s sin convertir" % (human(size), human(total)))
+    if keep:
+        dst = _unique_path(os.path.join(keep_dir(job), name))
+        shutil.move(out, dst)
+        shutil.rmtree(work, ignore_errors=True)
+        setj(job, conv_pct=100)
+        return {"mode": "keep", "path": dst}
     free = free_space(bf) if bf.alive() else None
     if free is not None and size + margin_bytes() > free:
         raise no_space(job, size, free, "No cabe en la PS5: la %s ocupa %s, hay %s libres y dejo %s de margen. "
@@ -3165,6 +3316,312 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
     with LOCK:
         job["_placed_game"] = True
     return {"mode": "done", "placed": [target], "game": True}
+
+
+def _unique_path(path):
+    if not os.path.exists(path):
+        return path
+    base, ext = (path, "") if os.path.isdir(path) else os.path.splitext(path)
+    k = 2
+    while os.path.exists("%s (%d)%s" % (base, k, ext)):
+        k += 1
+    return "%s (%d)%s" % (base, k, ext)
+
+
+def keep_dir(job):
+    d = (job.get("pcdir") or "").strip().strip('"')
+    return d if d and os.path.isabs(d) else pc_library_dir()
+
+
+def keep_on_pc_job(job, srcs, cancel):
+    """Modo «Solo en el PC»: baja todo, une las partes, descomprime y lo deja en una carpeta del PC.
+    No toca la consola. Devuelve la ruta final."""
+    import shutil
+    import subprocess
+    cfg = cfg_snapshot()
+    cfg["_limit_bps"] = live_limit_bps
+    mine = bool(job.get("torrent"))     # lo bajado por torrent si se puede mover
+    if srcs[0].kind == "folder" or (all(s.kind == "file" for s in srcs) and not mine
+                                    and not E.is_archive(E.first_volume([x.name for x in srcs]))):
+        raise E.PipeError("Eso ya está en tu PC. «Solo en el PC» es para enlaces: los baja, los une y los "
+                          "descomprime en una carpeta del PC.")
+    dest_root = keep_dir(job)
+    os.makedirs(dest_root, exist_ok=True)
+    names = [s.name for s in srcs]
+    folder = os.path.join(pc_temp_root(cfg), E.safe_name(E.set_key(srcs[0].name)))
+    dl = Meter()
+    stop_speed = threading.Event()
+
+    def speed_loop():
+        while not stop_speed.wait(1):
+            if job.get("pc_step") == "bajar":
+                setj(job, speed=dl.rate(), dl_speed=0.0)
+    threading.Thread(target=speed_loop, daemon=True).start()
+    try:
+        setj(job, status="enviando", total=sum(max(0, s.size) for s in srcs), sent=0, pc_step="bajar",
+             speed_label="Descarga al PC", sent_label="Bajado al PC")
+        local, created = fetch_to_pc(job, srcs, cfg, cancel, dl, folder)
+        stop_speed.set()
+        setj(job, speed=0.0)
+        first = local[E.first_volume(names)]
+        steps = job.get("keep_steps") or "extract"
+        fmt = job.get("fmt") if job.get("fmt") in F.FORGE_FORMATS else ""
+        if steps == "convert" and fmt and fmt != "plain":
+            res = forge_job(job, srcs, cfg, cancel, first, created, folder, Meter())
+            if isinstance(res, dict) and res.get("mode") == "keep":
+                for c in created:
+                    try:
+                        os.remove(c)
+                    except OSError:
+                        pass
+                shutil.rmtree(folder, ignore_errors=True)
+                return res["path"]
+            jlog(job, "No se ha convertido: lo dejo descomprimido, sin convertir")
+        raw_split = (not E.is_archive(first) and len(names) > 1
+                     and all(E.SPLIT_RAW_RE.match(n) for n in names))
+        if raw_split and steps != "dl":
+            # una imagen partida en .001, .002...: se une en un solo archivo
+            base = E.SPLIT_RAW_RE.match(names[0]).group("base")
+            dst = _unique_path(os.path.join(dest_root, base))
+            setj(job, status="convirtiendo", pc_step="descomprimir", conv_pct=0, phase="Uniendo las partes")
+            tot, done = sum(os.path.getsize(local[n]) for n in names), 0
+            with open(dst + ".part", "wb") as fo:
+                for n in sorted(names, key=E.volume_order):
+                    with open(local[n], "rb") as fi:
+                        while True:
+                            if cancel.is_set():
+                                raise E.Cancelled()
+                            b = fi.read(8 * 1024 * 1024)
+                            if not b:
+                                break
+                            fo.write(b)
+                            done += len(b)
+                            setj(job, conv_pct=int(done * 100 / max(1, tot)))
+            os.replace(dst + ".part", dst)
+            for c in created:
+                try:
+                    os.remove(c)
+                except OSError:
+                    pass
+            shutil.rmtree(folder, ignore_errors=True)
+            return dst
+        if job.get("raw") or steps == "dl" or not E.is_archive(first):
+            # solo bajar, o una imagen, un .pkg o un archivo suelto: se deja tal cual
+            outs = []
+            if len(names) > 1:          # varias partes: juntas en su carpeta
+                dest_root = _unique_path(os.path.join(dest_root, E.safe_name(E.display_name(names[0])) or "descarga"))
+                os.makedirs(dest_root, exist_ok=True)
+            for n in names:
+                dst = _unique_path(os.path.join(dest_root, n))
+                if local[n] in created or mine:
+                    shutil.move(local[n], dst)
+                else:
+                    shutil.copy2(local[n], dst)
+                outs.append(dst)
+            shutil.rmtree(folder, ignore_errors=True)
+            return outs[0] if len(outs) == 1 else dest_root
+        # descomprimir con 7-Zip (o tarfile para los .tar)
+        name = E.safe_name(E.display_name(srcs[0].name)) or "descomprimido"
+        work = os.path.join(dest_root, "." + name + ".descomprimiendo")
+        shutil.rmtree(work, ignore_errors=True)
+        os.makedirs(work, exist_ok=True)
+        setj(job, status="convirtiendo", pc_step="descomprimir", conv_pct=0, conv_text="",
+             phase="Descomprimiendo en el PC", sent_label="Bajado al PC")
+        if E.is_tar(first):
+            import tarfile
+            with tarfile.open(first) as t:
+                try:
+                    t.extractall(work, filter="data")
+                except TypeError:
+                    t.extractall(work)
+        else:
+            exe = E.find_7z(cfg.get("sevenzip_path"))
+            if not exe:
+                raise E.PipeError("Para descomprimir en el PC hace falta 7-Zip (gratis, 7-zip.org). Instálalo o "
+                                  "pon la ruta de 7z.exe en Ajustes.")
+            cands = password_candidates(job, cfg)
+            pw, entries = None, None
+            try:
+                entries, _ = E.list_7z(exe, first)
+                if E.needs_password(entries):
+                    pw = "?"
+            except E.PipeError as e:
+                if not E._pw_error(str(e)):
+                    raise
+                pw = "?"
+            if pw == "?":
+                pw = None
+                for c in cands:
+                    try:
+                        entries, _ = E.list_7z(exe, first, c)
+                        pw = c
+                        break
+                    except E.PipeError:
+                        continue
+                if pw is None:
+                    raise E.PipeError("El comprimido tiene contraseña y ninguna lo abre. Escríbela en el trabajo o "
+                                      "en Ajustes y pulsa Reintentar (no se vuelve a descargar).")
+            total = sum(e["size"] for e in entries or [] if not e["dir"])
+            free = shutil.disk_usage(dest_root).free
+            if total and total + GiB > free:
+                raise E.PipeError("No cabe en el PC: descomprimido ocupa %s y en %s hay %s libres. Libera espacio "
+                                  "o elige otra carpeta." % (human(total), dest_root, human(free)))
+            jlog(job, "Descomprimiendo %s en %s" % (human(total), dest_root))
+            proc = subprocess.Popen(E._7z_cmd(exe, "x", first, "-o" + work, password=pw),
+                                    stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                                    creationflags=E._NOWIN)
+            while proc.poll() is None:
+                if cancel.is_set():
+                    proc.kill()
+                    raise E.Cancelled()
+                done = _dir_size(work)
+                if total:
+                    pct = min(99, int(done * 100 / total))
+                    setj(job, conv_pct=pct, conv_text="%s de %s" % (human(done), human(total)),
+                         phase="Descomprimiendo en el PC: %d%%" % pct)
+                time.sleep(0.5)
+            if proc.returncode != 0:
+                err = proc.stderr.read().decode("utf-8", "replace").strip()
+                raise E.PipeError("7-Zip no pudo descomprimirlo: %s" % err[-300:])
+        # si dentro hay una sola carpeta, esa es la que se queda (sin carpetas dobles)
+        inside = [x for x in os.listdir(work) if not x.startswith(".")]
+        if len(inside) == 1 and os.path.isdir(os.path.join(work, inside[0])):
+            out = _unique_path(os.path.join(dest_root, inside[0]))
+            shutil.move(os.path.join(work, inside[0]), out)
+            shutil.rmtree(work, ignore_errors=True)
+        else:
+            out = _unique_path(os.path.join(dest_root, name))
+            os.replace(work, out)
+        setj(job, conv_pct=100)
+        # las partes bajadas ya no hacen falta
+        for c in created:
+            try:
+                os.remove(c)
+            except OSError:
+                pass
+        shutil.rmtree(folder, ignore_errors=True)
+        jlog(job, "Borradas del PC las partes descargadas")
+        return out
+    except BaseException:
+        w = locals().get("work")
+        if w and os.path.isdir(w):
+            shutil.rmtree(w, ignore_errors=True)     # lo descomprimido a medias no sirve
+        raise
+    finally:
+        stop_speed.set()
+
+
+# ---------------------------------------------------------------------------
+# Revisar enlaces (como el capturador de JDownloader): saca los enlaces de cualquier texto,
+# los comprueba y los agrupa en paquetes (todas las partes de lo mismo juntas).
+# ---------------------------------------------------------------------------
+
+GRAB = {"busy": False, "done": 0, "total": 0, "packages": [], "error": "", "id": 0}
+GRAB_URL_RX = re.compile(r"(?i)\b(?:https?|ftp)://[^\s<>\"'\]\[(){}|]+|magnet:\?[^\s<>\"']+")
+
+
+def add_lines(text):
+    """Lineas para la cola: un enlace o una ruta del PC por linea tal cual; de una linea con texto y enlaces
+    dentro (un mensaje copiado), solo los enlaces."""
+    out = []
+    for ln in str(text or "").splitlines():
+        t = ln.strip()
+        if not t:
+            continue
+        if re.match(r"(?i)^((https?|ftp)://|magnet:\?)\S+$", t):
+            out.append(t)          # ya es un enlace solo (aunque lleve parentesis u otros signos)
+            continue
+        urls = grab_links(t)
+        if not urls or (len(urls) == 1 and urls[0] == t):
+            out.append(t)
+            continue
+        for u in urls:
+            if u not in out:
+                out.append(u)
+    return out
+
+
+def grab_links(text):
+    out = []
+    for m in GRAB_URL_RX.finditer(text or ""):
+        u = m.group(0).rstrip(".,;:!?»”’")
+        if u not in out:
+            out.append(u)
+    return out
+
+
+def missing_parts(names):
+    """Numeros de parte que faltan en un conjunto (part1, part2... / .001, .002... / .rar, .r00...)."""
+    nums, base = [], 1
+    for n in names:
+        m = re.search(r"\.part(\d+)\.rar$", n, re.I) or re.search(r"\.(\d{3})$", n)
+        if m:
+            nums.append(int(m.group(1)))
+            continue
+        m = re.search(r"\.r(\d{2,3})$", n, re.I)
+        if m:
+            nums.append(int(m.group(1)) + 2)        # .rar = 1, .r00 = 2...
+            base = 1
+        elif re.search(r"\.rar$", n, re.I):
+            nums.append(1)
+    if len(nums) < 1:
+        return []
+    return sorted(set(range(base, max(nums) + 1)) - set(nums))
+
+
+def grab_scan(text):
+    from concurrent.futures import ThreadPoolExecutor
+    links = grab_links(text)
+    with LOCK:
+        GRAB.update(busy=True, done=0, total=len(links), packages=[], error="", id=GRAB["id"] + 1)
+        gid = GRAB["id"]
+    if not links:
+        with LOCK:
+            GRAB.update(busy=False, error="No encuentro enlaces en ese texto (tienen que empezar por http://, "
+                                          "https://, ftp:// o magnet:).")
+        return
+
+    def one(u):
+        if u.lower().startswith("magnet:") or u.lower().split("?")[0].endswith(".torrent"):
+            r = {"url": u, "name": torrent_name(u), "size": -1, "ok": True, "err": "", "torrent": True}
+        else:
+            try:
+                src = E.make_source(u).probe()
+                r = {"url": u, "name": src.name or u.rsplit("/", 1)[-1], "size": src.size, "ok": True, "err": ""}
+            except Exception as e:
+                name = urllib.parse.unquote(u.split("?")[0].rstrip("/").rsplit("/", 1)[-1]) or u
+                r = {"url": u, "name": name, "size": -1, "ok": False, "err": conn_error_text(e)}
+        with LOCK:
+            if GRAB["id"] == gid:
+                GRAB["done"] += 1
+        return r
+
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        res = list(ex.map(one, links))
+    groups, order = {}, []
+    for r in res:
+        k = r["url"] if r.get("torrent") else E.set_key(r["name"])
+        if F.is_checksum_name(r["name"]):
+            k = E.set_key(os.path.splitext(r["name"])[0])
+        if k not in groups:
+            groups[k] = []
+            order.append(k)
+        groups[k].append(r)
+    pk = []
+    for k in order:
+        parts = sorted(groups[k], key=lambda r: E.volume_order(r["name"]))
+        real = [r for r in parts if not F.is_checksum_name(r["name"])]
+        if not real:          # un .sfv suelto
+            continue
+        sizes = [r["size"] for r in real]
+        pk.append({"key": k, "name": E.display_name(real[0]["name"]), "parts": parts,
+                   "size": sum(x for x in sizes if x > 0), "unknown": any(x < 0 for x in sizes),
+                   "offline": sum(1 for r in parts if not r["ok"]),
+                   "missing": missing_parts([r["name"] for r in real]),
+                   "torrent": bool(real[0].get("torrent"))})
+    with LOCK:
+        if GRAB["id"] == gid:
+            GRAB.update(busy=False, packages=pk)
 
 
 def pc_temp_root(cfg):
@@ -4251,7 +4708,8 @@ def transfer_worker():
                     for k, extra in enumerate(sets[1:], 1):
                         nj = new_job([s.original for s in extra], job["password"], job["dest"],
                                      where=job.get("where"), raw=job.get("raw"), fmt=job.get("fmt"),
-                                     comp=job.get("comp"))
+                                     comp=job.get("comp"), pcdir=job.get("pcdir") or "",
+                                     keep_steps=job.get("keep_steps") or "")
                         nj["fmt_set"] = job.get("fmt_set", False)
                         nj["checks"] = {k: v for k, v in (job.get("checks") or {}).items()
                                         if k in {x.name.lower() for x in extra}}
@@ -4262,6 +4720,18 @@ def transfer_worker():
                 srcs = sets[0]
             setj(job, sources=describe(srcs), title=job["title"] or E.display_name(srcs[0].name))
             save_jobs()
+            if job.get("where") == "keep":
+                out = keep_on_pc_job(job, srcs, cancel)
+                setj(job, status="hecho", result=[out], speed=0.0, conv_text="",
+                     phase="Listo en tu PC: %s" % out)
+                jlog(job, "Terminado: %s" % out)
+                record_history(job)
+                notify("ok", "Listo en tu PC: %s" % (job.get("title") or os.path.basename(out)), out,
+                       {"tab": "Library", "view": "pc"})
+                if not COL["busy"]:
+                    threading.Thread(target=collection_scan, daemon=True).start()
+                save_jobs()
+                continue
             info = transfer_job(job, srcs, cancel)
             setj(job, info=info, status="en cola para descomprimir",
                  phase="Enviado. Esperando turno para descomprimir")
@@ -4283,7 +4753,7 @@ def transfer_worker():
                 free = free_space(E.BFpilot(cfg_snapshot()))
                 if free is not None and free < margin_bytes():
                     msg += " -- La PS5 solo tiene %s libres: seguramente se lleno el disco." % human(free)
-            setj(job, status="error", error=msg, phase="Error")
+            setj(job, status="error", error=msg, phase="Error", auto_retry=is_conn_lost(msg))
             jlog(job, "ERROR: %s" % msg)
             record_history(job)
             traceback.print_exc()
@@ -4331,7 +4801,7 @@ def extract_worker():
                 free = free_space(E.BFpilot(cfg_snapshot()))
                 if free is not None and free < margin_bytes():
                     msg += " -- La PS5 solo tiene %s libres: seguramente se lleno el disco." % human(free)
-            setj(job, status="error", error=msg, phase="Error")
+            setj(job, status="error", error=msg, phase="Error", auto_retry=is_conn_lost(msg))
             jlog(job, "ERROR: %s" % msg)
             record_history(job)
             traceback.print_exc()
@@ -4895,7 +5365,7 @@ def _save_roots(f):
     return roots
 
 
-def backup_run(sections=None, label="copia"):
+def backup_run(sections=None, label="copia", tids=None):
     """Hace la copia en un .zip con fecha. sections: saves, config, appdb, list."""
     import zipfile
     cfg = cfg_snapshot()
@@ -4914,8 +5384,20 @@ def backup_run(sections=None, label="copia"):
         try:
             todo = []      # (seccion, ruta, tamano)
             if "saves" in sections:
+                want = {t.upper() for t in (tids or [])}
                 for r in _save_roots(f):
-                    todo += [("saves", p, s) for p, s in _ftp_walk_sizes(f, r, [], BK_CANCEL)]
+                    if not want:
+                        todo += [("saves", p, s) for p, s in _ftp_walk_sizes(f, r, [], BK_CANCEL)]
+                        continue
+                    try:
+                        subs = [n for n, v in E.ftp_listdir(f, r) if v["type"] == "dir" and n.upper()[:9] in want]
+                    except ftplib.all_errors:
+                        subs = []
+                    for n in subs:
+                        todo += [("saves", p, s) for p, s in _ftp_walk_sizes(f, r + "/" + n, [], BK_CANCEL)]
+                if want and not todo:
+                    raise E.PipeError("No encuentro partidas de %s en la consola (¿no lo has jugado todavía?)"
+                                      % ", ".join(sorted(want)))
             if "config" in sections:
                 for r in BK_CONFIG_DIRS:
                     todo += [("config", p, s) for p, s in _ftp_walk_sizes(f, r, [], BK_CANCEL, BK_MAX_FILE)]
@@ -5246,6 +5728,8 @@ def console_status():
     out["reachable"] = bool(ver or out["loader"] or any(i["ok"] for i in out["items"]) or
                             _port_open(cfg["ps5_ip"], 2121, 1) or _port_open(cfg["ps5_ip"], 5905, 1))
     out["mac_lan"] = MAC_LAN_MSG if (not out["reachable"] and mac_lan_blocked(cfg["ps5_ip"])) else ""
+    # sin nada que conteste: ¿esta apagada, o encendida pero sin jailbreak (por ejemplo, recien reiniciada)?
+    out["alive"] = True if out["reachable"] else (False if out["mac_lan"] else _host_alive(cfg["ps5_ip"]))
     return out
 
 
@@ -5300,7 +5784,227 @@ def console_fix(pid, action):
     return {"name": p["name"], "up": up}
 
 
-def console_auto():
+def _host_alive(host):
+    """¿Contesta la consola aunque no tenga payloads? (Remote Play escucha en 9295; si no, un ping)."""
+    host = E.clean_host(host or "")[0]
+    if not host:
+        return False
+    if _port_open(host, 9295, 1.2) or _port_open(host, 997, 0.8):
+        return True
+    import subprocess
+    try:
+        args = ["ping", "-n", "1", "-w", "1000", host] if os.name == "nt" else ["ping", "-c", "1", "-W", "1", host]
+        r = subprocess.run(args, capture_output=True, timeout=4,
+                           **({"creationflags": 0x08000000} if os.name == "nt" else {}))
+        return r.returncode == 0 and b"ttl" in r.stdout.lower()
+    except Exception:
+        return False
+
+
+AUTO_TRIED = {}
+PLAYED_T = [0.0]
+CONN_LOST_RX = re.compile(r"(?i)no puedo conectar con el ftp|conexi[oó]n con la ps5 perdida|bfpilot ha dejado de responder|"
+                          r"bfpilot no responde|no hay conexi[oó]n con la consola|10054|10053|10060|10061|10065|"
+                          r"connection (reset|refused|aborted)|timed out|no route|unreachable|broken pipe")
+
+
+def is_conn_lost(msg):
+    """¿Fallo porque se perdio la consola (reposo, reinicio, payload caido)? Entonces se puede reanudar sola."""
+    m = str(msg or "")
+    return bool(CONN_LOST_RX.search(m)) and not re.search(r"(?i)no cabe|no hay sitio|contrase|crc|da[nñ]ad", m)
+
+
+def auto_resume():
+    """Reanuda las transferencias que fallaron por perder la consola, cuando vuelve a contestar (max. 5 veces)."""
+    cfg = cfg_snapshot()
+    with LOCK:
+        cands = [j for j in JOBS if j["status"] == "error" and j.get("auto_retry") and (j.get("auto_tries") or 0) < 5]
+    if not cands:
+        return
+    ftp_ok = _svc_ok("ftpsrv", cfg)[0]
+    if not ftp_ok:
+        return
+    bf_ok = None
+    names = []
+    with WAKE:
+        for job in cands:
+            if job["status"] != "error":
+                continue
+            if re.search(r"(?i)bfpilot", job.get("error") or ""):
+                if bf_ok is None:
+                    bf_ok = bool(E.BFpilot(cfg).alive())
+                if not bf_ok:
+                    continue
+            job["auto_tries"] = (job.get("auto_tries") or 0) + 1
+            CANCELS.setdefault(job["id"], threading.Event()).clear()
+            jlog(job, "La consola ha vuelto: reanudo solo (intento %d de 5)" % job["auto_tries"])
+            job["error"] = ""
+            job.pop("need_bytes", None)
+            job.pop("ask", None)
+            if job.get("info") and job.get("sent", 0) >= max(0, job.get("total", 0)) and job.get("total", -1) > 0:
+                job["status"] = "en cola para descomprimir"
+                job["phase"] = "Reintentando la descompresion"
+                EXTRACT_Q.append(job["id"])
+            else:
+                job["status"] = "pendiente"
+                job["phase"] = "En cola"
+            names.append(_job_name(job))
+        WAKE.notify_all()
+    if names:
+        save_jobs()
+        notify("info", "La consola ha vuelto: reanudo %s" % ", ".join(names[:3]), "")      # id -> momento del ultimo intento automatico (para no insistir cada pocos segundos)
+
+
+def console_watch():
+    """Cada poco, si falta ftpsrv o BFpilot y Payload Manager esta abierto (por ejemplo, despues de reiniciar
+    la consola y volver a hacer el jailbreak), los inicia solos. No repite el mismo intento antes de 2 min."""
+    time.sleep(40)
+    while True:
+        try:
+            with LOCK:
+                on = SETTINGS.get("auto_payloads", True)
+            cfg = cfg_snapshot()
+            if on and cfg.get("ps5_ip") and not all(_svc_ok(x, cfg)[0] for x in ("ftpsrv", "bfpilot")):
+                if F.PayloadManager(cfg["ps5_ip"]).version():
+                    console_auto(min_gap=120)
+            auto_resume()
+            if time.time() - PLAYED_T[0] > 120 and _svc_ok("ftpsrv", cfg)[0]:
+                PLAYED_T[0] = time.time()
+                played_poll()
+        except Exception as e:
+            print("Vigilancia de la consola:", e)
+        time.sleep(15)
+
+
+DISCOVER_PORTS = ((2121, "FTP"), (8084, "Payload Manager"), (5905, "BFpilot"), (9021, "cargador de ELF"),
+                  (9295, "PS5"))
+
+
+def _local_ipv4s():
+    ips = set()
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("10.255.255.255", 1))
+        ips.add(s.getsockname()[0])
+        s.close()
+    except Exception:
+        pass
+    try:
+        for ai in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            ips.add(ai[4][0])
+    except Exception:
+        pass
+    return [ip for ip in ips if not ip.startswith(("127.", "169.254."))]
+
+
+def discover_ps5(timeout=0.35):
+    """Busca la consola en la red de casa: equipos que contesten en los puertos de los payloads o de la PS5."""
+    from concurrent.futures import ThreadPoolExecutor
+    mine = _local_ipv4s()
+    nets = sorted({ip.rsplit(".", 1)[0] for ip in mine})[:3]
+    hosts = [n + "." + str(k) for n in nets for k in range(1, 255) if n + "." + str(k) not in mine]
+
+    def probe(h):
+        found = []
+        for port, label in DISCOVER_PORTS:
+            try:
+                socket.create_connection((h, port), timeout=timeout).close()
+                found.append(label)
+            except OSError:
+                pass
+        return h, found
+    out = []
+    with ThreadPoolExecutor(max_workers=96) as ex:
+        for h, found in ex.map(probe, hosts):
+            if found:
+                out.append({"ip": h, "found": found})
+    out.sort(key=lambda x: -len(x["found"]))
+    return {"items": out, "nets": [n + ".x" for n in nets]}
+
+
+PLAYED_FILE = os.path.join(DATA_DIR, "abiertos.json")
+PLAYED_LOCK = threading.Lock()
+SMP_LOGS = ("/data/shadowmount/debug.log", "/data/shadowmountplus/debug.log")
+GAME_EV_RX = re.compile(r"^\[(\d\d):(\d\d):(\d\d)\][^\n]*?\[GAME\] started: ([A-Z]{4}\d{5}) pid=(\d+)", re.M)
+GAME_HAND_RX = re.compile(r"^\[(\d\d):(\d\d):(\d\d)\][^\n]*?process handoff: ([A-Z]{4}\d{5})[^\n]*?-> pid=(\d+)", re.M)
+GAME_STOP_RX = re.compile(r"^\[(\d\d):(\d\d):(\d\d)\][^\n]*?game stopped: pid=(\d+) title=([A-Z]{4}\d{5})", re.M)
+
+
+def played_load():
+    try:
+        with open(PLAYED_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {"titles": {}, "seen": [], "open": {}}
+
+
+def _log_ts(h, m, sec, now):
+    """La hora del registro de ShadowMountPlus (sin fecha) -> fecha y hora: hoy, o ayer si aun no ha llegado."""
+    t = time.mktime(time.localtime(now)[:3] + (int(h), int(m), int(sec), 0, 0, -1))
+    return t - 86400 if t > now + 300 else t
+
+
+def played_poll():
+    """Lee el final del registro de ShadowMountPlus y apunta cuando se abre y se cierra cada titulo
+    (para «Abierto hace…» y el tiempo de uso). Solo cuenta desde que PS5 Directo lo mira."""
+    cfg = cfg_snapshot()
+    now = time.time()
+
+    def read(f):
+        for p in SMP_LOGS:
+            try:
+                size = f.size(p)
+            except ftplib.all_errors:
+                continue
+            if not size:
+                continue
+            off = max(0, size - 256 * 1024)
+            return F.ftp_read(f, p, off, size - off).decode("utf-8", "replace")
+        return ""
+    try:
+        txt = E.Ftp(cfg).call(read)
+    except Exception:
+        return
+    if not txt:
+        return
+    with PLAYED_LOCK:
+        d = played_load()
+        seen = set(d.get("seen") or [])
+        opened = d.setdefault("open", {})
+        titles = d.setdefault("titles", {})
+        evs = [(_log_ts(h, m, x, now), "start", tid, pid) for h, m, x, tid, pid in GAME_EV_RX.findall(txt)]
+        evs += [(_log_ts(h, m, x, now), "stop", tid, pid) for h, m, x, pid, tid in GAME_STOP_RX.findall(txt)]
+        evs += [(_log_ts(h, m, x, now) + 0.5, "hand", tid, pid) for h, m, x, tid, pid in GAME_HAND_RX.findall(txt)]
+        changed = False
+        for ts, kind, tid, pid in sorted(evs):
+            key = "%s|%s|%s|%d" % (kind, tid, pid, int(ts) // 60)
+            if key in seen:
+                continue
+            seen.add(key)
+            changed = True
+            t = titles.setdefault(tid, {"last": 0, "times": 0, "secs": 0})
+            if kind == "start":
+                if ts - t.get("last", 0) > 120:      # el mismo arranque sale dos veces (relevo de proceso)
+                    t["times"] = t.get("times", 0) + 1
+                t["last"] = max(t.get("last", 0), ts)
+                opened[tid] = opened.get(tid) or ts
+            elif kind == "hand":                     # el titulo sigue abierto con otro proceso
+                opened[tid] = opened.get(tid) or ts
+                t.setdefault("_hand", 0)
+                t.pop("_hand", None)
+            else:
+                st = opened.pop(tid, None)
+                if st and 0 < ts - st < 24 * 3600:
+                    t["secs"] = t.get("secs", 0) + int(ts - st)
+        if changed:
+            d["seen"] = sorted(seen)[-3000:]
+            try:
+                _save_json(PLAYED_FILE, d)
+            except Exception:
+                pass
+
+
+def console_auto(min_gap=0):
     """Al abrir PS5 Directo: si falta ftpsrv o BFpilot y Payload Manager esta abierto en la consola,
     los inicia solo (solo los que no esten ya en marcha: nunca dos veces lo mismo)."""
     with LOCK:
@@ -5317,6 +6021,9 @@ def console_auto():
         for it in st["items"]:
             if it["ok"] or it["state"] != "off" or not it["installed"]:
                 continue
+            if min_gap and time.time() - AUTO_TRIED.get(it["id"], 0) < min_gap:
+                continue
+            AUTO_TRIED[it["id"]] = time.time()
             try:
                 r = console_fix(it["id"], "start")
                 done.append({"id": it["id"], "name": it["name"], "up": r.get("up")})
@@ -5475,6 +6182,8 @@ def _test_connection(cfg):
         try:
             st = bf._req("GET", "/api/fs/stat", {"path": "/data"})
             out["free"] = human(int(st.get("availableBytes") or 0))
+            out["free_bytes"] = int(st.get("availableBytes") or 0)
+            out["total_bytes"] = int(st.get("usableTotalBytes") or st.get("totalBytes") or 0)
         except Exception:
             pass
     return out
@@ -5689,6 +6398,14 @@ CONV_CANCEL = threading.Event()
 
 def MEDIA_CONV_DIR():
     return os.path.join(downloads_dir(), "PS5 Directo", "Capturas")
+
+
+def media_mp4_path(path):
+    """Donde queda el MP4 convertido de un clip de la consola."""
+    path = fm_clean(str(path or ""))
+    if not path.startswith(MEDIA_ROOT + "/"):
+        return None
+    return os.path.join(MEDIA_CONV_DIR(), os.path.splitext(posixpath.basename(path))[0] + ".mp4")
 
 
 def ffmpeg_path():
@@ -6411,8 +7128,9 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.split("?")[0] == "/prueba":
             # pagina minima, sin token ni JavaScript: para saber si el movil llega al PC
             return self._send(200, PRUEBA_HTML, "text/html; charset=utf-8")
-        if self.path == "/api/ext/ping":
-            return self._send(200, {"ok": True, "app": "PS5 Directo", "version": VERSION})
+        if self.path.split("?")[0] == "/api/ext/ping":
+            return self._send(200, {"ok": True, "app": "PS5 Directo", "version": VERSION,
+                                    "ext_version": _ext_version(os.path.join(HERE, "extension"))})
         if self.path.startswith("/api/media/file?"):
             q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             if not token_ok((q.get("t") or [""])[0]):
@@ -6427,11 +7145,30 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(size))
             self.send_header("Cache-Control", "private, max-age=86400")
             if (q.get("dl") or [""])[0]:
-                self.send_header("Content-Disposition", 'attachment; filename="%s"' % os.path.basename(fp))
+                orig = posixpath.basename((q.get("p") or [""])[0]) or os.path.basename(fp)
+                if ctype == "image/jpeg" and not orig.lower().endswith((".jpg", ".jpeg")):
+                    orig = os.path.splitext(orig)[0] + ".jpg"
+                self.send_header("Content-Disposition", "attachment; filename*=UTF-8''%s" % urllib.parse.quote(orig))
             self.end_headers()
             with open(fp, "rb") as fh:
                 shutil_copy = __import__("shutil").copyfileobj
                 shutil_copy(fh, self.wfile, 1024 * 1024)
+            return
+        if self.path.startswith("/api/media/mp4?"):
+            # el MP4 ya convertido de un clip (para guardarlo en el movil)
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            if not token_ok((q.get("t") or [""])[0]):
+                return self._send(403, {"ok": False})
+            fp = media_mp4_path((q.get("p") or [""])[0])
+            if not fp or not os.path.isfile(fp):
+                return self._send(404, {"ok": False})
+            self.send_response(200)
+            self.send_header("Content-Type", "video/mp4")
+            self.send_header("Content-Length", str(os.path.getsize(fp)))
+            self.send_header("Content-Disposition", "attachment; filename*=UTF-8''%s" % urllib.parse.quote(os.path.basename(fp)))
+            self.end_headers()
+            with open(fp, "rb") as fh:
+                __import__("shutil").copyfileobj(fh, self.wfile, 1024 * 1024)
             return
         if self.path.startswith("/api/report/file?"):
             q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
@@ -6509,7 +7246,85 @@ class Handler(BaseHTTPRequestHandler):
         return o.startswith("chrome-extension://") or o.startswith("moz-extension://") \
             or o.startswith("extension://")
 
+    def _ext_api(self):
+        """Lo que usa la extension del navegador: estado de la cola, mandar enlaces y pausar/cancelar.
+        Solo desde una extension en este PC (nunca desde la red)."""
+        b = self._body()
+        if b.get("ext_version"):
+            have, want = str(b["ext_version"])[:20], _ext_version(os.path.join(HERE, "extension"))
+            EXT_SEEN.update(version=have, t=time.time())
+            if want and _vt(have) < _vt(want):
+                notify("warn", "La extensión del navegador está desactualizada (%s, hay %s)" % (have, want),
+                       "Quítala en la página de extensiones del navegador y vuelve a cargarla desde Ajustes → «Abrir "
+                       "la carpeta de la extensión» (Cargar descomprimida). Desde entonces se actualiza sola.",
+                       {"tab": "Transfers"}, key="extold:" + want)
+        if self.path == "/api/ext/status":
+            with LOCK:
+                js = [{"id": j["id"], "title": _job_name(j), "status": j["status"], "pct": job_pct(j),
+                       "speed": float(j.get("speed") or 0), "phase": j.get("phase") or "", "where": j.get("where") or ""}
+                      for j in JOBS[-12:]]
+                inbox = len(INBOX)
+            return self._send(200, {"ok": True, "version": VERSION, "jobs": js, "ftp": CONN_STATE["ftp"],
+                                    "bf": CONN_STATE["bf"], "inbox": inbox})
+        if self.path == "/api/ext/send":
+            links = [x for x in add_lines("\n".join(str(v) for v in (b.get("links") or [])[:500]))
+                     if re.match(r"^((https?|ftp)://|magnet:\?)", x, re.I)]
+            if not links:
+                return self._send(400, {"ok": False, "error": "No hay enlaces"})
+            cookies = b.get("cookies") if isinstance(b.get("cookies"), dict) else {}
+            for u in links:
+                if re.match(r"^https?://", u, re.I):
+                    host = urllib.parse.urlparse(u).netloc.lower()
+                    E.set_browser_headers(u, str(cookies.get(host) or ""), str(b.get("ua") or ""),
+                                          str(b.get("referrer") or ""))
+            if b.get("mode") == "queue":
+                where = "keep" if b.get("where") == "keep" else ""
+                job = new_job(links, "", SETTINGS.get("dest") or "/data/homebrew", where=where,
+                              keep_steps="extract" if where else "")
+                with WAKE:
+                    JOBS.append(job)
+                    WAKE.notify_all()
+                save_jobs()
+                return self._send(200, {"ok": True, "queued": len(links), "id": job["id"]})
+            with LOCK:
+                for u in links:
+                    if not any(x["url"] == u for x in INBOX):
+                        INBOX.append({"url": u, "name": urllib.parse.unquote(u.split("?")[0].rsplit("/", 1)[-1])[:300],
+                                      "t": time.time()})
+                del INBOX[:-200]
+            return self._send(200, {"ok": True, "boxed": len(links)})
+        if self.path == "/api/ext/job":
+            action, jid = str(b.get("action") or ""), str(b.get("id") or "")
+            with WAKE:
+                job = find(jid)
+                if not job:
+                    return self._send(404, {"ok": False, "error": "no existe"})
+                if action == "pause":
+                    if job["status"] == "pendiente":
+                        job["status"] = "pausado"
+                        job["phase"] = "En pausa (pulsa Reanudar para seguir)"
+                    elif job["status"] in ("comprobando", "enviando", "convirtiendo"):
+                        job["_pause"] = True
+                        CANCELS.setdefault(jid, threading.Event()).set()
+                elif action == "cancel":
+                    CANCELS.setdefault(jid, threading.Event()).set()
+                    if job["status"] in ("pendiente", "en cola para descomprimir"):
+                        job["status"] = "cancelado"
+                        job["phase"] = "Cancelado"
+                elif action == "resume" and job["status"] == "pausado" and not job.get("ask"):
+                    CANCELS.setdefault(jid, threading.Event()).clear()
+                    job["status"] = "pendiente"
+                    job["phase"] = "En cola"
+                    WAKE.notify_all()
+            save_jobs()
+            return self._send(200, {"ok": True})
+        return self._send(404, {"ok": False})
+
     def do_POST(self):
+        if self.path in ("/api/ext/status", "/api/ext/send", "/api/ext/job"):
+            if self.lan or not self._from_extension():
+                return self._send(403, {"ok": False, "error": "solo desde la extension"})
+            return self._ext_api()
         if self.path.split("?")[0] == "/api/bye":
             # la ventana se esta cerrando (sendBeacon no deja poner cabeceras: token en la URL)
             q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
@@ -6546,7 +7361,7 @@ class Handler(BaseHTTPRequestHandler):
             if p == "/api/settings":
                 b = {k: v for k, v in b.items() if k not in LAN_LOCKED}
             if p == "/api/add":
-                ls = [x.strip() for x in str(b.get("lines", "")).splitlines() if x.strip()]
+                ls = add_lines(b.get("lines", ""))
                 if any(not re.match(r"^((https?|ftp)://|magnet:\?)", x, re.I) for x in ls):
                     return self._send(400, {"ok": False, "error": "Desde el móvil solo se pueden añadir enlaces "
                                                                   "(http, https o ftp), no archivos del PC"})
@@ -6554,7 +7369,8 @@ class Handler(BaseHTTPRequestHandler):
         if extra is not None:
             return self._send(200, extra)
         if p == "/api/open_ext_folder":
-            folder = os.path.join(HERE, "extension")
+            sync_extension()
+            folder = EXT_DIR if os.path.isdir(EXT_DIR) else os.path.join(HERE, "extension")
             try:
                 F.open_path(folder)
                 return self._send(200, {"ok": True, "path": folder})
@@ -6640,7 +7456,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
+        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p in ("/api/discover", "/api/played") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
             try:
                 return self._send(200, dict(ok=True, **fm_api(p, b)))
             except E.PipeError as e:
@@ -6688,14 +7504,20 @@ class Handler(BaseHTTPRequestHandler):
                     notify("warn", "El PC y la PS5 están en redes distintas", warn, key="net:" + warn[:60])
             return self._send(200, {"ok": True, **r})
         if p == "/api/add":
-            lines = [x.strip() for x in str(b.get("lines", "")).splitlines() if x.strip()]
+            lines = add_lines(b.get("lines", ""))
             if not lines:
                 return self._send(400, {"ok": False, "error": "Pega al menos un enlace"})
             dest = (b.get("dest") or SETTINGS["dest"]).rstrip("/") or "/data/homebrew"
             if not dest.startswith("/data") and not dest.startswith("/mnt/"):
                 return self._send(400, {"ok": False, "error": "El destino debe estar en /data o /mnt"})
+            pcdir = "" if self.lan else str(b.get("pcdir") or "").strip().strip('"')
+            if pcdir and not os.path.isabs(pcdir):
+                return self._send(400, {"ok": False, "error": "La carpeta del PC tiene que ser una ruta completa"})
             job = new_job(lines, (b.get("password") or "").strip(), dest, where=b.get("where"),
-                          raw=bool(b.get("raw")), fmt=b.get("fmt"), comp=b.get("comp"))
+                          raw=bool(b.get("raw")), fmt=b.get("fmt"), comp=b.get("comp"), pcdir=pcdir,
+                          keep_steps=str(b.get("keep_steps") or ""))
+            if b.get("title"):
+                job["title"] = str(b["title"])[:200]
             if "fmt" in b:
                 job["fmt_set"] = True
             with WAKE:
@@ -6770,7 +7592,8 @@ class Handler(BaseHTTPRequestHandler):
                         torrent_forget(job)
                         nj = new_job(list(job.get("orig_lines") or job.get("lines") or []), job.get("password") or "", job["dest"],
                                      where=job.get("where"), raw=job.get("raw"), fmt=job.get("fmt"),
-                                     comp=job.get("comp"))
+                                     comp=job.get("comp"), pcdir=job.get("pcdir") or "",
+                                     keep_steps=job.get("keep_steps") or "")
                         nj["fmt_set"] = job.get("fmt_set", False)
                         nj["title"] = job.get("title") or ""
                         JOBS[JOBS.index(job)] = nj
@@ -7471,6 +8294,8 @@ def main():
         pass
     threading.Thread(target=ensure_shortcuts, daemon=True).start()
     threading.Thread(target=console_auto, daemon=True).start()   # payloads que falten, con Payload Manager
+    threading.Thread(target=console_watch, daemon=True).start()
+    threading.Thread(target=sync_extension, daemon=True).start()  # y si luego se abre Payload Manager, igual
     refresh_window_icon()
     if SETTINGS.get("lan_access"):
         try:
