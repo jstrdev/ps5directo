@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Ps5Theme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:colorPrimary">#4b4fe6</item>
+        <item name="android:colorAccent">#5b9dff</item>
+        <item name="android:statusBarColor">#0f1115</item>
+        <item name="android:navigationBarColor">#0f1115</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+</resources>

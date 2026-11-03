@@ -1,11 +1,12 @@
 #!/bin/bash
-# Lanzador de "PS5 Directo.app" (va en Contents/MacOS/PS5 Directo).
+# Lanzador de "PS5 Directo.app" (va en Contents/Resources/launcher.sh; lo arranca el ejecutable nativo
+# Contents/MacOS/PS5 Directo, hecho con launcher.c).
 #  - Python incluido para Apple Silicon (python-arm64) e Intel (python-x86_64), en Contents/Resources.
 #  - El programa se copia a ~/Library/Application Support/PS5 Directo/app y se ejecuta desde ahi,
 #    para que «Actualizar» pueda escribir aunque la app este en /Applications. Si la app trae una
 #    version mas nueva que la copiada, se vuelve a copiar.
 #  - Si algo impide arrancar, muestra un aviso con el error (en vez de no hacer nada).
-RES="$(cd "$(dirname "$0")/../Resources" && pwd)"
+RES="$(cd "$(dirname "$0")/../Resources" && pwd)"   # vale desde MacOS/ y desde Resources/
 BUNDLE="$(cd "$RES/../.." && pwd)"
 SUP="$HOME/Library/Application Support/PS5 Directo"
 APP="$SUP/app"
@@ -30,7 +31,7 @@ y vuelve a abrir la app. Si sigue igual, avisa en github.com/jstrdev/ps5directo/
 
 If it doesn't fix itself, open Terminal and run the command above, then open the app again. If it still fails, please report it at github.com/jstrdev/ps5directo/issues with the text above."
 
-log "inicio: app en $BUNDLE, procesador $(uname -m), macOS $(sw_vers -productVersion 2>/dev/null)"
+log "inicio: app en $BUNDLE, procesador $(uname -m) (traducido por Rosetta: $(sysctl -n sysctl.proc_translated 2>/dev/null || echo 0)), macOS $(sw_vers -productVersion 2>/dev/null)"
 case "$BUNDLE" in */AppTranslocation/*) log "la app se ejecuta desde una copia temporal de macOS (no está en Aplicaciones)";; esac
 
 # macOS marca como "descargado de internet" todo lo que trae la app y puede bloquear en silencio el
@@ -90,7 +91,7 @@ cd "$APP" || exit 1
 # El programa sigue en segundo plano y el lanzador termina: asi cada clic en el icono vuelve a
 # entrar aqui y, si ya estaba abierto, solo trae su ventana (si no, macOS creeria que la app
 # sigue abierta y no haria nada). Antes de terminar, espera a ver que arranca bien.
-START=$(wc -c < "$PLOG" 2>/dev/null | tr -d ' '); START=${START:-0}
+START=$(wc -c 2>/dev/null < "$PLOG" | tr -d ' '); START=${START:-0}
 nohup "$PY" "$APP/app.py" "$@" >> "$PLOG" 2>&1 < /dev/null &
 PID=$!
 log "arranco el programa (proceso $PID)"

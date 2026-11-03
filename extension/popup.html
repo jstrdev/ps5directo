@@ -12,10 +12,12 @@ h1{font-size:15px;margin:0 0 8px;display:flex;align-items:center;gap:8px}h1 img{
 .jt{display:flex;gap:6px;align-items:center}.jt b{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar{height:5px;background:#21262d;border-radius:3px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:#3b82f6}
 .ph{font-size:11.5px;opacity:.65;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+input[type=number]{background:#1f2937;color:#e6edf3;border:1px solid #374151;border-radius:6px;padding:3px 6px;font:12px system-ui}
 button,select{background:#1f2937;color:#e6edf3;border:1px solid #374151;border-radius:6px;padding:3px 8px;cursor:pointer;font:12px system-ui}
 button.x{padding:1px 6px}
 fieldset{border:1px solid #30363d;border-radius:8px;padding:6px 10px;margin:10px 0 0}legend{font-size:12px;opacity:.75;padding:0 4px}
 label.r{display:flex;gap:6px;align-items:flex-start;margin:4px 0;font-size:12.5px}
+.eta{font-size:12px;opacity:.8;margin:2px 0 4px}.pcm{background:#132a1e;border:1px solid #1f6f43;border-radius:8px;padding:4px 8px}
 small{opacity:.6;display:block;margin-top:10px;line-height:1.4}
 .warn{background:rgba(242,196,109,.12);border:1px solid rgba(242,196,109,.45);border-radius:8px;padding:8px;margin:0 0 8px;font-size:12px;line-height:1.4}
 </style></head>
@@ -23,13 +25,20 @@ small{opacity:.6;display:block;margin-top:10px;line-height:1.4}
 <h1><img src="icon32.png" alt="">PS5 Directo</h1>
 <div class="st" id="st">Comprobando…</div>
 <div class="dots" id="dots" hidden><span class="dot" id="dFtp"><i></i>FTP</span><span class="dot" id="dBf"><i></i>BFpilot</span></div>
+<div class="eta" id="eta" hidden></div>
 <div class="q" id="q" hidden></div>
+<div class="row pcm" id="pcmRow" hidden><label for="pcm" id="lblPcm">🖥 Modo PC: todo se queda en tu PC</label><input type="checkbox" id="pcm"></div>
 <fieldset><legend id="lgSend">Clic derecho → «Enviar a PS5 Directo»</legend>
   <label class="r"><input type="radio" name="mode" value="box"><span id="mBox">A la caja de enlaces (lo revisas y pulsas «Añadir a la cola»)</span></label>
   <label class="r"><input type="radio" name="mode" value="queue"><span id="mQueue">Directo a la cola</span></label>
   <div class="row" id="whereRow"><span id="lWhere">¿A dónde va?</span><select id="where"><option value="ps5">📺 A la PS5</option><option value="keep">💻 Solo a mi PC</option></select></div>
 </fieldset>
 <div class="row"><label for="en" id="lblEn">Capturar descargas de .rar, .7z, .zip, .pkg…</label><input type="checkbox" id="en"></div>
+<fieldset><legend id="lgRules">Reglas de captura</legend>
+  <div class="row"><label for="minmb" id="lblMin">No capturar si pesa menos de</label><span><input type="number" id="minmb" min="0" max="100000" style="width:64px"> MB</span></div>
+  <div class="row"><span id="lblSite">En <b id="site">esta web</b></span><select id="siteRule"><option value="" id="oNorm">Normal</option><option value="never" id="oNever">Nunca capturar</option><option value="always" id="oAlways">Capturar cualquier archivo</option></select></div>
+  <div class="muted" id="altTip" style="font-size:11.5px">Alt + clic en un enlace: lo descarga el navegador, sin capturar.</div>
+</fieldset>
 <div class="row"><label for="prog" id="lblProg">Progreso de la cola en el icono</label><input type="checkbox" id="prog"></div>
 <div class="row"><span class="st muted" id="cnt"></span><button id="reset">Poner a 0</button></div>
 <small id="help">Pasa el captcha y pulsa Descargar como siempre: si es un .rar, .7z, .zip, .pkg… y PS5 Directo está abierto, el enlace va a su caja de enlaces y el navegador no descarga nada. Si PS5 Directo está cerrado, la descarga sigue normal.</small>

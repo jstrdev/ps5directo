@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="downloading">Guardando %1$s en Descargas › PS5 Directo…</string>
+    <string name="connect_first">Primero conecta la app con tu PC (escanea el QR) y vuelve a compartir el enlace.</string>
+</resources>

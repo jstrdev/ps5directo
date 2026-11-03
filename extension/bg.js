@@ -12,14 +12,16 @@ const WANTED_FILE = /\.(part\d+\.rar|rar|r\d{2,3}|7z(\.\d{3})?|zip|z\d{2}|\d{3}|
 const PORTS = [8777, 8778, 8779];
 
 async function settings() {
-  return chrome.storage.local.get({ enabled: true, captured: 0, mode: "box", where: "ps5", progress: true });
+  return chrome.storage.local.get({ enabled: true, captured: 0, mode: "box", where: "ps5", whereSet: false, progress: true,
+                                    minMB: 0, sites: {} });
 }
+const hostOf = u => { try { return new URL(u).hostname.toLowerCase().replace(/^www\./, ""); } catch (e) { return ""; } };
 
 async function findApp() {
   const { port: last } = await chrome.storage.local.get({ port: 0 });
   for (const port of (last ? [last, ...PORTS.filter(p => p !== last)] : PORTS)) {
     try {
-      const r = await fetch(`http://127.0.0.1:${port}/api/ext/ping`, { cache: "no-store" });
+      const r = await fetch(`http://127.0.0.1:${port}/api/ext/ping?v=${encodeURIComponent(chrome.runtime.getManifest().version)}`, { cache: "no-store" });
       if (r.ok) {
         const j = await r.json();
         if (j.app === "PS5 Directo") {
@@ -89,9 +91,18 @@ async function handle(item) {
   if (!cfg.enabled) return;
   const url = item.finalUrl || item.url;
   if (!/^https?:/i.test(url)) return;
+  // Alt + clic en el enlace: esta descarga la hace el navegador
+  const { bypassUntil = 0 } = await chrome.storage.session.get({ bypassUntil: 0 }).catch(() => ({ bypassUntil: 0 }));
+  if (Date.now() < bypassUntil) { chrome.storage.session.set({ bypassUntil: 0 }).catch(() => {}); return; }
+  // reglas por web: "never" = nunca capturar ahí; "always" = capturar cualquier archivo ahí
+  const site = hostOf(item.referrer || "") || hostOf(url);
+  const rule = (cfg.sites || {})[site] || (cfg.sites || {})[hostOf(url)] || "";
+  if (rule === "never") return;
   const name = fileName(item);
   const path = url.split("?")[0];
-  if (!WANTED_FILE.test(name) && !WANTED_FILE.test(path)) return;     // no es un archivo que nos interese
+  if (rule !== "always" && !WANTED_FILE.test(name) && !WANTED_FILE.test(path)) return;     // no es un archivo que nos interese
+  const size = item.fileSize > 0 ? item.fileSize : (item.totalBytes > 0 ? item.totalBytes : 0);
+  if (cfg.minMB > 0 && size > 0 && size < cfg.minMB * 1048576) return;                     // pequeño: que lo baje el navegador
   const app = await findApp();
   if (!app) {                                                          // PS5 Directo cerrado: no tocar
     chrome.action.setBadgeText({ text: "off" });
@@ -127,8 +138,8 @@ function makeMenus() {
     chrome.contextMenus.create({ id: "ps5d-sel", contexts: ["selection"], title: L("Enviar los enlaces seleccionados a PS5 Directo", "Send selected links to PS5 Directo") });
   });
 }
-chrome.runtime.onInstalled.addListener(() => { makeMenus(); setupAlarm(); });
-chrome.runtime.onStartup.addListener(() => { makeMenus(); setupAlarm(); });
+chrome.runtime.onInstalled.addListener(() => { makeMenus(); setupAlarm(); pollStatus(); });
+chrome.runtime.onStartup.addListener(() => { makeMenus(); setupAlarm(); pollStatus(); });
 
 // En la pagina: enlaces que hay dentro de lo seleccionado (los href) y los que se ven escritos en el texto
 function linksInSelection() {
@@ -145,9 +156,24 @@ function linksInSelection() {
   return [...out].filter(u => /^(https?|ftp):|^magnet:/i.test(u));
 }
 
+// En la pagina: el texto del bloque donde esta el enlace (para encontrar una contraseña escrita al lado)
+function textAround(href) {
+  const a = [...document.querySelectorAll("a[href]")].find(x => x.href === href);
+  const box = a && (a.closest("li,tr,p,article,section,blockquote,div") || a.parentElement);
+  let t = box ? box.innerText : "";
+  if (t.length < 40 && box && box.parentElement) t = box.parentElement.innerText;
+  return (t || "").slice(0, 3000);
+}
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  let links = [];
-  if (info.menuItemId === "ps5d-link" && info.linkUrl) links = [info.linkUrl];
+  let links = [], text = info.selectionText || "";
+  if (info.menuItemId === "ps5d-link" && info.linkUrl) {
+    links = [info.linkUrl];
+    try {
+      const [res] = await chrome.scripting.executeScript({ target: { tabId: tab.id, frameIds: [info.frameId || 0] }, func: textAround, args: [info.linkUrl] });
+      text = (res && res.result) || text;
+    } catch (e) { /* sin acceso a la pagina */ }
+  }
   if (info.menuItemId === "ps5d-sel") {
     try {
       const [res] = await chrome.scripting.executeScript({ target: { tabId: tab.id, frameIds: [info.frameId || 0] }, func: linksInSelection });
@@ -161,14 +187,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!app) { note("PS5 Directo", L("PS5 Directo no está abierto. Ábrelo y vuelve a probar.", "PS5 Directo isn't open. Open it and try again.")); return; }
   const cfg = await settings();
   try {
-    const r = await post(app, "/api/ext/send", { links, mode: cfg.mode, where: cfg.where,
+    const r = await post(app, "/api/ext/send", { links, text, mode: cfg.mode, where: cfg.where, where_set: !!cfg.whereSet,
       cookies: await cookiesFor(links.filter(u => /^https?:/i.test(u))), ua: navigator.userAgent, referrer: (tab && tab.url) || "" });
     if (!r.ok) throw new Error(r.error || "error");
     const n = links.length;
     note(L("Enviado a PS5 Directo", "Sent to PS5 Directo"),
-      cfg.mode === "queue"
+      (cfg.mode === "queue"
         ? L(`${n} enlace(s) añadidos a la cola` + (cfg.where === "keep" ? " (solo a tu PC)." : "."), `${n} link(s) added to the queue` + (cfg.where === "keep" ? " (PC only)." : "."))
-        : L(`${n} enlace(s) en la caja de enlaces. Revisa y pulsa «Añadir a la cola».`, `${n} link(s) in the link box. Check them and click "Add to queue".`));
+        : L(`${n} enlace(s) en la caja de enlaces. Revisa y pulsa «Añadir a la cola».`, `${n} link(s) in the link box. Check them and click "Add to queue".`))
+        + (r.password ? L(" Con la contraseña que había al lado.", " With the password that was next to it.") : ""));
     pollStatus();
   } catch (e) { note("PS5 Directo", L("No se pudo enviar: ", "Couldn't send: ") + e.message); }
 });
@@ -188,10 +215,14 @@ async function pollStatus() {
   const first = !Object.keys(seen).length;
   for (const j of st.jobs) {
     const prev = seen[j.id];
-    if (!first && prev && prev !== j.status && (j.status === "hecho" || j.status === "error"))
-      note(j.status === "hecho" ? L("Listo: ", "Done: ") + j.title : L("Problema: ", "Problem: ") + j.title,
-           j.status === "hecho" ? (j.where === "keep" ? L("Ya está en tu PC.", "It's on your PC now.") : L("Ya está en la PS5.", "It's on the PS5 now."))
-                                : L("Ábrelo en PS5 Directo para ver qué ha pasado.", "Open PS5 Directo to see what happened."));
+    if (!first && prev && prev !== j.status && (j.status === "hecho" || j.status === "error")) {
+      const opt = { type: "basic", iconUrl: "icon128.png",
+        title: j.status === "hecho" ? L("Listo: ", "Done: ") + j.title : L("Problema: ", "Problem: ") + j.title,
+        message: j.status === "hecho" ? (j.where === "keep" ? L("Ya está en tu PC.", "It's on your PC now.") : L("Ya está en la PS5.", "It's on the PS5 now."))
+                                      : L("Ábrelo en PS5 Directo para ver qué ha pasado.", "Open PS5 Directo to see what happened.") };
+      if (j.status === "hecho" && j.where === "keep") opt.buttons = [{ title: L("📂 Abrir la carpeta", "📂 Open the folder") }];
+      chrome.notifications.create("ps5d-done:" + j.id, opt);
+    }
     seen[j.id] = j.status;
   }
   chrome.storage.session.set({ seen }).catch(() => {});
@@ -209,7 +240,18 @@ async function pollStatus() {
   return st;
 }
 
+chrome.notifications.onButtonClicked.addListener(async (nid) => {
+  if (!nid.startsWith("ps5d-done:")) return;
+  const app = await findApp();
+  if (app) post(app, "/api/ext/job", { id: nid.slice(10), action: "reveal" }).catch(() => {});
+});
+
 chrome.runtime.onMessage.addListener((msg, _s, reply) => {
+  if (msg && msg.type === "bypass") { chrome.storage.session.set({ bypassUntil: Date.now() + 8000 }).catch(() => {}); return; }
+  if (msg && msg.type === "pcmode") {
+    findApp().then(app => app ? post(app, "/api/ext/pcmode", { on: !!msg.on }) : null).then(reply);
+    return true;
+  }
   if (msg && msg.type === "poll") { pollStatus().then(reply); return true; }
   if (msg && msg.type === "job") {
     findApp().then(app => app ? post(app, "/api/ext/job", { id: msg.id, action: msg.action }) : null).then(reply);

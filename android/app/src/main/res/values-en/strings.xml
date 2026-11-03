@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="downloading">Saving %1$s to Downloads › PS5 Directo…</string>
+    <string name="connect_first">First connect the app to your PC (scan the QR) and share the link again.</string>
+</resources>

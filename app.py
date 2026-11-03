@@ -4,6 +4,7 @@ Arranque:  python app.py   (o doble clic en "Iniciar PS5 Directo.bat")
 """
 
 import ftplib
+import io
 import json
 import re
 import os
@@ -14,17 +15,40 @@ import sys
 import threading
 import time
 import traceback
+import urllib.error
 import urllib.parse
 import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+# Mac: abierto desde el Finder, el PATH no incluye Homebrew ni MacPorts, y no se encontrarian
+# aria2, ffmpeg o rclone instalados con ellos (en Linux se anade ~/.local/bin, de pip y similares)
+if sys.platform == "darwin" or sys.platform.startswith("linux"):
+    _extra = (["/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin"] if sys.platform == "darwin"
+              else [os.path.expanduser("~/.local/bin")])
+    _have = os.environ.get("PATH", "").split(os.pathsep)
+    os.environ["PATH"] = os.pathsep.join(_have + [d for d in _extra if os.path.isdir(d) and d not in _have])
+    # el Python incluido busca los certificados de las webs en /etc/ssl; si en esta distribucion estan
+    # en otro sitio (Fedora, openSUSE...), se le dice donde, para que las descargas https no fallen
+    try:
+        import ssl as _ssl
+        _vp = _ssl.get_default_verify_paths()
+        if not os.environ.get("SSL_CERT_FILE") and not (_vp.cafile and os.path.isfile(_vp.cafile)) and \
+                not (_vp.capath and os.path.isdir(_vp.capath) and os.listdir(_vp.capath)):
+            for _c in ("/etc/ssl/cert.pem", "/etc/ssl/certs/ca-certificates.crt", "/etc/pki/tls/certs/ca-bundle.crt",
+                       "/etc/ssl/ca-bundle.pem", "/etc/pki/tls/cacert.pem", "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"):
+                if os.path.isfile(_c):
+                    os.environ["SSL_CERT_FILE"] = _c
+                    break
+    except Exception:
+        pass
 sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "1.26.0"
+VERSION = "2.0.0"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -55,18 +79,38 @@ DEFAULTS = {
     "passwords": [],
     "guess_passwords": True,
     "delete_archives": True,
-    "forge_auto_update": True,   # bajar solo las versiones nuevas de PS5 Dump Forge (comprobando que valen)
+    "trash_on": True,          # Biblioteca y Archivos: «Borrar» manda a la papelera de la consola (se recupera)
+    "trash_days": 7,           # lo de la papelera se borra solo pasados estos dias
+    "watch_since": 0.0,       # lo de la carpeta vigilada anterior a esto ya se vio
+    "shots_auto": False,      # bajar solas al PC las capturas y videos nuevos (Descargas/PS5 Directo/Capturas/<titulo>)
+    "low_prio": False,        # «Usar menos el PC»: Forge y 7-Zip con prioridad baja (va mas lento, el PC sigue agil)
+    "shots_send": "",         # y ademas mandarlas a: "tg" (Telegram), "dc" (Discord), "both" o "" (a ningun sitio)
+    "shots_tg_token": "",     # bot de Telegram (lo creas tu con @BotFather)
+    "shots_tg_chat": "",      # chat, grupo o canal de Telegram donde publica el bot
+    "shots_dc_hook": "",      # webhook de un canal de Discord
+    "shots_route": {},        # Title ID -> "tg", "dc", "both" o "none" (si no, el de shots_send)
+    "zftpd_dl": False,        # «Descargar en la PS5»: la propia consola baja el enlace con zftpd (sin pasar por el PC)
+    "watch_dir": "",          # carpeta vigilada: lo que termine de bajar ahi (FDM, JDownloader...) llega a la caja
+    "clip_watch": False,       # captar los enlaces de descarga que copies (van a la caja de enlaces)
+    "pc_mode": False,          # «Modo PC»: todo va a tu PC (bajar, descomprimir o convertir), nada a la consola
+    "pc_mode_steps": "extract",  # en Modo PC: dl, extract o convert (lo que usan la extension y el movil)
+    "pc_mode_fmt": "",         # en Modo PC con convert: formato
+    "forge_auto_update": False,  # bajar solo las versiones nuevas de PS5 Dump Forge (si no, avisa y pregunta)
     "tour_done": False,       # la guia de bienvenida ya se vio
+    "tour20_done": False,     # la guia de la 2.0 (lo nuevo) ya se vio
     "seen_version": "",       # ultima version cuyas novedades ya se ensenaron
     "shortcut_done": False,   # ya se creo el acceso directo del escritorio una vez
     "icon_ver": "",           # version cuyo icono ya se dejo en la cache de la ventana
     # 1.20
     "elf_port": 9021,         # cargador de payloads de la consola (etaHEN / elfldr)
     "auto_payloads": True,    # al abrir, iniciar solos ftpsrv/BFpilot con Payload Manager si faltan
-    "console_fw": "",         # firmware de tu PS5 (p. ej. 13.60) para avisar de lo que no arrancara
+    "console_fw": "",
+    "fw_guard": True,         # Guardian del firmware: avisa si la consola baja una actualizacion del sistema
+    "fw_guard_auto": False,   # y la quita sola
+    "bug_ask": True,          # proponer el informe cuando el programa detecta un fallo suyo         # firmware de tu PS5 (p. ej. 13.60) para avisar de lo que no arrancara
     "dup_check": True,        # preguntar antes de enviar algo que ya esta en la consola
     "verify_sums": True,      # comprobar .sfv/.md5/.sha1 si vienen con las partes
-    "pc_format": "folder",    # en el PC: folder, ffpkg, ffpfsc, lz4, lz4ffpkg (con PS5 Dump Forge)
+    "pc_format": "folder",    # en el PC: folder, ffpkg, ffpfsc, lz4, lz4ffpkg, zstd, zstdffpkg (con PS5 Dump Forge)
     "forge_path": "",         # ruta de ps5-dump-forge.exe (vacio = descargarlo solo)
     "keep_awake": True,       # que el PC no se suspenda mientras hay envios
     "welcome_seen": False,    # la ventana de bienvenida ya se ha visto
@@ -75,7 +119,7 @@ DEFAULTS = {
     "backup_dir": "",         # copias de seguridad de la consola (vacio = Documentos\\PS5 Directo\\Copias)
     "backup_auto": False,     # una copia al dia, sola, si la consola esta encendida
     "backup_keep": 10,        # cuantas copias guardar
-    "backup_saves": True, "backup_config": True, "backup_appdb": True,
+    "backup_saves": True, "backup_config": True, "backup_appdb": True, "backup_emu": True,
     "lan_access": False,      # abrir la app desde el movil (misma red)
     "lan_port": 8780,
     "lan_token": "",
@@ -115,6 +159,10 @@ def load_state():
         if int(SETTINGS.get("extract_threads") or 0) == 1:
             SETTINGS["extract_threads"] = 0
     SETTINGS["_threads_v181"] = True
+    # 1.28.0: las versiones nuevas de PS5 Dump Forge se avisan con sus novedades y se actualiza cuando quieras
+    if not SETTINGS.get("_forge_ask_v128"):
+        SETTINGS["forge_auto_update"] = False
+        SETTINGS["_forge_ask_v128"] = True
     try:
         with open(JOBS_FILE, encoding="utf-8") as f:
             JOBS = json.load(f)
@@ -158,7 +206,7 @@ def new_job(lines, password, dest, title=None, where=None, raw=False, fmt=None, 
         "raw": bool(raw),
         "fmt": fmt if fmt in F.FORGE_FORMATS else "",
         "comp": comp if comp in COMP_LEVELS else "",
-        "where": where if where in ("ps5", "pc", "keep") else "",
+        "where": where if where in ("ps5", "pc", "keep", "zdl") else "",
         "id": secrets.token_hex(4),
         "created": time.time(),
         "title": title or "",
@@ -317,15 +365,37 @@ def part_hasher(job, s):
     return F.StreamHasher(chk[0])
 
 
-def verify_part(job, s, hasher, on_bad=None):
-    """Compara la suma calculada al enviar con la del .sfv/.md5. Lanza PipeError si no coincide."""
+def verify_part(job, s, hasher, on_bad=None, local=None, remote=None):
+    """Compara la suma calculada al enviar con la del .sfv/.md5. Lanza PipeError si no coincide.
+    Si no se pudo sumar al vuelo (se continuo a medias), la calcula leyendo el archivo entero: del PC (local) o de
+    la consola por FTP (remote)."""
     if hasher is None:
         return
     algo, want = job["checks"][s.name.lower()]
     if not hasher.valid or hasher.pos != s.size:
-        jlog(job, "%s: sin comprobar con %s (ya estaba enviado o se continuo de un envio anterior)"
-             % (s.name, algo.upper()))
-        return
+        h2 = F.StreamHasher(algo)
+        try:
+            if local and os.path.isfile(local):
+                jlog(job, "%s: se continuó a medias, compruebo el %s leyendo el archivo entero" % (s.name, algo.upper()))
+                with open(local, "rb") as fh:
+                    for _ in h2.wrap(iter(lambda: fh.read(4 * E.MiB), b""), 0):
+                        pass
+            elif remote:
+                jlog(job, "%s: se continuó a medias, compruebo el %s leyéndolo de la consola" % (s.name, algo.upper()))
+                setj(job, phase="Comprobando %s (%s) en la consola" % (s.name, algo.upper()))
+                def feed(b):
+                    h2._update(b)
+                    h2.pos += len(b)
+                E.Ftp(cfg_snapshot()).call(lambda f: f.retrbinary("RETR " + remote, feed, 4 * E.MiB))
+            else:
+                raise E.PipeError("sin archivo")
+        except E.PipeError:
+            jlog(job, "%s: sin comprobar con %s (se continuó de un envío anterior)" % (s.name, algo.upper()))
+            return
+        except Exception as e:
+            jlog(job, "%s: no pude releerlo para comprobar el %s (%s)" % (s.name, algo.upper(), e))
+            return
+        hasher = h2
     got = hasher.hexdigest()
     if got.lower() == want.lower():
         jlog(job, "%s: %s correcto" % (s.name, algo.upper()))
@@ -411,6 +481,44 @@ def start_space_watch(job, bf, cancel, what):
     return done
 
 
+STAMPS_FILE = os.path.join(DATA_DIR, "huellas.json")
+STAMPS_LOCK = threading.Lock()
+
+
+def stamps_check_console(job, bf, inc, srcs):
+    """Antes de continuar un envio a medias: si el archivo del servidor ya no es el mismo (otro ETag, otra fecha o
+    otro tamano), lo que hay a medias en la consola es de otro archivo y se borra para empezar de cero."""
+    with STAMPS_LOCK:
+        try:
+            with open(STAMPS_FILE, encoding="utf-8") as fh:
+                known = json.load(fh)
+        except Exception:
+            known = {}
+        changed = False
+        for s in srcs:
+            if not hasattr(s, "stamp") or not s.name:
+                continue
+            key = "%s/%s" % (inc, s.name)
+            new = s.stamp()
+            if E.stamp_changed(known.get(key), new):
+                part = key + ".ps5part"
+                try:
+                    if bf.exists(part):
+                        bf.delete(part)
+                        jlog(job, "%s: el archivo del servidor ha cambiado desde el último envío. Lo que había a "
+                                  "medias en la PS5 no vale: empiezo desde cero." % s.name)
+                except Exception as e:
+                    jlog(job, "No pude borrar lo enviado a medias de %s: %s" % (s.name, e))
+            if known.get(key) != new:
+                known[key] = new
+                changed = True
+        if changed:
+            try:
+                _save_json(STAMPS_FILE, dict(list(known.items())[-400:]))
+            except Exception:
+                pass
+
+
 def adopt_previous(job, bf, inc, names):
     """Mueve a 'inc' las partes que otros trabajos ya mandaron (completas o a medias)."""
     root = WORK_ROOT + "/incoming"
@@ -488,7 +596,7 @@ def send_parts_parallel(job, cfg, srcs, inc, cancel, meter, set_sent):
                          lambda v, s=s: (progress(s.name, v), phase()),
                          stop, lambda msg: jlog(job, msg))
                 verify_part(job, s, hasher,
-                            on_bad=lambda remote=remote: E.Ftp(cfg).call(lambda f: f.delete(remote)))
+                            on_bad=lambda remote=remote: E.Ftp(cfg).call(lambda f: f.delete(remote)), remote=remote)
                 progress(s.name, max(0, s.size))
             except Exception as e:
                 with lock:
@@ -526,7 +634,8 @@ def transfer_job(job, srcs, cancel):
     if job.get("raw"):
         return raw_job(job, srcs, cancel)
     if srcs[0].kind == "folder":
-        if job.get("fmt") == "plain" and os.path.isfile(os.path.join(srcs[0].path, "ampr_assets.index")):
+        if job.get("fmt") == "plain" and (os.path.isfile(os.path.join(srcs[0].path, "ampr_assets.index"))
+                                         or os.path.isfile(os.path.join(srcs[0].path, "ampr_zstd.index"))):
             with LOCK:
                 job["_plain_conv"] = True     # carpeta empaquetada en LZ4 -> carpeta normal
         return folder_job(job, srcs[0], cancel)
@@ -539,7 +648,7 @@ def transfer_job(job, srcs, cancel):
     fmt = job_fmt(job)
     if fmt and len(srcs) == 1 and srcs[0].name.lower().endswith(CONV_SRC_EXTS):
         want = F.FORGE_FORMATS[fmt][1]
-        if want and srcs[0].name.lower().endswith(want) and fmt != "lz4ffpkg":
+        if want and srcs[0].name.lower().endswith(want) and fmt not in ("lz4ffpkg", "zstdffpkg"):
             jlog(job, "Ya viene como %s: lo envío tal cual, sin convertir" % want)
         else:
             return pc_extract_job(job, srcs, cancel)
@@ -580,6 +689,7 @@ def transfer_job(job, srcs, cancel):
     bf = E.BFpilot(cfg)
 
     adopt_previous(job, bf, inc, [s.name for s in srcs])
+    stamps_check_console(job, bf, inc, srcs)
     check_duplicates_first(job, bf, E.title_id(srcs[0].name))
 
     # Comprobacion de espacio: lo que falta por enviar + margen. La descompresion la
@@ -642,7 +752,7 @@ def transfer_job(job, srcs, cancel):
             return hasher.wrap(it, off) if hasher else it
         E.upload(cfg, remote, s.size, make,
                  lambda n: set_sent(n), cancel, lambda msg: jlog(job, msg))
-        verify_part(job, s, hasher, on_bad=lambda: E.Ftp(cfg).call(lambda f: f.delete(remote)))
+        verify_part(job, s, hasher, on_bad=lambda: E.Ftp(cfg).call(lambda f: f.delete(remote)), remote=remote)
         return {"mode": "file", "path": remote, "name": s.name}
     finally:
         stop_speed.set()
@@ -728,6 +838,11 @@ def record_history(job):
             _save_json(HISTORY_FILE, hist[-500:])
         if job.get("status") == "hecho":
             torrent_cleanup(job)
+            rv = job.get("rec_ver")
+            if rv:
+                vers = _emu_vers()
+                vers[rv["id"]] = rv["tag"]
+                _save_json(EMU_VER_FILE, vers)
         title = job.get("title") or "Transferencia"
         link = {"tab": "Transfers", "job": job["id"]}
         if job.get("status") == "hecho":
@@ -1137,8 +1252,175 @@ def fm_paste(op, srcs, dst, mode="replace"):
     _fm_start(op, len(srcs), work, where=dst, names=[posixpath.basename(x) for x in srcs])
 
 
-def fm_delete(paths):
+# ---------------------------------------------------------------------------
+# Papelera en la consola: lo borrado (y la copia vieja al reemplazar) se aparta en una carpeta del mismo disco,
+# se puede recuperar unos dias y luego se borra solo. Apartar es instantaneo, pero no libera espacio.
+# ---------------------------------------------------------------------------
+
+TRASH_FILE = os.path.join(DATA_DIR, "papelera.json")
+TRASH_LOCK = threading.Lock()
+
+
+def trash_root(path):
+    m = re.match(r"^(/mnt/(?:ext|usb)\d+)(/|$)", path)
+    if m:
+        return m.group(1) + "/ps5directo-papelera"
+    if path.startswith("/data/"):
+        return "/data/ps5directo/papelera"
+    return None
+
+
+def trash_load():
+    try:
+        with open(TRASH_FILE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return []
+
+
+def trash_save(items):
+    _save_json(TRASH_FILE, items)
+
+
+def _rename_console(src, dst):
+    bf = E.BFpilot(cfg_snapshot())
+    if bf.alive():
+        bf.mkdir(posixpath.dirname(dst))
+        bf.rename(src, dst)
+    else:
+        def go(f):
+            E.Ftp.mkdirs(f, posixpath.dirname(dst))
+            f.rename(src, dst)
+        E.Ftp(cfg_snapshot()).call(go)
+
+
+def trash_move(path, why="borrado", size=None):
+    """Aparta path en la papelera. True si se pudo (si no, quien llama lo borra del todo)."""
+    root = trash_root(path)
+    if not root or not SETTINGS.get("trash_on", True) or path.startswith(root):
+        return False
+    tid = "%d%s" % (int(time.time() * 1000), secrets.token_hex(2))
+    dst = "%s/%s__%s" % (root, tid, posixpath.basename(path.rstrip("/")))
+    try:
+        _rename_console(path, dst)
+    except Exception as e:
+        print("Papelera: no pude apartar %s: %s" % (path, e))
+        return False
+    with TRASH_LOCK:
+        items = trash_load()
+        items.append({"id": tid, "orig": path, "at": dst, "t": time.time(), "why": why, "size": size})
+        trash_save(items)
+    return True
+
+
+def _delete_console(path, cancel=None):
+    bf = E.BFpilot(cfg_snapshot())
+    if bf.alive():
+        bf.delete(path, cancel)
+    else:
+        ftp_rmtree(cfg_snapshot(), path, cancel or threading.Event())
+
+
+def trash_delete(ids=None, older_than=None):
+    """Borra del todo lo de la papelera (todo, unos ids o lo mas viejo que older_than). Devuelve cuantos."""
+    with TRASH_LOCK:
+        items = trash_load()
+    gone = []
+    for it in items:
+        if ids is not None and it["id"] not in ids:
+            continue
+        if older_than is not None and it["t"] > older_than:
+            continue
+        try:
+            _delete_console(it["at"])
+            gone.append(it["id"])
+        except Exception as e:
+            print("Papelera: no pude borrar %s: %s" % (it["at"], e))
+    with TRASH_LOCK:
+        trash_save([x for x in trash_load() if x["id"] not in gone])
+    return len(gone)
+
+
+def trash_restore(tid):
+    with TRASH_LOCK:
+        it = next((x for x in trash_load() if x["id"] == tid), None)
+    if not it:
+        raise E.PipeError("Ya no está en la papelera")
+    cfg = cfg_snapshot()
+    exists = E.BFpilot(cfg).exists(it["orig"]) if E.BFpilot(cfg).alive() else \
+        E.Ftp(cfg).call(lambda f: _ftp_isdir(f, it["orig"]) or E.Ftp.size(f, it["orig"]) is not None)
+    if exists:
+        raise E.PipeError("En %s ya hay otra cosa: muévela o bórrala antes de recuperar esta." % it["orig"])
+    _rename_console(it["at"], it["orig"])
+    with TRASH_LOCK:
+        trash_save([x for x in trash_load() if x["id"] != tid])
+    return it["orig"]
+
+
+def trash_list():
+    items = trash_load()
+    # quitar de la lista lo que ya no esta (borrado a mano, otra consola...)
+    try:
+        roots = sorted({posixpath.dirname(x["at"]) for x in items})
+
+        def names(f):
+            out = set()
+            for r in roots:
+                try:
+                    out |= {r + "/" + n for n, v in E.ftp_listdir(f, r)}
+                except ftplib.all_errors:
+                    pass
+            return out
+        if roots:
+            have = E.Ftp(cfg_snapshot()).call(names)
+            if any(x["at"] not in have for x in items):
+                with TRASH_LOCK:
+                    items = [x for x in trash_load() if x["at"] in have]
+                    trash_save(items)
+    except Exception:
+        pass
+    days = int(SETTINGS.get("trash_days") or 7)
+    for it in items:
+        it["left_days"] = max(0, round(days - (time.time() - it["t"]) / 86400, 1))
+    return sorted(items, key=lambda x: -x["t"])
+
+
+def trash_tidy():
+    """Borra lo que lleve en la papelera mas de los dias elegidos (si la consola contesta)."""
+    days = int(SETTINGS.get("trash_days") or 7)
+    if trash_load():
+        trash_delete(older_than=time.time() - days * 86400)
+
+
+def trash_make_room(need, bf=None):
+    """Si no hay sitio para `need` bytes, vacia la papelera empezando por lo mas viejo."""
+    items = sorted(trash_load(), key=lambda x: x["t"])
+    if not items:
+        return
+    try:
+        free = free_space(bf or E.BFpilot(cfg_snapshot()))
+    except Exception:
+        return
+    for it in items:
+        if free is None or free >= need:
+            return
+        trash_delete(ids=[it["id"]])
+        try:
+            free = free_space(bf or E.BFpilot(cfg_snapshot()))
+        except Exception:
+            return
+
+
+def fm_delete(paths, trash=False):
     paths = [fm_clean(x) for x in paths]
+    if trash and SETTINGS.get("trash_on", True):
+        rest = [p for p in paths if not trash_move(p)]
+        if not rest:
+            with LOCK:
+                FMOP.update(busy=False, op="delete", items_done=len(paths), items_total=len(paths), error="",
+                            message="En la papelera: se puede recuperar unos días (Espacio › Papelera)")
+            return
+        paths = rest
     for p in paths:
         if p.count("/") < 2:
             raise E.PipeError("Por seguridad no borro carpetas de primer nivel (%s)" % p)
@@ -1246,7 +1528,149 @@ def pc_library_dir():
     return d or os.path.join(downloads_dir(), "PS5 Directo", "Biblioteca")
 
 
-def fm_download(paths, dest=None):
+def lib_scan_safe():
+    try:
+        library_start(False)
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Lo archivado en el PC: lista con fecha, ruta y suma SHA-256 de cada archivo, para comprobar mas adelante que
+# sigue entero (un disco que falla, una copia a medias...).
+# ---------------------------------------------------------------------------
+
+ARCH_FILE = os.path.join(DATA_DIR, "archivados.json")
+ARCH_LOCK = threading.Lock()
+ARCH_STATE = {}          # id -> {"busy", "pct", "msg"}
+
+
+def _arch_load():
+    try:
+        with open(ARCH_FILE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return []
+
+
+def _arch_save(lst):
+    _save_json(ARCH_FILE, lst)
+
+
+def _sha256_file(path, cancel=None, on_bytes=None):
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        while True:
+            if cancel is not None and cancel.is_set():
+                raise E.Cancelled()
+            b = fh.read(4 * 1024 * 1024)
+            if not b:
+                break
+            h.update(b)
+            if on_bytes:
+                on_bytes(len(b))
+    return h.hexdigest()
+
+
+def arch_record(console_path, root_local, files):
+    """Apunta lo archivado y calcula sus sumas en segundo plano (en un disco lento puede tardar)."""
+    name = posixpath.basename(console_path)
+    rec = {"id": secrets.token_hex(5), "t": time.time(), "name": name, "tid": E.title_id(name) or "",
+           "console": console_path, "pc": os.path.join(root_local, name),
+           "size": sum(sz or 0 for _, _, sz in files),
+           "files": [{"rel": rel, "size": sz} for _, rel, sz in files], "state": "sumando", "checked": None}
+    titles = (lib_load().get("titles") or {})
+    if rec["tid"] and (titles.get(rec["tid"]) or {}).get("title"):
+        rec["title"] = titles[rec["tid"]]["title"]
+    with ARCH_LOCK:
+        lst = _arch_load()
+        lst.append(rec)
+        _arch_save(lst)
+    threading.Thread(target=_arch_hash, args=(rec["id"], root_local, False), daemon=True).start()
+
+
+def _arch_hash(rid, root_local=None, verify=True):
+    with ARCH_LOCK:
+        rec = next((r for r in _arch_load() if r["id"] == rid), None)
+    if not rec:
+        return
+    base = os.path.dirname(rec["pc"]) if root_local is None else root_local
+    total = max(1, rec.get("size") or 1)
+    st = ARCH_STATE.setdefault(rid, {})
+    st.update(busy=True, pct=0, msg="Comprobando…" if verify else "Calculando las sumas…")
+    done = {"n": 0}
+
+    def tick(n):
+        done["n"] += n
+        st["pct"] = min(99, int(done["n"] * 100 / total))
+    bad, missing = [], []
+    try:
+        for fe in rec["files"]:
+            lp = os.path.join(base, *fe["rel"].split("/"))
+            if not os.path.isfile(lp):
+                missing.append(fe["rel"])
+                continue
+            if fe.get("size") is not None and os.path.getsize(lp) != fe["size"]:
+                bad.append(fe["rel"])
+                continue
+            hx = _sha256_file(lp, on_bytes=tick)
+            if verify and fe.get("sha256"):
+                if hx != fe["sha256"]:
+                    bad.append(fe["rel"])
+            else:
+                fe["sha256"] = hx
+        state = "ok" if not bad and not missing else "mal"
+        msg = ("Todo entero (%d archivos)" % len(rec["files"]) if state == "ok" else
+               "%s%s" % ("Cambiados o dañados: %s. " % ", ".join(bad[:4]) if bad else "",
+                         "Faltan: %s." % ", ".join(missing[:4]) if missing else ""))
+    except Exception as e:
+        state, msg = "error", str(e)
+    with ARCH_LOCK:
+        lst = _arch_load()
+        for r in lst:
+            if r["id"] == rid:
+                if not verify:
+                    r["files"] = rec["files"]
+                r["state"] = state
+                r["msg"] = msg
+                r["checked"] = time.time()
+        _arch_save(lst)
+    st.update(busy=False, pct=100, msg=msg)
+    if verify and state != "ok":
+        notify("warn", "Archivado con problemas: %s" % (rec.get("title") or rec["name"]), msg, {"tab": "Library"})
+
+
+def arch_list():
+    with ARCH_LOCK:
+        lst = _arch_load()
+    out = []
+    for r in sorted(lst, key=lambda x: x.get("t", 0), reverse=True):
+        it = {k: r.get(k) for k in ("id", "t", "name", "title", "tid", "console", "pc", "size", "state", "msg", "checked")}
+        it["n"] = len(r.get("files") or [])
+        it["exists"] = os.path.exists(r.get("pc") or "")
+        st = ARCH_STATE.get(r["id"]) or {}
+        it["busy"] = bool(st.get("busy"))
+        it["pct"] = st.get("pct", 0)
+        out.append(it)
+    return {"items": out}
+
+
+def arch_verify_start(rid):
+    if (ARCH_STATE.get(rid) or {}).get("busy"):
+        return {"busy": True}
+    threading.Thread(target=_arch_hash, args=(rid, None, True), daemon=True).start()
+    return {"busy": True}
+
+
+def arch_forget(rid):
+    with ARCH_LOCK:
+        lst = [r for r in _arch_load() if r["id"] != rid]
+        _arch_save(lst)
+    return {"ok": True}
+
+
+def fm_download(paths, dest=None, scan=True, after=None):
     cfg = cfg_snapshot()
     paths = [fm_clean(x) for x in paths]
     root_local = dest or os.path.join(downloads_dir(), "PS5 Directo")
@@ -1301,7 +1725,9 @@ def fm_download(paths, dest=None):
         with LOCK:
             FMOP.update(items_done=len(files), bytes_done=done,
                         message="Guardado en %s" % root_local)
-        if dest:   # bajado a la carpeta de la Biblioteca: que salga ya en «En tu PC»
+        if after:
+            after(files, root_local)
+        if dest and scan:   # bajado a la carpeta de la Biblioteca: que salga ya en «En tu PC»
             threading.Thread(target=collection_scan, daemon=True).start()
     _fm_start("download", len(paths), work, names=[posixpath.basename(x) for x in paths])
 
@@ -1551,6 +1977,53 @@ def fm_api(p, b):
         os.makedirs(report_dir(), exist_ok=True)
         _open_quiet(report_dir())
         return {"dir": report_dir()}
+    if p == "/api/lib/checkall":
+        if b.get("cancel"):
+            CHECKALL_CANCEL.set()
+            return {}
+        with LOCK:
+            if CHECKALL["busy"]:
+                return {"busy": True}
+            if not (LIB.get("items") or {}).get("items"):
+                raise E.PipeError("Primero lee la Biblioteca de la consola")
+            CHECKALL["busy"] = True
+        threading.Thread(target=check_all, daemon=True).start()
+        return {}
+    if p == "/api/lib/checkall/state":
+        with LOCK:
+            return {"st": {k: (list(v) if isinstance(v, list) else v) for k, v in CHECKALL.items()}}
+    if p == "/api/lib/meta":
+        tid = str(b.get("tid") or "").upper()
+        meta = dict((lib_load()["titles"].get(tid) or {})) if tid else {}
+        meta.pop("cover", None)
+        played = (played_load().get("titles") or {}).get(tid) if tid else None
+        with LOCK:
+            pcs = [{"path": x.get("path"), "kind": x.get("kind"), "size": x.get("size"), "version": x.get("version")}
+                   for x in (COL.get("items") or []) if tid and (x.get("tid") or "").upper() == tid]
+        bks = []
+        try:
+            for x in backup_list():
+                if tid and tid in (x.get("saves") or []):
+                    bks.append({"name": x["name"], "t": x["t"]})
+        except Exception:
+            pass
+        return {"meta": meta, "played": played, "pc": pcs, "backups": bks[:10]}
+    if p == "/api/lib/rename":
+        if b.get("apply") or b.get("undo"):
+            return rename_apply(b.get("paths") or [], undo=bool(b.get("undo")))
+        return rename_plan()
+    if p == "/api/lib/note":
+        tid = str(b.get("tid") or "").upper()
+        if not re.match(r"^[A-Z]{4}\d{5}$", tid):
+            raise E.PipeError("Sin Title ID")
+        d = lib_load()
+        t = d["titles"].setdefault(tid, {})
+        if "note" in b:
+            t["note"] = str(b.get("note") or "")[:4000]
+        if "tags" in b:
+            t["tags"] = [str(x)[:40] for x in (b.get("tags") or [])][:20]
+        lib_save(d)
+        return {}
     if p == "/api/lib/check":
         return launch_check(str(b.get("path") or ""), int(b.get("minutes") or 30))
     if p == "/api/lib/checkreport":
@@ -1590,6 +2063,47 @@ def fm_api(p, b):
         os.makedirs(d, exist_ok=True)
         _open_quiet(d)
         return {"dir": d}
+    if p == "/api/lib/archive":
+        # «Archivar en el PC»: se copia a la carpeta de la Biblioteca del PC, se comprueba que ha llegado entero y
+        # entonces se quita de la consola (del todo: para liberar espacio). Vuelve con «Enviar a la consola».
+        path = str(b.get("path") or "")
+        if not path.startswith(("/data/", "/mnt/")) or path.count("/") < 3:
+            raise E.PipeError("Eso no se puede archivar")
+        d = pc_library_dir()
+        os.makedirs(d, exist_ok=True)
+
+        def after(files, root_local):
+            bad = []
+            for rp, rel, sz in files:
+                lp = os.path.join(root_local, *rel.split("/"))
+                if not os.path.isfile(lp) or (sz is not None and os.path.getsize(lp) != sz):
+                    bad.append(rel)
+            if bad or not files:
+                raise E.PipeError("No se ha copiado entero al PC (%s): no lo quito de la consola."
+                                  % (", ".join(bad[:3]) or "sin archivos"))
+            with LOCK:
+                FMOP["message"] = "Comprobado en tu PC: lo quito de la consola…"
+            _delete_console(path, FM_CANCEL)
+            total = sum(sz or 0 for _, _, sz in files)
+            with LOCK:
+                FMOP["message"] = "Archivado en tu PC (%s): liberados %s en la consola. Para devolverlo: Biblioteca › En tu PC › Enviar a la consola." % (os.path.join(root_local, posixpath.basename(path)), human(total))
+            threading.Thread(target=lambda: lib_scan_safe(), daemon=True).start()
+            arch_record(path, root_local, files)
+        fm_download([path], dest=d, after=after)
+        return {"dir": d}
+    if p == "/api/archived/list":
+        return arch_list()
+    if p == "/api/archived/verify":
+        return arch_verify_start(str(b.get("id") or ""))
+    if p == "/api/archived/reveal":
+        with ARCH_LOCK:
+            r = next((x for x in _arch_load() if x["id"] == b.get("id")), None)
+        if not r or not os.path.exists(r.get("pc") or ""):
+            raise E.PipeError("Ya no está en tu PC (¿lo has movido o borrado?)")
+        F.reveal_path(r["pc"])
+        return {}
+    if p == "/api/archived/forget":
+        return arch_forget(str(b.get("id") or ""))
     if p == "/api/lib/download":
         paths = [str(x) for x in (b.get("paths") or []) if str(x).startswith(("/data/", "/mnt/"))]
         if not paths:
@@ -1620,6 +2134,15 @@ def fm_api(p, b):
             raise E.PipeError("Elige algún vídeo")
         media_convert(paths)
         return {}
+    if p == "/api/media/download":
+        paths = [fm_clean(str(x)) for x in (b.get("paths") or [])]
+        paths = [x for x in paths if x.startswith(MEDIA_ROOT + "/")]
+        if not paths:
+            raise E.PipeError("Elige alguna captura")
+        d = MEDIA_CONV_DIR()
+        os.makedirs(d, exist_ok=True)
+        fm_download(paths, dest=d, scan=False)
+        return {"dir": d}
     if p == "/api/media/mp4ready":
         return {"ready": {x: bool(media_mp4_path(x) and os.path.isfile(media_mp4_path(x)))
                           for x in [str(v) for v in (b.get("paths") or [])][:500]}}
@@ -1668,7 +2191,7 @@ def fm_api(p, b):
     if p == "/api/bk/run":
         if BK["busy"]:
             raise E.PipeError("Ya hay una copia en marcha")
-        secs = [x for x in (b.get("sections") or []) if x in ("saves", "config", "appdb", "list")] or None
+        secs = [x for x in (b.get("sections") or []) if x in ("saves", "emu", "config", "appdb", "list")] or None
         tids = [str(x).upper() for x in (b.get("tids") or []) if re.match(r"^[A-Za-z]{4}\d{5}$", str(x))]
         if tids:
             def has_saves(f):
@@ -1697,7 +2220,8 @@ def fm_api(p, b):
         if not bpath.startswith(os.path.abspath(backup_dir(cfg_snapshot()))) or not os.path.isfile(bpath):
             raise E.PipeError("Esa copia ya no está en la carpeta de copias (¿la moviste o borraste?). "
                               "Pulsa Actualizar en la lista de copias.")
-        threading.Thread(target=backup_restore, args=(bpath, b.get("ids") or []), daemon=True).start()
+        threading.Thread(target=backup_restore, args=(bpath, b.get("ids") or [], b.get("emus") or []),
+                         daemon=True).start()
         return {}
     if p == "/api/bk/open":
         d = backup_dir()
@@ -1743,8 +2267,15 @@ def fm_api(p, b):
         fm_paste(op, b.get("srcs") or [], b.get("dst"), b.get("mode") or ("replace" if b.get("overwrite") else "replace"))
         return {}
     if p == "/api/fm/delete":
-        fm_delete(b.get("paths") or [])
+        fm_delete(b.get("paths") or [], trash=bool(b.get("trash")))
         return {}
+    if p == "/api/trash/list":
+        return {"items": trash_list(), "days": int(SETTINGS.get("trash_days") or 7), "on": bool(SETTINGS.get("trash_on", True))}
+    if p == "/api/trash/restore":
+        return {"path": trash_restore(str(b.get("id") or ""))}
+    if p == "/api/trash/delete":
+        ids = b.get("ids")
+        return {"n": trash_delete(ids=None if b.get("all") else [str(x) for x in (ids or [])])}
     if p == "/api/fm/download":
         fm_download(b.get("paths") or [])
         return {}
@@ -1757,6 +2288,22 @@ def fm_api(p, b):
     if p == "/api/fm/cancel":
         FM_CANCEL.set()
         return {}
+    if p == "/api/job/reveal":
+        with LOCK:
+            j = next((x for x in JOBS if x["id"] == b.get("id")), None)
+            res = list((j or {}).get("result") or [])
+            keep = (j or {}).get("where") == "keep"
+        i = int(b.get("i") or 0)
+        if not j or not keep or i >= len(res):
+            raise E.PipeError("Ya no encuentro ese resultado")
+        path = res[i]
+        if not os.path.exists(path):
+            raise E.PipeError("Ya no está en %s (¿lo has movido o borrado?)" % path)
+        if b.get("open") and os.path.isdir(path):
+            F.open_path(path)
+        else:
+            F.reveal_path(path)
+        return {"path": path}
     if p == "/api/fm/open_local":
         path = FMOP.get("local") or os.path.join(downloads_dir(), "PS5 Directo")
         if os.path.isdir(path):
@@ -1995,7 +2542,7 @@ _CONN_RX = re.compile(r"(?i)10054|10053|10060|10061|10065|connection (reset|refu
                       r"no respondi|errno (32|54|60|61|64|65|104|110|111|113)")
 
 
-MAC_LAN_MSG = ("macOS no deja a PS5 Directo usar la red local. Ve a Ajustes del Sistema → Privacidad y seguridad → Red local, activa «PS5 Directo» (o «python3») y vuelve a abrir el programa.")
+MAC_LAN_MSG = ("macOS no deja a PS5 Directo usar la red local. Ve a Ajustes del Sistema → Privacidad y seguridad → Red local, activa «PS5 Directo» (o «python3») y vuelve a abrir el programa. Si no sale en esa lista, cierra PS5 Directo (Salir) y ábrelo otra vez desde Aplicaciones: macOS pregunta la primera vez que intenta conectar con la consola.")
 
 
 def mac_lan_blocked(host=None):
@@ -2230,6 +2777,9 @@ def make_report(job_id=None, form=None):
                        "".join(re.sub(r"([#?&]t=)[\w-]+", r"\1(oculto)", ln) for ln in lines))
         except OSError:
             pass
+        with AUTOBUG_LOCK:
+            if AUTOBUG["items"]:
+                z.writestr("fallos_detectados.json", json.dumps(AUTOBUG["items"], ensure_ascii=False, indent=1))
         z.writestr("LEEME.txt", "Informe de PS5 Directo %s (%s)\n\n%s%s\n\nNo lleva contraseñas. Pásaselo a quien te "
                    "ayude.\n" % (VERSION, info["date"], (told + "\n") if told else "", "\n".join(summary)))
     return fp
@@ -2304,7 +2854,7 @@ def _recent_logs(f, roots, since, limit=6):
     return out
 
 
-def launch_check(path, minutes=30):
+def launch_check(path, minutes=30, quick=False):
     cfg = cfg_snapshot()
     path = fm_clean(path)
     checks = []
@@ -2422,6 +2972,33 @@ def launch_check(path, minutes=30):
                 elif len(exes) > 1:
                     add("info", "Tiene varios ejecutables (%s): en las colecciones, si uno no usa AMPR se cierra "
                         "al elegirlo aunque el menú arranque bien." % ", ".join(exes[:5]))
+            # zstd (PS5 Dump Forge 0.5): ampr_zstd.index + ampr_zstd-NNN.pak, leidos por ampr-emu-ng
+            zst = [n for n in ls if n.lower().startswith("ampr_zstd")]
+            if zst:
+                vols = [n for n in zst if n.lower().endswith(".pak")]
+                if "ampr_zstd.index" not in [n.lower() for n in zst]:
+                    add("bad", "Está empaquetada en zstd pero falta ampr_zstd.index.", "Vuelve a convertirla o envíala sin convertir.")
+                else:
+                    add("ok", "zstd: tiene el índice de paquetes (%d archivos de datos)." % len(vols))
+                empty = [n for n in vols if not ls[n].get("size")]
+                if empty:
+                    add("bad", "zstd: hay archivos de datos vacíos (%s)." % ", ".join(empty[:4]), "Vuelve a enviarla.")
+                has_rt = False
+                for d in [d for d in ("fakelib", "fakelib2") if d in ls]:
+                    try:
+                        has_rt |= any(n.lower() == "libsceampr.sprx" for n, _ in E.ftp_listdir(f, path + "/" + d))
+                    except ftplib.all_errors:
+                        pass
+                if has_rt:
+                    add("ok", "zstd: lleva el emulador AMPR (ampr-emu-ng) en su fakelib.")
+                else:
+                    add("bad", "zstd: no encuentro el emulador AMPR (fakelib/libSceAmpr.sprx).",
+                        "Sin él no puede leer sus datos. Vuelve a convertirla.")
+                info["lz4"] = True
+            if amp or zst:
+                add("info", "Si ShadowMountPlus tiene activada la actualización de fakelib, puede cambiar el emulador AMPR "
+                    "de este título por el suyo y entonces no lee sus datos empaquetados.",
+                    "Si se cierra al arrancar, desactiva esa opción en ShadowMountPlus y vuelve a enviarlo.")
         # backports de otras carpetas que pueden pisar los de esta
         tid = (info.get("tid") or E.title_id(posixpath.basename(path)) or "").upper()
         if tid:
@@ -2434,7 +3011,7 @@ def launch_check(path, minutes=30):
                     add("warn", "Hay un backport aparte para este título en %s/%s, que puede sustituir al suyo." % (base, n),
                         "Si se cierra al arrancar, prueba a apartar esa carpeta.")
         since = _console_now(f) - minutes * 60
-        info["logs"] = _recent_logs(f, ([path] if is_dir else []) + ["/data"], since)
+        info["logs"] = [] if quick else _recent_logs(f, ([path] if is_dir else []) + ["/data"], since)
     E.Ftp(cfg).call(run)
     # cierres que ha visto ShadowMountPlus (signal / general protection fault) en los registros recientes
     tid = (info.get("tid") or "").upper()
@@ -2461,11 +3038,49 @@ def launch_check(path, minutes=30):
         add("warn", "Está repetida en %s: dos copias con el mismo Title ID pueden liar a ShadowMountPlus." % ", ".join(me["dup"]),
             "Deja solo una.")
     try:
-        caps = media_list()[:4]
+        caps = [] if quick else media_list()[:4]
     except Exception:
         caps = []
     info.update(path=path, checks=checks, captures=caps, codes=LAUNCH_CODES)
     return info
+
+
+CHECKALL = {"busy": False, "done": 0, "total": 0, "current": "", "results": [], "error": "", "t": 0}
+CHECKALL_CANCEL = threading.Event()
+
+
+def check_all():
+    """«Revisar todo»: «Comprobar arranque» de cada cosa de la Biblioteca, de una vez (sin registros ni capturas)."""
+    items = [x for x in ((LIB.get("items") or {}).get("items") or [])
+             if x.get("kind") in ("folder", "image") and not x.get("extra") and str(x.get("path", "")).startswith(("/data/", "/mnt/"))]
+    with LOCK:
+        CHECKALL.update(busy=True, done=0, total=len(items), current="", results=[], error="")
+    CHECKALL_CANCEL.clear()
+    rank = {"bad": 3, "warn": 2, "info": 1, "ok": 0}
+    try:
+        for i, it in enumerate(items):
+            if CHECKALL_CANCEL.is_set():
+                break
+            with LOCK:
+                CHECKALL.update(done=i, current=it.get("title") or it.get("path"))
+            try:
+                r = launch_check(it["path"], 0, quick=True)
+                probs = [c for c in r.get("checks") or [] if c["level"] in ("bad", "warn")
+                         and not c["text"].startswith("Falta la portada")]     # no impide arrancar
+                probs.sort(key=lambda c: -rank[c["level"]])
+                res = {"path": it["path"], "title": it.get("title") or posixpath.basename(it["path"]), "tid": it.get("tid"),
+                       "level": probs[0]["level"] if probs else "ok", "issues": probs[:4]}
+            except Exception as e:
+                res = {"path": it["path"], "title": it.get("title") or it["path"], "tid": it.get("tid"), "level": "warn",
+                       "issues": [{"level": "warn", "text": "No pude revisarlo: %s" % e, "fix": ""}]}
+            with LOCK:
+                CHECKALL["results"].append(res)
+    except Exception as e:
+        with LOCK:
+            CHECKALL["error"] = str(e)
+    finally:
+        with LOCK:
+            CHECKALL.update(busy=False, done=CHECKALL["total"], current="", t=time.time())
 
 
 COL = {"busy": False, "items": None, "error": "", "t": 0, "current": ""}
@@ -2645,7 +3260,7 @@ def media_cached(path, preview=False):
     return fp, MEDIA_TYPES[ext]
 FMT_LABEL = {"plain": "carpeta normal", "ffpkg": "imagen .ffpkg", "exfat": "imagen .exfat", "ffpfs": "imagen .ffpfs",
              "ffpfsc": "imagen comprimida .ffpfsc", "fpkg": "paquete .fpkg", "lz4": "carpeta LZ4",
-             "lz4ffpkg": "imagen .ffpkg con LZ4"}
+             "lz4ffpkg": "imagen .ffpkg con LZ4", "zstd": "carpeta zstd", "zstdffpkg": "imagen .ffpkg con zstd"}
 FPKG_MAX_FW = "11.60"
 
 
@@ -2700,7 +3315,7 @@ def forge_maybe_update(job, cfg, exe):
     """Una vez al dia, al convertir: si hay un PS5 Dump Forge mas nuevo en GitHub, lo baja y lo usa. Antes comprueba
     que entiende las opciones que usa PS5 Directo; si no, sigue con la version que ya funcionaba."""
     import shutil
-    if (cfg.get("forge_path") or "").strip() or not cfg.get("forge_auto_update", True):
+    if (cfg.get("forge_path") or "").strip() or not cfg.get("forge_auto_update", False):
         return exe
     now = time.time()
     if now - float(SETTINGS.get("forge_checked") or 0) < 24 * 3600:
@@ -2743,6 +3358,139 @@ def forge_maybe_update(job, cfg, exe):
     for d in olds:
         shutil.rmtree(os.path.join(root, d), ignore_errors=True)
     return new
+
+
+FORGE_UPD = {"busy": False, "pct": 0, "text": "", "error": "", "done": ""}
+
+
+def _vtuple(tag):
+    return tuple(int(x) for x in re.findall(r"\d+", tag or "")[:4]) or (0,)
+
+
+def forge_installed(cfg=None):
+    """(version, ruta) del PS5 Dump Forge que se usa. La version sale de la carpeta (tools/forge/v0.5.1)."""
+    cfg = cfg or cfg_snapshot()
+    exe = F.find_forge(cfg.get("forge_path"), DATA_DIR, skip=tuple(SETTINGS.get("forge_bad") or ()))
+    if not exe:
+        return "", ""
+    if (cfg.get("forge_path") or "").strip():
+        return "propio", exe
+    d = os.path.basename(os.path.dirname(exe))
+    return (d if re.match(r"v?\d", d) else ""), exe
+
+
+def forge_news(force=False):
+    """Mira en GitHub si hay PS5 Dump Forge nuevo (como mucho cada 6 h) y guarda las novedades de cada version
+    posterior a la que tienes. No baja nada: eso lo decides tu con «Actualizar»."""
+    have, exe = forge_installed()
+    with LOCK:
+        nw = dict(SETTINGS.get("forge_news") or {})
+    if not force and time.time() - float(nw.get("checked") or 0) < 6 * 3600:
+        return nw
+    try:
+        base = F.GH_API + "/repos/%s/releases?per_page=15" % F.FORGE_REPO
+        req = urllib.request.Request(base, headers=F._ua())
+        with urllib.request.urlopen(req, timeout=20) as r:
+            rels = [x for x in json.load(r) if not x.get("draft")]
+    except Exception as e:
+        nw["error"] = str(e)
+        nw["checked"] = time.time()
+        with LOCK:
+            SETTINGS["forge_news"] = nw
+        save_settings()
+        return nw
+    stable = [x for x in rels if not x.get("prerelease")] or rels
+    latest = stable[0] if stable else None
+    notes = []
+    for x in stable:
+        tag = (x.get("tag_name") or "").strip()
+        if have and have != "propio" and _vtuple(tag) <= _vtuple(have):
+            break
+        notes.append({"tag": tag, "date": (x.get("published_at") or "")[:10], "url": x.get("html_url") or "",
+                      "body": (x.get("body") or "").strip()[:12000]})
+        if len(notes) >= 8:
+            break
+    nw = {"checked": time.time(), "error": "", "latest": (latest or {}).get("tag_name", ""),
+          "latest_url": (latest or {}).get("html_url", ""), "notes": notes}
+    with LOCK:
+        SETTINGS["forge_news"] = nw
+    save_settings()
+    lt = nw["latest"]
+    if have and have != "propio" and lt and _vtuple(lt) > _vtuple(have) and lt not in (SETTINGS.get("forge_bad") or []):
+        notify("info", "PS5 Dump Forge %s ya está disponible (tienes la %s)" % (lt, have),
+               "Ajustes → PS5 Dump Forge: «Ver novedades» y «Actualizar» cuando quieras.", key="forgenew:" + lt)
+    return nw
+
+
+def forge_info():
+    have, exe = forge_installed()
+    with LOCK:
+        nw = dict(SETTINGS.get("forge_news") or {})
+        bad = list(SETTINGS.get("forge_bad") or [])
+        upd = dict(FORGE_UPD)
+        auto = bool(SETTINGS.get("forge_auto_update"))
+    lt = nw.get("latest") or ""
+    has = bool(have and have != "propio" and lt and _vtuple(lt) > _vtuple(have) and lt not in bad)
+    return {"ok": True, "installed": have, "path": exe, "latest": lt, "latest_url": nw.get("latest_url", ""),
+            "notes": nw.get("notes") or [], "checked": nw.get("checked") or 0, "error": nw.get("error") or "",
+            "update": has, "bad": lt in bad, "auto": auto, "custom": have == "propio", "upd": upd}
+
+
+def forge_update_run():
+    """Baja la ultima version de PS5 Dump Forge, comprueba que sigue entendiendo lo que usa PS5 Directo y pasa a
+    usarla. Si no vale, se queda con la que habia."""
+    import shutil
+    have, old = forge_installed()
+    try:
+        with LOCK:
+            FORGE_UPD.update(busy=True, pct=0, text="Mirando la última versión…", error="", done="")
+        tag, assets = F.github_release(F.FORGE_REPO)
+
+        a = F._forge_asset(assets) or {}
+        total = int(a.get("size") or 0)
+
+        def prog(done):
+            with LOCK:
+                FORGE_UPD.update(pct=min(99, int(done * 100 / total)) if total else 0,
+                                 text="Descargando %s: %s de %s" % (tag, human(done), human(total) if total else "?"))
+        with FORGE_LOCK:
+            new, tag = F.download_forge(DATA_DIR, progress=prog, release=(tag, assets))
+        with LOCK:
+            FORGE_UPD.update(pct=100, text="Comprobando que funciona…")
+        ok = F.forge_cli_ok(new)
+        safe = os.path.basename(os.path.dirname(new))
+        if ok is False:
+            with LOCK:
+                SETTINGS["forge_bad"] = sorted(set(SETTINGS.get("forge_bad") or []) | {safe})
+            save_settings()
+            shutil.rmtree(os.path.dirname(new), ignore_errors=True)
+            raise E.PipeError("PS5 Dump Forge %s ha cambiado sus opciones y esta versión de PS5 Directo aún no las "
+                              "conoce: sigues con la %s. Actualiza PS5 Directo cuando salga una versión nueva." % (tag, have or "que tenías"))
+        # se guardan las dos ultimas versiones
+        root = os.path.join(DATA_DIR, "tools", "forge")
+        keep = {safe, os.path.basename(os.path.dirname(old)) if old else ""}
+        for d in sorted(os.listdir(root)):
+            if d not in keep:
+                shutil.rmtree(os.path.join(root, d), ignore_errors=True)
+        # que la carpeta nueva sea la mas reciente (find_forge elige por fecha)
+        try:
+            os.utime(new, None)
+        except OSError:
+            pass
+        with LOCK:
+            FORGE_UPD.update(done=tag, text="")
+            n = SETTINGS.get("forge_news") or {}
+            n["notes"] = [x for x in (n.get("notes") or []) if _vtuple(x.get("tag")) > _vtuple(tag)]
+            SETTINGS["forge_news"] = n
+        save_settings()
+        notify("ok", "PS5 Dump Forge actualizado a la %s" % tag, "Antes tenías la %s." % (have or "—"),
+               key="forgeok:" + tag)
+    except Exception as e:
+        with LOCK:
+            FORGE_UPD.update(error=str(e), text="")
+    finally:
+        with LOCK:
+            FORGE_UPD["busy"] = False
 
 
 def ensure_forge(job, cfg):
@@ -3097,9 +3845,9 @@ def forge_split_archive(job, cfg, cancel, archive, cands):
                                                                               human(free_pc)))
     setj(job, status="convirtiendo", pc_step="convertir", phase="Descomprimiendo %s en el PC para convertirlo" % root,
          conv_pct=0, conv_text="")
-    proc = subprocess.Popen(E._7z_cmd(exe7, "x", archive, "-o" + work, root, password=pw),
+    proc = F.child_started(subprocess.Popen(E._7z_cmd(exe7, "x", archive, "-o" + work, root, password=pw),
                             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
-                            creationflags=E._NOWIN)
+                            creationflags=E._NOWIN))
     while proc.poll() is None:
         if cancel.is_set():
             proc.kill()
@@ -3112,7 +3860,8 @@ def forge_split_archive(job, cfg, cancel, archive, cands):
         time.sleep(0.5)
     if proc.returncode != 0:
         err = proc.stderr.read().decode("utf-8", "replace").strip()
-        raise E.PipeError("7-Zip no pudo descomprimirlo para convertirlo: %s" % err[-300:])
+        jlog(job, "7-Zip dice: %s" % err[-400:])
+        raise E.PipeError(E.explain_7z(err)[1])
     if not os.path.isfile(os.path.join(folder, "sce_sys", "param.json")):
         jlog(job, "No encuentro %s después de descomprimir" % root)
         return None
@@ -3168,9 +3917,24 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
         return None
     lz4 = info.get("lz4") or {}
     extra = []
-    if fmt == "plain" and lz4.get("packed"):
+    zst_src = bool(info.get("zstd_packed"))
+    if fmt == "plain" and zst_src:
+        extra.append("--zstd-unpack")
+        jlog(job, "Viene empaquetado en zstd: lo desempaqueto a archivos normales")
+    elif fmt == "plain" and lz4.get("packed"):
         extra.append("--lz4-unpack")
         jlog(job, "Viene empaquetado en LZ4: lo desempaqueto a archivos normales")
+    if zst_src and fmt in ("lz4", "lz4ffpkg"):
+        raise E.PipeError("Viene empaquetado en zstd y PS5 Dump Forge no lo pasa directo a LZ4. Elige «zstd», "
+                          "«Carpeta» o una imagen, o pásalo antes a «Carpeta».")
+    if fmt in ("zstd", "zstdffpkg") and not F.forge_has(exe, "--zstd-pack"):
+        jlog(job, "Para zstd hace falta PS5 Dump Forge 0.5 o posterior: lo actualizo")
+        setj(job, phase="Actualizando PS5 Dump Forge (hace falta para zstd)")
+        forge_update_run()
+        exe = F.find_forge(cfg.get("forge_path"), DATA_DIR, skip=tuple(SETTINGS.get("forge_bad") or ()))
+        if not exe or not F.forge_has(exe, "--zstd-pack"):
+            raise E.PipeError("Para zstd hace falta PS5 Dump Forge 0.5 o posterior y no he podido actualizarlo (%s). "
+                              "Mira Ajustes → PS5 Dump Forge." % (FORGE_UPD.get("error") or "sin conexión"))
     if fmt == "fpkg":
         mine = (SETTINGS.get("console_fw") or "").strip()
         if mine and F.fw_ok(FPKG_MAX_FW, mine) is False:
@@ -3178,17 +3942,13 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
                               "«Imagen .ffpkg» (o «Sin convertir») y pulsa Reintentar." % (FPKG_MAX_FW, mine))
         jlog(job, "Ojo: los .fpkg solo se instalan en firmware %s o inferior (con kstuff, fpkg-enable y "
                   "ppr-patch)" % FPKG_MAX_FW)
-    comp = job.get("comp") or ("fast" if fmt == "fpkg" else "balanced")
-    if fmt in F.FORGE_COMP and comp in F.FORGE_COMP[fmt]:
-        extra += F.FORGE_COMP[fmt][comp]
-        jlog(job, "Compresión: %s" % {"fast": "rápida", "balanced": "equilibrada", "smallest": "mínimo tamaño",
-                                       "stored": "sin compresión"}[comp])
-    if fmt in ("lz4", "lz4ffpkg") and not lz4.get("imports_ampr"):
-        jlog(job, "Este título no usa AMPR, así que LZ4 no sirve con él")
+    if fmt in ("lz4", "lz4ffpkg", "zstd", "zstdffpkg") and not lz4.get("imports_ampr"):
+        kind = "zstd" if fmt.startswith("zstd") else "LZ4"
+        jlog(job, "Este título no usa AMPR, así que %s no sirve con él" % kind)
         remember_title(tid, extra={"no_ampr": True})
-        if fmt == "lz4":
+        if fmt in ("lz4", "zstd"):
             img = len(srcs) == 1 and IMAGE_RE.search(srcs[0].name or "")
-            msg = ("PS5 Dump Forge dice que este título no usa AMPR, así que no se puede pasar a LZ4: "
+            msg = ("PS5 Dump Forge dice que este título no usa AMPR, así que no se puede pasar a %s: " % kind
                    + ("se envía sin convertir, tal cual (%s)." % srcs[0].name if img else
                       "se envía sin convertir, como carpeta normal."))
             with LOCK:
@@ -3199,11 +3959,19 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
         fmt = "ffpkg"
         with LOCK:
             job["warning"] = ("PS5 Dump Forge dice que este título no usa AMPR: se envía como imagen .ffpkg "
-                              "normal, sin LZ4.")
+                              "normal, sin %s." % kind)
         jlog(job, "Lo convierto a imagen .ffpkg normal")
     setj(job, fmt_real=fmt)
+    comp = job.get("comp") or ("fast" if fmt in ("fpkg", "lz4", "lz4ffpkg", "zstd", "zstdffpkg") else "balanced")
+    if fmt in F.FORGE_COMP and comp in F.FORGE_COMP[fmt]:
+        extra += F.FORGE_COMP[fmt][comp]
+        jlog(job, "Compresión: %s" % {"fast": "rápida", "balanced": "equilibrada", "smallest": "mínimo tamaño",
+                                       "stored": "sin compresión"}[comp])
     if fmt in ("lz4", "lz4ffpkg"):
-        jlog(job, "LZ4 es experimental (ampr_emu de prueba): con algunos títulos se cuelga al guardar partida")
+        jlog(job, "LZ4 es experimental: con algunos títulos no arranca o se cuelga al guardar partida")
+    if fmt in ("zstd", "zstdffpkg"):
+        jlog(job, "zstd es nuevo: comprueba que arranca antes de borrar el original. Si ShadowMountPlus tiene activada "
+                  "la actualización de fakelib, desactívala para este título")
     check_fw_warning(job, tid, title, need_fw, info.get("firmware"), bool(info.get("backport")))
     bf = E.BFpilot(cfg)
     dest = "/data/pkg" if fmt == "fpkg" else (job.get("dest") or cfg["dest"]).rstrip("/")
@@ -3227,7 +3995,7 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
                               "cambia la carpeta temporal en Ajustes o elige 'Carpeta normal'."
                               % (FMT_LABEL[fmt], human(need_pc), work, human(free_pc)))
         free = free_space(bf) if (not keep and bf.alive()) else None
-        est = int(total * (0.5 if fmt in ("ffpfsc", "lz4", "lz4ffpkg") else 0.9 if fmt == "fpkg" else 1.02))
+        est = int(total * (0.5 if fmt in ("ffpfsc", "lz4", "lz4ffpkg", "zstd", "zstdffpkg") else 0.9 if fmt == "fpkg" else 1.02))
         if free is not None and total and est + margin_bytes() > free:
             raise no_space(job, est, free, "Lo más probable es que no quepa en la PS5: la %s ocupará unos %s, hay "
                            "%s libres y dejo %s de margen." % (FMT_LABEL[fmt], human(est), human(free),
@@ -3466,10 +4234,22 @@ def keep_on_pc_job(job, srcs, cancel):
             if total and total + GiB > free:
                 raise E.PipeError("No cabe en el PC: descomprimido ocupa %s y en %s hay %s libres. Libera espacio "
                                   "o elige otra carpeta." % (human(total), dest_root, human(free)))
+            only = [x for x in (job.get("only") or []) if x]
+            extra = []
+            if only:
+                import tempfile
+                lst = os.path.join(tempfile.gettempdir(), "ps5directo-solo-%s.txt" % job["id"])
+                with open(lst, "w", encoding="utf-8") as fh:
+                    fh.write("\n".join(only))
+                extra = ["-i@" + lst, "-scsUTF-8"]
+                sel = set(only)
+                total = sum(e["size"] for e in entries or [] if not e["dir"] and
+                            any(e["path"] == x or e["path"].startswith(x.rstrip("/") + "/") for x in sel))
+                jlog(job, "Saco solo lo elegido: %d elemento(s)" % len(only))
             jlog(job, "Descomprimiendo %s en %s" % (human(total), dest_root))
-            proc = subprocess.Popen(E._7z_cmd(exe, "x", first, "-o" + work, password=pw),
+            proc = F.child_started(subprocess.Popen(E._7z_cmd(exe, "x", first, "-o" + work, *extra, password=pw),
                                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
-                                    creationflags=E._NOWIN)
+                                    creationflags=E._NOWIN))
             while proc.poll() is None:
                 if cancel.is_set():
                     proc.kill()
@@ -3482,7 +4262,10 @@ def keep_on_pc_job(job, srcs, cancel):
                 time.sleep(0.5)
             if proc.returncode != 0:
                 err = proc.stderr.read().decode("utf-8", "replace").strip()
-                raise E.PipeError("7-Zip no pudo descomprimirlo: %s" % err[-300:])
+                key, msg = E.explain_7z(err)
+                jlog(job, "7-Zip dice: %s" % err[-400:])
+                if not pc_extract_fallback(job, key, first, work, pw, cfg, cancel):
+                    raise E.PipeError(msg)
         # si dentro hay una sola carpeta, esa es la que se queda (sin carpetas dobles)
         inside = [x for x in os.listdir(work) if not x.startswith(".")]
         if len(inside) == 1 and os.path.isdir(os.path.join(work, inside[0])):
@@ -3518,6 +4301,15 @@ def keep_on_pc_job(job, srcs, cancel):
 
 GRAB = {"busy": False, "done": 0, "total": 0, "packages": [], "error": "", "id": 0}
 GRAB_URL_RX = re.compile(r"(?i)\b(?:https?|ftp)://[^\s<>\"'\]\[(){}|]+|magnet:\?[^\s<>\"']+")
+
+
+PW_NEAR_RX = re.compile(r"(?i)(?:contrase(?:ñ|n)a|password|passwort|senha|pass|clave|pwd|pw)\s*[:=]\s*[\"'«]?([^\s\"'«»<>]{1,80})")
+
+
+def password_in_text(text):
+    """La contraseña si el texto la dice («Contraseña: abc», «Password = xyz»...), o ''."""
+    m = PW_NEAR_RX.search(text or "")
+    return m.group(1).strip(".,;)") if m else ""
 
 
 def add_lines(text):
@@ -3655,6 +4447,51 @@ def _pcx_forget(job):
         pass
 
 
+def pc_extract_fallback(job, key, archive, work, pw, cfg, cancel):
+    """Si 7-Zip falla por algo suyo (metodo que no conoce, no lo reconoce), prueba otra forma: el .zip con Python y,
+    si no, PS5 Dump Forge (sabe leer .zip, .7z y .rar de un titulo). True si lo ha conseguido."""
+    import shutil
+    if key not in ("method", "notarchive", "other"):
+        return False            # contraseña, archivo dañado, falta una parte, sin espacio...: otro programa no lo arregla
+    shutil.rmtree(work, ignore_errors=True)
+    os.makedirs(work, exist_ok=True)
+    if archive.lower().endswith(".zip"):
+        import zipfile
+        try:
+            jlog(job, "Pruebo a descomprimirlo sin 7-Zip (el .zip con Python)")
+            with zipfile.ZipFile(archive) as z:
+                for m in z.infolist():
+                    if cancel.is_set():
+                        raise E.Cancelled()
+                    parts = [x for x in m.filename.replace("\\", "/").split("/") if x not in ("", ".")]
+                    if ".." in parts:
+                        raise E.PipeError("Ruta peligrosa dentro del comprimido")
+                    z.extract(m, work, pwd=pw.encode() if pw else None)
+            jlog(job, "Descomprimido sin 7-Zip")
+            return True
+        except E.Cancelled:
+            raise
+        except Exception as e:
+            jlog(job, "Tampoco así: %s" % e)
+            shutil.rmtree(work, ignore_errors=True)
+            os.makedirs(work, exist_ok=True)
+    exe = F.find_forge(cfg.get("forge_path"), DATA_DIR, skip=tuple(SETTINGS.get("forge_bad") or ()))
+    if exe:
+        try:
+            jlog(job, "Pruebo a sacarlo con PS5 Dump Forge en vez de 7-Zip")
+            out = os.path.join(work, "contenido")
+            F.forge_convert(exe, archive, out, "plain", pw or "", cancel, lambda *a: None, lambda m: jlog(job, "Forge: " + m))
+            jlog(job, "Sacado con PS5 Dump Forge")
+            return True
+        except E.Cancelled:
+            raise
+        except Exception as e:
+            jlog(job, "PS5 Dump Forge tampoco pudo: %s" % e)
+            shutil.rmtree(work, ignore_errors=True)
+            os.makedirs(work, exist_ok=True)
+    return False
+
+
 def fetch_to_pc(job, srcs, cfg, cancel, meter, folder):
     """Baja al PC las partes que son enlaces (las de tu PC se usan tal cual).
     Devuelve {nombre: ruta local} y la lista de archivos que hemos creado nosotros."""
@@ -3685,41 +4522,116 @@ def fetch_to_pc(job, srcs, cfg, cancel, meter, folder):
                           "cambia la carpeta temporal en Ajustes o descomprime en la PS5."
                           % (human(missing), folder, human(free)))
     jlog(job, "Bajando %d partes al PC (%s) en %s" % (len(urls), human(total), folder))
-    done_before = 0
-    for k, s in enumerate(urls, 1):
+    # varias partes a la vez (como los gestores de descargas): con las mismas conexiones en total, repartidas
+    at_once = max(1, min(4, int(cfg.get("parallel_files") or 1), len(urls)))
+    hosts = {urllib.parse.urlparse(getattr(x, "url", "") or "").netloc.lower() for x in urls}
+    if any(any(h in host for h in E.LIMITED_HOSTS) and not any(d in host for d in E.DEBRID_HOSTS) for host in hosts):
+        at_once = 1      # cuentas gratis de alojamientos: suelen dejar solo una descarga a la vez
+    pcfg = dict(cfg)
+    if at_once > 1:
+        pcfg["streams"] = max(2, int(cfg.get("streams", 8)) // at_once)
+        jlog(job, "Bajo %d partes a la vez (%d conexiones cada una)" % (at_once, pcfg["streams"]))
+    prog = {}
+    plock = threading.Lock()
+
+    def bump(name, n):
+        with plock:
+            prog[name] = n
+            tot = sum(prog.values())
+        setj(job, sent=tot)
+
+    def one(k, s):
         final = os.path.join(folder, s.name)
-        created.append(final)
-        local[s.name] = final
         if os.path.isfile(final) and os.path.getsize(final) == s.size:
-            done_before += s.size
-            setj(job, sent=done_before)
-            continue
+            bump(s.name, s.size)
+            return
         part = final + ".part"
         off = os.path.getsize(part) if os.path.isfile(part) else 0
         if off > s.size:
             off = 0
+        stamp = s.stamp() if hasattr(s, "stamp") else None
+        if off and stamp:
+            try:
+                with open(part + ".huella", encoding="utf-8") as fh:
+                    old = json.load(fh)
+            except Exception:
+                old = None
+            if E.stamp_changed(old, stamp):
+                jlog(job, "%s: el archivo del servidor ha cambiado desde la última vez (otra versión o se ha "
+                          "vuelto a subir). Lo bajado no vale: empiezo desde cero." % s.name)
+                off = 0
+        if stamp:
+            try:
+                with open(part + ".huella", "w", encoding="utf-8") as fh:
+                    json.dump(stamp, fh)
+            except OSError:
+                pass
         if off:
             jlog(job, "%s: continuando desde %s" % (s.name, human(off)))
-        setj(job, phase="Bajando al PC: parte %d de %d (%s)" % (k, len(urls), s.name))
+        if at_once == 1:
+            setj(job, phase="Bajando al PC: parte %d de %d (%s)" % (k, len(urls), s.name))
         got = off
+        bump(s.name, got)
         hasher = part_hasher(job, s)
         if hasher is not None and off:
             hasher.valid = False          # continuacion de otra vez: no se puede sumar desde el principio
         with open(part, "r+b" if off else "wb") as f:
             f.seek(off)
             f.truncate()
-            it = s.stream(off, cfg, cancel, meter)
+            it = s.stream(off, pcfg, cancel, meter)
             for data in (hasher.wrap(it, off) if hasher else it):
                 f.write(data)
                 got += len(data)
-                setj(job, sent=done_before + got)
+                bump(s.name, got)
         if got != s.size:
             raise E.PipeError("La descarga de %s se quedo corta (%s de %s). Pulsa Reintentar."
                               % (s.name, human(got), human(s.size)))
-        verify_part(job, s, hasher, on_bad=lambda: os.remove(part))
+        verify_part(job, s, hasher, on_bad=lambda: os.remove(part), local=part)
         os.replace(part, final)
-        done_before += s.size
+        try:
+            os.remove(part + ".huella")
+        except OSError:
+            pass
         jlog(job, "En el PC: %s" % s.name)
+
+    for s in urls:
+        final = os.path.join(folder, s.name)
+        created.append(final)
+        local[s.name] = final
+    if at_once == 1:
+        for k, s in enumerate(urls, 1):
+            one(k, s)
+    else:
+        import concurrent.futures as cf
+        nxt = {"i": 0}
+        done_n = {"n": 0}
+        stop = threading.Event()
+
+        def run():
+            while not stop.is_set() and not cancel.is_set():
+                with plock:
+                    if nxt["i"] >= len(urls):
+                        return
+                    k = nxt["i"]
+                    nxt["i"] += 1
+                one(k + 1, urls[k])
+                with plock:
+                    done_n["n"] += 1
+                setj(job, phase="Bajando al PC: %d de %d partes listas (%d a la vez)" % (done_n["n"], len(urls), at_once))
+        setj(job, phase="Bajando al PC: %d partes, %d a la vez" % (len(urls), at_once))
+        with cf.ThreadPoolExecutor(max_workers=at_once) as ex:
+            futs = [ex.submit(run) for _ in range(at_once)]
+            err = None
+            for fu in cf.as_completed(futs):
+                try:
+                    fu.result()
+                except BaseException as e:
+                    stop.set()
+                    err = err or e
+            if err:
+                raise err
+        if cancel.is_set():
+            raise E.Cancelled()
     return local, created
 
 
@@ -4199,7 +5111,7 @@ def ftp_find_duplicates(cfg, tid, exclude=None):
 def check_duplicates_first(job, bf, tid, exclude=None):
     """Antes de enviar: si ese juego ya esta en la consola, pregunta que hacer (una vez).
     Respuestas (job["dup_choice"]): send = enviar igualmente, replace = borrar la copia y enviar."""
-    if not tid:
+    if not tid or job.get("merge_into"):
         return
     cfg = cfg_snapshot()
     try:
@@ -4214,12 +5126,19 @@ def check_duplicates_first(job, bf, tid, exclude=None):
     choice = job.get("dup_choice")
     if choice == "replace":
         for p in dups:
+            if trash_move(p, why="reemplazado"):
+                jlog(job, "La copia que ya había (%s) va a la papelera: si lo nuevo no funciona, la recuperas desde "
+                          "Espacio › Papelera" % p)
+                continue
             setj(job, phase="Borrando la copia anterior: %s" % p)
             jlog(job, "Borro la copia que ya habia: %s" % p)
             if bf.alive():
                 bf.delete(p)
             else:
                 ftp_rmtree(cfg, p, threading.Event())
+        need = int(max(0, job.get("total") or 0) * 2.1) + margin_bytes()
+        if need and trash_load():
+            trash_make_room(need, bf)
         with LOCK:
             job["dup_choice"] = "send"
         return
@@ -4271,6 +5190,9 @@ def resolve_existing(job, target, exists, delete, tid=None):
     Devuelve el nombre final, o lanza NeedsDecision para que el trabajo se pare a preguntar."""
     choice = job.get("dup_choice")
     if choice == "replace":
+        if trash_move(target, why="reemplazado"):
+            jlog(job, "La copia que ya había en %s va a la papelera (se recupera desde Espacio › Papelera)" % target)
+            return target
         jlog(job, "Borro la copia que ya había en %s" % target)
         setj(job, phase="Borrando la copia anterior: %s" % target)
         delete(target)
@@ -4358,11 +5280,12 @@ def place(job, bf, staging, dest, cancel, hint_name):
             raise E.Cancelled()
         name = posixpath.basename(path)
         if kind == "game":
-            # Siempre TITLEID-app, venga suelto o dentro de una carpeta del RAR
+            # Siempre TITLEID-app, venga suelto o dentro de una carpeta del RAR (los de «Recomendados», TITLEID tal
+            # cual: esos programas buscan su propia carpeta por ese nombre)
             tid = (E.title_id(bf.read_text(path + "/sce_sys/param.json"))
                    or E.title_id(name) or E.title_id(hint_name))
             if tid:
-                name = tid + "-app"
+                name = tid if job.get("exact_name") else tid + "-app"
             elif path == staging:
                 name = E.safe_name(hint_name)
         elif path == staging:
@@ -4375,6 +5298,14 @@ def place(job, bf, staging, dest, cancel, hint_name):
             # resto de un envio anterior que se quedo a medias: no es una aplicacion, se sustituye
             jlog(job, "En %s había un envío anterior a medias: lo sustituyo" % target)
             bf.delete(target, cancel)
+        if job.get("merge_into") and kind == "game" and bf.exists(target):
+            # actualizar un emulador o programa de «Recomendados»: lo nuevo encima, sin tocar ajustes, partidas,
+            # BIOS ni contenido que tengas dentro de su carpeta
+            jlog(job, "Actualizo %s: copio lo nuevo encima y conservo tus archivos" % target)
+            bf_merge(bf, path, target, cancel)
+            placed.append(target)
+            job["_placed_game"] = True
+            continue
         if bf.exists(target):
             target = resolve_existing(job, target, bf.exists, lambda t: bf.delete(t, cancel), E.title_id(name))
         bf.mkdir(target_dir)
@@ -4384,6 +5315,27 @@ def place(job, bf, staging, dest, cancel, hint_name):
         if kind in ("game", "image"):
             job["_placed_game"] = True
     return placed
+
+
+def bf_merge(bf, src, dst, cancel=None):
+    """Mueve el contenido de src dentro de dst, sustituyendo solo los archivos que vienen en src."""
+    for e in bf.listdir(src):
+        if cancel is not None and cancel.is_set():
+            raise E.Cancelled()
+        a, b = src + "/" + e["name"], dst + "/" + e["name"]
+        if e.get("dir"):
+            if bf.exists(b):
+                bf_merge(bf, a, b, cancel)
+                continue
+            bf.rename(a, b)
+        else:
+            if bf.exists(b):
+                bf.delete(b)
+            bf.rename(a, b)
+    try:
+        bf.delete(src)
+    except Exception:
+        pass
 
 
 def fix_game_perms(job, bf, target, cancel=None):
@@ -4678,6 +5630,655 @@ def sched_wait():
     return left
 
 
+ZDL_DIR = "/data/ps5directo/descargas"
+
+
+def zftpd_job(job, cancel):
+    """«La PS5 lo baja sola»: cada enlace lo descarga zftpd en la propia consola (http, https, ftp y magnet; sigue
+    donde iba si se corta). Los .zip se descomprimen alli mismo; el resto se queda tal cual en la carpeta."""
+    cfg = cfg_snapshot()
+    z = F.Zftpd(cfg["ps5_ip"])
+    if not z.alive():
+        raise E.PipeError("zftpd no está en marcha en la consola. Inícialo en Biblioteca › ⭐ Recomendados › zftpd "
+                          "(o en Payloads) y pulsa Reintentar.")
+    urls = [x for x in job["lines"] if re.match(r"^((https?|ftp)://|magnet:\?)", x, re.I)]
+    if not urls:
+        raise E.PipeError("La consola solo puede bajar sola enlaces http, https, ftp o magnet (no archivos de tu PC).")
+    dst = (job.get("zdl_dir") or ZDL_DIR).rstrip("/")
+    try:
+        E.Ftp(cfg).call(lambda f: _ftp_makedirs(f, dst))
+    except Exception as e:
+        raise E.PipeError("No pude crear %s en la consola por FTP: %s" % (dst, e))
+    setj(job, status="enviando", phase="La consola empieza a descargar", total=-1, sent=0,
+         title=job.get("title") or E.display_name(urllib.parse.unquote(urls[0].split("?")[0].rstrip("/").split("/")[-1]) or "magnet"))
+    with LOCK:
+        ids = dict(job.get("zdl_ids") or {})
+    for u in urls:
+        if u in ids:
+            continue
+        r = z.dl_start(u, dst)
+        if not r.get("id"):
+            raise E.PipeError("zftpd no aceptó el enlace: %s" % (r.get("error") or u))
+        ids[u] = int(r["id"])
+        jlog(job, "La consola descarga %s (en %s)" % (r.get("name") or u, dst))
+    with LOCK:
+        job["zdl_ids"] = ids
+    save_jobs()
+    want = set(ids.values())
+    names = {}
+    while True:
+        if cancel.is_set():
+            for i in want:
+                try:
+                    z.dl_cancel(i)
+                except Exception:
+                    pass
+            with LOCK:
+                job["zdl_ids"] = {}
+            raise E.Cancelled()
+        try:
+            st = [d for d in z.dl_status() if int(d.get("id") or 0) in want]
+        except Exception as e:
+            setj(job, phase="No contesta zftpd (%s): sigo esperando…" % e)
+            time.sleep(5)
+            continue
+        if len(st) < len(want):
+            gone = want - {int(d["id"]) for d in st}
+            raise E.PipeError("zftpd ya no tiene %d de las descargas (¿se reinició la consola o el payload?). "
+                              "Pulsa Reintentar: lo que llevaba se aprovecha." % len(gone))
+        bad = [d for d in st if d.get("error")]
+        if bad:
+            with LOCK:
+                job["zdl_ids"] = {}
+            raise E.PipeError("La consola no pudo bajar %s: %s" % (bad[0].get("name") or bad[0].get("url"), bad[0]["error"]))
+        tot = sum(int(d.get("total_size") or 0) for d in st)
+        got = sum(int(d.get("downloaded") or 0) for d in st)
+        spd = sum(float(d.get("speed") or 0) for d in st)
+        ndone = sum(1 for d in st if d.get("done"))
+        for d in st:
+            names[int(d["id"])] = d.get("name") or ""
+        queued = any(d.get("queued") for d in st)
+        setj(job, total=tot if tot else -1, sent=got, speed=spd,
+             phase=("En espera en la cola de zftpd" if queued and not got else
+                    "La consola descarga sola: %d de %d listos" % (ndone, len(st))))
+        if ndone == len(st):
+            break
+        time.sleep(2)
+    files = ["%s/%s" % (dst, names[i]) for i in want if names.get(i)]
+    out = []
+    for fp in files:
+        if fp.lower().endswith(".zip") and not job.get("raw"):
+            folder = "%s/%s" % ((job.get("dest") or "/data/homebrew").rstrip("/"), posixpath.basename(fp)[:-4])
+            setj(job, status="descomprimiendo", phase="Descomprimiendo en la consola: %s" % posixpath.basename(fp), sent=0)
+            try:
+                z.extract(fp, folder)
+                while True:
+                    if cancel.is_set():
+                        try:
+                            z.post("/api/extract_cancel")
+                        except Exception:
+                            pass
+                        raise E.Cancelled()
+                    pr = z.extract_progress()
+                    setj(job, total=int(pr.get("total_bytes") or 0) or -1, sent=int(pr.get("bytes_extracted") or 0))
+                    if pr.get("error"):
+                        raise E.PipeError(pr.get("error_msg") or "error al descomprimir")
+                    if pr.get("done") or not pr.get("active"):
+                        break
+                    time.sleep(1.5)
+                folder = _zdl_flatten(cfg, folder)
+                out.append(folder)
+                jlog(job, "Descomprimido en la consola: %s" % folder)
+                try:
+                    E.Ftp(cfg).call(lambda f: f.delete(fp))
+                except Exception:
+                    pass
+                continue
+            except E.Cancelled:
+                raise
+            except Exception as e:
+                jlog(job, "No pude descomprimirlo en la consola (%s): se queda el .zip" % e)
+        out.append(fp)
+    setj(job, status="hecho", result=out, speed=0.0, phase="Bajado por la consola: %s" % ", ".join(out)[:300])
+    with LOCK:
+        job["zdl_ids"] = {}
+    jlog(job, "Terminado (descargado por la consola)")
+    record_history(job)
+
+
+def _zdl_flatten(cfg, folder):
+    """Si el .zip traia una sola carpeta dentro (lo normal), se sube un nivel: /data/homebrew/PPSA..., no
+    /data/homebrew/nombre-del-zip/PPSA..."""
+    def work(f):
+        lst = E.ftp_listdir(f, folder)
+        if len(lst) != 1 or lst[0][1].get("type") != "dir":
+            return folder
+        sub = lst[0][0]
+        up = posixpath.dirname(folder) + "/" + sub
+        if _ftp_isdir(f, up):
+            return folder
+        f.rename(folder + "/" + sub, up)
+        f.rmd(folder)
+        return up
+    try:
+        return E.Ftp(cfg).call(work)
+    except Exception:
+        return folder
+
+
+def _ftp_makedirs(f, path):
+    cur = ""
+    for part in [x for x in path.split("/") if x]:
+        cur += "/" + part
+        try:
+            f.mkd(cur)
+        except ftplib.all_errors:
+            pass
+
+
+# ---------------------------------------------------------------------------
+# Panel de actualizaciones: version que tienes de cada titulo frente a la ultima que conocen prosperopatches.com
+# (PS5) y orbispatches.com (PS4), webs publicas de terceros. Solo se mira el numero de version: no se descarga nada
+# ni se habla con servidores de Sony. Para actualizar, PatchDL (Recomendados).
+# ---------------------------------------------------------------------------
+
+UPD_FILE = os.path.join(DATA_DIR, "actualizaciones.json")
+UPD = {"busy": False, "done": 0, "n": 0, "current": "", "error": ""}
+UPD_CANCEL = threading.Event()
+PS5_VER_RX = re.compile(r"\b(\d{2}\.\d{3}\.\d{3})\b")
+PS4_VER_RX = re.compile(r"\b(?:v|ver\.?\s*|version\s*)?(\d{2}\.\d{2})\b", re.I)
+
+
+def _ver_key(v):
+    try:
+        return tuple(int(x) for x in str(v).split("."))
+    except Exception:
+        return ()
+
+
+def _fw_tuple(fw):
+    try:
+        return tuple(int(x) for x in re.findall(r"\d+", str(fw))[:2])
+    except Exception:
+        return ()
+
+
+def upd_lookup(tid):
+    """Versiones de un Title ID en prosperopatches.com (PS5) u orbispatches.com (PS4), como las pide su propia web
+    (la pagina del titulo trae un codigo y con el se piden sus versiones). Solo numeros de version y firmware."""
+    tid = tid.upper()
+    ps4 = tid.startswith(("CUSA", "PLAS"))
+    base = os.environ.get("PS5D_PATCHSITE") or ("https://orbispatches.com" if ps4 else "https://prosperopatches.com")
+    url = "%s/%s" % (base, tid)
+    ua = {"User-Agent": "PS5Directo (%s)" % VERSION}
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=dict(ua, Accept="text/html")), timeout=20) as r:
+            html = r.read(3 * 1024 * 1024).decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return {"latest": "", "url": url, "found": False}
+        raise
+    vers = []
+    m = re.search(r'data-key="([0-9a-fA-F]+)"', html) or re.search(r"'key':\s*'([0-9a-fA-F]+)'", html)
+    if m:
+        body = json.dumps({"titleid": tid, "key": m.group(1)}).encode()
+        req = urllib.request.Request(base + "/api/internal/loadpatches", data=body, method="POST",
+                                     headers=dict(ua, **{"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                                                         "X-Requested-With": "XMLHttpRequest", "Referer": url}))
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                txt = r.read(2 * 1024 * 1024).decode("utf-8", "replace")
+            j = json.loads(txt)
+            for e in _walk_dicts(j):
+                v = e.get("content_ver") or e.get("version")
+                if v and re.match(r"^\d{2}\.\d{2,3}", str(v)):
+                    vers.append({"v": str(v), "fw": str(e.get("required_firmware") or "")})
+        except Exception:
+            vers = []
+    if not vers:
+        rx = PS4_VER_RX if ps4 else PS5_VER_RX
+        vers = [{"v": v, "fw": ""} for v in rx.findall(html) if _ver_key(v) and _ver_key(v)[0] < 100]
+    if not vers:
+        return {"latest": "", "url": url, "found": False}
+    best = max(vers, key=lambda x: _ver_key(x["v"]))
+    out = {"latest": best["v"], "need_fw": "" if ps4 else best["fw"], "url": url, "found": True}
+    with LOCK:
+        mine = (SETTINGS.get("console_fw") or "").strip()
+    if mine and not ps4:
+        ok = [x for x in vers if x["fw"] and _fw_tuple(x["fw"]) <= _fw_tuple(mine)]
+        if ok:
+            out["fits"] = max(ok, key=lambda x: _ver_key(x["v"]))["v"]
+    return out
+
+
+def _walk_dicts(o):
+    if isinstance(o, dict):
+        yield o
+        for v in o.values():
+            yield from _walk_dicts(v)
+    elif isinstance(o, list):
+        for v in o:
+            yield from _walk_dicts(v)
+
+
+def upd_load():
+    try:
+        with open(UPD_FILE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return {}
+
+
+def upd_items():
+    """Lo instalado de la Biblioteca (una entrada por Title ID, la version mas alta que tengas)."""
+    with LOCK:
+        res = LIB.get("items") or {}
+    out = {}
+    for it in (res.get("items") or []):
+        tid = (it.get("tid") or "").upper()
+        if not re.match(r"^[A-Z]{4}\d{5}$", tid) or tid.startswith("NPXS") or it.get("extra"):
+            continue
+        v = it.get("version") or ""
+        cur = out.get(tid)
+        if not cur or _ver_key(v) > _ver_key(cur["have"]):
+            out[tid] = {"tid": tid, "title": it.get("title") or it.get("name") or tid, "have": v,
+                        "path": it.get("path") or ""}
+    return out
+
+
+def upd_check(force=False):
+    if UPD["busy"]:
+        return
+    UPD_CANCEL.clear()
+    items = upd_items()
+    if not items:
+        UPD.update(error="Primero abre la Biblioteca para que lea lo que tienes en la consola.")
+        return
+    UPD.update(busy=True, done=0, n=len(items), current="", error="")
+
+    def run():
+        cache = upd_load()
+        try:
+            for k, (tid, it) in enumerate(sorted(items.items(), key=lambda x: x[1]["title"].lower())):
+                if UPD_CANCEL.is_set():
+                    break
+                UPD.update(done=k, current=it["title"])
+                c = cache.get(tid)
+                if c and not force and time.time() - c.get("t", 0) < 24 * 3600:
+                    continue
+                try:
+                    r = upd_lookup(tid)
+                    r["t"] = time.time()
+                    cache[tid] = r
+                except Exception as e:
+                    cache[tid] = dict(c or {}, err=str(e)[:200], t=time.time())
+                time.sleep(1.2)            # sin prisas: es una web de voluntarios
+                if k % 5 == 0:
+                    _save_json(UPD_FILE, cache)
+            _save_json(UPD_FILE, cache)
+            news = [it for tid, it in items.items() if cache.get(tid, {}).get("latest")
+                    and it["have"] and _ver_key(cache[tid]["latest"]) > _ver_key(it["have"])]
+            if news:
+                notify("info", "Actualizaciones disponibles: %d" % len(news),
+                       ", ".join(x["title"] for x in news[:6]) + (" y más" if len(news) > 6 else ""),
+                       {"tab": "Library"}, key="upd%d" % int(time.time() // 3600))
+        except Exception as e:
+            UPD["error"] = str(e)
+        finally:
+            UPD.update(busy=False, done=UPD["n"], current="")
+    threading.Thread(target=run, daemon=True).start()
+
+
+def upd_state():
+    cache = upd_load()
+    items = upd_items()
+    rows = []
+    for tid, it in items.items():
+        c = cache.get(tid) or {}
+        latest = c.get("latest") or ""
+        st = ("new" if latest and it["have"] and _ver_key(latest) > _ver_key(it["have"]) else
+              "ok" if latest and it["have"] else "unknown" if c else "unchecked")
+        rows.append(dict(it, latest=latest, url=c.get("url") or "", state=st, err=c.get("err") or "",
+                         checked=c.get("t"), need_fw=c.get("need_fw") or "", fits=c.get("fits") or ""))
+    order = {"new": 0, "ok": 2, "unknown": 1, "unchecked": 3}
+    rows.sort(key=lambda r: (order[r["state"]], r["title"].lower()))
+    return dict(UPD, items=rows)
+
+
+# ---------------------------------------------------------------------------
+# ☁️ Mis almacenamientos (rclone): navegar tus nubes, bajar al PC o mandar a la consola. Los archivos sueltos se
+# sirven en este PC solo para PS5 Directo (127.0.0.1, con codigo en la ruta) y entran en la cola como cualquier
+# enlace: se bajan con varias conexiones, continuan si se cortan y se descomprimen o convierten igual.
+# ---------------------------------------------------------------------------
+
+CLOUD = {"busy": False, "phase": "", "pct": 0, "error": "", "done": ""}
+CLOUD_SRV = {}           # remoto -> {"proc", "port", "token"}
+CLOUD_LOCK = threading.Lock()
+CLOUD_VER = {"v": None}
+
+
+def cloud_exe():
+    return F.rclone_path(DATA_DIR)
+
+
+def _remote_ok(name):
+    if not re.match(r"^[\w][\w .-]{0,60}$", name or ""):
+        raise E.PipeError("Nombre de almacenamiento no válido (letras, números, guiones)")
+    return name
+
+
+def cloud_state():
+    exe = cloud_exe()
+    out = {"installed": bool(exe), "types": F.CLOUD_TYPES, "remotes": [], "srv": sorted(CLOUD_SRV)}
+    out.update({k: CLOUD[k] for k in CLOUD})
+    if not exe:
+        return out
+    if CLOUD_VER["v"] is None:
+        try:
+            CLOUD_VER["v"] = (F.rclone_run(exe, ["version"], 20).splitlines() or [""])[0].replace("rclone ", "")
+        except Exception:
+            CLOUD_VER["v"] = ""
+    out["version"] = CLOUD_VER["v"]
+    try:
+        for ln in F.rclone_run(exe, ["listremotes", "--long"], 30).splitlines():
+            name, _, typ = ln.partition(":")
+            if name.strip():
+                out["remotes"].append({"name": name.strip(), "type": typ.strip()})
+    except Exception as e:
+        out["error"] = str(e)
+    return out
+
+
+def _cloud_bg(phase, fn):
+    if CLOUD["busy"]:
+        raise E.PipeError("Espera: ya estoy con otra cosa de las nubes")
+    CLOUD.update(busy=True, phase=phase, pct=0, error="", done="")
+
+    def run():
+        try:
+            CLOUD["done"] = fn() or ""
+        except Exception as e:
+            CLOUD["error"] = str(e)
+        finally:
+            CLOUD.update(busy=False, phase="")
+    threading.Thread(target=run, daemon=True).start()
+
+
+def cloud_install():
+    def fn():
+        def prog(got, total):
+            CLOUD["pct"] = int(got * 100 / total) if total else 0
+        path, tag = F.rclone_install(DATA_DIR, prog)
+        CLOUD_VER["v"] = None
+        return "rclone %s instalado" % tag
+    _cloud_bg("Bajando rclone de su GitHub oficial…", fn)
+
+
+def cloud_add(name, typ, fields):
+    exe = cloud_exe()
+    if not exe:
+        raise E.PipeError("Primero instala rclone")
+    name = _remote_ok(name)
+    t = next((x for x in F.CLOUD_TYPES if x["type"] == typ), None)
+    if not t:
+        raise E.PipeError("Tipo no admitido aquí: usa «Configurar a mano»")
+    args = ["config", "create", name, typ]
+    for k in t.get("fields") or []:
+        v = str((fields or {}).get(k) or "")
+        if not v:
+            raise E.PipeError("Falta: %s" % k)
+        args += [k, v]
+    if t.get("fields"):
+        args.append("--obscure")
+    if t.get("oauth"):
+        _cloud_bg("Se ha abierto el navegador: entra en tu cuenta y da permiso a rclone. Vuelve aquí al terminar.",
+                  lambda: (F.rclone_run(exe, args, 600), "Añadido: %s" % name)[1])
+        return
+    F.rclone_run(exe, args, 60)
+    CLOUD["done"] = "Añadido: %s" % name
+
+
+def cloud_ls(remote, path):
+    exe = cloud_exe()
+    if not exe:
+        raise E.PipeError("Primero instala rclone")
+    _remote_ok(remote)
+    path = (path or "").strip("/")
+    raw = F.rclone_run(exe, ["lsjson", "%s:%s" % (remote, path), "--max-depth", "1", "--no-mimetype"], 180)
+    items = []
+    for x in json.loads(raw or "[]"):
+        items.append({"name": x.get("Name"), "dir": bool(x.get("IsDir")), "size": x.get("Size"),
+                      "t": x.get("ModTime"), "path": (path + "/" if path else "") + (x.get("Name") or "")})
+    items.sort(key=lambda x: (not x["dir"], (x["name"] or "").lower()))
+    return {"remote": remote, "path": path, "items": items}
+
+
+def cloud_serve(remote):
+    """Arranca (o reutiliza) «rclone serve http» de un remoto, solo en este PC."""
+    exe = cloud_exe()
+    if not exe:
+        raise E.PipeError("rclone no está instalado")
+    with CLOUD_LOCK:
+        s = CLOUD_SRV.get(remote)
+        if s and s["proc"].poll() is None:
+            return s
+        import subprocess
+        sk = socket.socket()
+        sk.bind(("127.0.0.1", 0))
+        port = sk.getsockname()[1]
+        sk.close()
+        token = secrets.token_hex(8)
+        proc = subprocess.Popen([exe, "serve", "http", remote + ":", "--addr", "127.0.0.1:%d" % port, "--read-only",
+                                 "--baseurl", "/" + token, "--vfs-cache-mode", "off"],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=F.NO_WINDOW)
+        t0 = time.time()
+        while time.time() - t0 < 20 and not _port_open("127.0.0.1", port, 0.5):
+            if proc.poll() is not None:
+                raise E.PipeError("rclone no pudo abrir %s" % remote)
+            time.sleep(0.3)
+        s = {"proc": proc, "port": port, "token": token}
+        CLOUD_SRV[remote] = s
+        return s
+
+
+def cloud_stop_all():
+    for s in list(CLOUD_SRV.values()):
+        try:
+            s["proc"].terminate()
+        except Exception:
+            pass
+
+
+import atexit  # noqa: E402
+atexit.register(lambda: cloud_stop_all())
+
+
+def cloud_urls(remote, paths):
+    s = cloud_serve(remote)
+    return ["http://127.0.0.1:%d/%s/%s" % (s["port"], s["token"], urllib.parse.quote(p.strip("/"))) for p in paths]
+
+
+def cloud_fix_job(job):
+    """Al empezar o reintentar un trabajo de la nube, el servidor local puede ser otro: rehace los enlaces."""
+    c = job.get("cloud")
+    if c:
+        with LOCK:
+            job["lines"] = cloud_urls(c["remote"], c["paths"])
+
+
+def cloud_send(remote, items, to):
+    """items: [{"path", "dir", "name"}]. to: 'pc' (bajar a tu PC) o 'ps5' (a la consola, como cualquier enlace)."""
+    _remote_ok(remote)
+    files = [x["path"] for x in items if not x.get("dir")]
+    dirs = [x["path"] for x in items if x.get("dir")]
+    out = {"jobs": 0, "copy": bool(dirs)}
+    with LOCK:
+        dest = SETTINGS.get("dest") or "/data/homebrew"
+    if files:
+        c = {"remote": remote, "paths": files}
+        job = new_job(cloud_urls(remote, files), "", dest, where="keep" if to == "pc" else None,
+                      keep_steps="dl" if to == "pc" else "")
+        job["cloud"] = c
+        job["title"] = "☁️ %s: %s" % (remote, posixpath.basename(files[0]) + (" y %d más" % (len(files) - 1) if len(files) > 1 else ""))
+        with WAKE:
+            JOBS.append(job)
+            WAKE.notify_all()
+        save_jobs()
+        out["jobs"] = 1
+    if dirs:
+        exe = cloud_exe()
+        root = os.path.join(downloads_dir(), "PS5 Directo", "Nube")
+
+        def fn():
+            done = []
+            for k, d in enumerate(dirs):
+                local = os.path.join(root, E.safe_name(posixpath.basename(d)) or "carpeta")
+                CLOUD["phase"] = "Bajando la carpeta %s (%d de %d)" % (d, k + 1, len(dirs))
+                _rclone_copy(exe, "%s:%s" % (remote, d), local)
+                done.append(local)
+                if to == "ps5":
+                    job = new_job([local], "", dest, title="☁️ %s" % posixpath.basename(d))
+                    with WAKE:
+                        JOBS.append(job)
+                        WAKE.notify_all()
+                    save_jobs()
+            return ("Carpetas en tu PC: %s" % ", ".join(done)) + (" — y en la cola para la consola" if to == "ps5" else "")
+        _cloud_bg("Bajando carpetas de la nube…", fn)
+    return out
+
+
+def _rclone_copy(exe, src, dst):
+    import subprocess
+    os.makedirs(dst, exist_ok=True)
+    p = subprocess.Popen([exe, "copy", src, dst, "--stats", "1s", "--use-json-log", "--stats-log-level", "NOTICE",
+                          "--transfers", "4"], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                         creationflags=F.NO_WINDOW)
+    last = ""
+    for raw in p.stderr:
+        ln = raw.decode("utf-8", "replace").strip()
+        try:
+            j = json.loads(ln)
+        except Exception:
+            last = ln or last
+            continue
+        st = j.get("stats") or {}
+        if st.get("totalBytes"):
+            CLOUD["pct"] = int(st.get("bytes", 0) * 100 / st["totalBytes"])
+        if j.get("level") == "error":
+            last = j.get("msg") or last
+    if p.wait() != 0:
+        raise E.PipeError("rclone no pudo bajar %s: %s" % (src, last[:300]))
+
+
+SYS_HIST = []         # [(t, cpu_temp, title_id)] para la grafica de la pestana Sistema
+TEMP_FILE = os.path.join(DATA_DIR, "temperaturas.json")
+NOWPLAY = {"tid": "", "name": "", "fps": None, "t": 0, "src": ""}
+SYS_T = [0.0]
+
+
+def _title_name(tid, extra=None):
+    if not tid:
+        return ""
+    if extra and extra.get(tid):
+        return extra[tid]
+    t = (lib_load().get("titles") or {}).get(tid) or {}
+    return t.get("title") or tid
+
+
+def _temps_load():
+    try:
+        with open(TEMP_FILE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return {"titles": {}, "hist": []}
+
+
+def sys_sample(ex=None):
+    """Cada minuto, con ps5-exporter cargado: apunta la temperatura y que titulo estaba abierto, para la grafica y
+    para saber que titulo calienta mas la consola. Tambien rellena «Ahora en la consola»."""
+    ip = cfg_snapshot().get("ps5_ip") or ""
+    if ex is None:
+        if not ip or not _port_open(ip, F.EXPORTER_PORT, 1.0):
+            NOWPLAY.update(tid="", name="", fps=None, src="")
+            return None
+        try:
+            ex = F.exporter_summary(F.exporter_metrics(ip))
+        except Exception:
+            return None
+    tid = ex.get("running") or ""
+    NOWPLAY.update(tid=tid, name=_title_name(tid, ex.get("smp_names")), fps=ex.get("fps"), t=time.time(), src="exporter")
+    temp = ex.get("cpu_temp")
+    if temp is None:
+        return ex
+    now = int(time.time())
+    with LOCK:
+        if not SYS_HIST or now - SYS_HIST[-1][0] >= 50:
+            SYS_HIST.append((now, temp, tid))
+            del SYS_HIST[:-1440]
+            d = _temps_load()
+            d["hist"] = [h for h in d.get("hist", []) if now - h[0] < 7 * 86400][-10080:] + [[now, temp, tid]]
+            if tid:
+                a = d.setdefault("titles", {}).setdefault(tid, {"n": 0, "sum": 0.0, "max": 0.0, "name": ""})
+                a["n"] += 1
+                a["sum"] += temp
+                a["max"] = max(a["max"], temp)
+                a["name"] = NOWPLAY["name"] or a.get("name") or tid
+                if ex.get("watts"):
+                    a["wsum"] = a.get("wsum", 0.0) + ex["watts"]
+            try:
+                _save_json(TEMP_FILE, d)
+            except Exception:
+                pass
+    return ex
+
+
+def sys_state():
+    cfg = cfg_snapshot()
+    ip = cfg.get("ps5_ip") or ""
+    host = E.clean_host(ip)[0] if ip else ""
+    out = {"overlay": _port_open(ip, 8585, 1.2) if ip else False,
+           "overlay_url": "http://%s:8585" % host if ip else "",
+           "zftpd_url": "http://%s:8888" % host if ip else "",
+           "exporter": bool(ip) and _port_open(ip, F.EXPORTER_PORT, 1.2)}
+    if out["exporter"]:
+        try:
+            ex = F.exporter_summary(F.exporter_metrics(ip))
+            out.update({k: v for k, v in ex.items() if k != "smp_names"})
+            sys_sample(ex)
+            out["running_name"] = NOWPLAY["name"]
+        except Exception as e:
+            out["exporter_error"] = str(e)
+    z = F.Zftpd(ip)
+    out["zftpd"] = z.alive() if ip else False
+    if out["zftpd"] and out.get("cpu_temp") is None:
+        st = z.stats()
+        out.update({k: v for k, v in st.items() if out.get(k) is None})
+        if st.get("cpu_temp") is not None:
+            with LOCK:
+                SYS_HIST.append((int(time.time()), st["cpu_temp"], ""))
+                del SYS_HIST[:-1440]
+    d = _temps_load()
+    hist = [tuple(h) for h in d.get("hist", []) if time.time() - h[0] < 6 * 3600]
+    with LOCK:
+        live = [h for h in SYS_HIST if time.time() - h[0] < 6 * 3600]
+    seen = {h[0] for h in hist}
+    hist = sorted(hist + [h for h in live if h[0] not in seen])
+    out["hist"] = [[h[0], h[1], h[2] if len(h) > 2 else ""] for h in hist][-720:]
+    names = {}
+    for h in out["hist"]:
+        if h[2] and h[2] not in names:
+            names[h[2]] = _title_name(h[2])
+    out["hist_names"] = names
+    hot = []
+    for tid, a in (d.get("titles") or {}).items():
+        if a.get("n", 0) >= 5:
+            hot.append({"tid": tid, "name": a.get("name") or tid, "avg": round(a["sum"] / a["n"], 1),
+                        "max": a.get("max"), "minutes": a["n"],
+                        "watts": round(a["wsum"] / a["n"]) if a.get("wsum") else None})
+    out["hot"] = sorted(hot, key=lambda x: -x["avg"])[:10]
+    return out
+
+
 def transfer_worker():
     while True:
         with WAKE:
@@ -4696,7 +6297,14 @@ def transfer_worker():
             cancel = CANCELS.setdefault(job["id"], threading.Event())
             cancel.clear()
             job["status"] = "comprobando"
+            F.CHILD.job = job["id"]
         try:
+            if job.get("where") == "zdl":
+                zftpd_job(job, cancel)
+                save_jobs()
+                continue
+            if job.get("cloud"):
+                cloud_fix_job(job)
             if any(is_torrent(x) for x in job["lines"]):
                 torrent_stage(job, cfg_snapshot(), cancel)
             srcs = probe_job(job, cancel)
@@ -4769,6 +6377,7 @@ def extract_worker():
         if job is None or job["status"] != "en cola para descomprimir":
             continue
         cancel = CANCELS.setdefault(job["id"], threading.Event())
+        F.CHILD.job = job["id"]
         try:
             placed = extract_job(job, job["info"], cancel)
             try:
@@ -4780,8 +6389,8 @@ def extract_worker():
                 and (job.get("dest", "").startswith("/data/homebrew") or "/homebrew" in job.get("dest", ""))
             is_pkg = any(p.lower().endswith(".pkg") for p in placed)
             if is_pkg:
-                jlog(job, "Es un .fpkg: instálalo desde /data/pkg con el instalador de paquetes "
-                          "(etaHEN, ItemzFlow o ps5upload)")
+                jlog(job, "Es un .fpkg: instálalo desde /data/pkg con «Instalar en la consola» (Biblioteca o Archivos "
+                          "de la consola, con zftpd) o con el instalador de paquetes que uses")
             setj(job, status="hecho", result=placed, extract_text="",
                  phase=("Listo en /data/pkg: instálalo con el instalador de paquetes" if is_pkg
                         else "Listo. ShadowMountPlus lo añadirá al inicio en unos segundos" if is_game
@@ -4919,6 +6528,151 @@ def library_bases(bf, f):
         except ftplib.all_errors:
             pass
     return out
+
+
+# ---------------------------------------------------------------------------
+# Ordenar nombres: las imagenes (.ffpkg, .exfat, .ffpfs, .ffpfsc) y los .pkg con un nombre claro,
+# «Titulo-PPSA01234-EU», sacado del propio param.json (sin bases de datos externas). Nunca carpetas: muchas
+# aplicaciones y emuladores tienen que seguir llamandose como su Title ID. Idea de pristmc-code/game-library-renamer.
+# ---------------------------------------------------------------------------
+
+REN_LOG = os.path.join(DATA_DIR, "renombrados.json")
+REN_SKIP_RX = re.compile(r"(?i)patch|backport|update|upd[_-]|dlc")
+
+
+def ren_clean(t):
+    import unicodedata
+    t = unicodedata.normalize("NFKD", str(t or ""))
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    t = re.sub(r"[™®©]", "", t)
+    t = re.sub(r"[^A-Za-z0-9]+", "_", t).strip("_")
+    return re.sub(r"_+", "_", t)
+
+
+def ren_target(title, tid, region, ext):
+    """Nombre propuesto. ShadowMountPlus monta en /mnt/shadowmnt/<nombre>_<hash>: el nombre sin extension no puede
+    pasar de 63 caracteres (58 en .ffpfsc, que va en pfsc/)."""
+    tail = "-" + tid.upper() + ("-" + region if region else "")
+    base = ren_clean(title) or tid.upper()
+    if base.upper() == tid.upper():
+        base, tail = tid.upper(), ("-" + region if region else "")
+    limit = 58 if ext == "ffpfsc" else 63 if ext != "pkg" else 200
+    base = base[:max(8, limit - len(tail))].rstrip("_")
+    return base + tail + "." + ext
+
+
+def rename_plan():
+    with LOCK:
+        lib = list(((LIB.get("items") or {}).get("items")) or [])
+    if not lib:
+        raise E.PipeError("Primero lee la Biblioteca (botón «Actualizar lista»).")
+    titles = lib_load().get("titles") or {}
+    cands = []
+    for it in lib:
+        if it.get("kind") == "image" and it.get("path", "").startswith(("/data/", "/mnt/usb", "/mnt/ext")):
+            cands.append({"path": it["path"], "name": it["name"], "tid": it.get("tid") or "", "title": it.get("title") or "",
+                          "region": it.get("region") or "", "ext": (it.get("ext") or it["name"].rsplit(".", 1)[-1]).lower(),
+                          "mounted": bool(it.get("mounted"))})
+    # .pkg en /data/pkg y en las carpetas de la Biblioteca (el titulo, si ya se conoce por su Title ID)
+    cfg = cfg_snapshot()
+    dirs = sorted({posixpath.dirname(c["path"]) for c in cands} | {"/data/pkg"})
+    listing = {}
+
+    def work(f):
+        for d in dirs:
+            try:
+                listing[d] = {n for n, v in E.ftp_listdir(f, d)}
+                for n, v in E.ftp_listdir(f, d):
+                    if v["type"] == "file" and n.lower().endswith(".pkg"):
+                        tid = E.title_id(n) or ""
+                        t = titles.get(tid.upper()) or {}
+                        cands.append({"path": d.rstrip("/") + "/" + n, "name": n, "tid": tid, "title": t.get("title") or "",
+                                      "region": "", "ext": "pkg", "mounted": False})
+            except ftplib.all_errors:
+                listing[d] = set()
+    E.Ftp(cfg).call(work)
+    out, targets = [], {}
+    for c in cands:
+        d = posixpath.dirname(c["path"])
+        it = dict(c, new="", status="", why="")
+        if not c["tid"] or not c["title"]:
+            it.update(status="skip", why="No sé su título (léelo antes en la Biblioteca)" if c["tid"] else "Sin Title ID")
+        elif c["ext"] == "pkg" and REN_SKIP_RX.search(c["name"]):
+            it.update(status="skip", why="Parche o backport: se deja como está")
+        else:
+            new = ren_target(c["title"], c["tid"], c["region"], c["ext"])
+            it["new"] = new
+            if new == c["name"]:
+                it["status"] = "ok"
+            elif new in listing.get(d, set()) or (d + "/" + new) in targets:
+                it.update(status="conflict", why="Ya hay otro con ese nombre")
+            else:
+                it["status"] = "ready"
+                targets[d + "/" + new] = c["path"]
+        stem = c["name"].rsplit(".", 1)[0]
+        if c["ext"] != "pkg" and len(stem) > (58 if c["ext"] == "ffpfsc" else 63):
+            it["too_long"] = True       # tal como esta, ShadowMountPlus no lo puede montar
+        out.append(it)
+    order = {"ready": 0, "conflict": 1, "skip": 2, "ok": 3}
+    out.sort(key=lambda x: (order.get(x["status"], 9), (x["title"] or x["name"]).lower()))
+    try:
+        with open(REN_LOG, encoding="utf-8") as fh:
+            last = json.load(fh)
+    except (OSError, ValueError):
+        last = []
+    return {"items": out, "undo": len(last[-1]["items"]) if last else 0}
+
+
+def rename_apply(paths=None, undo=False):
+    cfg = cfg_snapshot()
+    try:
+        with open(REN_LOG, encoding="utf-8") as fh:
+            log = json.load(fh)
+    except (OSError, ValueError):
+        log = []
+    if undo:
+        if not log:
+            raise E.PipeError("No hay nada que deshacer.")
+        pairs = [(x["to"], x["from"]) for x in reversed(log[-1]["items"])]
+    else:
+        plan = {x["path"]: x for x in rename_plan()["items"] if x["status"] == "ready"}
+        pairs = [(p, posixpath.dirname(p) + "/" + plan[p]["new"]) for p in (paths or []) if p in plan]
+        if not pairs:
+            raise E.PipeError("No hay nada marcado para renombrar.")
+    done, errs = [], []
+
+    def work(f):
+        for a, b in pairs:
+            d = posixpath.dirname(b)
+            try:
+                if posixpath.basename(b) in {n for n, _ in E.ftp_listdir(f, d)}:
+                    errs.append("%s: ya existe" % posixpath.basename(b))
+                    continue
+                f.rename(a, b)
+                done.append({"from": a, "to": b})
+            except ftplib.all_errors as e:
+                errs.append("%s: %s" % (posixpath.basename(a), e))
+    E.Ftp(cfg).call(work)
+    if undo:
+        log = log[:-1]
+    elif done:
+        log.append({"t": time.time(), "items": done})
+    try:
+        with open(REN_LOG, "w", encoding="utf-8") as fh:
+            json.dump(log[-20:], fh, ensure_ascii=False, indent=1)
+    except OSError:
+        pass
+    # la Biblioteca ya sabe los nombres nuevos (sin volver a leerlo todo)
+    with LOCK:
+        m = {x["from"]: x["to"] for x in done}
+        for it in (((LIB.get("items") or {}).get("items")) or []):
+            if it.get("path") in m:
+                it["path"] = m[it["path"]]
+                it["name"] = posixpath.basename(it["path"])
+                it.pop("mounted", None)
+    if done:
+        print("Renombrados %d en la consola%s" % (len(done), " (deshecho)" if undo else ""))
+    return {"done": len(done), "errors": errs}
 
 
 def library_scan(refresh=False):
@@ -5074,6 +6828,7 @@ def library_scan(refresh=False):
                       "ext": LIB_IMAGE_RE.search(name).group(1).lower(), "size": x.get("size"),
                       "tid": tid, "title": mf.get("title") or t.get("title"),
                       "version": mf.get("version"), "need_fw": mf.get("need_fw") or t.get("need_fw"),
+                      "region": mf.get("region") or "",
                       "backport": mf.get("backport") or t.get("backport"),
                       "cover": bool(mf.get("icon") or t.get("cover"))}
                 if m and mf.get("icon"):
@@ -5233,8 +6988,9 @@ def library_start(refresh=False):
     threading.Thread(target=run, daemon=True).start()
 
 
-def cover_png(path=None, tid=None):
-    """Bytes de la portada (icon0.png) de una aplicacion de la consola, guardada en cache."""
+def cover_png(path=None, tid=None, pic=False):
+    """Bytes de la portada (icon0.png) de una aplicacion de la consola, guardada en cache. Con pic, su imagen de
+    fondo (pic0.png, la que sale detras en el menu de la PS5)."""
     import hashlib
     if tid:
         t = lib_load()["titles"].get(tid.upper()) or {}
@@ -5250,12 +7006,13 @@ def cover_png(path=None, tid=None):
         return None
     c = lib_load()["entries"].get(path) or {}
     key = hashlib.sha1(("%s|%s" % (path, c.get("mtime"))).encode("utf-8")).hexdigest()[:20]
-    fp = os.path.join(COVER_DIR, key + ".png")
+    fp = os.path.join(COVER_DIR, key + ("_pic0" if pic else "") + ".png")
     if os.path.isfile(fp):
         with open(fp, "rb") as fh:
             return fh.read()
-    icon = path + ("/icon0.png" if path.startswith("/user/appmeta/") else "/sce_sys/icon0.png")
-    data = E.Ftp(cfg_snapshot()).call(lambda f: F.ftp_read(f, icon, 0, 8 * 1024 * 1024))
+    name = "pic0.png" if pic else "icon0.png"
+    icon = path + ("/" + name if path.startswith("/user/appmeta/") else "/sce_sys/" + name)
+    data = E.Ftp(cfg_snapshot()).call(lambda f: F.ftp_read(f, icon, 0, 16 * 1024 * 1024))
     if not data.startswith(b"\x89PNG"):
         return None
     os.makedirs(COVER_DIR, exist_ok=True)
@@ -5319,7 +7076,7 @@ def sched_set(b):
 BK = {"busy": False, "what": "", "done": 0, "total": 0, "files": 0, "current": "", "error": "", "last": "", "t": 0}
 BK_CANCEL = threading.Event()
 BK_CONFIG_DIRS = ["/data/shadowmount", "/data/shadowmountplus", "/data/pldmgr", "/data/etaHEN", "/data/GameUpdater",
-                  "/data/ps5_autoloader", "/data/kstuff"]
+                  "/data/ps5_autoloader", "/data/kstuff", "/data/overlay", "/data/SMPlusGui", "/data/tailscale"]
 BK_APPDB = ["/system_data/priv/mms/app.db", "/system_data/priv/mms/appinfo.db", "/system_data/priv/mms/addcont.db"]
 BK_SAVE_DIRS = ("savedata_prospero", "savedata")
 BK_MAX_FILE = 200 * 1024 * 1024       # en la configuracion no se copian archivos enormes
@@ -5365,12 +7122,101 @@ def _save_roots(f):
     return roots
 
 
+# Partidas de los emuladores que corren en la PS5 (son archivos normales, no partidas de PS5). Donde guarda cada uno,
+# segun su codigo (lo mismo que mira PS5Upload): carpetas de datos por orden, la primera que exista.
+_USB = range(8)
+EMU_SAVES = [
+    {"id": "PPSA99249", "name": "Crux2 (PS2)", "subs": ["memcards", "sstates"],
+     "outside": ["/data/crux2"] + ["/mnt/usb%d/crux2-data" % i for i in _USB], "in_use": "",
+     "installed": ["/data/homebrew/PPSA99249", "/user/app/PPSA99249", "/mnt/ext0/homebrew/PPSA99249",
+                   "/mnt/ext1/homebrew/PPSA99249", "/mnt/usb0/homebrew/PPSA99249", "/mnt/usb1/homebrew/PPSA99249"]},
+    {"id": "PPSA99203", "name": "PS5SX2 (PS2)", "subs": ["memcards", "savestates"], "loose": (".ps2", ".p2s"),
+     "outside": ["/data/PCSX2"], "in_use": "", "installed": []},
+    {"id": "PPSA99248", "name": "PSSwanStation (PS1)", "subs": ["data/saves", "data/states"],
+     "outside": ["/data/psswanstation"] + ["/mnt/usb%d/PSSwanStation" % i for i in _USB], "in_use": "data",
+     "installed": ["/data/homebrew/PPSA99248", "/user/app/PPSA99248", "/mnt/ext0/homebrew/PPSA99248",
+                   "/mnt/ext1/homebrew/PPSA99248", "/mnt/usb0/homebrew/PPSA99248", "/mnt/usb1/homebrew/PPSA99248"]},
+    {"id": "PPSA99008", "name": "ProsperoEden (Switch)",
+     "root": "/data/prosperoeden/user/nand/user/save/0000000000000000", "also": ["PPSA99016"]},
+]
+
+
+def _emu_save(tid, name, folder, subs):
+    return {"id": tid, "name": name, "subs": subs, "outside": [folder], "in_use": "", "installed": []}
+
+
+EMU_SAVES += [
+    _emu_save("PPSA97510", "PSXS5 (PS1)", "/data/PSXS5", ["memcards", "states", "saves", "profiles"]),
+    _emu_save("PPSA99764", "Porpoise (GameCube / Wii)", "/data/porpoise", ["GC", "Wii/title", "StateSaves", "saves"]),
+    _emu_save("PPSA99064", "Mupen64Plus (N64)", "/data/mupen64plus", ["save", "saves", "states"]),
+    _emu_save("PPSA99922", "Snes9x (SNES)", "/data/snes9x", ["saves", "sram", "states"]),
+    _emu_save("PPSA99921", "Genesis Plus GX (Sega)", "/data/genplus", ["saves", "states"]),
+    _emu_save("PPSA99924", "FBNeo (arcade)", "/data/fbneo", ["saves", "states"]),
+    _emu_save("PPSA99925", "Beetle PCE (PC Engine)", "/data/pce", ["saves", "states"]),
+    _emu_save("PPSA99247", "PSFlycast (Dreamcast)", "/data/homebrew/PPSA99247", ["vmu"]),
+    _emu_save("PPSA99169", "RetroArch", "/data/homebrew/PPSA99169", ["savefiles", "savestates"]),
+    _emu_save("PPSA68091", "Ruffle (Flash)", "/data/ruffle", ["saves"]),
+]
+EMU_NAMES = {e["id"]: e["name"] for e in EMU_SAVES}
+
+
+def _ftp_isdir(f, p):
+    try:
+        E.ftp_listdir(f, p)
+        return True
+    except ftplib.all_errors:
+        return False
+
+
+def emu_save_files(f, cancel):
+    """[(id del emulador, ruta, tamano)] de las partidas de los emuladores que haya en la consola."""
+    out = []
+    for e in EMU_SAVES:
+        if e.get("root"):
+            out += [(e["id"], p, sz) for p, sz in _ftp_walk_sizes(f, e["root"], [], cancel)]
+            continue
+        base = None
+        for d in e["outside"]:
+            if _ftp_isdir(f, d) and (not e["in_use"] or _ftp_isdir(f, d + "/" + e["in_use"])):
+                base = d
+                break
+        if base is None:
+            base = next((d for d in e["installed"] if _ftp_isdir(f, d)), None)
+        if base is None:
+            continue
+        found = False
+        for sub in e["subs"]:
+            got = _ftp_walk_sizes(f, base + "/" + sub, [], cancel)
+            found |= bool(got)
+            out += [(e["id"], p, sz) for p, sz in got]
+        if not found and e.get("loose"):
+            # PS5SX2 de la tienda: las tarjetas (.ps2) y los estados (.p2s) sueltos; nunca su BIOS ni sus juegos
+            try:
+                for n, v in E.ftp_listdir(f, base):
+                    if v["type"] == "file" and n.lower().endswith(e["loose"]):
+                        out.append((e["id"], base + "/" + n, v.get("size") or 0))
+            except ftplib.all_errors:
+                pass
+    return out
+
+
+def open_titles(max_age=12 * 3600):
+    """Titulos que segun el registro de ShadowMountPlus siguen abiertos (arrancados hace menos de max_age)."""
+    try:
+        with PLAYED_LOCK:
+            d = played_load()
+        now = time.time()
+        return {t for t, ts in (d.get("open") or {}).items() if ts and now - ts < max_age}
+    except Exception:
+        return set()
+
+
 def backup_run(sections=None, label="copia", tids=None):
     """Hace la copia en un .zip con fecha. sections: saves, config, appdb, list."""
     import zipfile
     cfg = cfg_snapshot()
     if sections is None:
-        sections = [k for k in ("saves", "config", "appdb") if cfg.get("backup_" + k, True)] + ["list"]
+        sections = [k for k in ("saves", "emu", "config", "appdb") if cfg.get("backup_" + k, True)] + ["list"]
     BK_CANCEL.clear()
     with LOCK:
         BK.update(busy=True, what="backup", done=0, total=0, files=0, current="Buscando qué copiar…", error="")
@@ -5398,6 +7244,12 @@ def backup_run(sections=None, label="copia", tids=None):
                 if want and not todo:
                     raise E.PipeError("No encuentro partidas de %s en la consola (¿no lo has jugado todavía?)"
                                       % ", ".join(sorted(want)))
+            if "emu" in sections and not tids:
+                emu_files = emu_save_files(f, BK_CANCEL)
+                todo += [("emu", p, sz) for _, p, sz in emu_files]
+                emu_of = {p: i for i, p, _ in emu_files}
+            else:
+                emu_of = {}
             if "config" in sections:
                 for r in BK_CONFIG_DIRS:
                     todo += [("config", p, s) for p, s in _ftp_walk_sizes(f, r, [], BK_CANCEL, BK_MAX_FILE)]
@@ -5424,7 +7276,8 @@ def backup_run(sections=None, label="copia", tids=None):
                     try:
                         with z.open(zipfile.ZipInfo(arc, time.localtime()[:6]), "w", force_zip64=True) as dst:
                             f.retrbinary("RETR " + p, dst.write, 1024 * 1024)
-                        manifest["files"].append({"section": sec, "path": p, "size": sz})
+                        manifest["files"].append(dict({"section": sec, "path": p, "size": sz},
+                                                      **({"emu": emu_of[p]} if p in emu_of else {})))
                     except ftplib.all_errors as e:
                         manifest.setdefault("skipped", []).append({"path": p, "error": str(e)[:200]})
                         try:
@@ -5504,6 +7357,8 @@ def backup_list():
                             if len(parts) > 5:
                                 ids.add(parts[5])
                     info["saves"] = sorted(ids)
+                    info["emus"] = sorted({it.get("emu") for it in m.get("files") or [] if it.get("emu")})
+                    info["emu_names"] = {i: EMU_NAMES.get(i, i) for i in info["emus"]}
                     titles = lib_load().get("titles") or {}
                     info["names"] = {i: (titles.get(i.upper()) or {}).get("title") for i in ids}
                     info["files"] = len(m.get("files") or [])
@@ -5513,10 +7368,18 @@ def backup_list():
     return out
 
 
-def backup_restore(path, ids):
+def backup_restore(path, ids, emus=None):
     """Vuelve a poner en la consola las partidas elegidas de una copia (antes guarda las de ahora)."""
     import zipfile
     cfg = cfg_snapshot()
+    emus = set(emus or [])
+    busy_emu = [EMU_NAMES.get(i, i) for i in emus if i in open_titles() or
+                any(a in open_titles() for e in EMU_SAVES if e["id"] == i for a in e.get("also", []))]
+    if busy_emu:
+        with LOCK:
+            BK["error"] = ("Cierra %s en la consola antes de restaurar sus partidas (si ya está cerrado, espera un "
+                           "par de minutos y vuelve a probar)." % ", ".join(busy_emu))
+        return
     path = os.path.abspath(path)
     if not path.startswith(os.path.abspath(backup_dir(cfg))) or not os.path.isfile(path):
         raise E.PipeError("Esa copia no está en la carpeta de copias")
@@ -5526,13 +7389,14 @@ def backup_restore(path, ids):
                   error="")
     BK_CANCEL.clear()
     try:
-        backup_run(["saves"], "antes-de-restaurar")
+        backup_run(["saves", "emu"] if emus else ["saves"], "antes-de-restaurar")
         with LOCK:
             BK.update(busy=True, what="restore", current="Restaurando…", error="")
         with zipfile.ZipFile(path) as z:
             m = json.loads(z.read("manifest.json"))
-            files = [it for it in m.get("files") or [] if it.get("section") == "saves"
+            files = [it for it in m.get("files") or [] if it.get("section") == "saves" and ids != ["-"]
                      and (not ids or (len(it["path"].split("/")) > 5 and it["path"].split("/")[5] in ids))]
+            files += [it for it in m.get("files") or [] if it.get("section") == "emu" and it.get("emu") in emus]
             with LOCK:
                 BK.update(total=sum(it.get("size") or 0 for it in files), files=len(files))
             f = E.Ftp(cfg).connect()
@@ -5542,12 +7406,13 @@ def backup_restore(path, ids):
                     if BK_CANCEL.is_set():
                         raise E.Cancelled()
                     p = it["path"]
-                    user_dir = "/".join(p.split("/")[:4])
-                    try:
-                        E.ftp_listdir(f, user_dir)
-                    except ftplib.all_errors:
-                        raise E.PipeError("En la consola no existe %s: esta copia es de otro usuario o de otra "
-                                          "consola" % user_dir)
+                    if it.get("section") != "emu":
+                        user_dir = "/".join(p.split("/")[:4])
+                        try:
+                            E.ftp_listdir(f, user_dir)
+                        except ftplib.all_errors:
+                            raise E.PipeError("En la consola no existe %s: esta copia es de otro usuario o de otra "
+                                              "consola" % user_dir)
                     with LOCK:
                         BK["current"] = p
                     E.Ftp.mkdirs(f, posixpath.dirname(p))
@@ -5575,6 +7440,45 @@ def backup_restore(path, ids):
             BK.update(busy=False, current="", t=time.time())
 
 
+def send_now(job):
+    """«Enviar ahora»: pasa delante de todo; lo que se esta enviando se pausa y sigue solo al acabar este.
+    Llamar con WAKE cogido."""
+    JOBS.remove(job)
+    first = next((i for i, x in enumerate(JOBS) if x["status"] in ("pendiente", "pausado")), len(JOBS))
+    JOBS.insert(first, job)
+    if job["status"] == "pausado":
+        job["status"] = "pendiente"
+        job["phase"] = "En cola"
+        CANCELS.setdefault(job["id"], threading.Event()).clear()
+    for x in JOBS:
+        if x is not job and x["status"] in ("comprobando", "enviando", "convirtiendo"):
+            x["_pause"] = True
+            x["resume_after"] = job["id"]
+            CANCELS.setdefault(x["id"], threading.Event()).set()
+            jlog(x, "En pausa para enviar antes otra cosa: sigue sola cuando termine")
+    WAKE.notify_all()
+
+
+def resume_after_now():
+    """Lo que se pauso por «Enviar ahora» sigue solo cuando ha terminado lo que se paso delante."""
+    with WAKE:
+        for x in JOBS:
+            ra = x.get("resume_after")
+            if not ra:
+                continue
+            other = find(ra)
+            if other and other["status"] not in ("hecho", "error", "cancelado"):
+                continue
+            x.pop("resume_after", None)
+            if x["status"] == "pausado":
+                CANCELS.setdefault(x["id"], threading.Event()).clear()
+                x["error"] = ""
+                x["status"] = "pendiente"
+                x["phase"] = "En cola"
+                jlog(x, "Sigo donde lo dejé")
+                WAKE.notify_all()
+
+
 def monitor():
     """Cada pocos segundos: que el PC no se duerma con trabajo y la accion al acabar la cola."""
     awake = None
@@ -5582,10 +7486,15 @@ def monitor():
     while True:
         time.sleep(5)
         try:
+            resume_after_now()
+        except Exception:
+            traceback.print_exc()
+        try:
             # copia de seguridad diaria (si esta activada y la consola responde)
             if (SETTINGS.get("backup_auto") and not BK["busy"] and not busy()
                     and time.time() - float(SETTINGS.get("backup_last") or 0) > 24 * 3600
-                    and time.time() - last_auto > 1800):
+                    and time.time() - last_auto > 1800 and not open_titles(6 * 3600)):
+                # si hay algo abierto en la consola se espera a que lo cierres: asi no se copia una partida a medio guardar
                 last_auto = time.time()
                 try:
                     E.Ftp(cfg_snapshot()).call(lambda f: f.voidcmd("NOOP"))
@@ -5636,7 +7545,7 @@ def monitor():
 def payload_list():
     folder = os.path.join(DATA_DIR, "payloads")
     out = []
-    for p in F.PAYLOADS:
+    for p in F.PAYLOADS + [x for x in F.EXTRA_PAYLOADS if x["id"] in ("zftpd", "overlay")]:
         cached = []
         try:
             cached = sorted(n[len(p["id"]) + 1:-4] for n in os.listdir(folder)
@@ -5793,7 +7702,9 @@ def _host_alive(host):
         return True
     import subprocess
     try:
-        args = ["ping", "-n", "1", "-w", "1000", host] if os.name == "nt" else ["ping", "-c", "1", "-W", "1", host]
+        # ojo: en Mac, -W va en milisegundos (en Linux, en segundos)
+        args = (["ping", "-n", "1", "-w", "1000", host] if os.name == "nt" else
+                ["ping", "-c", "1", "-W", "1000" if sys.platform == "darwin" else "1", host])
         r = subprocess.run(args, capture_output=True, timeout=4,
                            **({"creationflags": 0x08000000} if os.name == "nt" else {}))
         return r.returncode == 0 and b"ttl" in r.stdout.lower()
@@ -5803,6 +7714,174 @@ def _host_alive(host):
 
 AUTO_TRIED = {}
 PLAYED_T = [0.0]
+SHOTS_T = [0.0]
+SHOTS_FILE = os.path.join(DATA_DIR, "capturas_bajadas.json")
+SHOTS = {"busy": False, "done": 0, "n": 0, "last": None, "msg": ""}
+SHOTS_LOCK = threading.Lock()
+
+
+def _shots_seen():
+    try:
+        with open(SHOTS_FILE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return {}
+
+
+SENT_FILE = os.path.join(DATA_DIR, "capturas_envios.json")
+TG_API = os.environ.get("PS5D_TG_API") or "https://api.telegram.org"      # se puede cambiar para pruebas
+DC_RX = re.compile(os.environ.get("PS5D_DC_RX") or r"^https://(?:\w+\.)?discord(?:app)?\.com/api/webhooks/")
+SENT_LOCK = threading.Lock()
+
+
+def _multipart(fields, files):
+    """Cuerpo multipart/form-data: fields {nombre: texto}, files [(campo, nombre, bytes, tipo)]."""
+    bnd = "----PS5Directo" + secrets.token_hex(12)
+    out = io.BytesIO()
+    for k, v in fields.items():
+        out.write(("--%s\r\nContent-Disposition: form-data; name=\"%s\"\r\n\r\n%s\r\n" % (bnd, k, v)).encode("utf-8"))
+    for field, name, data, ctype in files:
+        out.write(("--%s\r\nContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: %s\r\n\r\n"
+                   % (bnd, field, name.replace('"', ''), ctype)).encode("utf-8"))
+        out.write(data)
+        out.write(b"\r\n")
+    out.write(("--%s--\r\n" % bnd).encode())
+    return out.getvalue(), "multipart/form-data; boundary=" + bnd
+
+
+def _post_multipart(url, fields, files, timeout=300):
+    body, ctype = _multipart(fields, files)
+    req = urllib.request.Request(url, data=body, method="POST",
+                                 headers={"Content-Type": ctype, "User-Agent": "PS5Directo"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.read(65536).decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        txt = e.read(4096).decode("utf-8", "replace")
+        try:
+            msg = json.loads(txt).get("description") or json.loads(txt).get("message") or txt
+        except Exception:
+            msg = txt
+        raise E.PipeError("HTTP %s: %s" % (e.code, str(msg)[:200]))
+
+
+def send_capture(path, dest, title="", when=""):
+    """Manda una captura o un clip que ya esta en el PC a Telegram (tu bot) o a Discord (un webhook)."""
+    cfg = cfg_snapshot()
+    name = os.path.basename(path)
+    ext = os.path.splitext(name)[1].lower()
+    size = os.path.getsize(path)
+    caption = " · ".join(x for x in (title, when.replace("T", " ")[:16]) if x)
+    if ext == ".jxr":                          # HDR: Telegram y Discord no lo ensenan; se manda su vista en JPG
+        jpg = os.path.splitext(path)[0] + "_vista.jpg"
+        if os.path.isfile(jpg) or _jxr_to_jpg(path, jpg):
+            path, name, ext, size = jpg, os.path.basename(jpg), ".jpg", os.path.getsize(jpg)
+    with open(path, "rb") as fh:
+        data = fh.read(60 * 1024 * 1024)
+    img = ext in (".jpg", ".jpeg", ".png", ".webp")
+    vid = ext in (".mp4", ".mov", ".webm")
+    ctype = MEDIA_TYPES.get(ext) or ("image/jpeg" if img else "application/octet-stream")
+    if dest == "tg":
+        tok, chat = cfg.get("shots_tg_token") or "", cfg.get("shots_tg_chat") or ""
+        if not tok or not chat:
+            raise E.PipeError("Falta el bot o el chat de Telegram (Capturas › Enviar también a…)")
+        if size > 50 * 1024 * 1024:
+            raise E.PipeError("Pesa más de 50 MB: Telegram no deja a los bots mandar archivos tan grandes")
+        if img and size <= 10 * 1024 * 1024:
+            method, field = "sendPhoto", "photo"
+        elif ext == ".mp4":
+            method, field = "sendVideo", "video"
+        else:
+            method, field = "sendDocument", "document"
+        _post_multipart("%s/bot%s/%s" % (TG_API, tok, method), {"chat_id": chat, "caption": caption},
+                        [(field, name, data, ctype)])
+    elif dest == "dc":
+        hook = cfg.get("shots_dc_hook") or ""
+        if not DC_RX.match(hook):
+            raise E.PipeError("Falta el webhook de Discord (Capturas › Enviar también a…)")
+        if size > 10 * 1024 * 1024:
+            raise E.PipeError("Pesa más de 10 MB: Discord no lo acepta sin Nitro en el servidor")
+        _post_multipart(hook, {"content": caption}, [("files[0]", name, data, ctype)])
+    else:
+        raise E.PipeError("Destino desconocido")
+    return True
+
+
+def _sent_log(entry):
+    with SENT_LOCK:
+        try:
+            with open(SENT_FILE, encoding="utf-8") as fh:
+                lst = json.load(fh)
+        except Exception:
+            lst = []
+        lst = [x for x in lst if not (x["file"] == entry["file"] and x["dest"] == entry["dest"])]
+        lst.append(entry)
+        _save_json(SENT_FILE, lst[-300:])
+
+
+def shots_route(tid):
+    cfg = cfg_snapshot()
+    d = (cfg.get("shots_route") or {}).get(tid) or cfg.get("shots_send") or ""
+    return [] if d in ("", "none") else (["tg", "dc"] if d == "both" else [d])
+
+
+def shots_forward(local, it):
+    for dest in shots_route(it.get("tid") or ""):
+        entry = {"t": time.time(), "file": local, "dest": dest, "title": it.get("app") or it.get("tid") or "",
+                 "when": it.get("when") or "", "ok": False, "err": ""}
+        try:
+            send_capture(local, dest, entry["title"], entry["when"])
+            entry["ok"] = True
+        except Exception as e:
+            entry["err"] = str(e)[:300]
+        _sent_log(entry)
+
+
+def shots_sync(all_old=False, baseline=False):
+    """Baja al PC las capturas y videos nuevos de la consola, ordenados en carpetas por titulo. Lo que ya se bajo
+    (o lo que habia al activarlo, con baseline) queda apuntado y no se repite aunque lo borres del PC."""
+    if not SHOTS_LOCK.acquire(blocking=False):
+        return
+    try:
+        SHOTS.update(busy=True, done=0, n=0, msg="Mirando las capturas de la consola…")
+        items = media_list()
+        seen = _shots_seen()
+        if baseline:
+            for it in items:
+                seen[it["path"]] = it["size"]
+            _save_json(SHOTS_FILE, seen)
+            SHOTS.update(msg="Listo: a partir de ahora se bajarán solas las nuevas (%d que ya había no)." % len(items))
+            return
+        todo = [it for it in items if all_old or seen.get(it["path"]) != it["size"]]
+        SHOTS.update(n=len(todo))
+        cfg = cfg_snapshot()
+        root = MEDIA_CONV_DIR()
+        got = 0
+        for it in reversed(todo):          # las mas viejas primero
+            folder = (E.safe_name(it["app"]) if it.get("app") else "") or it.get("tid") or "Otros"
+            dst = os.path.join(root, folder, it["name"])
+            if not (os.path.isfile(dst) and os.path.getsize(dst) == it["size"]):
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                SHOTS["msg"] = "Bajando %s (%s)" % (it["name"], folder)
+                E.ftp_download(cfg, it["path"], dst, threading.Event(), lambda n: None, it["size"])
+                got += 1
+                if not all_old and shots_route(it.get("tid") or ""):
+                    SHOTS["msg"] = "Enviando %s…" % it["name"]
+                    shots_forward(dst, it)
+            seen[it["path"]] = it["size"]
+            SHOTS["done"] += 1
+            if SHOTS["done"] % 10 == 0:
+                _save_json(SHOTS_FILE, seen)
+        _save_json(SHOTS_FILE, seen)
+        SHOTS.update(last=time.time(), msg=("Bajadas %d capturas o vídeos nuevos a %s" % (got, root)) if got else
+                     "No hay capturas nuevas")
+        if got:
+            notify("ok", "Capturas nuevas en tu PC", "%d en %s" % (got, root), None, key="shots%d" % int(time.time() // 60))
+    except Exception as e:
+        SHOTS["msg"] = "No pude bajar las capturas: %s" % e
+    finally:
+        SHOTS["busy"] = False
+        SHOTS_LOCK.release()
 CONN_LOST_RX = re.compile(r"(?i)no puedo conectar con el ftp|conexi[oó]n con la ps5 perdida|bfpilot ha dejado de responder|"
                           r"bfpilot no responde|no hay conexi[oó]n con la consola|10054|10053|10060|10061|10065|"
                           r"connection (reset|refused|aborted)|timed out|no route|unreachable|broken pipe")
@@ -5855,11 +7934,117 @@ def auto_resume():
         notify("info", "La consola ha vuelto: reanudo %s" % ", ".join(names[:3]), "")      # id -> momento del ultimo intento automatico (para no insistir cada pocos segundos)
 
 
+FORGE_T = [0.0]
+TRASH_T = [0.0]
+CLIP = {"last": None, "seq": None, "ok": None}
+WATCH = {"dir": None, "seen": {}, "sizes": {}}
+WATCH_EXTS = (".rar", ".zip", ".7z", ".exfat", ".ffpkg", ".ffpfs", ".ffpfsc", ".pkg", ".tar", ".torrent")
+WATCH_SKIP = (".part", ".crdownload", ".tmp", ".download", ".!ut", ".aria2", ".partial")
+
+
+def watch_dir_tick():
+    """«Carpeta vigilada»: lo nuevo que termine de bajar ahi (con FDM, JDownloader, el navegador...) va a la caja de
+    enlaces como archivo del PC, todas las partes juntas. Se espera a que deje de crecer."""
+    with LOCK:
+        d = (SETTINGS.get("watch_dir") or "").strip()
+    if not d or not os.path.isdir(d):
+        WATCH["dir"] = None
+        return
+    names = {}
+    for n in os.listdir(d):
+        fp = os.path.join(d, n)
+        low = n.lower()
+        if not os.path.isfile(fp) or low.endswith(WATCH_SKIP):
+            continue
+        if not (low.endswith(WATCH_EXTS) or re.search(r"\.(\d{3}|r\d\d)$", low)):
+            continue
+        try:
+            names[fp] = (os.path.getsize(fp), os.path.getmtime(fp))
+        except OSError:
+            pass
+    if WATCH["dir"] != d:            # lo que ya habia al activarla (o ya se recogio antes) no cuenta
+        since = float(SETTINGS.get("watch_since") or 0) or time.time()
+        WATCH.update(dir=d, seen={fp: st for fp, st in names.items() if st[1] <= since}, sizes={})
+    new = []
+    for fp, st in names.items():
+        if WATCH["seen"].get(fp) == st:
+            continue
+        if WATCH["sizes"].get(fp) != st:      # sigue creciendo: otra vuelta
+            WATCH["sizes"][fp] = st
+            continue
+        WATCH["seen"][fp] = st
+        WATCH["sizes"].pop(fp, None)
+        new.append(fp)
+    if not new:
+        return
+    with LOCK:
+        SETTINGS["watch_since"] = max([float(SETTINGS.get("watch_since") or 0)] + [names[fp][1] for fp in new])
+        for fp in sorted(new):
+            if not any(x["url"] == fp for x in INBOX):
+                INBOX.append({"url": fp, "name": os.path.basename(fp), "t": time.time()})
+        del INBOX[:-200]
+    notify("info", "%d archivo(s) nuevo(s) en la carpeta vigilada" % len(new),
+           "Están en la caja de enlaces. Revísalos y pulsa «Añadir a la cola».", {"tab": "Transfers"},
+           key="watch:%d" % int(time.time() // 10))
+    save_settings()
+
+
+def clip_watch():
+    """«Captar enlaces que copies»: si copias enlaces de descarga (en cualquier programa), van a la caja de enlaces
+    de PS5 Directo, como con la extension. Solo enlaces de archivos (.rar, .7z, .zip, partes, .pkg, imagenes...)."""
+    while True:
+        time.sleep(1.2)
+        try:
+            with LOCK:
+                on = bool(SETTINGS.get("clip_watch"))
+            if not on:
+                CLIP["last"] = None
+                CLIP["seq"] = None
+                continue
+            seq = F.clipboard_seq()
+            if seq is not None and seq == CLIP["seq"]:
+                continue
+            CLIP["seq"] = seq
+            txt = F.clipboard_text()
+            CLIP["ok"] = txt is not None
+            if txt is None:
+                time.sleep(5)
+                continue
+            if CLIP["last"] is None:          # lo que ya habia al activarlo no cuenta
+                CLIP["last"] = txt
+                continue
+            if txt == CLIP["last"]:
+                continue
+            CLIP["last"] = txt
+            links = F.clipboard_links(txt)
+            if not links:
+                continue
+            new = 0
+            with LOCK:
+                for u in links:
+                    if not any(x["url"] == u for x in INBOX) and not any(u in (j.get("lines") or []) for j in JOBS):
+                        INBOX.append({"url": u, "name": urllib.parse.unquote(u.split("?")[0].rsplit("/", 1)[-1])[:300],
+                                      "t": time.time()})
+                        new += 1
+                del INBOX[:-200]
+            if new:
+                notify("info", "%d enlace(s) copiado(s) en la caja de enlaces" % new,
+                       "Los has copiado y PS5 Directo los ha recogido. Revísalos y pulsa «Añadir a la cola».",
+                       {"tab": "Transfers"}, key="clip:%d" % int(time.time() // 5))
+        except Exception as e:
+            print("Portapapeles:", e)
+            time.sleep(5)
+
+
 def console_watch():
     """Cada poco, si falta ftpsrv o BFpilot y Payload Manager esta abierto (por ejemplo, despues de reiniciar
     la consola y volver a hacer el jailbreak), los inicia solos. No repite el mismo intento antes de 2 min."""
     time.sleep(40)
     while True:
+        try:
+            watch_dir_tick()
+        except Exception as e:
+            print("Carpeta vigilada:", e)
         try:
             with LOCK:
                 on = SETTINGS.get("auto_payloads", True)
@@ -5868,9 +8053,36 @@ def console_watch():
                 if F.PayloadManager(cfg["ps5_ip"]).version():
                     console_auto(min_gap=120)
             auto_resume()
+            if time.time() - TRASH_T[0] > 3600 and _svc_ok("ftpsrv", cfg)[0]:
+                TRASH_T[0] = time.time()
+                trash_tidy()
+            if time.time() - SYS_T[0] > 60 and cfg.get("ps5_ip"):
+                SYS_T[0] = time.time()
+                threading.Thread(target=sys_sample, daemon=True).start()
+            if time.time() - EMU_T[0] > 6 * 3600:
+                EMU_T[0] = time.time()
+                threading.Thread(target=emu_news, daemon=True).start()
+            if time.time() - FORGE_T[0] > 1800:
+                FORGE_T[0] = time.time()
+                threading.Thread(target=forge_news, daemon=True).start()
+            if cfg.get("shots_auto") and time.time() - SHOTS_T[0] > 300 and _svc_ok("ftpsrv", cfg)[0]:
+                SHOTS_T[0] = time.time()
+                threading.Thread(target=shots_sync, daemon=True).start()
             if time.time() - PLAYED_T[0] > 120 and _svc_ok("ftpsrv", cfg)[0]:
                 PLAYED_T[0] = time.time()
                 played_poll()
+            if cfg.get("ps5_ip") and time.time() - PLD_T[0] > 6 * 3600:
+                PLD_T[0] = time.time() - 6 * 3600 + 600          # si Payload Manager no esta, otra vez en 10 min
+                if F.PayloadManager(cfg["ps5_ip"]).version(timeout=2):
+                    PLD_T[0] = time.time()
+                    threading.Thread(target=pld_tick, daemon=True).start()
+            if cfg.get("ps5_ip") and time.time() - GUARD_T[0] > 600 and _svc_ok("ftpsrv", cfg)[0]:
+                GUARD_T[0] = time.time()
+                threading.Thread(target=guard_tick, daemon=True).start()
+            if cfg.get("ps5_ip") and _svc_ok("ftpsrv", cfg)[0]:
+                threading.Thread(target=crash_tick, daemon=True).start()
+            if time.time() - RECOMP["t"] > 6 * 3600:
+                threading.Thread(target=recomp_fetch, daemon=True).start()
         except Exception as e:
             print("Vigilancia de la consola:", e)
         time.sleep(15)
@@ -6036,7 +8248,388 @@ def console_auto(min_gap=0):
             notify("info", "Iniciado desde Payload Manager: %s" % ", ".join(ok), "")
 
 
+def extra_payload(pid, action):
+    """PS5 Dump Forge (y otros) en la consola: 'status' mira si su web contesta; 'send' lo baja de GitHub y lo
+    inicia (con Payload Manager si esta abierto, si no por el cargador de ELF)."""
+    cfg = cfg_snapshot()
+    p = next((x for x in F.EXTRA_PAYLOADS if x["id"] == pid), None)
+    if not p:
+        raise E.PipeError("Payload desconocido")
+    host = E.clean_host(cfg.get("ps5_ip") or "")[0]
+    url = "http://%s:%d" % (host, p["port"]) if p.get("port") else ""
+    if action == "send":
+        path, tag = F.fetch_payload(pid, DATA_DIR, log=print)
+        pm = F.PayloadManager(cfg["ps5_ip"])
+        with open(path, "rb") as fh:
+            data = fh.read(64 * 1024 * 1024)
+        if pm.version():
+            name = "%s_%s.elf" % (p["name"].replace(" ", "_"), re.sub(r"[^\w.-]", "_", tag or ""))
+            if not any(x.get("filename") == name for x in pm.payloads()):
+                pm.upload(name, data)
+            hit = next((x for x in pm.payloads() if x.get("filename") == name), None)
+            if not hit:
+                raise E.PipeError("Payload Manager no muestra %s después de instalarlo" % p["name"])
+            pm.launch(hit["slot"])
+        elif _port_open(cfg["ps5_ip"], cfg.get("elf_port") or 9021):
+            F.send_elf(cfg["ps5_ip"], int(cfg.get("elf_port") or 9021), data)
+        else:
+            raise E.PipeError("Abre Payload Manager en la consola (o un cargador de ELF en el puerto 9021) y vuelve a probar.")
+        if not p.get("port"):
+            return {"running": False, "sent": True, "url": "", "tag": tag, "name": p["name"]}
+        t0 = time.time()
+        while time.time() - t0 < 30 and not _port_open(cfg["ps5_ip"], p["port"], 1.5):
+            time.sleep(1.5)
+        return {"running": _port_open(cfg["ps5_ip"], p["port"], 1.5), "url": url, "tag": tag, "name": p["name"]}
+    if not p.get("port"):
+        return {"running": False, "url": "", "name": p["name"]}
+    return {"running": _port_open(cfg["ps5_ip"], p["port"], 1.5), "url": url, "name": p["name"]}
+
+
+def rec_installed(f):
+    """Title IDs que hay en las carpetas de aplicaciones de la consola."""
+    have = set()
+    for base in ("/data/homebrew", "/mnt/ext0/homebrew", "/mnt/ext1/homebrew", "/mnt/usb0/homebrew", "/mnt/usb1/homebrew",
+                 "/user/app"):
+        try:
+            for n, v in E.ftp_listdir(f, base):
+                t = E.title_id(n)
+                if t:
+                    have.add(t.upper())
+        except ftplib.all_errors:
+            pass
+    return have
+
+
+def rec_list():
+    cfg = cfg_snapshot()
+    try:
+        have = E.Ftp(cfg).call(rec_installed)
+        ok = True
+    except Exception:
+        have, ok = set(), False
+    out = []
+    for c in F.CATALOG:
+        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam") if k in c}
+        it["exp"] = bool(c.get("exp"))
+        it["sys"] = c.get("sys", "")
+        it["update"] = c.get("update", "")
+        if c["kind"] == "app":
+            it["tid"] = c["tid"]
+            tids = [c["tid"]] + list(c.get("also") or [])
+            it["installed"] = any(t in have for t in tids) if ok else None
+            it["emu"] = bool(c.get("emu"))
+            it["ver"] = _emu_vers().get(c["id"]) or ""
+            it["latest"] = rec_latest(c["repo"]) if it["installed"] else ""
+            it["guide"] = (c.get("emu") or {}).get("guide") or []
+            em = c.get("emu") or {}
+            it["has_bios"] = bool(em.get("bios"))
+            it["has_games"] = bool(em.get("games"))
+            it["games_label"] = em.get("games_label") or ""
+        elif c["kind"] == "payload":
+            p = next((x for x in F.EXTRA_PAYLOADS if x["id"] == c["id"]), None)
+            it["once"] = bool(p and not p.get("port"))
+            it["running"] = _port_open(cfg["ps5_ip"], p["port"], 1.2) if p and p.get("port") else False
+            it["url"] = "http://%s:%d" % (E.clean_host(cfg.get("ps5_ip") or "")[0], p["port"]) if p and p.get("port") else ""
+        elif c["kind"] == "guide":
+            it["guide"] = c.get("guide") or []
+            it["doc"] = c.get("doc") or ""
+            it["payload"] = c.get("payload") or ""
+        else:
+            it["url"] = "https://github.com/%s/releases/latest" % c["repo"]
+            it["ip"] = E.clean_host(cfg.get("ps5_ip") or "")[0]
+        out.append(it)
+    return {"items": out, "console": ok}
+
+
+def rec_install(cid, update=False):
+    """Pone en la cola la ultima version oficial (su GitHub) de un programa de «Recomendados». Con update, lo nuevo
+    se copia encima de lo que hay (se conservan ajustes, partidas y lo que tengas dentro de su carpeta)."""
+    c = next((x for x in F.CATALOG if x["id"] == cid and x["kind"] == "app"), None)
+    if not c:
+        raise E.PipeError("No lo conozco")
+    tag, assets = F.github_release(c["repo"])
+    REC_LATEST[c["repo"]] = (time.time(), tag)
+    a = F.pick_asset(assets, c["asset"])
+    if not a:
+        raise E.PipeError("La última versión de %s (%s) no trae un archivo que sepa instalar. Míralo en su GitHub: "
+                          "github.com/%s/releases" % (c["name"], tag or "?", c["repo"]))
+    job = new_job([a["browser_download_url"]], "", "/data/homebrew", title="%s %s" % (c["name"], tag), where="ps5")
+    job["exact_name"] = True
+    job["fmt_set"] = True
+    job["rec_ver"] = {"id": cid, "tag": tag}
+    if update:
+        job["merge_into"] = True
+        job["title"] = "%s: actualizar a %s" % (c["name"], tag)
+    with WAKE:
+        JOBS.append(job)
+        WAKE.notify_all()
+    save_jobs()
+    return {"id": job["id"], "tag": tag, "file": a.get("name")}
+
+
+# ---------------------------------------------------------------------------
+# Emuladores de «Recomendados»: version instalada frente a la de su GitHub, poner tu BIOS, enviar tus juegos a su
+# carpeta, y ver (y retocar) sus ajustes y registros.
+# ---------------------------------------------------------------------------
+
+EMU_VER_FILE = os.path.join(DATA_DIR, "emu_versions.json")
+REC_LATEST = {}          # repo -> (t, tag)
+EMU_T = [0.0]
+EMU_EDIT_EXT = (".ini", ".cfg", ".json", ".txt")
+
+
+def _emu_vers():
+    try:
+        with open(EMU_VER_FILE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return {}
+
+
+def rec_latest(repo, max_age=6 * 3600):
+    hit = REC_LATEST.get(repo)
+    if hit and time.time() - hit[0] < max_age:
+        return hit[1]
+    try:
+        tag = F.github_release(repo)[0]
+    except Exception:
+        return hit[1] if hit else ""
+    REC_LATEST[repo] = (time.time(), tag)
+    return tag
+
+
+def emu_news():
+    """Cada 6 h: si hay version nueva de un emulador que tienes, avisa en la campana (una vez por version)."""
+    vers = _emu_vers()
+    for c in F.CATALOG:
+        if c.get("kind") != "app" or c["id"] not in vers:
+            continue
+        new = rec_latest(c["repo"])
+        if new and new != vers[c["id"]]:
+            notify("info", "Versión nueva de %s: %s" % (c["name"], new),
+                   "Tienes la %s. Actualízalo en Biblioteca › ⭐ Recomendados: se conservan tus ajustes, partidas, "
+                   "BIOS y contenido." % vers[c["id"]], {"tab": "Library", "view": "rec"}, key="emu:%s:%s" % (c["id"], new))
+
+
+def _emu_cat(cid):
+    c = next((x for x in F.CATALOG if x["id"] == cid and x.get("emu")), None)
+    if not c:
+        raise E.PipeError("No es un emulador que conozca")
+    return c
+
+
+def _emu_join(base, sub):
+    """Carpeta de un emulador: relativa a su base, absoluta, o la propia base («.»)."""
+    sub = (sub or "").strip()
+    if sub in ("", "."):
+        return base
+    if sub.startswith("/"):
+        return sub
+    return base.rstrip("/") + "/" + sub
+
+
+def emu_dirs(f, c):
+    """Carpeta del emulador instalado y la carpeta donde guarda tus cosas."""
+    em = c["emu"]
+    app = None
+    for t in [c["tid"]] + list(c.get("also") or []):
+        for base in ("/data/homebrew", "/mnt/ext0/homebrew", "/mnt/ext1/homebrew", "/mnt/usb0/homebrew",
+                     "/mnt/usb1/homebrew", "/user/app"):
+            if _ftp_isdir(f, "%s/%s" % (base, t)):
+                app = "%s/%s" % (base, t)
+                break
+        if app:
+            break
+    data_on = _ftp_isdir(f, em["data"])
+    base = em["data"] if (em.get("fixed") or data_on) else app
+    return {"app": app, "data": em["data"], "data_on": data_on, "base": base}
+
+
+def _ftp_files(f, d):
+    try:
+        return [(n, v) for n, v in E.ftp_listdir(f, d)]
+    except ftplib.all_errors:
+        return None
+
+
+def emu_info(cid):
+    c = _emu_cat(cid)
+    em = c["emu"]
+
+    def work(f):
+        d = emu_dirs(f, c)
+        out = {"dirs": d, "bios": [], "games": None, "files": [], "extra": []}
+        if not d["base"]:
+            return out
+
+        def files_in(sub):
+            if not sub:
+                return None
+            lst = _ftp_files(f, _emu_join(d["base"], sub))
+            if lst is None:
+                return None
+            return [{"name": n, "size": v.get("size") if isinstance(v, dict) else None,
+                     "dir": bool(isinstance(v, dict) and v.get("type") == "dir")} for n, v in lst]
+        out["bios"] = (files_in(em["bios"]) or []) if em.get("bios") else []
+        g = files_in(em.get("games"))
+        out["games"] = None if g is None else len([x for x in g if not x["dir"]]) + len([x for x in g if x["dir"]])
+        for x in em.get("extra_dirs") or []:
+            lst = files_in(x["dir"])
+            out["extra"].append({"dir": x["dir"], "what": x["what"], "n": len(lst) if lst is not None else None})
+        for rel in em.get("files") or []:
+            roots = [d["base"]] + ([d["app"]] if d["app"] and d["app"] != d["base"] else [])
+            if rel.endswith("/"):
+                for r in roots:
+                    lst = _ftp_files(f, r + "/" + rel.rstrip("/"))
+                    if lst:
+                        for n, v in lst[:40]:
+                            if isinstance(v, dict) and v.get("type") == "dir":
+                                continue
+                            out["files"].append({"path": "%s/%s%s" % (r, rel, n), "rel": rel + n,
+                                                 "size": v.get("size") if isinstance(v, dict) else None})
+                        break
+                continue
+            for r in roots:
+                parent, name = posixpath.split(r + "/" + rel)
+                lst = _ftp_files(f, parent) or []
+                hit = next((v for n, v in lst if n == name), None)
+                if hit is not None:
+                    out["files"].append({"path": parent + "/" + name, "rel": rel,
+                                         "size": hit.get("size") if isinstance(hit, dict) else None})
+                    break
+        for x in out["files"]:
+            x["edit"] = x["rel"].lower().endswith(EMU_EDIT_EXT[:3])
+        return out
+    out = E.Ftp(cfg_snapshot()).call(work)
+    out.update(name=c["name"], id=cid, bios_what=em.get("bios_what"), bios_dir=em.get("bios") or "",
+               games_dir=em.get("games") or "", games_label=em.get("games_label") or "", exp=bool(c.get("exp")),
+               needs=c.get("needs") or "", installed=bool(out["dirs"].get("app")), tid=c["tid"],
+               saves=any(e["id"] == c["tid"] or c["tid"] in (e.get("also") or []) for e in EMU_SAVES),
+               guide=em.get("guide") or [], ver=_emu_vers().get(cid) or "", latest=rec_latest(c["repo"]))
+    return out
+
+
+def _emu_path_ok(cid, path):
+    info = emu_info(cid)
+    ok = {x["path"]: x for x in info["files"]}
+    if path not in ok:
+        raise E.PipeError("Ese archivo no es de %s" % info["name"])
+    return ok[path]
+
+
+def _zftpd_or_fail(what):
+    z = F.Zftpd(cfg_snapshot().get("ps5_ip") or "")
+    if not z.alive():
+        raise E.PipeError("Para %s desde aquí hace falta zftpd en la consola: inícialo en Biblioteca › "
+                          "⭐ Recomendados › zftpd y vuelve a probar." % what)
+    return z
+
+
+def title_launch(tid):
+    """Abre en la consola un titulo instalado (con zftpd), como si lo eligieras en su menu."""
+    tid = (tid or "").upper()
+    if not re.match(r"^[A-Z]{4}\d{5}$", tid):
+        raise E.PipeError("Title ID no válido")
+    r = _zftpd_or_fail("abrirlo").launch(tid)
+    if not r.get("ok") and str(r.get("status")) != "ok":
+        raise E.PipeError("La consola no lo ha abierto: %s" % (r.get("message") or r.get("error") or "sin respuesta"))
+    threading.Thread(target=after_launch, args=(tid,), daemon=True).start()
+    return {"tid": tid}
+
+
+PKG = {"path": "", "t": 0}
+
+
+def pkg_install(path, overwrite=False):
+    """Instala un .pkg que ya esta en la consola (con zftpd). No firma ni cambia nada: instala lo que tu le das."""
+    path = fm_clean(path)
+    if not path.lower().endswith(".pkg") or not path.startswith(("/data/", "/mnt/")):
+        raise E.PipeError("Elige un archivo .pkg de la consola")
+    z = _zftpd_or_fail("instalar .pkg")
+    r = z.install(path, overwrite)
+    if r.get("already"):
+        return {"already": True, "path": path}
+    if not r.get("ok", True):
+        raise E.PipeError("La consola no aceptó el paquete: %s" % (r.get("message") or r.get("error") or "?"))
+    PKG.update(path=path, t=time.time())
+    return {"started": True, "path": path}
+
+
+def pkg_state():
+    try:
+        st = F.Zftpd(cfg_snapshot().get("ps5_ip") or "").install_status()
+    except Exception as e:
+        return {"active": False, "error": str(e), "path": PKG["path"]}
+    return {"active": bool(st.get("active")), "progress": st.get("progress") or 0, "error": st.get("error") or 0,
+            "title_id": st.get("title_id") or "", "path": PKG["path"] or st.get("path") or ""}
+
+
+def emu_read(cid, path):
+    meta = _emu_path_ok(cid, path)
+    buf = bytearray()
+    size = meta.get("size") or 0
+    start = max(0, size - 400 * 1024) if size and not meta["edit"] else 0
+
+    def work(f):
+        def cb(b):
+            buf.extend(b)
+            if len(buf) > 1024 * 1024:
+                raise E.Cancelled()
+        try:
+            f.retrbinary("RETR " + path, cb, 65536, rest=start or None)
+        except E.Cancelled:
+            pass
+    E.Ftp(cfg_snapshot()).call(work)
+    return {"text": bytes(buf).decode("utf-8", "replace"), "cut": bool(start), "edit": meta["edit"], "path": path}
+
+
+def emu_write(cid, path, text):
+    meta = _emu_path_ok(cid, path)
+    if not meta["edit"]:
+        raise E.PipeError("Ese archivo solo se puede ver")
+    data = str(text).encode("utf-8")
+    if len(data) > 1024 * 1024:
+        raise E.PipeError("Demasiado grande")
+
+    def work(f):
+        old = bytearray()
+        f.retrbinary("RETR " + path, old.extend, 65536)
+        f.storbinary("STOR " + path + ".bak", io.BytesIO(bytes(old)))
+        f.storbinary("STOR " + path, io.BytesIO(data))
+    E.Ftp(cfg_snapshot()).call(work)
+    return {"saved": path, "backup": path + ".bak"}
+
+
+def emu_put(cid, what, paths):
+    """Pone en la cola tus archivos del PC (BIOS, contenido, claves...) para la carpeta que toca del emulador."""
+    c = _emu_cat(cid)
+    em = c["emu"]
+    sub = {"bios": em.get("bios"), "games": em.get("games")}.get(what)
+    if sub is None:
+        sub = next((x["dir"] for x in em.get("extra_dirs") or [] if x["dir"] == what), None)
+    if sub is None:
+        raise E.PipeError("No sé dónde va eso")
+    paths = [p for p in paths if p and os.path.exists(p)]
+    if not paths:
+        raise E.PipeError("No has elegido nada")
+    d = E.Ftp(cfg_snapshot()).call(lambda f: emu_dirs(f, c))
+    if not d["base"]:
+        raise E.PipeError("%s no está instalado en la consola" % c["name"])
+    target = _emu_join(d["base"], sub)
+    E.Ftp(cfg_snapshot()).call(lambda f: _ftp_makedirs(f, target))
+    label = {"bios": "BIOS", "games": em.get("games_label") or "contenido"}.get(what, sub)
+    job = new_job(paths, "", target, title="%s: %s (%d)" % (c["name"], label, len(paths)), raw=True)
+    with WAKE:
+        JOBS.append(job)
+        WAKE.notify_all()
+    save_jobs()
+    return {"id": job["id"], "target": target}
+
+
 def payload_send(pid=None, path=None):
+    if pid and any(x["id"] == pid for x in F.EXTRA_PAYLOADS):
+        r = extra_payload(pid, "send")
+        return {"name": r.get("name") or pid, "tag": r.get("tag") or "", "up": r.get("running")}
     cfg = cfg_snapshot()
     if pid and F.PayloadManager(cfg["ps5_ip"]).version():
         # con Payload Manager abierto en la consola, lo carga el (el cargador 9021 suele ser solo local)
@@ -6077,10 +8670,13 @@ def payload_send(pid=None, path=None):
 
 LAN = {"srv": None, "port": None, "error": ""}
 LAN_HITS = []        # lo ultimo que ha pedido el movil: para saber si llega y si se corta
-LAN_DENY = {"/api/bk/restore", "/api/bk/open", "/api/report/open", "/api/col/set", "/api/col/libdir",
+LAN_DEVICES = {}     # ip -> {name, first, last, n}: moviles que han entrado con el codigo actual
+LAN_DENY = {"/api/archive/list", "/api/archived/reveal", "/api/emu/put", "/api/shots/send", "/api/cloud/install", "/api/cloud/add", "/api/cloud/manual", "/api/cloud/remove", "/api/trash/delete", "/api/col/reveal", "/api/forge/update", "/api/job/reveal", "/api/bk/restore", "/api/bk/open", "/api/report/open", "/api/col/set", "/api/col/libdir",
             "/api/col/openlibdir", "/api/lan/firewall", "/api/lan/hits", "/api/update/zip", "/api/update/github", "/api/quit", "/api/pick", "/api/open_ext_folder",
-            "/api/fm/open_local", "/api/lan", "/api/forge/download", "/api/payload/file", "/api/fixperms"}
-LAN_LOCKED = {"sevenzip_path", "forge_path", "pc_temp_dir", "pc_library_dir", "update_repo", "lan_access", "lan_port", "lan_token"}
+            "/api/fm/open_local", "/api/lan", "/api/forge/download", "/api/payload/file", "/api/fixperms",
+            "/api/ext/openpage", "/api/ext/setup", "/api/ui/focus", "/api/youtube", "/api/bug/list"}
+LAN_LOCKED = {"sevenzip_path", "forge_path", "pc_temp_dir", "pc_library_dir", "update_repo", "lan_access", "lan_port", "lan_token",
+              "shots_tg_token", "shots_tg_chat", "shots_dc_hook"}
 
 
 def token_ok(tok):
@@ -6133,6 +8729,13 @@ def lan_info():
             out["url"] = "http://%s:%d/#t=%s" % (ip, LAN["port"], tok)
             out["svg"] = F.qr_svg(out["url"])
             out["test_url"] = "http://%s:%d/prueba" % (ip, LAN["port"])
+            # para el atajo de iPhone («Compartir» › Enviar a PS5 Directo) y las apps de Wake-on-LAN
+            out["add_url"] = "http://%s:%d/api/add" % (ip, LAN["port"])
+            out["token"] = tok
+            try:
+                out["pc_mac"] = F.mac_for_ip(ip)
+            except Exception:
+                out["pc_mac"] = ""
             out["test_svg"] = F.qr_svg(out["test_url"], scale=3)
         else:
             out["error"] = "No sé la IP de este PC en la red local"
@@ -6635,6 +9238,52 @@ def _up_test(cfg, seconds, stop):
             pass
 
 
+CAL = {"running": False, "results": [], "best": None, "error": "", "now": None, "before": None}
+
+
+def calibrate(url):
+    """«Ajustar las conexiones»: prueba ese enlace con 2, 4, 8 y 16 conexiones a la vez y se queda con la mejor (si
+    otra da casi lo mismo con menos conexiones, esa: es mas amable con el servidor)."""
+    stop = threading.Event()
+    with LOCK:
+        CAL.update(running=True, results=[], best=None, error="", now=None, before=int(SETTINGS.get("streams") or 8))
+    try:
+        src = E.UrlSource(url).probe()
+        if not src.ranges or src.size <= 0:
+            raise E.PipeError("Este servidor no deja partir la descarga en trozos: da igual cuántas conexiones uses.")
+        if E.host_conn_cap(src.url):
+            raise E.PipeError("Este alojamiento limita las conexiones (usa %d por archivo pase lo que pase): prueba "
+                              "con un enlace de otro sitio." % E.LIMITED_CAP)
+        res = []
+        for n in (2, 4, 8, 16):
+            with LOCK:
+                CAL["now"] = n
+            cfg = cfg_snapshot()
+            cfg["streams"] = n
+            try:
+                v = _dl_test(src.url, cfg, 7, stop)
+            except Exception as e:
+                v = 0.0
+                print("Ajuste de conexiones (%d): %s" % (n, e))
+            res.append({"n": n, "speed": v})
+            with LOCK:
+                CAL["results"] = list(res)
+        top = max(x["speed"] for x in res)
+        if top <= 0:
+            raise E.PipeError("No he podido medir nada con ese enlace (¿ha caducado?).")
+        best = min((x for x in res if x["speed"] >= top * 0.93), key=lambda x: x["n"])["n"]
+        with LOCK:
+            SETTINGS["streams"] = best
+            CAL["best"] = best
+        save_settings()
+    except Exception as e:
+        with LOCK:
+            CAL["error"] = str(e)
+    finally:
+        with LOCK:
+            CAL.update(running=False, now=None)
+
+
 def run_speedtest(url, seconds=10):
     """Mide por separado para saber de quien es la culpa cuando va lento."""
     cfg = cfg_snapshot()
@@ -6899,8 +9548,13 @@ def _changelog(lang):
     return out
 
 
-def whats_new(lang):
-    """Novedades que ensenar tras actualizar (vacio si no toca)."""
+def whats_new(lang, everything=False):
+    """Novedades que ensenar tras actualizar (vacio si no toca). Con everything, las de las ultimas versiones."""
+    if everything:
+        log = _changelog(lang)
+        entries = [{"version": v, "items": items} for v, items in log.items() if items and _ver_tuple(v) <= _ver_tuple(VERSION)]
+        entries.sort(key=lambda e: _ver_tuple(e["version"]), reverse=True)
+        return {"show": bool(entries), "version": VERSION, "entries": entries[:8], "all": True}
     with LOCK:
         seen = SETTINGS.get("seen_version") or ""
         tour_done = SETTINGS.get("tour_done")
@@ -6932,7 +9586,7 @@ def whats_new(lang):
             if items:
                 entries.append({"version": v, "items": items})
     entries.sort(key=lambda e: _ver_tuple(e["version"]), reverse=True)
-    return {"show": bool(entries), "version": VERSION, "entries": entries[:6]}
+    return {"show": bool(entries), "version": VERSION, "entries": entries[:20]}
 
 
 def install_zip(data):
@@ -7114,8 +9768,12 @@ class Handler(BaseHTTPRequestHandler):
                 with open(fp, "rb") as f:
                     return self._send(200, f.read(), "image/png")
         if self.path.split("?")[0] == "/manifest.webmanifest":
+            # con el codigo (?t=...), el icono de la pantalla de inicio se abre ya conectado: en iPhone,
+            # la app de la pantalla de inicio no comparte lo guardado con Safari y si no pediria el QR otra vez
+            mt = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("t") or [""])[0]
+            start = "/#t=" + urllib.parse.quote(mt, safe="") if mt and token_ok(mt) else "/"
             man = {"name": "PS5 Directo", "short_name": "PS5 Directo", "display": "standalone",
-                   "background_color": "#0f1115", "theme_color": "#0f1115", "start_url": "/",
+                   "background_color": "#0f1115", "theme_color": "#0f1115", "start_url": start, "scope": "/",
                    "icons": [{"src": "/icon-%d.png?v=%s" % (n, VERSION), "sizes": "%dx%d" % (n, n),
                               "type": "image/png"} for n in (192, 256, 512)]}
             return self._send(200, json.dumps(man).encode(), "application/manifest+json")
@@ -7129,6 +9787,9 @@ class Handler(BaseHTTPRequestHandler):
             # pagina minima, sin token ni JavaScript: para saber si el movil llega al PC
             return self._send(200, PRUEBA_HTML, "text/html; charset=utf-8")
         if self.path.split("?")[0] == "/api/ext/ping":
+            v = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("v") or [""])[0][:20]
+            if v and self._from_extension():
+                EXT_SEEN.update(version=v, t=time.time())
             return self._send(200, {"ok": True, "app": "PS5 Directo", "version": VERSION,
                                     "ext_version": _ext_version(os.path.join(HERE, "extension"))})
         if self.path.startswith("/api/media/file?"):
@@ -7204,7 +9865,7 @@ class Handler(BaseHTTPRequestHandler):
             if not token_ok((q.get("t") or [""])[0]):
                 return self._send(403, {"ok": False})
             try:
-                data = cover_png((q.get("p") or [None])[0], (q.get("tid") or [None])[0])
+                data = cover_png((q.get("p") or [None])[0], (q.get("tid") or [None])[0], (q.get("k") or [""])[0] == "pic0")
             except Exception:
                 data = None
             if not data:
@@ -7234,8 +9895,12 @@ class Handler(BaseHTTPRequestHandler):
                       "inbox": len(INBOX), "repo": SETTINGS.get("update_repo") or DEFAULT_REPO,
                       "sched": {"start": SCHED["start"], "after": SCHED["after"], "countdown": SCHED["countdown"]},
                       "lan": bool(LAN["srv"]), "remote": self.lan, "os": os.name,
-                      "platform": sys.platform}
+                      "platform": sys.platform,
+                      "bugs": bug_state() if not self.lan else None,
+                      "now": dict(NOWPLAY) if NOWPLAY.get("tid") and time.time() - NOWPLAY.get("t", 0) < 180 else None}
             st["settings"].pop("ftp_pass", None)
+            for k in ("shots_tg_token", "shots_dc_hook"):      # no se ensenan: solo si estan puestos
+                st["settings"][k] = "••••" if st["settings"].get(k) else ""
             if self.lan:
                 st["settings"].pop("lan_token", None)
             return self._send(200, st)
@@ -7261,11 +9926,12 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/api/ext/status":
             with LOCK:
                 js = [{"id": j["id"], "title": _job_name(j), "status": j["status"], "pct": job_pct(j),
-                       "speed": float(j.get("speed") or 0), "phase": j.get("phase") or "", "where": j.get("where") or ""}
+                       "speed": float(j.get("speed") or 0), "phase": j.get("phase") or "", "where": j.get("where") or "",
+                       "left": max(0, int(j.get("total") or 0) - int(j.get("sent") or 0)) if (j.get("total") or 0) > 0 else None}
                       for j in JOBS[-12:]]
                 inbox = len(INBOX)
             return self._send(200, {"ok": True, "version": VERSION, "jobs": js, "ftp": CONN_STATE["ftp"],
-                                    "bf": CONN_STATE["bf"], "inbox": inbox})
+                                    "bf": CONN_STATE["bf"], "inbox": inbox, "pc_mode": bool(SETTINGS.get("pc_mode"))})
         if self.path == "/api/ext/send":
             links = [x for x in add_lines("\n".join(str(v) for v in (b.get("links") or [])[:500]))
                      if re.match(r"^((https?|ftp)://|magnet:\?)", x, re.I)]
@@ -7277,22 +9943,32 @@ class Handler(BaseHTTPRequestHandler):
                     host = urllib.parse.urlparse(u).netloc.lower()
                     E.set_browser_headers(u, str(cookies.get(host) or ""), str(b.get("ua") or ""),
                                           str(b.get("referrer") or ""))
+            pw_found = password_in_text(str(b.get("text") or ""))[:120]
             if b.get("mode") == "queue":
-                where = "keep" if b.get("where") == "keep" else ""
-                job = new_job(links, "", SETTINGS.get("dest") or "/data/homebrew", where=where,
-                              keep_steps="extract" if where else "")
+                with LOCK:
+                    pcm = bool(SETTINGS.get("pc_mode"))
+                    steps = SETTINGS.get("pc_mode_steps") or "extract"
+                    pfmt = SETTINGS.get("pc_mode_fmt") or ""
+                # en Modo PC va a tu PC salvo que en la extension hayas elegido otra cosa a proposito
+                where = "keep" if b.get("where") == "keep" or (pcm and not b.get("where_set")) else ""
+                job = new_job(links, pw_found, SETTINGS.get("dest") or "/data/homebrew", where=where,
+                              keep_steps=(steps if pcm else "extract") if where else "",
+                              fmt=(pfmt or None) if where and pcm and steps == "convert" else None)
                 with WAKE:
                     JOBS.append(job)
                     WAKE.notify_all()
                 save_jobs()
-                return self._send(200, {"ok": True, "queued": len(links), "id": job["id"]})
+                return self._send(200, {"ok": True, "queued": len(links), "id": job["id"], "password": bool(pw_found)})
             with LOCK:
                 for u in links:
                     if not any(x["url"] == u for x in INBOX):
-                        INBOX.append({"url": u, "name": urllib.parse.unquote(u.split("?")[0].rsplit("/", 1)[-1])[:300],
-                                      "t": time.time()})
+                        it = {"url": u, "name": urllib.parse.unquote(u.split("?")[0].rsplit("/", 1)[-1])[:300],
+                              "t": time.time()}
+                        if pw_found:
+                            it["password"] = pw_found
+                        INBOX.append(it)
                 del INBOX[:-200]
-            return self._send(200, {"ok": True, "boxed": len(links)})
+            return self._send(200, {"ok": True, "boxed": len(links), "password": bool(pw_found)})
         if self.path == "/api/ext/job":
             action, jid = str(b.get("action") or ""), str(b.get("id") or "")
             with WAKE:
@@ -7316,12 +9992,23 @@ class Handler(BaseHTTPRequestHandler):
                     job["status"] = "pendiente"
                     job["phase"] = "En cola"
                     WAKE.notify_all()
+                elif action == "now" and job["status"] in ("pendiente", "pausado"):
+                    send_now(job)
+                elif action == "reveal":
+                    res = list(job.get("result") or [])
+                    if job.get("where") == "keep" and res and os.path.exists(res[0]):
+                        F.reveal_path(res[0])
             save_jobs()
             return self._send(200, {"ok": True})
+        if self.path == "/api/ext/pcmode":
+            with LOCK:
+                SETTINGS["pc_mode"] = bool(b.get("on"))
+            save_settings()
+            return self._send(200, {"ok": True, "pc_mode": bool(b.get("on"))})
         return self._send(404, {"ok": False})
 
     def do_POST(self):
-        if self.path in ("/api/ext/status", "/api/ext/send", "/api/ext/job"):
+        if self.path in ("/api/ext/status", "/api/ext/send", "/api/ext/job", "/api/ext/pcmode"):
             if self.lan or not self._from_extension():
                 return self._send(403, {"ok": False, "error": "solo desde la extension"})
             return self._ext_api()
@@ -7368,6 +10055,18 @@ class Handler(BaseHTTPRequestHandler):
         extra = extra_api(self, p, b)
         if extra is not None:
             return self._send(200, extra)
+        if p == "/api/ext/setup":
+            sync_extension()
+            return self._send(200, {"ok": True, "browsers": [{"id": x["id"], "name": x["name"]} for x in ext_browsers()],
+                                    "folder": EXT_DIR, "want": _ext_version(os.path.join(HERE, "extension")),
+                                    "seen": EXT_SEEN.get("version"), "seen_ago": (time.time() - EXT_SEEN["t"]) if EXT_SEEN.get("t") else None})
+        if p == "/api/ui/focus":
+            return self._send(200, {"ok": ui_focus_here()})
+        if p == "/api/ext/openpage":
+            try:
+                return self._send(200, {"ok": True, "name": ext_open_page(str(b.get("id") or ""))})
+            except Exception as e:
+                return self._send(200, {"ok": False, "error": str(e)})
         if p == "/api/open_ext_folder":
             sync_extension()
             folder = EXT_DIR if os.path.isdir(EXT_DIR) else os.path.join(HERE, "extension")
@@ -7415,7 +10114,7 @@ class Handler(BaseHTTPRequestHandler):
             restart_soon()
             return self._send(200, {"ok": True, "version": ver})
         if p == "/api/whatsnew":
-            return self._send(200, dict(ok=True, **whats_new("en" if b.get("lang") == "en" else "es")))
+            return self._send(200, dict(ok=True, **whats_new("en" if b.get("lang") == "en" else "es", bool(b.get("all")))))
         if p == "/api/whatsnew/seen":
             with LOCK:
                 SETTINGS["seen_version"] = VERSION
@@ -7424,6 +10123,8 @@ class Handler(BaseHTTPRequestHandler):
         if p == "/api/settings":
             with LOCK:
                 for k, v in b.items():
+                    if k in ("shots_tg_token", "shots_dc_hook") and v == "••••":
+                        continue
                     if k in DEFAULTS:
                         if isinstance(DEFAULTS[k], bool):
                             v = bool(v)
@@ -7443,6 +10144,8 @@ class Handler(BaseHTTPRequestHandler):
                                     b["ftp_port"] = port
                         SETTINGS[k] = v
             save_settings()
+            if "low_prio" in b:
+                F.priority_all(bool(SETTINGS.get("low_prio")))
             return self._send(200, {"ok": True})
         if p == "/api/locate":
             files = b.get("files") or []
@@ -7456,7 +10159,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p in ("/api/discover", "/api/played") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
+        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p in ("/api/discover", "/api/played", "/api/job/reveal") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
             try:
                 return self._send(200, dict(ok=True, **fm_api(p, b)))
             except E.PipeError as e:
@@ -7520,6 +10223,9 @@ class Handler(BaseHTTPRequestHandler):
                 job["title"] = str(b["title"])[:200]
             if "fmt" in b:
                 job["fmt_set"] = True
+            only = [str(x) for x in (b.get("only") or []) if str(x).strip()][:20000]
+            if only and job.get("where") == "keep":
+                job["only"] = only          # sacar del comprimido solo esto
             with WAKE:
                 JOBS.append(job)
                 WAKE.notify_all()
@@ -7542,6 +10248,9 @@ class Handler(BaseHTTPRequestHandler):
                         job["_pause"] = True
                         CANCELS.setdefault(job_id, threading.Event()).set()
                 elif action == "cancel":
+                    if job.get("held"):
+                        F.suspend_pids(F.CHILD_PROCS.get(job_id) or set(), False)
+                        job["held"] = False
                     CANCELS.setdefault(job_id, threading.Event()).set()
                     if job["status"] in ("pendiente", "en cola para descomprimir"):
                         job["status"] = "cancelado"
@@ -7565,6 +10274,18 @@ class Handler(BaseHTTPRequestHandler):
                             job["status"] = "pendiente"
                             job["phase"] = "En cola"
                         WAKE.notify_all()
+                elif action in ("hold", "unhold"):
+                    pids = F.CHILD_PROCS.get(job_id) or set()
+                    n = F.suspend_pids(pids, action == "hold")
+                    if action == "hold" and n:
+                        job["held"] = True
+                        job["_phase_before_hold"] = job.get("phase") or ""
+                        job["phase"] = "En pausa: no gasta procesador ni disco hasta que pulses Seguir"
+                    elif action == "unhold":
+                        job["held"] = False
+                        job["phase"] = job.pop("_phase_before_hold", "") or job.get("phase")
+                    elif action == "hold":
+                        return self._send(200, {"ok": False, "error": "Ahora mismo no hay nada que pausar en este trabajo"})
                 elif action == "retry":
                     if job["status"] in ("error", "cancelado", "pausado"):
                         if b.get("password"):
@@ -7599,10 +10320,17 @@ class Handler(BaseHTTPRequestHandler):
                         JOBS[JOBS.index(job)] = nj
                         WAKE.notify_all()
                 elif action in ("up", "down"):
-                    i = JOBS.index(job)
-                    k = i - 1 if action == "up" else i + 1
-                    if 0 <= k < len(JOBS):
-                        JOBS[i], JOBS[k] = JOBS[k], JOBS[i]
+                    # entre los que esperan (los terminados o en marcha no cuentan)
+                    waiting = [x for x in JOBS if x["status"] in ("pendiente", "pausado")]
+                    if job in waiting:
+                        i = waiting.index(job)
+                        k = i - 1 if action == "up" else i + 1
+                        if 0 <= k < len(waiting):
+                            a, c = JOBS.index(job), JOBS.index(waiting[k])
+                            JOBS[a], JOBS[c] = JOBS[c], JOBS[a]
+                elif action == "now":
+                    if job["status"] in ("pendiente", "pausado"):
+                        send_now(job)
             save_jobs()
             return self._send(200, {"ok": True})
         if p == "/api/clear":
@@ -7612,14 +10340,916 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"ok": True})
         if p == "/api/quit":
             self._send(200, {"ok": True})
-            threading.Thread(target=lambda: (time.sleep(0.5), os._exit(0)), daemon=True).start()
+            threading.Thread(target=lambda: (time.sleep(0.5), cloud_stop_all(), os._exit(0)), daemon=True).start()
             return
         self._send(404, {"ok": False})
+
+
+
+# ---------------------------------------------------------------------------
+# Fallos del programa detectados solos: para proponer el informe ya rellenado (Mac y Linux, en pruebas, y Windows)
+# Solo cuentan los fallos de programacion (no los de red, enlaces o consola apagada, que no son culpa del programa).
+# ---------------------------------------------------------------------------
+
+AUTOBUG = {"items": [], "n": 0}
+AUTOBUG_LOCK = threading.Lock()
+_BUG_TYPES = (TypeError, KeyError, AttributeError, IndexError, NameError, ZeroDivisionError, AssertionError,
+              RecursionError, UnicodeError, NotImplementedError, ValueError)
+
+
+def _scrub(t):
+    t = str(t or "")
+    home = os.path.expanduser("~")
+    if home and len(home) > 3:
+        t = t.replace(home, "~")
+    t = re.sub(r"([#?&]t=|X-Token[\"': ]+)[\w-]{8,}", r"\1(oculto)", t)
+    t = re.sub(r"(bot)\d+:[\w-]{20,}", r"\1(oculto)", t)
+    t = re.sub(r"https://discord(?:app)?\.com/api/webhooks/\S+", "(webhook oculto)", t)
+    return t
+
+
+def _is_program_bug(exc, tb_text):
+    if exc is None or isinstance(exc, (E.PipeError, E.Cancelled, KeyboardInterrupt, SystemExit)):
+        return False
+    if isinstance(exc, json.JSONDecodeError):
+        return False
+    if isinstance(exc, _BUG_TYPES):
+        return True
+    # Mac y Linux: un programa del sistema que no esta (osascript, xdg-open...) tambien es un fallo nuestro
+    if os.name != "nt" and isinstance(exc, (FileNotFoundError, PermissionError)) and "subprocess" in tb_text:
+        return True
+    return False
+
+
+def bug_record(where, exc=None, tb_text="", js=False):
+    try:
+        if not js and not _is_program_bug(exc, tb_text):
+            return
+        msg = _scrub(("%s: %s" % (type(exc).__name__, exc)) if exc is not None else where)[:400]
+        key = re.sub(r"\d+", "#", msg)[:200] + "|" + where
+        with AUTOBUG_LOCK:
+            for it in AUTOBUG["items"]:
+                if it["key"] == key:
+                    it["count"] += 1
+                    it["t"] = time.time()
+                    return
+            AUTOBUG["n"] += 1
+            AUTOBUG["items"].insert(0, {"id": AUTOBUG["n"], "key": key, "t": time.time(), "where": where[:120],
+                                        "msg": msg, "tb": _scrub(tb_text)[-6000:], "count": 1, "js": js,
+                                        "seen": False})
+            del AUTOBUG["items"][20:]
+    except Exception:
+        pass
+
+
+_orig_print_exc = traceback.print_exc
+
+
+def _print_exc_hook(*a, **k):
+    et, ev, tb = sys.exc_info()
+    try:
+        txt = "".join(traceback.format_exception(et, ev, tb))
+        where = traceback.extract_tb(tb)[-1].name if tb else "?"
+        bug_record(where, ev, txt)
+    except Exception:
+        pass
+    return _orig_print_exc(*a, **k)
+
+
+traceback.print_exc = _print_exc_hook
+
+
+def _thread_hook(args):
+    try:
+        txt = "".join(traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback))
+        bug_record("hilo %s" % (args.thread.name if args.thread else "?"), args.exc_value, txt)
+    except Exception:
+        pass
+    _orig_thread_hook(args)
+
+
+_orig_thread_hook = threading.excepthook
+threading.excepthook = _thread_hook
+
+
+def bug_state():
+    with AUTOBUG_LOCK:
+        new = [x for x in AUTOBUG["items"] if not x["seen"]]
+        return {"new": len(new), "last": ({"id": new[0]["id"], "msg": new[0]["msg"], "where": new[0]["where"]}
+                                          if new else None)}
+
+
+def bug_os_label():
+    return "macOS" if sys.platform == "darwin" else "Linux" if sys.platform.startswith("linux") else "Windows"
+
+
+
+# ---------------------------------------------------------------------------
+# Actualizaciones de los payloads: lo que tienes en Payload Manager frente a la ultima version de su catalogo (su
+# repositorio oficial y tus fuentes) y, para lo subido a mano con la version en el nombre, frente al GitHub de su
+# autor. Avisa una vez por version nueva; «Actualizar» hace lo mismo que el boton de Payload Manager.
+# ---------------------------------------------------------------------------
+
+PLD = {"t": 0, "items": [], "error": "", "busy": False, "pm": None}
+PLD_T = [0.0]
+PLD_SEEN_FILE = os.path.join(DATA_DIR, "payloads_avisados.json")
+# subidos a mano (sin datos del catalogo): nombre del archivo -> GitHub de su autor
+PLD_GITHUB = [(re.compile(r"(?i)shadow ?mount"), "drakmor/ShadowMountPlus", "ShadowMountPlus"),
+              (re.compile(r"(?i)^ftpsrv"), "ps5-payload-dev/ftpsrv", "ftpsrv"),
+              (re.compile(r"(?i)^elfldr"), "ps5-payload-dev/elfldr", "elfldr"),
+              (re.compile(r"(?i)bfpilot"), "ItsBlurf/BFpilot", "BFpilot"),
+              (re.compile(r"(?i)zhttp|zftpd"), "seregonwar/zftpd", "zftpd")]
+_FILE_VER = re.compile(r"(?i)[_\- ]v?(\d+(?:\.\d+)+(?:[-_.]?(?:alpha|beta|b|rc)\.?\d*)?)")
+
+
+def pld_check(refresh=False):
+    cfg = cfg_snapshot()
+    if not cfg.get("ps5_ip"):
+        raise E.PipeError("Falta la IP de la PS5: ponla en Ajustes")
+    pm = F.PayloadManager(cfg["ps5_ip"])
+    ver = pm.version()
+    if not ver:
+        with LOCK:
+            PLD.update(t=time.time(), pm=None, error="Payload Manager no está abierto en la consola.")
+        return pld_state()
+    full = pm.list_full()
+    try:
+        repo = pm.repository(refresh=refresh)
+    except Exception as e:
+        repo, rerr = [], str(e)
+    else:
+        rerr = ""
+    items = []
+    for x in full.get("items") or []:
+        it = {"slot": x.get("slot") or "", "file": x.get("filename") or "", "kind": x.get("kind") or "",
+              "name": x.get("name") or x.get("filename") or "", "have": x.get("version") or "", "new": "",
+              "source": x.get("source_name") or "", "source_url": x.get("source_url") or "", "id": x.get("id") or "",
+              "repo": "", "how": ""}
+        if it["kind"] == "repo" and it["id"]:
+            cands = [r for r in repo if (r.get("id") or "") == it["id"] and
+                     (not it["source_url"] or (r.get("source_url") or "").rstrip("/") == it["source_url"].rstrip("/"))]
+            best = None
+            for r in cands:
+                if best is None or F.pm_compare(r.get("version"), best.get("version"), r.get("last_update"),
+                                                best.get("last_update")) > 0:
+                    best = r
+            if best and F.pm_compare(best.get("version"), it["have"], best.get("last_update"),
+                                     x.get("last_update")) > 0:
+                it.update(new=best.get("version") or "?", how="pm", when=best.get("last_update") or "")
+        else:
+            m = _FILE_VER.search(it["file"])
+            gh = next((g for g in PLD_GITHUB if g[0].search(it["file"])), None)
+            if gh:
+                it["repo"] = gh[1]
+                it["name"] = gh[2]
+                if m:
+                    it["have"] = m.group(1)
+                    try:
+                        tag, _ = F.github_release(gh[1])
+                        if tag and F.pm_compare(tag, it["have"]) > 0:
+                            it.update(new=tag, how="github")
+                    except Exception:
+                        pass
+        items.append(it)
+    sv = full.get("self") or {}
+    if sv.get("pending_version") and F.pm_compare(sv.get("pending_version"), sv.get("running_version")) > 0:
+        items.insert(0, {"slot": "pldmgr", "file": "", "kind": "self", "name": "Payload Manager",
+                         "have": sv.get("running_version") or ver, "new": sv["pending_version"], "how": "restart",
+                         "source": "", "source_url": "", "id": "pldmgr", "repo": "itsPLK/ps5-payload-manager"})
+    with LOCK:
+        PLD.update(t=time.time(), items=items, pm=ver, error=rerr)
+    return pld_state()
+
+
+def pld_state():
+    with LOCK:
+        d = dict(PLD)
+        d["updates"] = sum(1 for x in PLD["items"] if x.get("new"))
+    return d
+
+
+def pld_tick():
+    """Cada 6 horas con Payload Manager abierto: si sale una version nueva de algo que tienes, aviso una vez."""
+    try:
+        st = pld_check(refresh=True)
+    except Exception as e:
+        print("Actualizaciones de payloads:", e)
+        return
+    try:
+        with open(PLD_SEEN_FILE, encoding="utf-8") as fh:
+            seen = set(json.load(fh))
+    except (OSError, ValueError):
+        seen = set()
+    new = [x for x in st["items"] if x.get("new") and "%s@%s" % (x["slot"] or x["name"], x["new"]) not in seen]
+    if not new:
+        return
+    names = ", ".join("%s %s" % (x["name"], x["new"]) for x in new)
+    notify("info", "Versión nueva de %s" % (new[0]["name"] if len(new) == 1 else "%d payloads" % len(new)),
+           "%s. Pulsa para actualizar." % names, {"tab": "System", "card": "pldCard"},
+           key="pld-" + names[:150])
+    try:
+        shots_text("🧩 PS5 Directo: hay versión nueva de %s. Actualízalo desde PS5 Directo › Sistema." % names)
+    except Exception:
+        pass
+    seen |= {"%s@%s" % (x["slot"] or x["name"], x["new"]) for x in new}
+    try:
+        with open(PLD_SEEN_FILE, "w", encoding="utf-8") as fh:
+            json.dump(sorted(seen)[-300:], fh)
+    except OSError:
+        pass
+
+
+def pld_update(slot):
+    """Actualiza un payload que vino del catalogo de Payload Manager (como su propio boton «Actualizar»)."""
+    with LOCK:
+        it = next((x for x in PLD["items"] if x["slot"] == slot), None)
+    if not it or it.get("how") != "pm":
+        raise E.PipeError("Ese payload no se puede actualizar desde aquí: mira su página de GitHub.")
+    cfg = cfg_snapshot()
+    r = F.PayloadManager(cfg["ps5_ip"]).repo_install(it["source_url"], it["id"], "replace")
+    if r.get("ok") is False:
+        raise E.PipeError("Payload Manager no lo ha actualizado: %s" % (r.get("message") or r.get("error") or "?"))
+    st = pld_check()
+    return dict(st, done=it["name"], version=it["new"])
+
+
+# ---------------------------------------------------------------------------
+# Guardian del firmware: que la consola no se actualice sola y pierdas el jailbreak (ideas de lvndry/ps5-firmware-pin)
+# Solo borra la actualizacion que la consola ya bajo (/update/PS5UPDATE.PUP); nada de firmware ni de juegos.
+# ---------------------------------------------------------------------------
+
+GUARD = {"t": 0, "fw": "", "pending": None, "error": "", "hosts": None, "hosts_path": "", "busy": False, "deleted": 0}
+GUARD_T = [0.0]
+FW_VERSION_FILES = ("/system_ex/version.txt", "/system/version.txt", "/dev/nfs/system/version.txt", "/etc/version.txt",
+                    "/system_data/settings/version.txt")
+UPDATE_DIR = "/update"
+UPDATE_HOSTS = ("update.playstation.com", "dl.playstation.com")
+HOSTS_FILES = ("/dev/nfs/etc/hosts", "/etc/hosts")
+
+
+def _ftp_text(f, path, n=64 * 1024):
+    try:
+        return F.ftp_read(f, path, 0, n).decode("utf-8", "replace")
+    except Exception:
+        return None
+
+
+def guard_check(remove=None):
+    """Mira la version del sistema y si hay una actualizacion descargada esperando. remove=True la borra."""
+    cfg = cfg_snapshot()
+    out = {}
+
+    def work(f):
+        fw = ""
+        for p in FW_VERSION_FILES:
+            t = _ftp_text(f, p, 4096)
+            m = re.search(r"\d{1,2}\.\d{2}(?:\.\d+)?", t or "")
+            if m:
+                fw = m.group(0)
+                break
+        out["fw"] = fw
+        pend = None
+        try:
+            for n, v in E.ftp_listdir(f, UPDATE_DIR):
+                if v["type"] != "dir" and re.search(r"(?i)\.pup", n):
+                    pend = {"name": n, "path": UPDATE_DIR + "/" + n, "size": v.get("size") or 0,
+                            "mtime": v.get("mtime") or 0}
+                    break
+        except ftplib.all_errors:
+            out["no_dir"] = True
+        if pend and remove:
+            try:
+                f.delete(pend["path"])
+            except ftplib.all_errors as e:
+                raise E.PipeError("No pude borrar %s: %s" % (pend["path"], e))
+            still = any(n == pend["name"] for n, _ in E.ftp_listdir(f, UPDATE_DIR))
+            if still:
+                raise E.PipeError("La consola no deja borrar %s ahora. Prueba otra vez desde la pantalla de inicio."
+                                  % pend["path"])
+            out["removed"] = pend["name"]
+            pend = None
+        out["pending"] = pend
+        hp = ""
+        state_hosts = None
+        for p in HOSTS_FILES:
+            t = _ftp_text(f, p)
+            if t is not None:
+                hp = p
+                state_hosts = all(h in t for h in UPDATE_HOSTS)
+                break
+        out["hosts"], out["hosts_path"] = state_hosts, hp
+    E.Ftp(cfg).call(work)
+    with LOCK:
+        GUARD.update(t=time.time(), fw=out.get("fw") or "", pending=out.get("pending"), error="",
+                     hosts=out.get("hosts"), hosts_path=out.get("hosts_path") or "")
+        if out.get("removed"):
+            GUARD["deleted"] += 1
+        real = re.match(r"\d+\.\d+", out["fw"]).group(0) if out.get("fw") else ""
+        if real and real != (SETTINGS.get("console_fw") or "").strip():
+            SETTINGS["console_fw"] = real   # el de verdad, leido de la consola (para «Comprobar arranque» y la Biblioteca)
+            fw_new = True
+        else:
+            fw_new = False
+    if fw_new:
+        save_settings()
+    if out.get("removed"):
+        record_event = "Actualización del sistema quitada de la consola (%s)" % out["removed"]
+        notify("ok", "Actualización quitada", record_event + ". Tu jailbreak sigue a salvo.", {"tab": "System"},
+               key="guard-removed-%d" % int(time.time() // 60))
+    return guard_state()
+
+
+def guard_state():
+    with LOCK:
+        g = dict(GUARD)
+        g.update(on=SETTINGS.get("fw_guard", True), auto=bool(SETTINGS.get("fw_guard_auto")))
+    return g
+
+
+def guard_tick():
+    """Cada 10 minutos con la consola conectada: si ha bajado una actualizacion, aviso (o la quito si lo pediste)."""
+    with LOCK:
+        on, auto = SETTINGS.get("fw_guard", True), bool(SETTINGS.get("fw_guard_auto"))
+    if not on:
+        return
+    try:
+        st = guard_check(remove=False)
+    except Exception as e:
+        with LOCK:
+            GUARD["error"] = str(e)
+        return
+    pend = st.get("pending")
+    if not pend:
+        return
+    if auto:
+        try:
+            guard_check(remove=True)
+            return
+        except Exception as e:
+            print("Guardián del firmware:", e)
+    gb = (pend.get("size") or 0) / 1e9
+    notify("err", "Tu PS5 ha descargado una actualización del sistema",
+           "Si la instalas, pierdes el jailbreak. Pulsa aquí para quitarla (%s, %.1f GB). Y si la consola te la "
+           "ofrece, pulsa ✕: nunca «Actualizar»." % (pend["name"], gb), {"tab": "System"},
+           key="guard-%s-%s" % (pend["name"], pend.get("mtime")))
+    try:
+        shots_text("⚠️ PS5 Directo: tu PS5 ha descargado una actualización del sistema. Si la instalas pierdes el "
+                   "jailbreak. Ábrela en PS5 Directo › Sistema › Guardián del firmware para quitarla.")
+    except Exception:
+        pass
+
+
+def shots_text(text):
+    """Avisos importantes tambien por tu bot de Telegram o webhook de Discord (si los tienes puestos en Capturas)."""
+    cfg = cfg_snapshot()
+    if not cfg.get("shots_send"):
+        return
+    tok, chat, hook = cfg.get("shots_tg_token") or "", cfg.get("shots_tg_chat") or "", cfg.get("shots_dc_hook") or ""
+    if tok and chat:
+        req = urllib.request.Request("%s/bot%s/sendMessage" % (TG_API, tok),
+                                     data=json.dumps({"chat_id": chat, "text": text}).encode(),
+                                     headers={"Content-Type": "application/json"}, method="POST")
+        urllib.request.urlopen(req, timeout=20).read()
+    if hook and re.match(DC_RX, hook):
+        req = urllib.request.Request(hook, method="POST", data=json.dumps({"content": text}).encode(),
+                                     headers={"Content-Type": "application/json", "User-Agent": "PS5Directo"})
+        urllib.request.urlopen(req, timeout=20).read()
+
+
+def guard_hosts(block):
+    """block=True: apunta los servidores de actualizacion a 127.0.0.1 en el hosts de la consola (con copia).
+    block=False: deja el hosts como estaba. Solo funciona si el hosts se puede escribir (kstuff o etaHEN)."""
+    cfg = cfg_snapshot()
+    res = {}
+
+    def work(f):
+        path = next((p for p in HOSTS_FILES if _ftp_text(f, p) is not None), None)
+        if not path:
+            raise E.PipeError("No encuentro el archivo hosts de la consola.")
+        bak = path + ".ps5directo.bak"
+        cur = _ftp_text(f, path) or ""
+        if block:
+            if all(h in cur for h in UPDATE_HOSTS):
+                res["already"] = True
+                return
+            if _ftp_text(f, bak) is None:
+                f.storbinary("STOR " + bak, io.BytesIO(cur.encode("utf-8")))
+            add = "".join("127.0.0.1   %s\n" % h for h in UPDATE_HOSTS if h not in cur)
+            new = cur + ("" if cur.endswith("\n") or not cur else "\n") + add
+        else:
+            old = _ftp_text(f, bak)
+            new = old if old is not None else "".join(ln + "\n" for ln in cur.splitlines()
+                                                       if not any(h in ln for h in UPDATE_HOSTS))
+        try:
+            f.storbinary("STOR " + path, io.BytesIO(new.encode("utf-8")))
+        except ftplib.all_errors as e:
+            raise E.PipeError("La consola no deja escribir %s (%s). Hace falta kstuff o etaHEN con el sistema de "
+                              "archivos completo; si no, usa la opción del DNS." % (path, e))
+        now = _ftp_text(f, path) or ""
+        ok = all(h in now for h in UPDATE_HOSTS) if block else not any(h in now for h in UPDATE_HOSTS)
+        if not ok:
+            raise E.PipeError("El cambio en %s no se ha quedado guardado (la consola lo tiene en solo lectura). "
+                              "Usa la opción del DNS." % path)
+        res["path"] = path
+    E.Ftp(cfg).call(work)
+    guard_check(remove=False)
+    return dict(res, **guard_state())
+
+
+# --- YouTube (para quien entra con Y2JB): que la consola no actualice la app y se pierda el jailbreak.
+# Lo mismo que hacen appinfo_editor.py de Gezine/Y2JB y la guia de SvenGDK: version 99.999.999 y la direccion
+# de actualizaciones apuntando a 127.0.0.2, con copia de todo en el PC para deshacerlo.
+YT_TIDS = ("PPSA01650", "PPSA01651", "PPSA01652")
+YT_FAKE_VER, YT_FAKE_URI = "99.999.999", "http://127.0.0.2"
+MMS = "/system_data/priv/mms"
+
+
+_YT_KEY = "__system_data__priv__mms__appinfo.db"     # copia en el PC: la ruta de la consola con / cambiado por __
+
+
+def yt_dir():
+    return os.path.join(DATA_DIR, "youtube-copia")
+
+
+def _yt_appmeta(tid):
+    return ["/system_data/priv/appmeta/%s/param.json" % tid, "/user/appmeta/%s/param.json" % tid]
+
+
+def yt_state():
+    cfg = cfg_snapshot()
+    out = {"installed": [], "blocked": None, "version": "", "backup": os.path.isfile(os.path.join(yt_dir(), "valores_originales.json"))}
+
+    def work(f):
+        for tid in YT_TIDS:
+            for p in _yt_appmeta(tid):
+                t = _ftp_text(f, p, 512 * 1024)
+                if t:
+                    try:
+                        j = json.loads(t)
+                    except ValueError:
+                        j = {}
+                    out["installed"].append(tid)
+                    v = str(j.get("contentVersion") or "")
+                    out["version"] = out["version"] or v
+                    if out["blocked"] is None:
+                        out["blocked"] = v == YT_FAKE_VER
+                    break
+    E.Ftp(cfg).call(work)
+    return out
+
+
+def yt_block(undo=False):
+    """Bloquea (o deshace) las actualizaciones de YouTube.
+    - Se baja appinfo.db, app.db y el param.json de YouTube, se cambian SOLO las filas de YouTube y se comprueba
+      que la base de datos sigue sana antes de subirla.
+    - Se sube con otro nombre y luego se renombra (si se corta a medias, la consola sigue con la buena).
+    - Deshacer vuelve a poner los valores originales de YouTube en la base de datos de AHORA (no se pisa entera con
+      una copia vieja: se perderia lo instalado despues). Las copias completas quedan en ~/.ps5directo/youtube-copia."""
+    import sqlite3
+    import shutil
+    import tempfile
+    cfg = cfg_snapshot()
+    bdir = yt_dir()
+    os.makedirs(bdir, exist_ok=True)
+    orig_file = os.path.join(bdir, "valores_originales.json")
+    tmp = tempfile.mkdtemp(prefix="ps5d-yt-")
+    done = []
+
+    def get(f, remote, local):
+        with open(local, "wb") as fh:
+            f.retrbinary("RETR " + remote, fh.write, 65536)
+
+    def put(f, local, remote):
+        part = remote + ".ps5d-nuevo"
+        with open(local, "rb") as fh:
+            f.storbinary("STOR " + part, fh, 65536)
+        size = os.path.getsize(local)
+        try:
+            got = int(f.sendcmd("SIZE " + part).split()[-1])
+        except (ftplib.all_errors, ValueError):
+            got = size
+        if got != size:
+            try:
+                f.delete(part)
+            except ftplib.all_errors:
+                pass
+            raise E.PipeError("La copia de %s no ha llegado entera a la consola; no he cambiado nada." % remote)
+        f.sendcmd("RNFR " + part)
+        f.sendcmd("RNTO " + remote)
+
+    def sane(db):
+        con = sqlite3.connect(db)
+        try:
+            return con.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+        finally:
+            con.close()
+
+    try:
+        with open(orig_file, encoding="utf-8") as fh:
+            orig = json.load(fh)
+    except (OSError, ValueError):
+        orig = {}
+
+    def work(f):
+        installed = [t for t in YT_TIDS if any(_ftp_text(f, p, 1024) is not None for p in _yt_appmeta(t))]
+        if not installed:
+            raise E.PipeError("No encuentro YouTube instalado en la consola.")
+        if undo and not orig:
+            raise E.PipeError("No hay valores originales guardados en este PC para deshacerlo.")
+        files = [MMS + "/appinfo.db", MMS + "/app.db"] + [p for t in installed for p in _yt_appmeta(t)]
+        local = {}
+        for r in files:
+            lp = os.path.join(tmp, r.replace("/", "__"))
+            try:
+                get(f, r, lp)
+            except ftplib.all_errors:
+                continue
+            local[r] = lp
+            keep = os.path.join(bdir, r.replace("/", "__"))
+            if not os.path.isfile(keep):          # copia completa de antes de tocar nada, por si acaso
+                shutil.copy2(lp, keep)
+        adb = MMS + "/appinfo.db"
+        if adb not in local:
+            raise E.PipeError("No pude leer %s de la consola." % adb)
+        if not sane(local[adb]):
+            raise E.PipeError("appinfo.db de la consola ya viene dañada: no la toco. Reinicia la consola y prueba otra vez.")
+        con = sqlite3.connect(local[adb])
+        try:
+            for t in installed:
+                rows = dict(con.execute("SELECT key, val FROM tbl_appinfo WHERE titleId=? AND key IN "
+                                        "('CONTENT_VERSION','VERSION_FILE_URI')", (t,)).fetchall())
+                if len(rows) != 2:
+                    continue
+                if not undo:
+                    if rows["CONTENT_VERSION"] != YT_FAKE_VER:
+                        orig.setdefault(t, {}).update(ver=rows["CONTENT_VERSION"], uri=rows["VERSION_FILE_URI"])
+                    ver, uri = YT_FAKE_VER, YT_FAKE_URI
+                else:
+                    o = orig.get(t)
+                    if not o:
+                        continue
+                    ver, uri = o["ver"], o["uri"]
+                con.execute("UPDATE tbl_appinfo SET val=? WHERE titleId=? AND key='CONTENT_VERSION'", (ver, t))
+                con.execute("UPDATE tbl_appinfo SET val=? WHERE titleId=? AND key='VERSION_FILE_URI'", (uri, t))
+            con.commit()
+        finally:
+            con.close()
+        if not undo:
+            with open(orig_file, "w", encoding="utf-8") as fh:
+                json.dump(orig, fh, indent=1)
+        if not sane(local[adb]):
+            raise E.PipeError("Algo ha salido mal al preparar appinfo.db: no he cambiado nada en la consola.")
+        # app.db (su copia en JSON), solo si se deja hacer limpio
+        if MMS + "/app.db" in local:
+            try:
+                con = sqlite3.connect(local[MMS + "/app.db"])
+                cols = [r[1] for r in con.execute("PRAGMA table_info(tbl_contentinfo)")]
+                if "AppInfoJson" in cols:
+                    for t in installed:
+                        row = con.execute("SELECT AppInfoJson FROM tbl_contentinfo WHERE titleId=?", (t,)).fetchone()
+                        o = orig.get(t) or {}
+                        if row and row[0] and (not undo or o):
+                            j = json.loads(row[0])
+                            j["CONTENT_VERSION"] = o.get("ver") if undo else YT_FAKE_VER
+                            j["VERSION_FILE_URI"] = o.get("uri") if undo else YT_FAKE_URI
+                            con.execute("UPDATE tbl_contentinfo SET AppInfoJson=? WHERE titleId=?",
+                                        (json.dumps(j, separators=(",", ":")), t))
+                    con.commit()
+                con.close()
+                if not sane(local[MMS + "/app.db"]):
+                    raise ValueError("integridad")
+            except Exception as e:
+                print("YouTube, app.db (no se toca):", e)
+                local.pop(MMS + "/app.db", None)
+        for r, lp in list(local.items()):
+            if r.endswith("param.json"):
+                tid = r.split("/")[-2]
+                o = orig.get(tid) or {}
+                if undo and not o:
+                    local.pop(r)
+                    continue
+                with open(lp, encoding="utf-8-sig") as fh:
+                    j = json.load(fh)
+                j["contentVersion"] = o.get("ver") if undo else YT_FAKE_VER
+                j["versionFileUri"] = o.get("uri") if undo else YT_FAKE_URI
+                with open(lp, "w", encoding="utf-8") as fh:
+                    json.dump(j, fh, ensure_ascii=False, indent=2)
+        # primero lo pequeño; la base de datos la ultima
+        for r in sorted(local, key=lambda x: x.endswith(".db")):
+            put(f, local[r], r)
+            done.append(r)
+    try:
+        E.Ftp(cfg).call(work)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return {"done": done, "backup": bdir}
+
+
+# ---------------------------------------------------------------------------
+# Cierres al arrancar detectados solos: cuando ShadowMountPlus apunta que algo se ha cerrado, se revisa ese
+# titulo con «Comprobar arranque» y se avisa con la causa mas probable (sin tener que buscarla).
+# ---------------------------------------------------------------------------
+
+CRASH = {"seen": set(), "init": False, "last": []}
+CRASH_T = [0.0]
+CRASH_RX = re.compile(r"game error: ([A-Z]{4}\d{5})[^\n]*?: signal: (\d+) \((\w+)\)(?:\s*thread name: (\S+))?")
+
+
+def _lib_path_for(tid):
+    for x in ((LIB.get("items") or {}).get("items") or []):
+        if (x.get("tid") or "").upper() == tid and x.get("path"):
+            return x["path"], x.get("title") or tid
+    return None, tid
+
+
+def crash_explain(tid, sig=""):
+    """Revisa un titulo que no ha arrancado y avisa con lo mas probable."""
+    path, title = _lib_path_for(tid)
+    top = None
+    if path:
+        try:
+            r = launch_check(path, 15, quick=True)
+            rank = {"bad": 3, "warn": 2}
+            probs = sorted([c for c in r.get("checks") or [] if c["level"] in rank
+                            and not c["text"].startswith("Falta la portada")], key=lambda c: -rank[c["level"]])
+            top = probs[0] if probs else None
+            title = r.get("title") or title
+        except Exception as e:
+            print("Revisar cierre:", e)
+    if top:
+        body = "Lo más probable: %s %s" % (top["text"], top.get("fix") or "")
+    elif sig:
+        body = LAUNCH_CODES.get(sig) or "Se cerró con %s." % sig
+    else:
+        body = "No encuentro nada raro en la carpeta. Pulsa para ver el registro y las últimas capturas."
+    notify("err", "«%s» se ha cerrado al arrancar%s" % (title, " (%s)" % sig if sig else ""), body,
+           {"tab": "Library", "check": path, "title": title} if path else {"tab": "Library"},
+           key="crash-%s-%d" % (tid, int(time.time() // 120)))
+    with LOCK:
+        CRASH["last"].insert(0, {"t": time.time(), "tid": tid, "title": title, "sig": sig, "body": body, "path": path})
+        del CRASH["last"][10:]
+
+
+def crash_tick(force=False):
+    if not force and time.time() - CRASH_T[0] < 90:
+        return
+    CRASH_T[0] = time.time()
+    cfg = cfg_snapshot()
+    found = []
+
+    def work(f):
+        since = _console_now(f) - 20 * 60
+        for lg in _recent_logs(f, ["/data/shadowmount", "/data/shadowmountplus"], since, limit=4):
+            for m in CRASH_RX.finditer(lg.get("tail") or ""):
+                found.append((m.group(0), m.group(1).upper(), m.group(3)))
+    try:
+        E.Ftp(cfg).call(work)
+    except Exception:
+        return
+    fresh = [x for x in found if x[0] not in CRASH["seen"]]
+    for x in found:
+        CRASH["seen"].add(x[0])
+    if not CRASH["init"]:          # lo que ya estaba al abrir el programa no se avisa
+        CRASH["init"] = True
+        return
+    for _, tid, sig in fresh[-3:]:
+        crash_explain(tid, sig)
+
+
+def after_launch(tid):
+    """Tras «Abrir en la consola»: si a los 25 s no esta abierto (lo dice ps5-exporter), se revisa por que."""
+    time.sleep(25)
+    try:
+        crash_tick(force=True)
+    except Exception:
+        pass
+    now = dict(NOWPLAY)
+    if now.get("src") == "exporter" and time.time() - now.get("t", 0) < 120 and now.get("tid") and now["tid"] != tid:
+        crash_explain(tid)
+
+
+# ---------------------------------------------------------------------------
+# Novedades de la scene: lo que se publica en el catalogo de RecompStore (recompstore.com/catalog.json), solo para
+# leerlo (nombre, autor, que es, version y su pagina). PS5 Directo no instala ni aloja nada de eso.
+# ---------------------------------------------------------------------------
+
+RECOMP_URL = os.environ.get("PS5D_RECOMP") or "https://recompstore.com/catalog.json"
+RECOMP = {"t": 0, "items": [], "error": "", "updated": ""}
+RECOMP_FILE = os.path.join(DATA_DIR, "novedades_scene.json")
+
+
+def _recomp_item(x, soon):
+    src = x.get("source") if isinstance(x.get("source"), dict) else {}
+    repo = str(src.get("repo") or x.get("repo") or "")   # catalogo de RecompStore: "repo" va suelto
+    tags = x.get("tags") if isinstance(x.get("tags"), list) else []
+    req = [r for r in (x.get("requires") or []) if isinstance(r, str)][:8]
+    when = str(x.get("released") or x.get("date") or "")[:25]
+    def url(u):
+        u = str(u or "")
+        if u.startswith("/"):
+            u = "https://recompstore.com" + u
+        return u if re.match(r"^https://", u) else ""
+    return {"id": str(x.get("id") or "")[:60], "name": str(x.get("name") or x.get("id") or "")[:120],
+            "author": str(x.get("author") or "")[:80], "cat": str(x.get("category") or "games")[:20],
+            "blurb": str(x.get("blurb") or "")[:300], "desc": str(x.get("description") or "")[:2500],
+            "needs": str(x.get("needs") or "")[:600], "version": str(x.get("version") or "")[:30],
+            "when": when, "repo": repo if re.match(r"^[\w.-]+/[\w.-]+$", repo) else "",
+            "icon": url(x.get("icon")), "hero": url(x.get("hero") or x.get("banner")), "tags": [str(t)[:30] for t in tags][:8],
+            "requires": req, "soon": soon, "news": str(x.get("news") or "")[:600]}
+
+
+def recomp_fetch(force=False):
+    with LOCK:
+        fresh = time.time() - RECOMP["t"] < 3600 and RECOMP["items"]
+    if fresh and not force:
+        return
+    try:
+        req = urllib.request.Request(RECOMP_URL, headers={"User-Agent": "PS5Directo/%s" % VERSION, "Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            j = json.loads(r.read(8 * 1024 * 1024).decode("utf-8", "replace"))
+        items, seen = [], set()
+        for key, soon in (("apps", False), ("newerStoreApps", False), ("v2Apps", False), ("comingSoon", True),
+                          ("comingSoonV2", True)):
+            for x in j.get(key) or []:
+                if not isinstance(x, dict) or x.get("beta") or x.get("testing"):
+                    continue
+                it = _recomp_item(x, soon)
+                if it["id"] and it["id"] not in seen:
+                    seen.add(it["id"])
+                    items.append(it)
+        items.sort(key=lambda x: (not x["soon"], x["when"]), reverse=True)
+        prev = {}
+        try:
+            with open(RECOMP_FILE, encoding="utf-8") as fh:
+                prev = json.load(fh)
+        except Exception:
+            pass
+        known = set(prev.get("known") or [])
+        first = not known
+        for it in items:
+            it["new"] = (not first) and it["id"] not in known
+            it["new"] = it["new"] or it["id"] in set(prev.get("unseen") or [])
+        unseen = [it["id"] for it in items if it["new"]]
+        try:
+            with open(RECOMP_FILE, "w", encoding="utf-8") as fh:
+                json.dump({"known": [it["id"] for it in items], "unseen": unseen}, fh)
+        except OSError:
+            pass
+        with LOCK:
+            RECOMP.update(t=time.time(), items=items, error="", updated=str(j.get("updated") or "")[:30])
+        if unseen and not first:
+            notify("info", "Novedades de la scene: %d nuevas" % len(unseen),
+                   ", ".join(it["name"] for it in items if it["new"])[:300], {"tab": "Library", "view": "news"},
+                   key="recomp-%s" % ",".join(sorted(unseen))[:120])
+    except Exception as e:
+        with LOCK:
+            RECOMP.update(error=str(e) if isinstance(e, E.PipeError) else
+                          "recompstore.com: %s" % e, t=time.time())
+
+
+def recomp_seen():
+    try:
+        with open(RECOMP_FILE, encoding="utf-8") as fh:
+            d = json.load(fh)
+        d["unseen"] = []
+        with open(RECOMP_FILE, "w", encoding="utf-8") as fh:
+            json.dump(d, fh)
+    except Exception:
+        pass
+    with LOCK:
+        for it in RECOMP["items"]:
+            it["new"] = False
+
+
+# ---------------------------------------------------------------------------
+# «Descubrir» en la ficha de cada titulo: resumen de Wikipedia (sin cuentas ni claves) y enlaces de busqueda
+# ---------------------------------------------------------------------------
+
+WIKI = {}
+WIKI_API = os.environ.get("PS5D_WIKI") or "https://%s.wikipedia.org"
+
+
+def wiki_summary(title, lang):
+    title = re.sub(r"[™®©]", "", str(title or "")).strip()[:120]
+    lang = "en" if lang == "en" else "es"
+    if not title:
+        return {}
+    k = (title.lower(), lang)
+    if k in WIKI and time.time() - WIKI[k]["t"] < 7 * 86400:
+        return WIKI[k]["v"]
+    base = WIKI_API % lang if "%s" in WIKI_API else WIKI_API
+    out = {}
+    try:
+        q = urllib.parse.urlencode({"action": "query", "list": "search", "srsearch": title + " videojuego"
+                                    if lang == "es" else title + " video game", "srlimit": 3, "format": "json"})
+        req = urllib.request.Request(base + "/w/api.php?" + q, headers={"User-Agent": "PS5Directo/%s (desktop app)" % VERSION})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            hits = (json.load(r).get("query") or {}).get("search") or []
+        words = set(re.findall(r"\w{3,}", title.lower()))
+        hit = next((h for h in hits if words and len(words & set(re.findall(r"\w{3,}", h["title"].lower()))) >= max(1, len(words) // 2)), None)
+        if hit:
+            req = urllib.request.Request(base + "/api/rest_v1/page/summary/" + urllib.parse.quote(hit["title"].replace(" ", "_")),
+                                         headers={"User-Agent": "PS5Directo/%s (desktop app)" % VERSION})
+            with urllib.request.urlopen(req, timeout=10) as r:
+                j = json.load(r)
+            out = {"title": j.get("title") or hit["title"], "text": (j.get("extract") or "")[:1200],
+                   "url": ((j.get("content_urls") or {}).get("desktop") or {}).get("page") or "",
+                   "img": ((j.get("thumbnail") or {}).get("source") or ""), "lang": lang}
+    except Exception as e:
+        out = {"error": conn_error_text(e)}
+    WIKI[k] = {"t": time.time(), "v": out}
+    return out
+
+
+CREDITS_CORE = [
+    ("ftpsrv", "ps5-payload-dev/ftpsrv", "Servidor FTP de la consola"),
+    ("elfldr", "ps5-payload-dev/elfldr", "Cargador de payloads (puerto 9021)"),
+    ("Payload Manager", "itsPLK/ps5-payload-manager", "Carga automática de payloads"),
+    ("ShadowMountPlus", "drakmor/ShadowMountPlus", "Monta las imágenes .exfat y .ffpkg"),
+    ("PS5 Payload SDK", "ps5-payload-dev/sdk", "Herramientas con las que se hacen los payloads"),
+    ("rclone", "rclone/rclone", "Mis almacenamientos (nubes)"),
+    ("7-Zip", "ip7z/7zip", "Descomprimir en el PC"),
+    ("aria2", "aria2/aria2", "Torrents"),
+    ("FFmpeg", "FFmpeg/FFmpeg", "Convertir vídeos de las capturas"),
+    ("python-build-standalone", "astral-sh/python-build-standalone", "El Python que va dentro de la app"),
+    ("Game Library Renamer", "pristmc-code/game-library-renamer", "La idea de «Ordenar nombres»"),
+]
+
+
+def credits_list():
+    """Proyectos libres que usa o recomienda PS5 Directo, con su autor (para la ventana «Créditos»)."""
+    seen, out = set(), []
+    def add(name, repo, what, kind):
+        if repo and repo.lower() not in seen:
+            seen.add(repo.lower())
+            out.append({"name": name, "repo": repo, "author": repo.split("/")[0], "what": what, "kind": kind})
+    for n, r, w in CREDITS_CORE:
+        add(n, r, w, "core")
+    for x in F.EXTRA_PAYLOADS:
+        add(x["name"], x.get("repo"), x.get("what", ""), "payload")
+    add("BFpilot", "ItsBlurf/BFpilot", "Explorador rápido, descomprimir en la consola", "payload")
+    add("PS5 Dump Forge", F.FORGE_REPO, "Convertir a .exfat y .ffpkg", "core")
+    for x in F.CATALOG:
+        add(x["name"], x.get("repo"), x.get("what", ""), x.get("group", "app"))
+    return out
 
 
 def extra_api(h, p, b):
     """Rutas de la 1.20. Devuelve el dict de respuesta o None si no es suya."""
     try:
+        if p == "/api/credits":
+            return {"ok": True, "items": credits_list()}
+        if p == "/api/bug/list":
+            with AUTOBUG_LOCK:
+                items = [dict(x) for x in AUTOBUG["items"]]
+                if b.get("seen"):
+                    for x in AUTOBUG["items"]:
+                        x["seen"] = True
+            return {"ok": True, "items": items, "os": bug_os_label(), "platform": sys.platform,
+                    "testing": sys.platform != "nt" and os.name != "nt"}
+        if p == "/api/bug/js":
+            bug_record("interfaz: %s" % str(b.get("src") or "")[-80:], None,
+                       "%s\n%s" % (str(b.get("msg") or "")[:500], str(b.get("stack") or "")[:3000]), js=True)
+            with AUTOBUG_LOCK:
+                if AUTOBUG["items"] and AUTOBUG["items"][0]["js"]:
+                    AUTOBUG["items"][0]["msg"] = _scrub(str(b.get("msg") or "Error en la interfaz"))[:400]
+            return {"ok": True}
+        if p == "/api/guard":
+            if "on" in b or "auto" in b:
+                with LOCK:
+                    if "on" in b:
+                        SETTINGS["fw_guard"] = bool(b.get("on"))
+                    if "auto" in b:
+                        SETTINGS["fw_guard_auto"] = bool(b.get("auto"))
+                save_settings()
+            if b.get("hosts") in ("block", "unblock"):
+                return dict(ok=True, **guard_hosts(b["hosts"] == "block"))
+            if b.get("check") or b.get("remove"):
+                return dict(ok=True, **guard_check(remove=bool(b.get("remove"))))
+            return dict(ok=True, **guard_state())
+        if p == "/api/youtube":
+            if b.get("block") or b.get("undo"):
+                return dict(ok=True, **yt_block(undo=bool(b.get("undo"))))
+            return dict(ok=True, **yt_state())
+        if p == "/api/recomp":
+            if b.get("seen"):
+                recomp_seen()
+                return {"ok": True}
+            recomp_fetch(force=bool(b.get("refresh")))
+            with LOCK:
+                return {"ok": True, "items": RECOMP["items"], "error": RECOMP["error"], "updated": RECOMP["updated"],
+                        "source": "recompstore.com"}
+        if p == "/api/wiki":
+            return dict(ok=True, **wiki_summary(b.get("title"), b.get("lang")))
+        if p == "/api/pld/updates":
+            if b.get("update"):
+                return dict(ok=True, **pld_update(str(b.get("update"))))
+            if b.get("check") or b.get("refresh"):
+                return dict(ok=True, **pld_check(refresh=bool(b.get("refresh"))))
+            return dict(ok=True, **pld_state())
+        if p == "/api/crash/last":
+            with LOCK:
+                return {"ok": True, "items": list(CRASH["last"])}
         if p == "/api/payload/list":
             with LOCK:
                 port = SETTINGS.get("elf_port") or 9021
@@ -7654,6 +11284,7 @@ def extra_api(h, p, b):
                     SETTINGS["lan_access"] = bool(b.get("enable"))
                     if b.get("regen"):
                         SETTINGS["lan_token"] = secrets.token_urlsafe(16)
+                        LAN_DEVICES.clear()      # los que tenian el codigo viejo ya no entran
                 save_settings()
                 if b.get("enable"):
                     if b.get("regen"):
@@ -7662,9 +11293,152 @@ def extra_api(h, p, b):
                 else:
                     lan_stop()
             return dict(ok=True, **lan_info())
+        if p == "/api/title/launch":
+            return dict(ok=True, **title_launch(str(b.get("tid") or "")))
+        if p == "/api/pkg/install":
+            return dict(ok=True, **pkg_install(str(b.get("path") or ""), bool(b.get("overwrite"))))
+        if p == "/api/pkg/state":
+            return dict(ok=True, **pkg_state())
+        if p == "/api/emu/info":
+            return dict(ok=True, **emu_info(str(b.get("id") or "")))
+        if p == "/api/emu/read":
+            return dict(ok=True, **emu_read(str(b.get("id") or ""), str(b.get("path") or "")))
+        if p == "/api/emu/write":
+            return dict(ok=True, **emu_write(str(b.get("id") or ""), str(b.get("path") or ""), b.get("text") or ""))
+        if p == "/api/emu/put":
+            return dict(ok=True, **emu_put(str(b.get("id") or ""), str(b.get("what") or ""),
+                                           [str(x) for x in (b.get("paths") or [])][:500]))
+        if p == "/api/cloud/state":
+            return dict(ok=True, **cloud_state())
+        if p == "/api/cloud/install":
+            cloud_install()
+            return {"ok": True}
+        if p == "/api/cloud/add":
+            cloud_add(str(b.get("name") or ""), str(b.get("type") or ""), b.get("fields") or {})
+            return {"ok": True}
+        if p == "/api/cloud/manual":
+            exe = cloud_exe()
+            if not exe:
+                raise E.PipeError("Primero instala rclone")
+            if not F.open_terminal([exe, "config"]):
+                raise E.PipeError("No pude abrir una terminal. Abre una y escribe: %s config" % exe)
+            return {"ok": True}
+        if p == "/api/cloud/remove":
+            F.rclone_run(cloud_exe(), ["config", "delete", _remote_ok(str(b.get("name") or ""))], 30)
+            return {"ok": True}
+        if p == "/api/cloud/ls":
+            return dict(ok=True, **cloud_ls(str(b.get("remote") or ""), str(b.get("path") or "")))
+        if p == "/api/cloud/send":
+            items = [x for x in (b.get("items") or []) if isinstance(x, dict) and x.get("path")][:500]
+            return dict(ok=True, **cloud_send(str(b.get("remote") or ""), items, "pc" if b.get("to") == "pc" else "ps5"))
+        if p == "/api/upd/state":
+            if b.get("check"):
+                upd_check(bool(b.get("force")))
+            if b.get("cancel"):
+                UPD_CANCEL.set()
+            return dict(ok=True, **upd_state())
+        if p == "/api/sys/state":
+            return dict(ok=True, **sys_state())
+        if p == "/api/shots/send":
+            if "cfg" in b:
+                c = b.get("cfg") or {}
+                with LOCK:
+                    for k in ("shots_send", "shots_tg_chat"):
+                        if k in c:
+                            SETTINGS[k] = str(c[k] or "").strip()
+                    for k in ("shots_tg_token", "shots_dc_hook"):
+                        if c.get(k) and c[k] != "••••":
+                            SETTINGS[k] = str(c[k]).strip()
+                        elif k in c and not c[k]:
+                            SETTINGS[k] = ""
+                    if isinstance(c.get("route"), dict):
+                        SETTINGS["shots_route"] = {str(t).upper(): str(v) for t, v in c["route"].items()
+                                                   if re.match(r"^[A-Za-z]{4}\d{5}$", str(t)) and v in ("tg", "dc", "both", "none")}
+                save_settings()
+            if b.get("test"):
+                d = str(b.get("test"))
+                cfg = cfg_snapshot()
+                try:
+                    if d == "tg":
+                        tok, chat = cfg.get("shots_tg_token") or "", cfg.get("shots_tg_chat") or ""
+                        req = urllib.request.Request("%s/bot%s/sendMessage" % (TG_API, tok),
+                                                     data=json.dumps({"chat_id": chat, "text": "PS5 Directo: prueba ✔"}).encode(),
+                                                     headers={"Content-Type": "application/json"}, method="POST")
+                        urllib.request.urlopen(req, timeout=20).read()
+                    else:
+                        req = urllib.request.Request(cfg.get("shots_dc_hook") or "", method="POST",
+                                                     data=json.dumps({"content": "PS5 Directo: prueba ✔"}).encode(),
+                                                     headers={"Content-Type": "application/json", "User-Agent": "PS5Directo"})
+                        urllib.request.urlopen(req, timeout=20).read()
+                except urllib.error.HTTPError as e:
+                    raise E.PipeError("No ha funcionado (HTTP %s). Revisa el bot, el chat o el webhook." % e.code)
+                except Exception as e:
+                    raise E.PipeError("No ha funcionado: %s" % e)
+            if b.get("retry"):
+                with SENT_LOCK:
+                    try:
+                        lst = json.load(open(SENT_FILE, encoding="utf-8"))
+                    except Exception:
+                        lst = []
+                it = next((x for x in lst if x["file"] == b["retry"].get("file") and x["dest"] == b["retry"].get("dest")), None)
+                if it and os.path.isfile(it["file"]):
+                    def again(it=it):
+                        e2 = dict(it, t=time.time(), ok=False, err="")
+                        try:
+                            send_capture(it["file"], it["dest"], it.get("title") or "", it.get("when") or "")
+                            e2["ok"] = True
+                        except Exception as e:
+                            e2["err"] = str(e)[:300]
+                        _sent_log(e2)
+                    threading.Thread(target=again, daemon=True).start()
+                    time.sleep(0.3)
+            if b.get("paths"):
+                items = {x["path"]: x for x in media_list()}
+                dests = [b.get("dest")] if b.get("dest") in ("tg", "dc") else ["tg"]
+
+                def manual(paths=list(b["paths"])[:50], dests=dests):
+                    for rp in paths:
+                        it = items.get(rp)
+                        if not it:
+                            continue
+                        local, _ = media_cached(rp)
+                        for d in dests:
+                            e2 = {"t": time.time(), "file": local, "dest": d, "title": it.get("app") or it.get("tid") or "",
+                                  "when": it.get("when") or "", "ok": False, "err": ""}
+                            try:
+                                send_capture(local, d, e2["title"], e2["when"])
+                                e2["ok"] = True
+                            except Exception as e:
+                                e2["err"] = str(e)[:300]
+                            _sent_log(e2)
+                threading.Thread(target=manual, daemon=True).start()
+            cfg = cfg_snapshot()
+            try:
+                hist = json.load(open(SENT_FILE, encoding="utf-8"))
+            except Exception:
+                hist = []
+            return {"ok": True, "send": cfg.get("shots_send") or "", "tg_chat": cfg.get("shots_tg_chat") or "",
+                    "tg_token": bool(cfg.get("shots_tg_token")), "dc_hook": bool(cfg.get("shots_dc_hook")),
+                    "route": cfg.get("shots_route") or {},
+                    "history": [dict(x, name=os.path.basename(x["file"])) for x in reversed(hist[-40:])]}
+        if p == "/api/shots/auto":
+            if "on" in b:
+                with LOCK:
+                    SETTINGS["shots_auto"] = bool(b.get("on"))
+                save_settings()
+                if b.get("on"):
+                    threading.Thread(target=shots_sync, kwargs={"baseline": not b.get("old")}, daemon=True).start()
+            if b.get("now"):
+                threading.Thread(target=shots_sync, kwargs={"all_old": bool(b.get("old"))}, daemon=True).start()
+                time.sleep(0.2)
+            with LOCK:
+                on = bool(SETTINGS.get("shots_auto"))
+            return dict(ok=True, on=on, dir=MEDIA_CONV_DIR(), **SHOTS)
         if p == "/api/lan/hits":
             with LOCK:
-                return {"ok": True, "hits": list(LAN_HITS[-12:])}
+                devs = sorted(LAN_DEVICES.values(), key=lambda d: d["last"], reverse=True)
+                return {"ok": True, "hits": list(LAN_HITS[-12:]),
+                        "devices": [dict(d, ago=int(time.time() - d["last"])) for d in devs[:12]]}
         if p == "/api/lan/firewall":
             with LOCK:
                 port = int(SETTINGS.get("lan_port") or 8780)
@@ -7691,6 +11465,75 @@ def extra_api(h, p, b):
         if p == "/api/forge/download":
             exe, tag = F.download_forge(DATA_DIR, log=print)
             return {"ok": True, "path": exe, "tag": tag}
+        if p == "/api/archive/list":
+            path = str(b.get("path") or "").strip().strip('"')
+            if not os.path.isfile(path):
+                raise E.PipeError("No encuentro ese archivo en tu PC")
+            exe = E.find_7z(cfg_snapshot().get("sevenzip_path"))
+            if not exe:
+                raise E.PipeError("Para ver qué hay dentro hace falta 7-Zip (7-zip.org)")
+            pw = str(b.get("password") or "") or None
+            try:
+                entries, _ = E.list_7z(exe, path, pw)
+            except E.PipeError as e:
+                if E._pw_error(str(e)) and not pw:
+                    return {"ok": True, "need_password": True, "entries": []}
+                raise
+            if E.needs_password(entries) and not pw:
+                return {"ok": True, "need_password": True, "entries": [x for x in entries][:5000]}
+            return {"ok": True, "entries": entries[:20000]}
+        if p == "/api/calibrate":
+            url = str(b.get("url") or "").strip()
+            if not re.match(r"^https?://", url):
+                raise E.PipeError("Hace falta un enlace de descarga (http o https) para medir")
+            with LOCK:
+                if CAL["running"]:
+                    return {"ok": True}
+                CAL["running"] = True
+            threading.Thread(target=calibrate, args=(url,), daemon=True).start()
+            return {"ok": True}
+        if p == "/api/calibrate/state":
+            with LOCK:
+                return dict(ok=True, **CAL)
+        if p == "/api/pcinfo":
+            ip = (h.headers.get("Host") or "").rsplit(":", 1)[0].strip("[]")
+            if not re.fullmatch(r"\d+\.\d+\.\d+\.\d+", ip) or ip.startswith("127."):
+                ip = (_local_ipv4s() or [""])[0]
+            mac = F.mac_for_ip(ip) if ip else ""
+            return {"ok": True, "ip": ip, "mac": mac, "bcast": ip.rsplit(".", 1)[0] + ".255" if ip else ""}
+        if p == "/api/rec/list":
+            return dict(ok=True, **rec_list())
+        if p == "/api/rec/kinds":
+            # Title ID -> categoria de «Descubrir», sin red: para el filtro de tipo de la biblioteca
+            kinds = {}
+            for c in F.CATALOG:
+                if c["kind"] == "app":
+                    for t in [c["tid"]] + list(c.get("also") or []):
+                        kinds[t.upper()] = c.get("group") or "tool"
+            return {"ok": True, "kinds": kinds}
+        if p == "/api/rec/install":
+            return dict(ok=True, **rec_install(str(b.get("id") or ""), bool(b.get("update"))))
+        if p == "/api/col/reveal":
+            path = str(b.get("path") or "")
+            with LOCK:
+                known = {x.get("path") for x in (COL.get("items") or [])}
+            if path not in known or not os.path.exists(path):
+                raise E.PipeError("Ya no está en tu PC (¿lo has movido o borrado?)")
+            F.reveal_path(path)
+            return {"ok": True}
+        if p == "/api/extra_payload":
+            return dict(ok=True, **extra_payload(str(b.get("id") or ""), "send" if b.get("send") else "status"))
+        if p == "/api/forge/info":
+            if b.get("check"):
+                forge_news(force=True)
+            return forge_info()
+        if p == "/api/forge/update":
+            with LOCK:
+                if FORGE_UPD["busy"]:
+                    return {"ok": True, "busy": True}
+                FORGE_UPD["busy"] = True
+            threading.Thread(target=forge_update_run, daemon=True).start()
+            return {"ok": True}
     except E.PipeError as e:
         return {"ok": False, "error": str(e)}
     except Exception as e:
@@ -7805,8 +11648,24 @@ def gzip_cached(body):
     return _GZ[k]
 
 
+def _ua_name(ua):
+    u = ua or ""
+    if "Shortcuts" in u or "ShortcutRunner" in u or "WorkflowKit" in u:
+        return "iPhone · Atajos"
+    dev = ("iPhone" if "iPhone" in u else "iPad" if "iPad" in u else "Android" if "Android" in u else
+           "Windows" if "Windows" in u else "Mac" if "Macintosh" in u else "Linux" if "Linux" in u else "Dispositivo")
+    app = "app PS5 Directo" if "PS5Directo" in u else ("Chrome" if "Chrome/" in u and "Edg" not in u else "Edge" if "Edg" in u
+                                                       else "Firefox" if "Firefox" in u else "Safari" if "Safari" in u else "")
+    return dev + (" · " + app if app else "")
+
+
 def lan_hit(h, code, raw, sent, err=""):
     path = urllib.parse.urlparse(h.path).path
+    ip = h.client_address[0]
+    if code < 400:
+        with LOCK:
+            d = LAN_DEVICES.setdefault(ip, {"ip": ip, "first": time.time()})
+            d.update(last=time.time(), name=_ua_name(h.headers.get("User-Agent") or ""), n=d.get("n", 0) + 1)
     if path.startswith("/api/") and path not in ("/api/state",) and not err and code < 400:
         return                          # solo lo que sirve para diagnosticar
     with LOCK:
@@ -7963,6 +11822,47 @@ def _find_app_browser():
     return None
 
 
+def ext_browsers():
+    """Navegadores instalados donde se puede cargar la extension: [{id, name, exe, page}]."""
+    import shutil
+    out, seen = [], set()
+    defs = [("chrome", "Chrome", "chrome://extensions"), ("edge", "Edge", "edge://extensions"),
+            ("brave", "Brave", "brave://extensions"), ("chromium", "Chromium", "chrome://extensions")]
+    for bid, name, page in defs:
+        cands = []
+        if os.name == "nt":
+            sub = {"chrome": ("Google", "Chrome", "Application", "chrome.exe"),
+                   "edge": ("Microsoft", "Edge", "Application", "msedge.exe"),
+                   "brave": ("BraveSoftware", "Brave-Browser", "Application", "brave.exe")}.get(bid)
+            for env in ("PROGRAMFILES", "PROGRAMFILES(X86)", "LOCALAPPDATA"):
+                if sub and os.environ.get(env):
+                    cands.append(os.path.join(os.environ[env], *sub))
+        elif sys.platform == "darwin":
+            app = {"chrome": "Google Chrome", "edge": "Microsoft Edge", "brave": "Brave Browser", "chromium": "Chromium"}[bid]
+            for base in ("/Applications", os.path.expanduser("~/Applications")):
+                cands.append(os.path.join(base, app + ".app", "Contents", "MacOS", app))
+        else:
+            names = {"chrome": ("google-chrome", "google-chrome-stable"), "edge": ("microsoft-edge", "microsoft-edge-stable"),
+                     "brave": ("brave-browser", "brave"), "chromium": ("chromium", "chromium-browser")}[bid]
+            cands += [shutil.which(n) for n in names if shutil.which(n)]
+        exe = next((c for c in cands if c and os.path.isfile(c)), None)
+        if exe and exe not in seen:
+            seen.add(exe)
+            out.append({"id": bid, "name": name, "exe": exe, "page": page})
+    return out
+
+
+def ext_open_page(bid):
+    """Abre la pagina de extensiones de ese navegador (una pagina web no puede abrir chrome://, el programa si)."""
+    import subprocess
+    b = next((x for x in ext_browsers() if x["id"] == bid), None)
+    if not b:
+        raise E.PipeError("No encuentro ese navegador")
+    subprocess.Popen([b["exe"], b["page"]], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                     **({"creationflags": 0x08000000} if os.name == "nt" else {}))
+    return b["name"]
+
+
 APP_USER_MODEL_ID = "PS5Directo.App"
 _TITLE_RX = re.compile(r"^PS5 Directo( v[\d.]+)?$")
 
@@ -8073,17 +11973,39 @@ def taskbar_watch():
         time.sleep(2)
 
 
-def focus_window():
+WIN_PROC = [None]   # la ventana que abrio este programa (Mac: para traerla al frente)
+
+
+def ui_focus_here():
+    """En el programa que ya estaba abierto: trae su ventana al frente si sigue abierta."""
+    p = WIN_PROC[0]
+    if p is None or p.poll() is not None:
+        return False
+    return F.mac_activate(p.pid)
+
+
+def focus_window(ses=None):
     """Si la ventana ya esta abierta, la trae al frente (en vez de abrir otra). True si habia."""
     if os.name != "nt":
         import shutil
         import subprocess
-        if sys.platform.startswith("linux") and shutil.which("wmctrl"):
-            try:
-                return subprocess.run(["wmctrl", "-x", "-a", "PS5Directo"], capture_output=True,
-                                      timeout=5).returncode == 0
+        if sys.platform == "darwin" and ses:
+            try:   # se lo pido al programa que ya estaba abierto: el sabe cual es su ventana
+                req = urllib.request.Request(ses[0] + "/api/ui/focus", data=b"{}",
+                                             headers={"X-Token": ses[1], "Content-Type": "application/json"})
+                with urllib.request.urlopen(req, timeout=5) as r:
+                    return bool(json.load(r).get("ok"))
             except Exception:
                 return False
+        if sys.platform.startswith("linux"):
+            for cmd in (["wmctrl", "-x", "-a", "PS5Directo"],
+                        ["xdotool", "search", "--class", "PS5Directo", "windowactivate"]):
+                if shutil.which(cmd[0]):
+                    try:
+                        if subprocess.run(cmd, capture_output=True, timeout=5).returncode == 0:
+                            return True
+                    except Exception:
+                        pass
         return False
     try:
         import ctypes
@@ -8273,10 +12195,11 @@ def main():
         if paths:
             forward_to_running(ses, paths)
             print("Anadido a la cola de PS5 Directo (ya estaba abierto)")
-        elif "--browser" in sys.argv or not focus_window():
+        elif "--browser" in sys.argv or not focus_window(ses):
             open_window(ses[0] + "/#t=" + ses[1])   # ya funcionaba: solo enseno la ventana
         sys.exit(3)
     load_state()
+    F.LOW_PRIO[0] = bool(SETTINGS.get("low_prio"))
     if paths:
         job = new_job(paths, "", SETTINGS["dest"])
         with WAKE:
@@ -8295,6 +12218,7 @@ def main():
     threading.Thread(target=ensure_shortcuts, daemon=True).start()
     threading.Thread(target=console_auto, daemon=True).start()   # payloads que falten, con Payload Manager
     threading.Thread(target=console_watch, daemon=True).start()
+    threading.Thread(target=clip_watch, daemon=True).start()
     threading.Thread(target=sync_extension, daemon=True).start()  # y si luego se abre Payload Manager, igual
     refresh_window_icon()
     if SETTINGS.get("lan_access"):
@@ -8306,7 +12230,7 @@ def main():
     print("PS5 Directo %s" % VERSION)
     print("Abre en el navegador: %s" % url)
     if "--no-browser" not in sys.argv:
-        threading.Timer(0.5, lambda: open_window(url)).start()
+        threading.Timer(0.5, lambda: WIN_PROC.__setitem__(0, open_window(url))).start()
         threading.Thread(target=watch_ui, daemon=True).start()
     if os.name == "nt":
         threading.Thread(target=taskbar_watch, daemon=True).start()

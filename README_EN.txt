@@ -1,5 +1,5 @@
-PS5 DIRECTO 1.20.0 — USER GUIDE (English)
-=========================================
+PS5 DIRECTO 2.0.0 — USER GUIDE (English)
+========================================
 
 QUICK START (5 MINUTES)
 =======================
@@ -21,8 +21,12 @@ and a Windows 10/11 PC on the same network.
 
 Something wrong? Settings > "Full check" tells you what and how to fix it.
 
-Note: PS5 Directo only copies files. Use it with content you have the
-right to use (your own backups and homebrew).
+Note: PS5 Directo is a file manager: it only moves, converts and organises
+the files you choose. It doesn't include or host any content, BIOS, keys or
+firmware, doesn't connect to Sony's servers and has no payload of its own.
+The programs in "Recommended" are downloaded from their authors' official
+GitHub pages and belong to their authors. Use it with content you have the
+right to use (your own backups and homebrew), at your own responsibility.
 
 (The full guide follows; you don't need it to get started.)
 
@@ -338,6 +342,171 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.0.0 - Firmware guard (System): checks every 10 minutes whether the console
+  has downloaded a system update and warns you (also on Telegram or Discord);
+  remove it with one click or automatically, and optionally block the update
+  servers on the console. Payloads up to date (System): compares what you have
+  in Payload Manager with its catalog, warns about new versions and updates them
+  with one click. Tidy up names (Library): clear names for your images and .pkg
+  files ("Title-PPSA01234-EU") from the title inside them; folders and patches
+  are never touched, the ShadowMountPlus limit is respected, and it can be
+  undone. YouTube without updates (for Y2JB users), with a
+  backup and "Undo". Scene news (Library): the latest from the RecompStore
+  catalog, read only. Beyond the console (Recommended): Linux (Ubuntu) and
+  Bazzite Deck (Steam) guides with the loader, and MihawkOS (your Windows
+  programs and Steam on the PS5 itself, experimental). If PS5 Directo detects a bug of
+  its own, it offers a pre-filled GitHub report. If something closes on start
+  on the console, it reads ShadowMountPlus's log, checks it and tells you the
+  likely cause. Title page: "About this title" (Wikipedia summary, trailer, reviews) and
+  an animated cover on hover. New "✨ Discover" tab: Scene news up top and 30+
+  emulators, apps and tools by category, with covers; Library gets Recommended
+  and What's new shortcuts plus an "Emulators" / "Apps and tools" filter. A new
+  interactive tour of everything 2.0 does, the first time you open it. Phone:
+  the ⋯ menu no longer goes off screen and the install-app notice stays until
+  you press "No, thanks". Smoother tab transitions and a livelier background.
+2.0.0 - iPhone and iPad: "Open on phone" › "Got an iPhone or iPad?" explains
+  how to keep it as a Home Screen icon (already connected) and how to create a
+  shortcut for "Share › Send to PS5 Directo" from any app. Mac: finds
+  Homebrew tools (aria2, FFmpeg, rclone), the console check works, the picker
+  comes to the front, clicking the icon again brings the window back, shortcuts
+  show ⌘. Linux: https downloads work even if the distribution keeps its
+  certificates elsewhere. Loading animation with triangle, circle, cross and
+  square. Tools: SMPlusGui and ps5-tailscale (experimental). ❤ Credits in the
+  ⋯ menu.
+2.0.0 - PC mode (switch at the top): everything you add, also from the
+        extension and the phone, stays on your PC: download only,
+        download and extract, or download, extract and convert. Nothing
+        goes to the console.
+      - When downloading to the PC, several parts at a time (Settings ›
+        "Parts at once"), with the same total connections.
+      - "Catch the download links you copy" (under the link box): file
+        links you copy in any website or program land in the box.
+      - When done, "Open the folder" (on your PC) or "See on the console"
+        buttons, and finished items are more compact in the queue.
+      - PS5 Dump Forge: a notice when a new version is out, with what's
+        new; you update when you want (or automatically, in Settings).
+      - zstd format (PS5 Dump Forge 0.5), as a folder or in an .ffpkg
+        image, and compression level for LZ4 and zstd. "Launch check"
+        knows zstd and warns about ShadowMountPlus's fakelib update.
+      - Library: Permissions, Saves and Delete are in each card's "⋯"
+        menu.
+      - Queue: ▲ ▼ to change the order and "⚡ Send now" (jumps ahead; what
+        was being sent pauses and carries on by itself when it's done).
+      - Backup: also the saves of the PS1 (PSSwanStation), PS2 (Crux2,
+        PS5SX2) and Switch (ProsperoEden) emulators, restored separately.
+        The daily backup waits until you close what's open on the console.
+      - Payloads: "PS5 Dump Forge" can be started on the console (converts
+        and installs .pkg from its web page, port 8095).
+      - Library › ⭐ Recommended: emulators (PSSwanStation, Crux2,
+        ProsperoEden) installed by themselves from their author's GitHub,
+        and tools loaded as a payload (PatchDL to update without
+        installing anything, PS5 Dump Forge), with what each does and
+        what you need.
+      - Library: "📂 Folder" button on each card (and 📂 on your PC's).
+      - If 7-Zip fails extracting on the PC, it says why and what to do,
+        and if it's 7-Zip's fault it tries without it (Python or PS5 Dump
+        Forge).
+      - Watched folder: whatever finishes downloading there with another
+        program lands in the link box by itself.
+      - Console trash (Space › Trash): "Delete" in the Library and in Console
+        files, and the old copy when replacing, are moved aside and can be
+        recovered for a few days (deleted by themselves after 7 days).
+      - Checksums (.sfv, .md5) are also checked on resumed parts, by
+        reading the whole file again.
+      - Time left for the whole queue, next to "Queue".
+      - "Only to my PC" › Download and extract: "Choose what to extract"
+        (see what's inside and extract only part of it).
+      - Speed test › "Tune connections with this link": tries 2, 4, 8 and
+        16 connections and keeps the best.
+      - Mac: the app is now native on Apple Silicon (no Rosetta) and
+        macOS asks for the Local Network permission as PS5 Directo.
+      - Extension 1.3.0: in PC mode, what you send with right-click goes
+        to your PC; Alt + click on a link lets the browser download it (no
+        capture); rules (don't capture under X MB, never or always on a
+        site); picks up the password written next to the link; in the
+        popup, "Send now", time left for the queue and the PC mode switch;
+        the "done" notification has "Open the folder".
+      - Android app: "Share" a link from any app sends it to PS5 Directo,
+        and "Wake up my PC" (Wake-on-LAN) if the PC is asleep.
+      - Library: "🩺 Check everything" (checks it all at once), details of
+        each title when you click its cover (where it is, use, backups,
+        notes), "Archive on PC" (copies, checks and removes it from the
+        console) and the "Not opened in 2 months" filter.
+      - Recommended: Remote Play from the PC (payload to get the pairing
+        PIN, and chiaki-ng).
+      - Recommended: PS5 Hardware Overlay (FPS, temperatures, clocks,
+        RAM, fan and power draw on top of the picture, like MangoHud) and
+        zftpd.
+      - New System tab: the console's CPU temperature (with a graph),
+        memory, disk and uptime (with zftpd), and access to the overlay.
+      - "The PS5 downloads it (zftpd)" destination: the console downloads
+        the link without going through the PC (http, https, ftp and
+        magnet); .zip files are extracted to the destination.
+      - ☁️ My storage (rclone): Google Drive, OneDrive, Dropbox, MEGA,
+        pCloud, Box, WebDAV and SFTP. Browse, tick and download to your PC
+        or send it to the console like any link.
+      - Library › 🔔 Updates: the version you have of each title against
+        the latest known by prosperopatches.com (PS5) and orbispatches.com
+        (PS4), with the one that fits your firmware. Only the version
+        number is checked; to install, PatchDL.
+      - Emulators in Recommended: a notice and "Update" button when a new
+        version is out (copied over, keeping settings, saves, BIOS and
+        content), "Add your BIOS", "Send content" to its folder, view and edit
+        its settings and view its logs, and a quick guide for each one.
+      - Captures: a checkbox so new screenshots and videos download to
+        the PC by themselves, one folder per title, when the console is on.
+      - Archive on PC: a list of what you archived with its SHA-256
+        checksum and a "Check" button to know if it's still intact (On your
+        PC › 🗄 Archived).
+      - When resuming a download, if the file on the server has changed
+        (different ETag, date or size), it starts over instead of mixing
+        two versions.
+      - Phone: a list of the devices that have connected; "Change code"
+        locks out everyone who had it.
+      - Recommended, many more emulators (each from its author's page; none
+        includes BIOS, keys, firmware or content): PS5SX2 and PSXS5
+        (PlayStation), PSP5 (PSP), Porpoise (GameCube and Wii), Mupen64Plus
+        (N64), Snes9x (SNES), EglantinePS5 (Switch 2, experimental), PS5-ECAM
+        (Wii U, 3DS, DS and Switch), PSFlycast (Dreamcast), Genesis Plus GX
+        (Sega), FBNeo (arcade), Beetle PCE (PC Engine), PS5X360 (Xbox 360),
+        XPSemu (Xbox), RetroArch (many systems) and Ruffle (Flash), grouped
+        by system, with search and an "Experimental" tag where it applies.
+      - 🧭 First steps: the first time you open an emulator it guides you
+        step by step (installing it, your BIOS or keys, your content and
+        opening it), ticking what's already done.
+      - Media in Recommended: VLC (with "Send videos and music"), Jelly5
+        and Emby5; and new tools: PShare, Chiral-FTP, ps5-exporter and PKG
+        Manager.
+      - Backup: also the saves of PSXS5, Porpoise, Mupen64Plus, Snes9x,
+        Genesis Plus GX, FBNeo, Beetle PCE, PSFlycast, RetroArch and Ruffle.
+      - System with ps5-exporter: fan, power, FPS, clocks, the console's
+        hours of use, "Now on the console" (also at the top, next to the
+        firmware) and which titles heat it up most.
+      - Captures: new ones are posted by themselves to your Telegram group
+        or channel (your bot) or Discord (a webhook), with a different
+        destination per title, history and "Retry"; and "📤 Send" for the
+        ones you tick.
+      - "Install on the console" for .pkg files (Library and Console files)
+        and "▶ Open on the console" for installed titles, with zftpd.
+      - Conversions: "⏸ Pause here" (frozen, using no processor or disk)
+        and "🐢 Use less of the PC" (low priority; also in Settings).
+      - Interface: a "⋯" menu at the top (language, guide, "Go to…",
+        updates, what's new, quit), "Go to…" with Ctrl+K, finished items in
+        one line and in their own section, long hints folded, each title's
+        details with its background art, "What's new" for every version you
+        skipped, and less animation if the system asks for it.
+
+1.27.0 - Android app (PS5Directo-X-Android.apk on GitHub › Releases): opens
+        PS5 Directo from your PC in its own window, with an icon in your
+        apps. The first time, scan the "Phone" QR from the app.
+      - Extension 1.2.2 with guided install: "🧩 Extension" button at the
+        top opens the extensions page, copies the path and shows when it
+        connects.
+      - Fixed: sending to the console from "On your PC" or "All" with "Only
+        to my PC" selected said "That's already on your PC".
+      - Fixed: Captures › "Download to PC" saves to Downloads › PS5 Directo
+        › Capturas, with its progress in the same tab.
+
 1.26.0 - "🔎 Find my PS5": finds the console on your network (in Settings,
         next to the IP, and in the "I can't find the PS5" notice).
       - Library › All: each title once, whether it's on the console, on

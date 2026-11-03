@@ -5,6 +5,7 @@
 #                                   «Actualizar» dentro del programa, que solo copia los archivos.
 #  - PS5Directo-X.Y.Z-Linux.tar.gz  Linux x86-64, con Python y 7-Zip incluidos (se abre con ps5directo.sh).
 #  - PS5Directo-X.Y.Z-macOS.dmg     Mac (Apple Silicon e Intel), en pruebas: la app con Python y 7-Zip.
+#  - PS5Directo-X.Y.Z-Android.apk   app del movil (abre PS5 Directo del PC en su propia ventana).
 name: Publicar version
 
 on:
@@ -35,7 +36,7 @@ jobs:
         run: |
           mkdir -p dist/PS5Directo
           git archive HEAD | tar -x -C dist/PS5Directo
-          rm -rf dist/PS5Directo/.github dist/PS5Directo/installer
+          rm -rf dist/PS5Directo/.github dist/PS5Directo/installer dist/PS5Directo/android
 
       - name: Python incluido
         run: |
@@ -59,7 +60,7 @@ jobs:
           L=build/linux/PS5Directo
           mkdir -p "$L"
           git archive HEAD | tar -x -C "$L"
-          rm -rf "$L/.github" "$L/installer" "$L"/*.bat "$L"/*.vbs
+          rm -rf "$L/.github" "$L/installer" "$L/android" "$L"/*.bat "$L"/*.vbs
           chmod +x "$L/ps5directo.sh"
           PBS=20250604; PYV=3.12.11
           curl -fsSL -o pyl.tgz "https://github.com/astral-sh/python-build-standalone/releases/download/$PBS/cpython-$PYV+$PBS-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
@@ -128,9 +129,12 @@ jobs:
           A="build/PS5 Directo.app"; C="$A/Contents"; R="$C/Resources"
           mkdir -p "$C/MacOS" "$R/app" "$R/bin"
           git archive HEAD | tar -x -C "$R/app"
-          rm -rf "$R/app/.github" "$R/app/installer" "$R/app"/*.bat "$R/app"/*.vbs "$R/app/ps5directo.sh"
-          cp installer/macos/launcher.sh "$C/MacOS/PS5 Directo"
-          chmod +x "$C/MacOS/PS5 Directo"
+          rm -rf "$R/app/.github" "$R/app/installer" "$R/app/android" "$R/app"/*.bat "$R/app"/*.vbs "$R/app/ps5directo.sh"
+          # ejecutable nativo para Apple Silicon e Intel (con un script como ejecutable, macOS pide Rosetta)
+          clang -O2 -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -o "$C/MacOS/PS5 Directo" installer/macos/launcher.c
+          lipo -archs "$C/MacOS/PS5 Directo" | grep -q arm64
+          cp installer/macos/launcher.sh "$R/launcher.sh"
+          chmod +x "$C/MacOS/PS5 Directo" "$R/launcher.sh"
           sed "s/__VERSION__/$VER/g" installer/macos/Info.plist > "$C/Info.plist"
           plutil -lint "$C/Info.plist"
           # icono
@@ -158,6 +162,9 @@ jobs:
           mkdir -p sz && curl -fsSL -o sz.tar.xz "$url" && tar -xJf sz.tar.xz -C sz
           cp sz/7zz "$R/bin/7zz" && chmod +x "$R/bin/7zz"
           "$R/bin/7zz" | head -2
+          # todo lo que se ejecuta tiene que llevar version para Apple Silicon (sin Rosetta)
+          lipo -archs "$R/bin/7zz"; lipo -archs "$R/bin/7zz" | grep -q arm64
+          lipo -archs "$R/python-arm64/bin/python3" | grep -q arm64
           codesign --force --deep --sign - "$A"
           codesign --verify --deep --verbose=1 "$A"
 
@@ -191,8 +198,39 @@ jobs:
           path: dist/PS5Directo-*-macOS.dmg
           retention-days: 3
 
+  # Android: la app del movil. Si fallara, la release sale igual sin la .apk.
+  android:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      VER: ${{ needs.build.outputs.ver }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+      - name: Compilar la .apk
+        working-directory: android
+        run: |
+          set -e
+          gradle --no-daemon assembleRelease -Pps5dVersion="$VER"
+          mkdir -p ../dist
+          cp app/build/outputs/apk/release/app-release.apk "../dist/PS5Directo-$VER-Android.apk"
+          ls -la ../dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/PS5Directo-*-Android.apk
+          retention-days: 3
+
   release:
-    needs: [build, setup, mac]
+    needs: [build, setup, mac, android]
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.setup.result == 'success' && needs.mac.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -205,8 +243,10 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.build.outputs.ver }}
+          fail_on_unmatched_files: false
           files: |
             dist/PS5Directo-*-Setup.exe
             dist/PS5Directo-*-Windows.zip
             dist/PS5Directo-*-Linux.tar.gz
             dist/PS5Directo-*-macOS.dmg
+            dist/PS5Directo-*-Android.apk

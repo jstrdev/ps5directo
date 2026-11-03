@@ -5,13 +5,13 @@ const T = EN ? {
   old: (a, b) => `This extension is version ${a} and PS5 Directo comes with ${b}. Remove it on the extensions page and load the folder again (Settings → "Open the extension folder" → Load unpacked). From then on it updates by itself.`,
   sent: "Captured", last: "last", connected: "● Connected", to: "to PS5 Directo", closed: "● PS5 Directo is not open", normal: "(downloads will work normally)",
   send: "Right-click → \"Send to PS5 Directo\"", box: "To the link box (you check it and click \"Add to queue\")", queue: "Straight to the queue",
-  where: "Where does it go?", ps5: "📺 To the PS5", keep: "💻 Only to my PC", empty: "Nothing in the queue.", pause: "Pause", resume: "Resume", cancel: "Cancel",
+  where: "Where does it go?", ps5: "📺 To the PS5", keep: "💻 Only to my PC", pcmode: "PC mode", now: "Send now", left: (a, b) => `Left: ${a}` + (b ? ` · about ${b}` : ""), pcmLbl: "🖥 PC mode: everything stays on your PC", rules: "Capture rules", minLbl: "Don't capture if smaller than", siteLbl: h => `On <b>${h}</b>`, norm: "Normal", never: "Never capture", always: "Capture any file", altTip: "Alt + click on a link: the browser downloads it, no capture.", thisSite: "this site", empty: "Nothing in the queue.", pause: "Pause", resume: "Resume", cancel: "Cancel",
   st: { pendiente: "waiting", comprobando: "checking", enviando: "sending", convirtiendo: "converting", extrayendo: "extracting", colocando: "placing",
         "en cola para descomprimir": "waiting to extract", hecho: "done", error: "error", cancelado: "cancelled", pausado: "paused" }
 } : {
   capture: null, prog: null, checking: "Comprobando…", reset: null, help: null,
   sent: "Capturados", last: "último", connected: "● Conectado", to: "a PS5 Directo", closed: "● PS5 Directo no está abierto", normal: "(las descargas seguirán normales)",
-  empty: "No hay nada en la cola.", pause: "Pausar", resume: "Reanudar", cancel: "Cancelar", st: {},
+  pcmode: "Modo PC", now: "Enviar ahora", left: (a, b) => `Queda: ${a}` + (b ? ` · unos ${b}` : ""), siteLbl: h => `En <b>${h}</b>`, thisSite: "esta web", empty: "No hay nada en la cola.", pause: "Pausar", resume: "Reanudar", cancel: "Cancelar", st: {},
   old: (a, b) => `Esta extensión es la versión ${a} y PS5 Directo trae la ${b}. Quítala en la página de extensiones y vuelve a cargar la carpeta (Ajustes → «Abrir la carpeta de la extensión» → Cargar descomprimida). Desde entonces se actualiza sola.`
 };
 const $ = id => document.getElementById(id);
@@ -21,7 +21,10 @@ if (EN) {
   $("reset").textContent = T.reset; $("help").textContent = T.help; $("lgSend").textContent = T.send;
   $("mBox").textContent = T.box; $("mQueue").textContent = T.queue; $("lWhere").textContent = T.where;
   $("where").options[0].textContent = T.ps5; $("where").options[1].textContent = T.keep;
+  $("lblPcm").textContent = T.pcmLbl; $("lgRules").textContent = T.rules; $("lblMin").textContent = T.minLbl;
+  $("oNorm").textContent = T.norm; $("oNever").textContent = T.never; $("oAlways").textContent = T.always; $("altTip").textContent = T.altTip;
 }
+const dur = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.max(1, Math.round((s % 3600) / 60)); return h ? `${h} h ${m} min` : `${m} min`; };
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const human = b => { b = +b || 0; const u = ["B", "KB", "MB", "GB"]; let i = 0; while (b >= 1024 && i < 3) { b /= 1024; i++ } return b.toFixed(i ? 1 : 0) + " " + u[i]; };
 
@@ -30,12 +33,18 @@ function paint(st) {
   if (!st) { s.innerHTML = `<span class="bad">${T.closed}</span> ${T.normal}`; $("dots").hidden = true; $("q").hidden = true; return; }
   s.innerHTML = `<span class="ok">${T.connected}</span> ${T.to} v${esc(st.version)}`;
   $("dots").hidden = false; $("dFtp").classList.toggle("on", st.ftp === true); $("dBf").classList.toggle("on", st.bf === true);
+  if (st.pc_mode && !window._whereSet) { $("where").value = "keep"; s.innerHTML += ` · <b>${T.pcmode}</b>`; }
+  const act = st.jobs.filter(j => ["pendiente", "comprobando", "enviando", "convirtiendo"].includes(j.status));
+  const left = act.reduce((a, j) => a + (j.left || 0), 0), spd = act.reduce((a, j) => a + (j.speed || 0), 0);
+  $("eta").hidden = !left; $("eta").textContent = left ? T.left(human(left), spd > 0 ? dur(left / spd) : "") : "";
+  $("pcmRow").hidden = false; if (document.activeElement !== $("pcm")) $("pcm").checked = !!st.pc_mode;
   const jobs = st.jobs.slice().reverse().slice(0, 6);
   $("q").hidden = false;
   $("q").innerHTML = jobs.length ? jobs.map(j => {
     const act = !["hecho", "error", "cancelado", "pausado"].includes(j.status);
     const btns = (act ? `<button class="x" data-a="pause" data-id="${j.id}" title="${T.pause}">⏸</button><button class="x" data-a="cancel" data-id="${j.id}" title="${T.cancel}">✕</button>`
-                      : j.status === "pausado" ? `<button class="x" data-a="resume" data-id="${j.id}" title="${T.resume}">▶</button>` : "");
+                      : j.status === "pausado" ? `<button class="x" data-a="resume" data-id="${j.id}" title="${T.resume}">▶</button>` : "")
+      + (["pendiente", "pausado"].includes(j.status) ? `<button class="x" data-a="now" data-id="${j.id}" title="${T.now}">⚡</button>` : "");
     return `<div class="job"><div class="jt"><b title="${esc(j.title)}">${esc(j.title)}</b><span class="muted">${esc(T.st[j.status] || j.status)}${act && j.pct ? " · " + j.pct + "%" : ""}</span>${btns}</div>
       ${act ? `<div class="bar"><i style="width:${j.pct || 0}%"></i></div><div class="ph">${esc(j.phase)}${j.speed > 0 ? " · " + human(j.speed) + "/s" : ""}</div>` : ""}</div>`;
   }).join("") : `<div class="muted">${T.empty}</div>`;
@@ -45,15 +54,25 @@ function paint(st) {
 async function refresh() { chrome.runtime.sendMessage({ type: "poll" }, paint); }
 
 (async () => {
-  const cfg = await chrome.storage.local.get({ enabled: true, captured: 0, last: "", mode: "box", where: "ps5", progress: true });
+  const cfg = await chrome.storage.local.get({ enabled: true, captured: 0, last: "", mode: "box", where: "ps5", whereSet: false, progress: true });
   $("en").checked = cfg.enabled; $("en").onchange = () => chrome.storage.local.set({ enabled: $("en").checked });
   $("prog").checked = cfg.progress; $("prog").onchange = () => { chrome.storage.local.set({ progress: $("prog").checked }); refresh(); };
   document.querySelectorAll("input[name=mode]").forEach(r => { r.checked = r.value === cfg.mode; r.onchange = () => { chrome.storage.local.set({ mode: r.value }); $("whereRow").hidden = r.value !== "queue"; }; });
   $("whereRow").hidden = cfg.mode !== "queue";
-  $("where").value = cfg.where; $("where").onchange = () => chrome.storage.local.set({ where: $("where").value });
+  $("where").value = cfg.where; $("where").onchange = () => chrome.storage.local.set({ where: $("where").value, whereSet: true });
+  window._whereSet = cfg.whereSet;
   $("cnt").textContent = cfg.captured ? `${T.sent}: ${cfg.captured}${cfg.last ? " (" + T.last + ": " + cfg.last + ")" : ""}` : "";
   $("reset").onclick = async () => { await chrome.storage.local.set({ captured: 0, last: "" }); $("cnt").textContent = ""; };
   const { outdated = "" } = await chrome.storage.local.get({ outdated: "" });
   if (outdated) { const w = document.createElement("div"); w.className = "warn"; w.textContent = T.old(chrome.runtime.getManifest().version, outdated); document.body.insertBefore(w, $("st")); }
+  $("pcm").onchange = () => chrome.runtime.sendMessage({ type: "pcmode", on: $("pcm").checked }, () => refresh());
+  // reglas
+  const rc = await chrome.storage.local.get({ minMB: 0, sites: {} });
+  $("minmb").value = rc.minMB || ""; $("minmb").onchange = () => chrome.storage.local.set({ minMB: Math.max(0, parseInt($("minmb").value) || 0) });
+  let host = "", web = false;
+  try { const [tab] = await chrome.tabs.query({ active: true, currentWindow: true }); web = /^https?:/.test(tab.url); host = new URL(tab.url).hostname.toLowerCase().replace(/^www\./, ""); } catch (e) {}
+  if (host && web) { $("lblSite").innerHTML = T.siteLbl(esc(host)); $("siteRule").value = rc.sites[host] || ""; }
+  else { $("siteRule").disabled = true; $("lblSite").innerHTML = T.siteLbl(esc(T.thisSite)); }
+  $("siteRule").onchange = async () => { const cur = (await chrome.storage.local.get({ sites: {} })).sites; if ($("siteRule").value) cur[host] = $("siteRule").value; else delete cur[host]; chrome.storage.local.set({ sites: cur }); };
   refresh(); setInterval(refresh, 1500);
 })();

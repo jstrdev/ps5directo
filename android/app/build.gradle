@@ -1,0 +1,38 @@
+// App de Android de PS5 Directo: una ventana propia (WebView) que abre PS5 Directo del PC por la red de casa.
+// La version la pasa el flujo de GitHub (-Pps5dVersion=X.Y.Z, la misma que app.py).
+plugins { id 'com.android.application' }
+
+def ver = (project.findProperty('ps5dVersion') ?: '1.0.0').toString()
+def nums = ver.tokenize('.').collect { it.replaceAll('\\D', '') ?: '0' }.collect { it.toInteger() }
+while (nums.size() < 3) nums << 0
+
+android {
+    namespace 'io.github.jstrdev.ps5directo'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'io.github.jstrdev.ps5directo'
+        minSdk 24
+        targetSdk 34
+        versionCode nums[0] * 10000 + nums[1] * 100 + nums[2]
+        versionName ver
+    }
+    signingConfigs {
+        // Clave fija para que cada version nueva se instale encima de la anterior
+        release {
+            storeFile file('../ps5directo.jks')
+            storePassword 'ps5directo'
+            keyAlias 'ps5directo'
+            keyPassword 'ps5directo'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

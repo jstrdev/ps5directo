@@ -325,6 +325,13 @@ class UrlSource:
         self.name = None
         self.size = -1
         self.ranges = False
+        self.etag = ""
+        self.lastmod = ""
+
+    def stamp(self):
+        """Huella del archivo remoto (ETag, fecha de cambio y tamano): si cambia entre una vez y otra, lo
+        bajado a medias es de otro archivo y no se puede continuar."""
+        return {"etag": self.etag, "lastmod": self.lastmod, "size": self.size}
 
     def probe(self):
         self.url = resolve_url(self.original)
@@ -344,6 +351,9 @@ class UrlSource:
                         self.ranges = False
                     self.name = safe_name(_filename_from_headers(r.headers, final))
                     self.url = final
+                    et = (r.headers.get("ETag") or "").strip()
+                    self.etag = "" if et.startswith("W/") else et      # las debiles no sirven para comparar bytes
+                    self.lastmod = (r.headers.get("Last-Modified") or "").strip()
                 if "text/html" in ctype and (self.size < 0 or self.size < 2 * MiB):
                     raise PipeError("El enlace devuelve una pagina web, no un archivo. "
                                     "Usa el enlace de descarga directa.")
@@ -456,6 +466,8 @@ LIMITED_HOSTS = ("akirabox.", "datanodes.to", "vikingfile.com", "fileditch", "1f
                  "torbox", "tb-cdn", "real-debrid", "rdb.gg", "alldebrid", "debrid-link",
                  "premiumize", "pikpak")
 LIMITED_CAP = 2
+# servicios de pago que si dejan varias descargas a la vez
+DEBRID_HOSTS = ("torbox", "tb-cdn", "real-debrid", "rdb.gg", "alldebrid", "debrid-link", "premiumize")
 
 
 def host_conn_cap(url):
@@ -604,6 +616,19 @@ def _ranged(url, start, end, cfg, cancel, meter):
         with cond:
             state["stop"] = True
             cond.notify_all()
+
+
+def stamp_changed(old, new):
+    """True si dos huellas dicen claramente que el archivo remoto es otro."""
+    if not old or not new:
+        return False
+    if old.get("size", -1) >= 0 and new.get("size", -1) >= 0 and old["size"] != new["size"]:
+        return True
+    if old.get("etag") and new.get("etag"):
+        return old["etag"] != new["etag"]
+    if old.get("lastmod") and new.get("lastmod"):
+        return old["lastmod"] != new["lastmod"]
+    return False
 
 
 class FileSource:
@@ -1499,6 +1524,44 @@ def _pw_error(text):
             or "can not read password" in t or "break signaled" in t)
 
 
+# Errores de 7-Zip -> causa y que hacer (en vez del texto en ingles de 7-Zip)
+_7Z_ERRORS = [
+    ("password", r"wrong password|cannot read password|can not read password|encrypted",
+     "La contraseña no es la buena.", "Escríbela en el trabajo (o en Ajustes › contraseñas) y pulsa Reintentar."),
+    ("damaged", r"crc failed|data error|headers error|unexpected end of (archive|data)|checksum error|"
+                r"is not valid|there are data after the end",
+     "El archivo está dañado o se bajó incompleto.",
+     "Pulsa «Descargar de nuevo». Si vuelve a pasar, el archivo del servidor está mal: busca otro enlace."),
+    ("volume", r"missing volume|unavailable start of archive|can ?not find volume|next volume",
+     "Falta una de las partes (o no se llama igual que las demás).",
+     "Pega todas las partes juntas (.part1, .part2… o .001, .002…) y vuelve a añadirlo."),
+    ("method", r"unsupported method|unsupported compression|unsupported feature",
+     "Tu 7-Zip no conoce el método de compresión de este archivo.",
+     "Actualiza 7-Zip (7-zip.org) o pon la ruta de uno más nuevo en Ajustes. También puedes descomprimirlo en la consola."),
+    ("space", r"not enough space|no space left|disk full|there is not enough space",
+     "No queda sitio en el disco del PC.", "Libera espacio o elige otra carpeta (Ajustes › carpeta temporal)."),
+    ("access", r"access is denied|permission denied|being used by another process|operation not permitted",
+     "Windows o el antivirus no dejan escribir ahí.",
+     "Cierra lo que esté usando esa carpeta, elige otra carpeta o añade la carpeta como excepción en el antivirus."),
+    ("long", r"path too long|file name too long|name too long",
+     "Las rutas de dentro son demasiado largas para Windows.", "Elige una carpeta corta, por ejemplo C:\\PS5."),
+    ("notarchive", r"can ?not open (the )?file as (an )?archive|is not archive|unknown archive",
+     "Ese archivo no es un comprimido que 7-Zip sepa abrir.",
+     "Puede que el enlace bajara una página web en vez del archivo, o que sea otro formato. Comprueba el enlace."),
+]
+
+
+def explain_7z(text):
+    """(clave, mensaje para el usuario) a partir de lo que dice 7-Zip."""
+    t = (text or "").lower()
+    for key, rx, why, fix in _7Z_ERRORS:
+        if re.search(rx, t):
+            return key, "%s %s" % (why, fix)
+    tail = (text or "").strip().splitlines()[-3:]
+    return "other", ("7-Zip no pudo descomprimirlo (%s). Pulsa «Diagnóstico» para ver qué pasó." %
+                     (" ".join(tail)[-200:] or "sin detalles"))
+
+
 def list_7z(exe, archive, password=None):
     """Devuelve (entradas, propiedades del archivo). Cada entrada: path, size, dir, crc, enc."""
     p = subprocess.run(_7z_cmd(exe, "l", "-slt", archive, password=password),
@@ -1508,7 +1571,9 @@ def list_7z(exe, archive, password=None):
     err = p.stderr.decode("utf-8", "replace")
     if p.returncode != 0 or "----------" not in out:
         msg = (err.strip() or out.strip()[-400:] or "codigo %s" % p.returncode)
-        raise PipeError("7-Zip no pudo leer el archivo: %s" % msg[-400:])
+        if _pw_error(msg):
+            raise PipeError("7-Zip no pudo leer el archivo: %s" % msg[-400:])   # se prueban otras contraseñas
+        raise PipeError(explain_7z(msg)[1] + " [7-Zip: %s]" % msg.strip().splitlines()[-1][:160])
     head, body = out.split("----------", 1)
     props = {}
     for line in head.splitlines():

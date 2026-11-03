@@ -23,7 +23,11 @@ primera vez macOS la bloquea. Es normal en programas gratuitos.
 
 NOTAS
 - Funciona en Mac con Apple Silicon (M1, M2...) e Intel, macOS 11 o
-  posterior. Trae Python y 7-Zip.
+  posterior, sin Rosetta. Trae Python y 7-Zip.
+- RED LOCAL (macOS 15 o posterior): la primera vez que conecta con la PS5,
+  macOS pregunta si PS5 Directo puede buscar dispositivos en la red local:
+  pulsa "Permitir". Si dijiste que no, actívalo en Ajustes del Sistema >
+  Privacidad y seguridad > Red local.
 - Para la ventana sin pestañas usa Chrome, Edge o Brave si los tienes; si
   no, se abre en Safari.
 - Para los torrents hace falta aria2: instala Homebrew (brew.sh) y luego
@@ -55,8 +59,12 @@ the first time. That's normal for free programs.
     xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"
 
 NOTES
-- Works on Apple Silicon (M1, M2...) and Intel Macs, macOS 11 or later.
-  Python and 7-Zip are included.
+- Works on Apple Silicon (M1, M2...) and Intel Macs, macOS 11 or later,
+  without Rosetta. Python and 7-Zip are included.
+- LOCAL NETWORK (macOS 15 or later): the first time it connects to the
+  PS5, macOS asks whether PS5 Directo may find devices on your local
+  network: click "Allow". If you said no, turn it on in System Settings >
+  Privacy & Security > Local Network.
 - For the window without tabs it uses Chrome, Edge or Brave if you have
   one; otherwise it opens in Safari.
 - Torrents need aria2: install Homebrew (brew.sh), then

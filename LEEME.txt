@@ -1,6 +1,15 @@
-PS5 DIRECTO 1.20.0
-==================
+PS5 DIRECTO 2.0.0
+=================
 (English: see README_EN.txt)
+
+AVISO
+  PS5 Directo es un gestor de archivos: solo mueve, convierte y organiza los
+  archivos que tú eliges. No trae ni aloja contenido, BIOS, claves ni
+  firmware, no se conecta a servidores de Sony y no incluye payloads
+  propios. Los programas de «Recomendados» se bajan de la página oficial de
+  su autor en GitHub y son de sus autores. Úsalo con contenido que tengas
+  derecho a usar (tus propias copias y homebrew). Cada uno lo usa bajo su
+  responsabilidad.
 
 EMPIEZA AQUÍ (5 MINUTOS)
 ========================
@@ -321,6 +330,189 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   tienes (si no, se abre en tu navegador). Para los torrents hace falta
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
+
+
+NOVEDADES 2.0.0
+- Guardián del firmware (Sistema): mira cada 10 minutos si la consola ha
+  descargado una actualización del sistema y te avisa (también por
+  Telegram o Discord). La quitas con un clic, o que se quite sola.
+  Opcional: bloquear los servidores de actualización en la consola.
+- Payloads al día (Sistema): compara lo que tienes en Payload Manager
+  (ShadowMountPlus, kstuff, ftpsrv…) con la última versión de su
+  catálogo, te avisa cuando sale una nueva y la actualizas con un clic.
+- Ordenar nombres (Biblioteca): pone a tus imágenes y .pkg un nombre
+  claro («Titulo-PPSA01234-EU») con el título que traen dentro. No toca
+  carpetas ni parches, cuida el límite de ShadowMountPlus y se deshace.
+- YouTube sin actualizaciones (para quien usa Y2JB): lo mismo que el
+  script del propio Y2JB, con copia en el PC y «Deshacer».
+- Novedades de la scene (Biblioteca): lo último del catálogo de
+  RecompStore (ports nativos, emuladores, apps y herramientas), con
+  aviso de lo nuevo. Solo para leerlo: se instala desde RecompStore.
+- Más allá de la consola (Recomendados): guías de Linux (Ubuntu) y
+  Bazzite Deck (Steam) en la PS5, con el cargador, y MihawkOS (tus
+  programas de Windows y Steam en la propia PS5, en pruebas).
+- Si PS5 Directo detecta un fallo suyo, te propone el informe ya
+  rellenado para enviarlo a GitHub (se puede desactivar).
+- Si algo se cierra al arrancar en la consola, PS5 Directo lo ve en el
+  registro de ShadowMountPlus, lo revisa solo y te dice la causa más
+  probable.
+- Ficha de cada título: «Sobre este título» (resumen de Wikipedia, tráiler,
+  opiniones) y portada animada al pasar el ratón.
+- Nueva pestaña «✨ Descubrir»: las Novedades de la scene arriba del todo
+  y más de 30 emuladores, apps y herramientas, cada cosa en su categoría
+  (Emuladores por sistema, Multimedia, Remote Play, Herramientas, Linux y
+  Steam) con portada. En Biblioteca vuelven los accesos a Recomendados y
+  Novedades, y el filtro «Emuladores» / «Apps y herramientas». Y una
+  guía interactiva nueva que enseña todo lo que hace la 2.0 la primera
+  vez que la abres (también en el menú ⋯ › Guía de uso).
+- Móvil: el menú ⋯ ya no se sale de la pantalla y el aviso de instalar
+  la app se queda hasta que pulses «No, gracias» (y vuelve desde el
+  menú ⋯ › Instalar como app).
+- Diseño: transiciones suaves entre pestañas y fondo más vivo (se
+  quita con «reducir movimiento» del sistema).
+- iPhone y iPad: en «Abrir en el móvil» › «¿Tienes iPhone o iPad?»
+  se explica cómo dejarlo como icono en la pantalla de inicio (ya
+  conectado) y cómo crear un atajo para «Compartir › Enviar a PS5
+  Directo» desde cualquier app.
+- Mac: encuentra lo instalado con Homebrew (aria2, FFmpeg, rclone),
+  la comprobación de la consola ya funciona, el selector sale delante,
+  un segundo clic en el icono trae la ventana y los atajos se ven con ⌘.
+- Linux: las descargas https funcionan aunque la distribución guarde
+  los certificados en otro sitio (Fedora, openSUSE…).
+- Animación de carga con triángulo, círculo, equis y cuadrado.
+- Herramientas: SMPlusGui (ajustes de ShadowMountPlus) y ps5-tailscale
+  (la consola desde fuera de casa, experimental).
+- ❤ Créditos en el menú ⋯: los proyectos libres que usa la app.
+- Modo PC (interruptor arriba): todo lo que añadas, también desde la
+  extensión y el móvil, se queda en tu PC: solo bajar, bajar y
+  descomprimir, o bajar, descomprimir y convertir. Nada va a la consola.
+- Al bajar al PC, varias partes a la vez (Ajustes › «Partes a la vez»),
+  con las mismas conexiones en total.
+- «Captar los enlaces de descarga que copies» (bajo la caja de enlaces):
+  los enlaces de archivos que copies en cualquier web o programa llegan
+  solos a la caja.
+- Al terminar, botones «Abrir la carpeta» (en tu PC) o «Ver en la
+  consola», y los terminados se ven más compactos en la cola.
+- PS5 Dump Forge: aviso cuando sale una versión nueva, con sus
+  novedades; actualizas cuando quieras (o en automático, en Ajustes).
+- Formato zstd (PS5 Dump Forge 0.5), en carpeta o en imagen .ffpkg, y
+  nivel de compresión para LZ4 y zstd. «Comprobar arranque» reconoce
+  zstd y avisa de la actualización de fakelib de ShadowMountPlus.
+- Biblioteca: Permisos, Partidas y Borrar van en el menú «⋯» de cada
+  tarjeta.
+- Cola: ▲ ▼ para cambiar el orden y «⚡ Enviar ahora» (pasa delante; lo
+  que se estaba enviando se pausa y sigue solo al terminar).
+- Copia de seguridad: también las partidas de los emuladores de PS1
+  (PSSwanStation), PS2 (Crux2, PS5SX2) y Switch (ProsperoEden), y se
+  restauran por separado. La copia diaria espera a que cierres lo que
+  esté abierto en la consola.
+- Payloads: «PS5 Dump Forge» se puede iniciar en la consola (convierte e
+  instala .pkg desde su web, puerto 8095).
+- Biblioteca › ⭐ Recomendados: emuladores (PSSwanStation, Crux2,
+  ProsperoEden) que se instalan solos desde el GitHub de su autor, y
+  herramientas que se cargan como payload (PatchDL para actualizar sin
+  instalar nada, PS5 Dump Forge), con lo que hace cada uno y lo que
+  necesitas.
+- Biblioteca: botón «📂 Carpeta» en cada tarjeta (y 📂 en las de tu PC).
+- Si 7-Zip falla al descomprimir en el PC, dice la causa y qué hacer, y
+  si es cosa de 7-Zip lo intenta sin él (Python o PS5 Dump Forge).
+- Carpeta vigilada: lo que termine de bajar ahí con otro programa llega
+  solo a la caja de enlaces.
+- Papelera en la consola (Espacio › Papelera): «Borrar» en la Biblioteca y
+  en Archivos de la consola, y la copia vieja al reemplazar, se apartan y
+  se pueden recuperar unos días (se borran solas a los 7 días).
+- Las sumas (.sfv, .md5) se comprueban también en lo que se reanuda,
+  releyendo el archivo entero.
+- Tiempo que le queda a toda la cola, junto a «Cola».
+- «Solo a mi PC» › Bajar y descomprimir: «Elegir qué sacar del
+  comprimido» (ver lo que hay dentro y sacar solo una parte).
+- Test de velocidad › «Ajustar las conexiones con este enlace»: prueba 2,
+  4, 8 y 16 conexiones y se queda con la mejor.
+- Mac: la app ya es nativa para Apple Silicon (no pide Rosetta) y
+  macOS pide el permiso de Red local a nombre de PS5 Directo.
+- Extensión 1.3.0: en Modo PC lo que mandes con clic derecho va a tu PC;
+  Alt + clic en un enlace lo descarga el navegador (sin capturar); reglas
+  (no capturar si pesa menos de X MB, nunca o siempre en una web); coge la
+  contraseña escrita junto al enlace; en la ventanita, «Enviar ahora»,
+  lo que le queda a la cola y el interruptor de Modo PC; el aviso de
+  terminado tiene «Abrir la carpeta».
+- App de Android: «Compartir» un enlace desde cualquier app lo manda a
+  PS5 Directo, y «Despertar mi PC» (Wake-on-LAN) si el PC está en reposo.
+- Biblioteca: «🩺 Revisar todo» (comprueba todo de una vez), ficha de cada
+  título al pulsar su portada (dónde está, uso, copias, notas), «Archivar
+  en el PC» (lo copia, comprueba y lo quita de la consola) y el filtro
+  «Sin abrir en 2 meses».
+- Recomendados: Remote Play desde el PC (payload para sacar el PIN de
+  vinculación y chiaki-ng).
+- Recomendados: PS5 Hardware Overlay (FPS, temperaturas, frecuencias,
+  RAM, ventilador y consumo encima de la imagen, como MangoHud) y zftpd.
+- Nueva pestaña Sistema: temperatura de la CPU (con gráfica), memoria,
+  disco y tiempo encendida de la consola (con zftpd), y acceso al overlay.
+- Destino «La PS5 lo baja sola (zftpd)»: la consola descarga el enlace
+  sin pasar por el PC (http, https, ftp y magnet); los .zip se
+  descomprimen en el destino.
+- ☁️ Mis almacenamientos (rclone): Google Drive, OneDrive, Dropbox, MEGA,
+  pCloud, Box, WebDAV y SFTP. Navegas, marcas y lo bajas a tu PC o lo
+  mandas a la consola como cualquier enlace.
+- Biblioteca › 🔔 Actualizaciones: la versión que tienes de cada título
+  frente a la última que conocen prosperopatches.com (PS5) y
+  orbispatches.com (PS4), con la que vale para tu firmware. Solo mira el
+  número de versión; para instalar, PatchDL.
+- Emuladores en Recomendados: aviso y botón «Actualizar» cuando sale
+  versión nueva (se copia encima y se conservan ajustes, partidas, BIOS
+  y contenido), «Poner tu BIOS», «Enviar contenido» a su carpeta, ver y
+  editar sus ajustes y ver sus registros, y una guía rápida de cada uno.
+- Capturas: casilla para que las capturas y vídeos nuevos se bajen solos
+  al PC, en una carpeta por título, cuando la consola esté encendida.
+- Archivar en el PC: lista de lo archivado con su suma SHA-256 y botón
+  «Comprobar» para saber si sigue entero (En tu PC › 🗄 Archivados).
+- Al reanudar una descarga, si el archivo del servidor ha cambiado
+  (otro ETag, otra fecha u otro tamaño), empieza de cero en vez de mezclar
+  dos versiones.
+- Móvil: lista de los dispositivos que han entrado; «Cambiar código»
+  deja fuera a todos los que lo tenían.
+- Recomendados, muchos más emuladores (cada uno de la página de su autor;
+  ninguno trae BIOS, claves, firmware ni contenido): PS5SX2 y PSXS5
+  (PlayStation), PSP5 (PSP), Porpoise (GameCube y Wii), Mupen64Plus (N64),
+  Snes9x (SNES), EglantinePS5 (Switch 2, en pruebas), PS5-ECAM (Wii U, 3DS,
+  DS y Switch), PSFlycast (Dreamcast), Genesis Plus GX (Sega), FBNeo
+  (arcade), Beetle PCE (PC Engine), PS5X360 (Xbox 360), XPSemu (Xbox),
+  RetroArch (muchos sistemas) y Ruffle (Flash), ordenados por sistema, con
+  buscador y la etiqueta «En pruebas» cuando toca.
+- 🧭 Primeros pasos: la primera vez que abres un emulador te guía paso a
+  paso (instalarlo, tu BIOS o tus claves, tu contenido y abrirlo), marcando
+  lo que ya está hecho.
+- Multimedia en Recomendados: VLC (con «Enviar vídeos y música»), Jelly5 y
+  Emby5; y herramientas nuevas: PShare, Chiral-FTP, ps5-exporter y PKG
+  Manager.
+- Copia de seguridad: también las partidas de PSXS5, Porpoise, Mupen64Plus,
+  Snes9x, Genesis Plus GX, FBNeo, Beetle PCE, PSFlycast, RetroArch y Ruffle.
+- Sistema con ps5-exporter: ventilador, consumo, FPS, frecuencias, horas de
+  uso de la consola, «Ahora en la consola» (también arriba, junto al
+  firmware) y qué títulos la calientan más.
+- Capturas: las nuevas se publican solas en tu grupo o canal de Telegram
+  (tu bot) o de Discord (un webhook), con destino distinto por título,
+  historial y «Reintentar»; y «📤 Enviar» para mandar las que marques.
+- «Instalar en la consola» para los .pkg (Biblioteca y Archivos de la
+  consola) y «▶ Abrir en la consola» para lo instalado, con zftpd.
+- Conversiones: «⏸ Pausar aquí» (se congela sin gastar procesador ni disco)
+  y «🐢 Usar menos el PC» (prioridad baja; también en Ajustes).
+- Interfaz: menú «⋯» arriba (idioma, guía, «Ir a…», actualizaciones,
+  novedades, salir), «Ir a…» con Ctrl+K, lo terminado de la cola en una
+  línea y en su propia sección, ayudas largas plegadas, la ficha de cada
+  título con su imagen de fondo, «Novedades» de todas las versiones que te
+  saltaste, y menos animaciones si el sistema lo pide.
+
+NOVEDADES 1.27.0
+- App de Android (PS5Directo-X-Android.apk en GitHub › Releases): abre
+  PS5 Directo del PC en su propia ventana, con icono en tus apps. La
+  primera vez escaneas el QR de «Móvil» desde la app.
+- Extensión 1.2.2 con instalación guiada: botón «🧩 Extensión» arriba,
+  abre la página de extensiones, copia la ruta y avisa cuando conecta.
+- Arreglado: enviar a la consola desde «En tu PC» o «Todo» con «Solo a
+  mi PC» elegido decía «Eso ya está en tu PC».
+- Arreglado: Capturas › «Bajar al PC» guarda en Descargas › PS5 Directo
+  › Capturas, con su progreso en la misma pestaña.
 
 
 NOVEDADES 1.26.0
