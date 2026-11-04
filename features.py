@@ -751,6 +751,12 @@ PAYLOADS = [
 EXTRA_PAYLOADS = [
     {"id": "rpgetpin", "name": "Remote Play: PIN para vincular", "repo": "idlesauce/ps5-remoteplay-get-pin", "port": None,
      "what": "Saca el PIN y el ID de cuenta para vincular un programa de Remote Play sin PSN"},
+    {"id": "patchsys", "name": "ps-patch-system", "repo": "illusionyy/ps-patch-system", "port": 23900,
+     "pick": [r"(?i)^patch-bundle-loader-prospero\.elf$", r"(?i)^patch-bundle-prospero\.elf$"],
+     "what": "Parches para títulos de PS4 y PS5 (60 fps, resolución…), se eligen en su web (puerto 23900)"},
+    {"id": "neoenabler", "name": "NeoEnabler", "repo": "gasb07/NeoEnabler", "port": None,
+     "pick": [r"(?i)^neo-manager\.elf$", r"(?i)neo.*\.elf$"],
+     "what": "Títulos de PS4 en modo PS4 Pro (hasta 4K) con sus parches; va después de ps-patch-system"},
     {"id": "patchdl", "name": "PatchDL", "repo": "knutwurst/ps5-patchdl", "port": 12880,
      "what": "Actualizaciones oficiales de lo instalado, desde el navegador (puerto 12880)"},
     {"id": "forge", "name": "PS5 Dump Forge", "repo": "quer3q/ps5-dump-forge", "port": 8095,
@@ -892,7 +898,7 @@ CATALOG = [
              "guide": ["Contenido en /data/snes9x/roms (o un USB).",
                        "Usa el mismo Helper que PS5SX2 para salir de su caja: cárgalo si no ve tus carpetas."]}},
     {"id": "eglantine", "kind": "app", "group": "emu", "fam": "nin", "name": "EglantinePS5", "sys": "Switch 2",
-     "tid": "PPSA98515", "repo": "heydemoura/EglantinePS5", "asset": [r"(?i)PPSA98515.*\.zip$", r"(?i)\.zip$"], "exp": True,
+     "tid": "PPSA98515", "repo": "mucahidkambur/EglantinePS5", "asset": [r"(?i)PPSA98515.*\.zip$", r"(?i)\.zip$"], "exp": True,
      "what": "Emulador de Nintendo Switch 2 (adaptación de Eglantine, basado en Eden). Muy experimental.",
      "needs": "Las claves y el firmware de tu propia consola y tu contenido (.nsp o .xci).",
      "update": "Avisa de versión nueva al abrirlo.",
@@ -1009,6 +1015,18 @@ CATALOG = [
      "asset": [r"(?i)PPSA96024.*\.zip$", r"(?i)\.zip$"],
      "what": "Gestor de archivos de dos paneles y cliente FTP/SFTP en la propia consola, con el mando.",
      "needs": "ShadowMountPlus y el cargador de ELF en el puerto 9021. Sus ajustes quedan en /data/chiral-ftp."},
+    {"id": "patchsys", "kind": "payload", "group": "patch", "name": "Parches de juegos (ps-patch-system)",
+     "repo": "illusionyy/ps-patch-system",
+     "what": "Mejoras para títulos de PS4 y PS5 que hace la comunidad: más fps, más resolución, arreglos… Se activan una a "
+             "una en su web. PS5 Directo lo carga y te pone los parches en la consola con un botón.",
+     "needs": "Firmware de PS5 3.00 a 12.70 (según su autor). Se vuelve a cargar tras cada reinicio. Los parches solo cambian "
+              "el ejecutable al arrancar: el título no se toca."},
+    {"id": "neoenabler", "kind": "payload", "group": "patch", "name": "NeoEnabler (PS4 en modo Pro)",
+     "repo": "gasb07/NeoEnabler", "exp": True,
+     "what": "Hace que los títulos de PS4 de su lista arranquen como en una PS4 Pro y suban de resolución (hasta 4K) con "
+             "sus parches. Necesita ps-patch-system cargado antes.",
+     "needs": "Firmware 4.00 a 13.60 y ps-patch-system cargado primero, después de cada reinicio. Solo sirve con los títulos "
+              "que tienen parche."},
     {"id": "rpgetpin", "kind": "payload", "group": "rp", "name": "Remote Play: sacar el PIN",
      "repo": "idlesauce/ps5-remoteplay-get-pin",
      "what": "Con el jailbreak la consola no entra en PSN, así que no da el PIN para vincular Remote Play. Este payload "
@@ -1124,6 +1142,19 @@ GH_API = os.environ.get("PS5D_GITHUB_API") or "https://api.github.com"   # se pu
 
 
 def github_release(repo):
+    """Como _github_release, pero con un error que se entiende si GitHub no contesta."""
+    try:
+        return _github_release(repo)
+    except E.PipeError:
+        raise
+    except Exception as e:
+        code = getattr(e, "code", None)
+        if code in (403, 429):
+            raise E.PipeError("GitHub ha limitado las consultas desde tu conexión: prueba otra vez en un rato")
+        raise E.PipeError("No he podido consultar GitHub (%s)" % E.net_reason(e))
+
+
+def _github_release(repo):
     """(tag, [assets]) de la ultima version publicada (si solo hay pruebas, la mas nueva)."""
     base = GH_API + "/repos/%s/releases" % repo
     try:
@@ -2545,3 +2576,44 @@ def open_terminal(cmd):
             subprocess.Popen(t + cmd)
             return True
     return False
+
+
+# Arte oficial de cada proyecto (icono y portada de su propio GitHub; Bazzite, de su «press kit»). Si falta, se usa el
+# del catálogo de RecompStore para ese repositorio o el icono de la consola si ya está instalado.
+CATALOG_ART = {
+    'crux2': {"icon": 'https://raw.githubusercontent.com/Press5elect/Crux2/main/ps5/sce_sys/icon0.png', "hero": ''},
+    'prosperoeden': {"icon": 'https://raw.githubusercontent.com/heydemoura/ProsperoEden/main/sce_sys/icon0.png', "hero": ''},
+    'ps5sx2': {"icon": 'https://raw.githubusercontent.com/Swordpdf/PS5SX2/main/ps5/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/Swordpdf/PS5SX2/main/ps5/docs/banner.png'},
+    'psxs5': {"icon": 'https://raw.githubusercontent.com/SynoPiia/PSXS5/main/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/SynoPiia/PSXS5/main/docs/media/banner.png'},
+    'psp5': {"icon": 'https://raw.githubusercontent.com/tsuramatsu1/PSP5/master/sce_sys/icon0.png', "hero": ''},
+    'porpoise': {"icon": 'https://raw.githubusercontent.com/elripalda/Porpoise/Main/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/elripalda/Porpoise/Main/docs/images/banner.png'},
+    'mupen64': {"icon": 'https://raw.githubusercontent.com/TheRealRetro/mupen64plus-ps5/main/ps5/app/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/TheRealRetro/mupen64plus-ps5/main/docs/banner.png'},
+    'snes9x': {"icon": 'https://raw.githubusercontent.com/MisterTemaki/snes9xPS5/main/ps5/app/sce_sys/icon0.png', "hero": ''},
+    'eglantine': {"icon": 'https://raw.githubusercontent.com/mucahidkambur/EglantinePS5/main/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/mucahidkambur/EglantinePS5/main/sce_sys/background-source.png'},
+    'ecam': {"icon": 'https://raw.githubusercontent.com/premohq/PS5-ECAM/PS5-ECAM/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/premohq/PS5-ECAM/PS5-ECAM/docs/banner.png'},
+    'psflycast': {"icon": 'https://raw.githubusercontent.com/Press5elect/PSFlycast/main/shell/ps5/sce_sys/icon0.png', "hero": ''},
+    'genplus': {"icon": 'https://raw.githubusercontent.com/MisterTemaki/genplusgxPS5/main/ps5/app/sce_sys/icon0.png', "hero": ''},
+    'fbneo': {"icon": 'https://raw.githubusercontent.com/MisterTemaki/fbneo-ps5/main/ps5/app/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/MisterTemaki/fbneo-ps5/main/ps5/docs/banner.jpg'},
+    'pce': {"icon": 'https://raw.githubusercontent.com/MisterTemaki/beetlepcePS5/main/ps5/app/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/MisterTemaki/beetlepcePS5/main/docs/banner.jpg'},
+    'ps5x360': {"icon": 'https://raw.githubusercontent.com/BrinooTk/PS5X360/main/assets/branding/icon0.png', "hero": 'https://raw.githubusercontent.com/BrinooTk/PS5X360/main/assets/branding/pic0.png'},
+    'xpsemu': {"icon": 'https://raw.githubusercontent.com/ZiZc3/XPSemu/main/ps5/sce_sys/icon0.png', "hero": ''},
+    'retroarch': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_RetroArch/main/sce_sys/icon0.png', "hero": ''},
+    'ruffle': {"icon": 'https://raw.githubusercontent.com/ZiZc3/Ruffle-Flash-PS5/main/ps5/sce_sys/icon0.png', "hero": ''},
+    'vlc': {"icon": 'https://raw.githubusercontent.com/ZiZc3/VLC/main/ps5/sce_sys/icon0.png', "hero": ''},
+    'jelly5': {"icon": 'https://raw.githubusercontent.com/02dnot/Jelly5/main/app/sce_sys/icon0.png', "hero": ''},
+    'emby5': {"icon": 'https://raw.githubusercontent.com/bornaradusin/Emby5/main/app/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/bornaradusin/Emby5/main/app/sce_sys/pic0.png'},
+    'pshare': {"icon": 'https://raw.githubusercontent.com/StonedModder/PShare/main/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/StonedModder/PShare/main/docs/banner.png'},
+    'chiral': {"icon": 'https://raw.githubusercontent.com/Herbrax/Chiral-FTP/main/ps5/sce_sys/icon0.png', "hero": ''},
+    'chiaki': {"icon": 'https://raw.githubusercontent.com/streetpea/chiaki-ng/main/assets/official-artwork/Chiaki-ng%20logo%20color.png', "hero": 'https://raw.githubusercontent.com/streetpea/chiaki-ng/main/gui/res/chiaking-logo.svg', "bg": ["#0e1626", "#05080f"]},
+    'patchdl': {"icon": 'https://raw.githubusercontent.com/knutwurst/ps5-patchdl/main/assets/icon0.png', "hero": ''},
+    'forge': {"icon": 'https://raw.githubusercontent.com/quer3q/ps5-dump-forge/main/ps5/icon0.png', "hero": ''},
+    'pkgmanager': {"icon": 'https://raw.githubusercontent.com/itsPLK/ps5-pkg-manager/main/assets/icon0.png', "hero": ''},
+    'ps5linux': {"bg": ["#2b2f3a", "#0f1116"], "icon": 'https://raw.githubusercontent.com/ps5-linux/ps5-linux-loader/main/logo.webp', "hero": ''},
+    'bazzite': {"icon": 'https://raw.githubusercontent.com/ublue-os/bazzite/main/press_kit/Bazzite_Color.svg', "hero": 'https://raw.githubusercontent.com/ublue-os/bazzite/main/press_kit/Bazzite_Color_Long.svg', "bg": ["#6a3fd8", "#24196b"]},
+    'mihawkos': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_MihawkOS/main/ps5/sce_sys/icon0.png', "hero": ''},
+    'smplusgui': {"icon": 'https://raw.githubusercontent.com/KarnerF/SMPlusGui/main/assets-app/icon1.png', "hero": ''},
+    'tailscale': {"icon": 'https://raw.githubusercontent.com/holdmysocks/ps5-tailscale/main/appicon/icon0.png', "hero": ''},
+    'patchsys': {"icon": '', "hero": 'https://github.com/user-attachments/assets/fd047e71-391e-46d2-91a8-5bde99dfdf7d'},
+    'neoenabler': {"icon": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/assets/icon0.png', "hero": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/docs/panel-games.jpg'},
+    'zftpd': {"icon": 'https://raw.githubusercontent.com/seregonwar/zftpd/main/assets/zftpd-logo.png', "hero": ''},
+}

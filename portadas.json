@@ -1,0 +1,4 @@
+{
+  "_ayuda": "Correcciones de portadas de Novedades de la scene. Clave: el id o el nombre del port (en minúsculas). use: 'icon' (su icono), 'shot' (su primera captura) o 'hero' con una URL de imagen (https, de GitHub). Solo cambia lo que está aquí.",
+  "burnout 3: takedown": {"use": "shot"}
+}

@@ -33,6 +33,41 @@ class Cancelled(Exception):
     pass
 
 
+
+NET_HTTP = {401: "pide usuario y contraseña, 401", 403: "el servidor no deja descargarlo, 403", 404: "no existe en el servidor, 404",
+            410: "ya no existe en el servidor, 410", 429: "el servidor pide esperar un rato, 429"}
+
+
+def net_reason(e):
+    """Explica un fallo de red con palabras normales (en vez de «<urlopen error [Errno -2]…>»)."""
+    code = getattr(e, "code", None)
+    if isinstance(e, str):
+        m = re.match(r"HTTP (\d+)$", e.strip())
+        code = int(m.group(1)) if m else None
+    if code:
+        if code in NET_HTTP:
+            return NET_HTTP[code]
+        if 500 <= code < 600:
+            return "el servidor tiene un problema ahora mismo, %d" % code
+        return "el servidor contesta %d" % code
+    t = str(getattr(e, "reason", "") or e)
+    tl = t.lower()
+    if any(k in tl for k in ("name or service not known", "getaddrinfo", "nodename nor servname", "11001", "temporary failure in name")):
+        return "no encuentro ese servidor: revisa el enlace y que haya internet"
+    if "tunnel connection failed" in tl or "proxy" in tl:
+        return "el proxy de tu red no deja pasar"
+    if "timed out" in tl or "timeout" in tl:
+        return "el servidor tarda demasiado en contestar"
+    if "refused" in tl or "10061" in tl:
+        return "el servidor no acepta la conexión"
+    if "reset" in tl or "10054" in tl or "remote end closed" in tl:
+        return "se cortó la conexión"
+    if "certificate" in tl or "ssl" in tl:
+        return "problema con el certificado seguro del servidor"
+    if "network is unreachable" in tl or "no route" in tl or "10051" in tl:
+        return "no hay conexión a internet"
+    return t[:160]
+
 class PipeError(Exception):
     pass
 
@@ -369,7 +404,7 @@ class UrlSource:
                 if e.code in (401, 403, 404, 410):
                     break
             except Exception as e:  # red
-                last = str(e)
+                last = net_reason(e)
             time.sleep(2 * (attempt + 1))
         hint = ""
         if last == "HTTP 403" and "akirabox.com/download/" in self.original:
@@ -379,7 +414,8 @@ class UrlSource:
         elif last == "HTTP 403":
             hint = (" -- El servidor rechaza a este programa (403). Si el enlace ha caducado, "
                     "genera uno nuevo.")
-        raise PipeError("No se puede abrir el enlace (%s): %s%s" % (last, self.original, hint))
+        raise PipeError("No se puede abrir el enlace (%s): %s%s" % (net_reason(last) if last.startswith("HTTP ") else last,
+                                                                    self.original, hint))
 
     # -- lectura ----------------------------------------------------------
     def stream(self, offset, cfg, cancel, meter):

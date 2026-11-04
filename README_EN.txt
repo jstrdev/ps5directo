@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.0 — USER GUIDE (English)
+PS5 DIRECTO 2.0.1 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -24,7 +24,7 @@ Something wrong? Settings > "Full check" tells you what and how to fix it.
 Note: PS5 Directo is a file manager: it only moves, converts and organises
 the files you choose. It doesn't include or host any content, BIOS, keys or
 firmware, doesn't connect to Sony's servers and has no payload of its own.
-The programs in "Recommended" are downloaded from their authors' official
+The programs in "Discover" are downloaded from their authors' official
 GitHub pages and belong to their authors. Use it with content you have the
 right to use (your own backups and homebrew), at your own responsibility.
 
@@ -342,6 +342,19 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.0.1 - New icons across the app: line icons in the same style as the format
+  cards instead of emojis. Discover shows each project's real artwork (its
+  official icon and image, or RecompStore's), cached on your PC. Library: a
+  type row (All · Titles · Emulators · Media · Tools), a single "Discover and
+  add more to your library" shortcut, uniform cards with the same buttons in
+  the same place, official art when the console has no cover, and dismissable
+  tips. PC on the PS5 (was "Linux and Steam"): step-by-step guides in your
+  language for Linux (Ubuntu), Bazzite Deck and MihawkOS that check your
+  firmware and running payloads, download the image to your PC with one click
+  and send the loader. Step-by-step Remote Play setup (chiaki-ng + PIN). Scene news syncs the whole PS5 catalog with full-size
+  art. Errors in plain words, single links checked before
+  queueing, dates in the app's language. Fixed: Activity and Backup on phones,
+  half-translated messages, a lone tile in System.
 2.0.0 - Firmware guard (System): checks every 10 minutes whether the console
   has downloaded a system update and warns you (also on Telegram or Discord);
   remove it with one click or automatically, and optionally block the update

@@ -4,6 +4,7 @@ Arranque:  python app.py   (o doble clic en "Iniciar PS5 Directo.bat")
 """
 
 import ftplib
+import hashlib
 import io
 import json
 import re
@@ -48,7 +49,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -5559,8 +5560,8 @@ def _extract_job(job, info, cancel):
     if last_err is not None:
         msg = str(last_err).lower()
         if "aes" in msg:
-            raise E.PipeError("Este ZIP usa cifrado AES y BFpilot todavia no sabe abrirlo (solo el cifrado "
-                              "ZIP clasico). Los archivos ya estan en la PS5, en %s. Puedes bajarlos al PC, "
+            raise E.PipeError("Este ZIP usa cifrado AES y tu BFpilot no sabe abrirlo: actualizalo a la 0.4.9 o posterior, "
+                              "que ya lo abre. Los archivos ya estan en la PS5, en %s. Puedes bajarlos al PC, "
                               "extraerlos con 7-Zip y subir la carpeta." % info["dir"])
         if "unsupported archive type" in msg and re.search(r"\.z\d{2}$|\.zip$", info["first"], re.I):
             raise E.PipeError("BFpilot no abre ZIP partidos (.z01, .z02...). Uno los RAR/7z partidos, "
@@ -8300,8 +8301,95 @@ def rec_installed(f):
     return have
 
 
+
+# ---------------------------------------------------------------------------
+# Arte de «Descubrir» y de las novedades: portadas e iconos oficiales de cada proyecto (su GitHub o el catálogo de
+# RecompStore). Se bajan una vez y se guardan en ~/.ps5directo/arte, así se ven al instante y también sin internet.
+# ---------------------------------------------------------------------------
+ART_DIR = os.path.join(DATA_DIR, "arte")
+ART_HOSTS = ("raw.githubusercontent.com", "githubusercontent.com", "github.com", "recompstore.com")
+ART_TYPES = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "webp": "image/webp", "svg": "image/svg+xml",
+             "gif": "image/gif"}
+
+
+def _art_host_ok(u):
+    try:
+        pu = urllib.parse.urlparse(u)
+    except Exception:
+        return False
+    h = (pu.hostname or "").lower()
+    extra = urllib.parse.urlparse(RECOMP_URL).hostname or ""
+    if pu.scheme == "http" and h in ("127.0.0.1", "localhost") and h == extra:
+        return True                                  # el catálogo de pruebas
+    return pu.scheme == "https" and (h == extra or any(h == x or h.endswith("." + x) for x in ART_HOSTS))
+
+
+def art_get(u):
+    """Devuelve (bytes, tipo) de una imagen de arte, de la caché o bajándola (máx. 12 MB)."""
+    u = (u or "").strip()
+    if not u or len(u) > 600 or not _art_host_ok(u):
+        return None
+    key = hashlib.sha1(u.encode("utf-8")).hexdigest()
+    path = os.path.join(ART_DIR, key)
+    try:
+        if os.path.isfile(path) and time.time() - os.path.getmtime(path) < 30 * 86400:
+            with open(path, "rb") as fh:
+                data = fh.read()
+            with open(path + ".t", encoding="utf-8") as fh:
+                return data, fh.read().strip() or "image/png"
+    except Exception:
+        pass
+    try:
+        req = urllib.request.Request(u, headers={"User-Agent": "PS5Directo/" + VERSION})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = r.read(12 * 1024 * 1024 + 1)
+            ctype = (r.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        if len(data) > 12 * 1024 * 1024:
+            return None
+        if not ctype.startswith("image/"):
+            ext = u.rsplit("?", 1)[0].rsplit(".", 1)[-1].lower()
+            ctype = ART_TYPES.get(ext, "")
+        if not ctype.startswith("image/"):
+            return None
+        head = data[:200].lstrip()
+        if not (data[:4] in (b"\x89PNG", b"GIF8", b"RIFF") or data[:3] == b"\xff\xd8\xff" or head[:5] in (b"<?xml", b"<svg ")
+                or head[:4] == b"<svg"):
+            return None                              # p. ej. un puntero de Git LFS en vez de la imagen
+        os.makedirs(ART_DIR, exist_ok=True)
+        with open(path, "wb") as fh:
+            fh.write(data)
+        with open(path + ".t", "w", encoding="utf-8") as fh:
+            fh.write(ctype)
+        return data, ctype
+    except Exception:
+        try:                                         # sin internet: vale la copia vieja
+            with open(path, "rb") as fh:
+                data = fh.read()
+            with open(path + ".t", encoding="utf-8") as fh:
+                return data, fh.read().strip() or "image/png"
+        except Exception:
+            return None
+
+
+def rec_art(c):
+    """Portada (hero) e icono de un programa de «Descubrir»: los oficiales de su proyecto o, si no, los del catálogo
+    de RecompStore para ese mismo repositorio."""
+    a = dict(F.CATALOG_ART.get(c["id"]) or {})
+    if not (a.get("icon") and a.get("hero")):
+        repo = (c.get("repo") or "").lower()
+        with LOCK:
+            m = next((x for x in RECOMP["items"] if (x.get("repo") or "").lower() == repo), None) if repo else None
+        if m:
+            a["icon"] = a.get("icon") or m.get("icon") or ""
+            a["hero"] = a.get("hero") or m.get("hero") or ""
+    return {"icon": a.get("icon") or "", "hero": a.get("hero") or "", "bg": a.get("bg") or []}
+
 def rec_list():
     cfg = cfg_snapshot()
+    try:
+        recomp_fetch()                               # para el arte de los que no traen el suyo
+    except Exception:
+        pass
     try:
         have = E.Ftp(cfg).call(rec_installed)
         ok = True
@@ -8313,6 +8401,7 @@ def rec_list():
         it["exp"] = bool(c.get("exp"))
         it["sys"] = c.get("sys", "")
         it["update"] = c.get("update", "")
+        it.update(rec_art(c))
         if c["kind"] == "app":
             it["tid"] = c["tid"]
             tids = [c["tid"]] + list(c.get("also") or [])
@@ -8340,6 +8429,220 @@ def rec_list():
         out.append(it)
     return {"items": out, "console": ok}
 
+
+
+# ---------------------------------------------------------------------------
+# Linux, Bazzite y MihawkOS: lo que se puede comprobar y hacer desde aquí para sus asistentes paso a paso
+# ---------------------------------------------------------------------------
+OS_IMAGES = {
+    "ps5linux": ("ps5-linux/ps5-linux-image", [r"(?i)ps5-ubuntu.*\.img\.xz$", r"(?i)ubuntu.*\.img\.(xz|zst|gz)$", r"(?i)\.img\.xz$"]),
+    "bazzite": ("VivaLaVent/ps5-bazzite-deck", [r"(?i)\.img\.(xz|zst|gz)$", r"(?i)\.raw\.(xz|zst)$", r"(?i)\.img$",
+                                                r"(?i)\.(7z|zip)$"]),
+}
+
+
+
+# ---------------------------------------------------------------------------
+# Traducción automática de las descripciones de las Novedades (vienen en inglés, como las publica cada autor).
+# Solo se manda ese texto al traductor de Google; cada frase se traduce una vez y se guarda en el PC.
+# ---------------------------------------------------------------------------
+TR_URL = os.environ.get("PS5D_TR") or "https://translate.googleapis.com/translate_a/single"
+TR_FILE = os.path.join(DATA_DIR, "traducciones.json")
+TR_CACHE = {"d": None}
+
+
+def _tr_one(text, to):
+    q = urllib.parse.urlencode({"client": "gtx", "sl": "auto", "tl": to, "dt": "t", "q": text})
+    req = urllib.request.Request(TR_URL + "?" + q, headers={"User-Agent": "Mozilla/5.0 PS5Directo/" + VERSION})
+    with urllib.request.urlopen(req, timeout=12) as r:
+        j = json.loads(r.read(400000).decode("utf-8", "replace"))
+    out = "".join(seg[0] for seg in (j[0] or []) if seg and seg[0])
+    return out.strip()
+
+
+def tr_texts(texts, to="es"):
+    """Traduce una lista de textos (con caché en disco). Lo que no se pueda traducir vuelve vacío."""
+    to = to if re.match(r"^[a-z]{2}(-[A-Z]{2})?$", to) else "es"
+    with LOCK:
+        if TR_CACHE["d"] is None:
+            try:
+                with open(TR_FILE, encoding="utf-8") as fh:
+                    TR_CACHE["d"] = json.load(fh)
+            except Exception:
+                TR_CACHE["d"] = {}
+        cache = TR_CACHE["d"]
+    keys = [hashlib.sha1((to + "|" + t).encode("utf-8")).hexdigest() for t in texts]
+    out = [cache.get(k, "") for k in keys]
+    todo = [i for i, t in enumerate(texts) if t.strip() and not out[i]]
+    if todo:
+        import concurrent.futures
+        def work(i):
+            try:
+                return i, _tr_one(texts[i][:4500], to)
+            except Exception:
+                return i, ""
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
+            for i, r in ex.map(work, todo):
+                if r:
+                    out[i] = r
+                    cache[keys[i]] = r
+        with LOCK:
+            if len(cache) > 6000:
+                for k in list(cache)[:2000]:
+                    cache.pop(k, None)
+            try:
+                os.makedirs(DATA_DIR, exist_ok=True)
+                with open(TR_FILE, "w", encoding="utf-8") as fh:
+                    json.dump(cache, fh, ensure_ascii=False)
+            except Exception:
+                pass
+    return out
+
+
+def recomp_install(rid):
+    """Instala en la consola algo del catálogo de RecompStore: la última versión de su GitHub, como los de Descubrir."""
+    with LOCK:
+        x = next((i for i in RECOMP["items"] if i["id"] == rid), None)
+    if not x or not x.get("repo"):
+        raise E.PipeError("No sé de dónde bajarlo: no tiene página en GitHub")
+    tag, assets = F.github_release(x["repo"])
+    def pick(exts):
+        hits = [a for a in assets if (a.get("name") or "").lower().endswith(exts) and "source" not in (a.get("name") or "").lower()]
+        hits.sort(key=lambda a: (not re.search(r"(?i)ps5|ppsa|prospero", a.get("name") or ""), -(a.get("size") or 0)))
+        return hits[0] if hits else None
+    a = pick((".zip", ".7z", ".rar"))
+    if a:
+        job = new_job([a["browser_download_url"]], "", "/data/homebrew", title="%s %s" % (x["name"], tag or ""), where="ps5")
+    else:
+        a = pick((".pkg",))
+        if a:
+            job = new_job([a["browser_download_url"]], "", "/data/pkg", title="%s %s" % (x["name"], tag or ""), where="ps5",
+                          raw=True)
+        elif pick((".elf", ".bin")):
+            raise E.PipeError("%s es un payload: cárgalo con Payload Manager o con el cargador de ELF." % x["name"])
+        else:
+            raise E.PipeError("La última versión de %s no trae nada que sepa instalar. Míralo en github.com/%s/releases"
+                              % (x["name"], x["repo"]))
+    with WAKE:
+        JOBS.append(job)
+        WAKE.notify_all()
+    save_jobs()
+    return {"file": a["name"], "pkg": a["name"].lower().endswith(".pkg")}
+
+
+PATCH_DIR = os.path.join(DATA_DIR, "parches")
+
+
+def _patches_zip(max_age=86400):
+    """patch1.zip de PS-Game-Patch (los parches de la comunidad), guardado en el PC y renovado una vez al día."""
+    import zipfile
+    path = os.path.join(PATCH_DIR, "patch1.zip")
+    fresh = os.path.isfile(path) and time.time() - os.path.getmtime(path) < max_age
+    if not fresh:
+        try:
+            tag, assets = F.github_release("illusionyy/PS-Game-Patch")
+            a = next((x for x in assets if re.match(r"(?i)^patch.*\.zip$", x.get("name") or "")), None)
+            if not a:
+                raise E.PipeError("La última versión de los parches no trae patch1.zip")
+            req = urllib.request.Request(a["browser_download_url"], headers={"User-Agent": "PS5Directo/" + VERSION})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                data = r.read(80 * 1024 * 1024)
+            os.makedirs(PATCH_DIR, exist_ok=True)
+            with open(path + ".part", "wb") as fh:
+                fh.write(data)
+            os.replace(path + ".part", path)
+        except Exception:
+            if not os.path.isfile(path):
+                raise
+    return zipfile.ZipFile(path)
+
+
+def patches_index():
+    """Title ID -> nombres de los parches que hay para él (para avisar en la biblioteca)."""
+    idx_path = os.path.join(PATCH_DIR, "indice.json")
+    try:
+        z = _patches_zip()
+        src = os.path.getmtime(os.path.join(PATCH_DIR, "patch1.zip"))
+        if os.path.isfile(idx_path) and os.path.getmtime(idx_path) >= src:
+            with open(idx_path, encoding="utf-8") as fh:
+                return json.load(fh)
+        idx = {}
+        for n in z.namelist():
+            if not n.lower().endswith(".xml"):
+                continue
+            t = z.read(n)[:200000].decode("utf-8", "replace")
+            names = re.findall(r'(?i)<Metadata[^>]*\bName="([^"]{1,80})"', t) or re.findall(r'(?i)\bName="([^"]{1,80})"', t)[:3]
+            for tid in set(re.findall(r"(?:PPSA|CUSA)\d{5}", t.upper())):
+                cur = idx.setdefault(tid, [])
+                for nm in names[:6]:
+                    if nm not in cur:
+                        cur.append(nm)
+        with open(idx_path, "w", encoding="utf-8") as fh:
+            json.dump(idx, fh, ensure_ascii=False)
+        return idx
+    except Exception:
+        return {}
+
+
+def patches_sync():
+    """Deja los parches de la comunidad (PS-Game-Patch) en /data/user/patches de la consola."""
+    z = _patches_zip(max_age=3600)
+    files = [n for n in z.namelist() if not n.endswith("/") and re.search(r"(?i)(^|/)xml_(prospero|orbis)/", n)]
+    if not files:
+        raise E.PipeError("patch1.zip no trae las carpetas xml_prospero ni xml_orbis")
+    def run(f):
+        done = 0
+        for n in files:
+            rel = n[n.lower().index("xml_"):]
+            dst = "/data/user/patches/" + rel
+            E.Ftp.mkdirs(f, posixpath.dirname(dst))
+            f.storbinary("STOR " + dst, io.BytesIO(z.read(n)))
+            done += 1
+        return done
+    n = E.Ftp(cfg_snapshot()).call(run)
+    return {"files": n}
+
+
+def os_check():
+    """Firmware que tienes puesto, si hay Payload Manager y qué tiene en marcha (sin lo del propio sistema)."""
+    cfg = cfg_snapshot()
+    pm = F.PayloadManager(cfg["ps5_ip"])
+    ver, procs, names = "", [], []
+    try:
+        ver = pm.version()
+        if ver:
+            procs = pm.processes()
+    except Exception:
+        pass
+    for x in procs:
+        n = str(x.get("name") or "")
+        if n and not n.startswith("Sce") and n not in names:
+            names.append(n)
+    return {"fw": SETTINGS.get("console_fw") or "", "pm": bool(ver), "procs": names[:40],
+            "loader": _port_open(cfg["ps5_ip"], cfg.get("elf_port") or 9021, 1.5)}
+
+
+def os_image(oid):
+    """Pone en la cola la imagen de Linux o de Bazzite (la última publicada en su GitHub) para bajarla a tu PC."""
+    if oid not in OS_IMAGES:
+        raise E.PipeError("No lo conozco")
+    repo, rxs = OS_IMAGES[oid]
+    tag, assets = F.github_release(repo)
+    a = None
+    for rx in rxs:
+        hits = [x for x in assets if re.search(rx, x.get("name") or "")]
+        if hits:
+            a = max(hits, key=lambda x: x.get("size") or 0)
+            break
+    if not a:
+        raise E.PipeError("La última versión (%s) no trae una imagen que reconozca. Míralo en github.com/%s/releases"
+                          % (tag or "?", repo))
+    job = new_job([a["browser_download_url"]], "", SETTINGS["dest"], title=a["name"], where="keep", keep_steps="dl")
+    with WAKE:
+        JOBS.append(job)
+        WAKE.notify_all()
+    save_jobs()
+    return {"file": a["name"], "size": a.get("size") or 0, "tag": tag}
 
 def rec_install(cid, update=False):
     """Pone en la cola la ultima version oficial (su GitHub) de un programa de «Recomendados». Con update, lo nuevo
@@ -9671,8 +9974,13 @@ def github_latest(repo):
     req = urllib.request.Request("https://api.github.com/repos/%s/releases/latest" % repo,
                                  headers={"User-Agent": "PS5Directo/" + VERSION,
                                           "Accept": "application/vnd.github+json"})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        j = json.load(r)
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            j = json.load(r)
+    except urllib.error.HTTPError as e:
+        if e.code not in (403, 429):
+            raise
+        return _github_latest_web(repo)          # la API limita las consultas: se mira la web de releases
     url = None
     zips = [a for a in j.get("assets") or [] if a.get("name", "").lower().endswith(".zip")]
     # el mas ligero primero: "without-Python" (o el normal de antes); el que trae Python, el ultimo
@@ -9683,6 +9991,22 @@ def github_latest(repo):
         url = zips[0].get("browser_download_url")
     url = url or j.get("zipball_url")
     return (j.get("tag_name") or "").lstrip("vV"), url, (j.get("body") or "")[:12000]
+
+
+def _github_latest_web(repo):
+    """Lo mismo que github_latest sin la API de GitHub (que limita a 60 consultas por hora): la página «latest»
+    redirige a la etiqueta de la última versión, y el zip se llama como lo publica la acción de GitHub."""
+    req = urllib.request.Request("https://github.com/%s/releases/latest" % repo,
+                                 headers={"User-Agent": "PS5Directo/" + VERSION})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        final = r.geturl()
+    m = re.search(r"/releases/tag/([^/?#]+)", final)
+    if not m:
+        raise E.PipeError("GitHub ha limitado las consultas desde tu conexión: prueba en un rato o instala el .zip a mano")
+    tag = urllib.parse.unquote(m.group(1))
+    ver = tag.lstrip("vV")
+    url = "https://github.com/%s/releases/download/%s/PS5Directo-%s-Windows.zip" % (repo, urllib.parse.quote(tag), ver)
+    return ver, url, ""
 
 
 # ---------------------------------------------------------------------------
@@ -9857,6 +10181,21 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "image/png")
             self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+            return
+        if self.path.startswith("/api/art?"):
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            if not token_ok((q.get("t") or [""])[0]):
+                return self._send(403, {"ok": False})
+            got = art_get((q.get("u") or [""])[0])
+            if not got:
+                return self._send(404, {"ok": False})
+            data, ctype = got
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "private, max-age=604800")
             self.end_headers()
             self.wfile.write(data)
             return
@@ -11044,6 +11383,30 @@ def _recomp_item(x, soon):
     tags = x.get("tags") if isinstance(x.get("tags"), list) else []
     req = [r for r in (x.get("requires") or []) if isinstance(r, str)][:8]
     when = str(x.get("released") or x.get("date") or "")[:25]
+    shots = []
+    for k in ("screenshots", "images", "gallery", "media", "shots"):
+        for v in (x.get(k) if isinstance(x.get(k), list) else []):
+            u = v if isinstance(v, str) else (v.get("url") or v.get("src") or v.get("image") or "") if isinstance(v, dict) else ""
+            if u and not re.search(r"\.(mp4|webm|m3u8)(\?|$)", str(u), re.I):
+                shots.append(str(u))
+    vid = ""
+    for k in ("video", "trailer", "youtube"):
+        v = x.get(k)
+        v = v.get("url") if isinstance(v, dict) else v
+        if isinstance(v, str) and re.match(r"^https://", v):
+            vid = v[:300]
+            break
+    pop = 0
+    for k, v in x.items():                         # downloads, downloadCount, installs, popularity, stars…
+        if re.search(r"(?i)download|install|popular|views|stars|likes|plays", str(k)) and not isinstance(v, (dict, list, bool)):
+            try:
+                pop = max(pop, int(float(v or 0)))
+            except (TypeError, ValueError):
+                pass
+        elif isinstance(v, dict) and re.search(r"(?i)stat|metric|count", str(k)):
+            for k2, v2 in v.items():
+                if re.search(r"(?i)download|install|popular|views", str(k2)) and isinstance(v2, (int, float)):
+                    pop = max(pop, int(v2))
     def url(u):
         u = str(u or "")
         if u.startswith("/"):
@@ -11055,8 +11418,38 @@ def _recomp_item(x, soon):
             "needs": str(x.get("needs") or "")[:600], "version": str(x.get("version") or "")[:30],
             "when": when, "repo": repo if re.match(r"^[\w.-]+/[\w.-]+$", repo) else "",
             "icon": url(x.get("icon")), "hero": url(x.get("hero") or x.get("banner")), "tags": [str(t)[:30] for t in tags][:8],
-            "requires": req, "soon": soon, "news": str(x.get("news") or "")[:600]}
+            "requires": req, "soon": soon, "news": str(x.get("news") or "")[:600],
+            "shots": [u for u in (url(v) for v in shots) if u][:8], "video": vid, "pop": pop,
+            "added": str(x.get("added") or x.get("addedAt") or x.get("createdAt") or x.get("created") or x.get("dateAdded")
+                         or x.get("firstReleased") or x.get("published") or "")[:25]}
 
+
+
+# Correcciones de portadas (portadas.json en el GitHub de PS5 Directo): para los pocos casos en que la imagen del
+# catálogo no representa bien un port. Solo cambia lo que está en la lista.
+COVERS_URL = os.environ.get("PS5D_COVERS") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/portadas.json"
+COVERS = {"t": 0, "d": {}}
+
+
+def covers_fix():
+    if time.time() - COVERS["t"] < 6 * 3600:
+        return COVERS["d"]
+    d = {}
+    try:
+        req = urllib.request.Request(COVERS_URL, headers={"User-Agent": "PS5Directo/" + VERSION})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            j = json.loads(r.read(500000).decode("utf-8", "replace"))
+        if isinstance(j, dict):
+            d = {str(k).lower(): v for k, v in j.items() if isinstance(v, dict) and not str(k).startswith("_")}
+    except Exception:
+        try:
+            with open(os.path.join(HERE, "portadas.json"), encoding="utf-8") as fh:
+                j = json.load(fh)
+            d = {str(k).lower(): v for k, v in j.items() if isinstance(v, dict) and not str(k).startswith("_")}
+        except Exception:
+            d = COVERS["d"]
+    COVERS.update(t=time.time(), d=d)
+    return d
 
 def recomp_fetch(force=False):
     with LOCK:
@@ -11068,16 +11461,34 @@ def recomp_fetch(force=False):
         with urllib.request.urlopen(req, timeout=20) as r:
             j = json.loads(r.read(8 * 1024 * 1024).decode("utf-8", "replace"))
         items, seen = [], set()
-        for key, soon in (("apps", False), ("newerStoreApps", False), ("v2Apps", False), ("comingSoon", True),
-                          ("comingSoonV2", True)):
+        known = ["apps", "newerStoreApps", "v2Apps", "comingSoon", "comingSoonV2"]
+        keys = known + [k for k, v in j.items() if k not in known and isinstance(v, list) and v and isinstance(v[0], dict)]
+        for key in keys:                              # todas las listas del catálogo, también las que añadan más adelante
+            soon = "soon" in key.lower()
             for x in j.get(key) or []:
-                if not isinstance(x, dict) or x.get("beta") or x.get("testing"):
+                if not isinstance(x, dict) or x.get("beta") or x.get("testing") or not (x.get("name") or x.get("id")):
                     continue
+                plat = x.get("platform") or x.get("platforms") or ""
+                plat = " ".join(plat) if isinstance(plat, list) else str(plat)
+                if plat and "ps5" not in plat.lower():
+                    continue                          # solo lo de PS5 (el catálogo también puede traer cosas de PC)
                 it = _recomp_item(x, soon)
                 if it["id"] and it["id"] not in seen:
                     seen.add(it["id"])
+                    it["pos"] = len(items)            # orden del catálogo (las tiendas añaden lo nuevo al final)
+                    it["src"] = key
                     items.append(it)
         items.sort(key=lambda x: (not x["soon"], x["when"]), reverse=True)
+        rank = []                                     # listas de «populares» del catálogo (ids o fichas, en orden)
+        for k, v in j.items():
+            if isinstance(v, list) and re.search(r"(?i)popular|trending|top|featured|mostused", k):
+                for e in v:
+                    i = e if isinstance(e, str) else (e.get("id") if isinstance(e, dict) else None)
+                    if i and i not in rank:
+                        rank.append(str(i))
+        for it in items:
+            if it["id"] in rank:
+                it["prank"] = rank.index(it["id"]) + 1
         prev = {}
         try:
             with open(RECOMP_FILE, encoding="utf-8") as fh:
@@ -11085,6 +11496,11 @@ def recomp_fetch(force=False):
         except Exception:
             pass
         known = set(prev.get("known") or [])
+        seen_at = dict(prev.get("seen_at") or {})      # cuándo vio PS5 Directo cada cosa por primera vez
+        now = int(time.time())
+        for it in items:
+            seen_at.setdefault(it["id"], 0 if not known else now)
+            it["seen"] = seen_at[it["id"]]
         first = not known
         for it in items:
             it["new"] = (not first) and it["id"] not in known
@@ -11092,7 +11508,7 @@ def recomp_fetch(force=False):
         unseen = [it["id"] for it in items if it["new"]]
         try:
             with open(RECOMP_FILE, "w", encoding="utf-8") as fh:
-                json.dump({"known": [it["id"] for it in items], "unseen": unseen}, fh)
+                json.dump({"known": [it["id"] for it in items], "unseen": unseen, "seen_at": seen_at}, fh)
         except OSError:
             pass
         with LOCK:
@@ -11168,6 +11584,7 @@ CREDITS_CORE = [
     ("ShadowMountPlus", "drakmor/ShadowMountPlus", "Monta las imágenes .exfat y .ffpkg"),
     ("PS5 Payload SDK", "ps5-payload-dev/sdk", "Herramientas con las que se hacen los payloads"),
     ("rclone", "rclone/rclone", "Mis almacenamientos (nubes)"),
+    ("Bazzite (press kit)", "ublue-os/bazzite", "Logo e imagen de la tarjeta de Bazzite Deck en Descubrir"),
     ("7-Zip", "ip7z/7zip", "Descomprimir en el PC"),
     ("aria2", "aria2/aria2", "Torrents"),
     ("FFmpeg", "FFmpeg/FFmpeg", "Convertir vídeos de las capturas"),
@@ -11236,8 +11653,9 @@ def extra_api(h, p, b):
                 recomp_seen()
                 return {"ok": True}
             recomp_fetch(force=bool(b.get("refresh")))
+            fix = covers_fix()
             with LOCK:
-                return {"ok": True, "items": RECOMP["items"], "error": RECOMP["error"], "updated": RECOMP["updated"],
+                return {"ok": True, "items": RECOMP["items"], "covers": fix, "error": RECOMP["error"], "updated": RECOMP["updated"],
                         "source": "recompstore.com"}
         if p == "/api/wiki":
             return dict(ok=True, **wiki_summary(b.get("title"), b.get("lang")))
@@ -11503,14 +11921,29 @@ def extra_api(h, p, b):
             return {"ok": True, "ip": ip, "mac": mac, "bcast": ip.rsplit(".", 1)[0] + ".255" if ip else ""}
         if p == "/api/rec/list":
             return dict(ok=True, **rec_list())
+        if p == "/api/tr":
+            return {"ok": True, "out": tr_texts([str(x) for x in (b.get("texts") or [])][:80], str(b.get("to") or "es"))}
+        if p == "/api/recomp/install":
+            return dict(ok=True, **recomp_install(str(b.get("id") or "")))
+        if p == "/api/patches/index":
+            return {"ok": True, "idx": patches_index()}
+        if p == "/api/patches/sync":
+            return dict(ok=True, **patches_sync())
+        if p == "/api/os/check":
+            return dict(ok=True, **os_check())
+        if p == "/api/os/image":
+            return dict(ok=True, **os_image(str(b.get("id") or "")))
         if p == "/api/rec/kinds":
             # Title ID -> categoria de «Descubrir», sin red: para el filtro de tipo de la biblioteca
-            kinds = {}
+            kinds, art = {}, {}
             for c in F.CATALOG:
                 if c["kind"] == "app":
+                    ic = (F.CATALOG_ART.get(c["id"]) or {}).get("icon") or ""
                     for t in [c["tid"]] + list(c.get("also") or []):
                         kinds[t.upper()] = c.get("group") or "tool"
-            return {"ok": True, "kinds": kinds}
+                        if ic:
+                            art[t.upper()] = ic
+            return {"ok": True, "kinds": kinds, "art": art}
         if p == "/api/rec/install":
             return dict(ok=True, **rec_install(str(b.get("id") or ""), bool(b.get("update"))))
         if p == "/api/col/reveal":

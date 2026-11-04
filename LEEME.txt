@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.0
+PS5 DIRECTO 2.0.1
 =================
 (English: see README_EN.txt)
 
@@ -6,7 +6,7 @@ AVISO
   PS5 Directo es un gestor de archivos: solo mueve, convierte y organiza los
   archivos que tú eliges. No trae ni aloja contenido, BIOS, claves ni
   firmware, no se conecta a servidores de Sony y no incluye payloads
-  propios. Los programas de «Recomendados» se bajan de la página oficial de
+  propios. Los programas de «Descubrir» se bajan de la página oficial de
   su autor en GitHub y son de sus autores. Úsalo con contenido que tengas
   derecho a usar (tus propias copias y homebrew). Cada uno lo usa bajo su
   responsabilidad.
@@ -331,6 +331,73 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.0.1
+- Iconos nuevos en toda la app: de línea, del mismo estilo que las
+  tarjetas de formato, en vez de emojis (pestañas, barra del móvil, menú
+  ⋯, Ajustes, Descubrir y avisos).
+- Descubrir con portadas reales: el arte oficial de cada proyecto (su
+  icono y su imagen de GitHub, o los del catálogo de RecompStore) en vez
+  de iconos repetidos. Se guardan en el PC y se ven también sin internet.
+  Las Novedades de la scene, igual.
+- Biblioteca: fila de tipos (Todo · Títulos · Emuladores · Multimedia ·
+  Herramientas) para ver solo lo que te interesa, un único acceso
+  «Descubre y añade más a tu biblioteca», tarjetas todas iguales con los
+  mismos botones en el mismo sitio, y el arte oficial cuando la consola
+  no tiene portada. Los avisos de Game Updater y PatchDL se pueden cerrar
+  para siempre (✕).
+- PC en la PS5 (antes «Linux y Steam»): asistentes paso a paso en tu
+  idioma para Linux (Ubuntu), Bazzite Deck y MihawkOS. Comprueban tu
+  firmware y los payloads que tienes en marcha, bajan la imagen de Linux
+  o Bazzite a tu PC con un botón, te dicen cómo grabarla y qué poner en
+  la consola, y envían el cargador. MihawkOS va aparte: es otra cosa
+  (programas de Windows dentro de la PS5).
+- Remote Play paso a paso (Descubrir › Remote Play › «Configurar Remote
+  Play»): cuenta activada sin conexión, sacar el PIN con un botón,
+  instalar chiaki-ng, vincular (con la IP para copiar) y preparar la
+  consola. Marca cada paso hecho (0/5 … 5/5).
+- Novedades de la scene: se sincroniza todo el catálogo de PS5 de
+  RecompStore (antes se cortaba en 120 y faltaban secciones), con «Ver
+  más». Con la app en español, las descripciones se traducen solas (se
+  traducen una vez con el traductor de Google y se guardan en el PC). Las
+  portadas de los títulos vuelven a ocupar toda la tarjeta.
+- Instalar desde las Novedades: lo del catálogo de la scene que tiene
+  GitHub se instala con un clic (la última versión). En Emuladores sale
+  también «Más emuladores de la scene». Y en cada emulador, botón para
+  instalar tu propia versión (una build que tengas en el PC).
+- Transferencias más limpia: «Añadir desde» (archivos, carpeta, mis
+  almacenamientos, captar lo que copies y carpeta vigilada) en una sola
+  fila, las explicaciones en una «i» y los formatos en «¿Qué formatos
+  sirven?». No se pierde ninguna opción.
+- Inicio de Descubrir al estilo de RecompStore: categorías con su número
+  (Ports nativos, Emuladores, Aplicaciones, Herramientas), «Más
+  populares», «Lo más nuevo» y «Ports nativos» en tarjetas cuadradas.
+- Al pasar el ratón (o al tocar) por algo de la scene sale su ficha:
+  imagen grande, descripción traducida, capturas, vídeo si lo tiene,
+  requisitos y botón de instalar.
+- Portadas: botón para cambiar la imagen de cada tarjeta (arte, captura o
+  icono; se recuerda) y lista de correcciones (portadas.json en el GitHub
+  de PS5 Directo) para los pocos casos en que la del catálogo no sirve.
+- Descubrir suma lo de RecompStore a cada categoría (Emuladores, Apps y
+  multimedia, Herramientas), con su número, en «Más de la scene».
+- Mejorar tus títulos (Descubrir): ps-patch-system y NeoEnabler con los
+  pasos para usarlos, y la etiqueta «Parches» en la Biblioteca en los
+  títulos que tienen parches de la comunidad.
+- Parches de juegos (Herramientas): ps-patch-system con un botón para
+  poner en la consola los parches de la comunidad (PS-Game-Patch), y
+  NeoEnabler (PS4 en modo Pro).
+- «¿A dónde va?» tiene una tercera opción: «La PS5 lo baja sola» (zftpd).
+- EglantinePS5 (Switch 2) se baja de la versión que sí publica builds.
+- Errores que se entienden: «no encuentro ese servidor», «no existe en
+  el servidor (404)», «GitHub ha limitado las consultas»… en vez de
+  mensajes técnicos.
+- Antes de añadir a la cola se comprueba también un enlace suelto (antes
+  solo si eran varios).
+- Fechas en el formato del idioma de la app.
+- Arreglado: en el móvil, Actividad y Copia de seguridad se salían de la
+  pantalla; textos a medio traducir en inglés; en Sistema, un recuadro
+  se quedaba solo en otra fila; «Descargar de nuevo» ahora dice «Enviar
+  de nuevo» cuando lo que se mandó estaba en tu PC.
 
 NOVEDADES 2.0.0
 - Guardián del firmware (Sistema): mira cada 10 minutos si la consola ha

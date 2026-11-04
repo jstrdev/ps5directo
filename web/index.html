@@ -205,7 +205,7 @@ tr:hover .dots{opacity:1}
 .fm-drop.over::after{content:attr(data-drop);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,17,22,.75);color:var(--text);font-weight:600;border-radius:10px;pointer-events:none}
 .keys{font-size:11.5px;opacity:.7}
 .ctxmenu{position:fixed;z-index:60;min-width:210px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
-.ctxmenu button{display:flex;justify-content:space-between;gap:18px;width:100%;text-align:left;background:none;border:none;border-radius:6px;padding:7px 10px;font-size:13.5px}
+.ctxmenu button{display:flex;justify-content:flex-start;align-items:center;gap:4px;width:100%;text-align:left;background:none;border:none;border-radius:6px;padding:7px 10px;font-size:13.5px}
 .ctxmenu button:hover,.ctxmenu button:focus{background:rgba(61,139,253,.18);outline:none}
 .ctxmenu button.danger{color:#ffb4ae}
 .ctxmenu kbd{font:11.5px "Segoe UI",system-ui,sans-serif;color:var(--muted)}
@@ -457,7 +457,7 @@ a.btn-a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:9p
 .wz-step h3{margin:4px 0 8px;font-size:17px}.wz-n{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.wz-p{white-space:pre-line;line-height:1.55}.wz-nav{margin-top:16px}
 .em-sec{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
 .rc-guide{margin:6px 0;font-size:13px}.rc-guide ul{margin:6px 0 0;padding-left:18px}.rc-guide li{margin:3px 0}
-.sy-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.sy-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin:10px 0}
 .sy-tile{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel)}.sy-tile b{font-size:18px;display:block;margin:2px 0}
 .sy-ok{color:var(--ok)}.sy-warn{color:var(--warn)}.sy-bad{color:var(--err)}
 .sy-spark{width:100%;height:110px;color:var(--accent);border:1px solid var(--line);border-radius:10px;margin-top:4px}
@@ -490,6 +490,7 @@ a.btn-a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:9p
 .wl-note b{color:var(--text)}
 @media(max-width:720px){.wl-grid,.bkopts{grid-template-columns:1fr}}
 .gubar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 10px;padding:9px 12px;border-radius:10px;border:1px solid rgba(91,157,255,.35);background:rgba(91,157,255,.08);font-size:13.5px}
+.tipx{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:6px}.tipx:hover{color:var(--text);background:rgba(255,255,255,.06)}
 .gubar.warn{border-color:#6b5a2b;background:rgba(210,153,34,.09);color:#ffd889}
 .btnlink{display:inline-flex;align-items:center;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text);text-decoration:none;font-size:13px}
 .btnlink.primary{background:#3b82f6;border-color:#3b82f6;color:#fff}
@@ -516,9 +517,80 @@ a.btn-a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:9p
 .recgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}.rec-h{font-size:14px;margin:16px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .reccard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:4px}
 .reccard p{margin:2px 0;font-size:13.5px;line-height:1.45}.rc-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rc-top b{font-size:15px}
+/* iconos de línea */
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;display:inline-block}
+.ic+*{margin-left:0}
+.tabs .ti .ic{width:20px;height:20px;vertical-align:middle}
+.dsc-nav .di{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);border:1px solid color-mix(in srgb,var(--c) 28%,transparent);font-size:0}
+.dsc-nav .di .ic{width:20px;height:20px}
+.dsc-nav button.on .di{background:color-mix(in srgb,var(--c) 24%,transparent)}
+.ctxmenu button kbd,.ctxmenu button .kb{margin-left:auto;padding-left:18px}
+.headmenu .ic,.ctxmenu .ic{color:var(--muted);margin-right:6px;width:16px;height:16px;vertical-align:-3px}
+.headmenu .danger .ic{color:inherit}
+h2 .ic,h3 .ic{color:var(--muted);margin-right:2px}
+.libtop{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px}.libtop .libview{margin:0}
+.lib-cta{margin-left:auto;position:relative;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid color-mix(in srgb,#b18cff 45%,transparent);background:linear-gradient(135deg,rgba(124,92,255,.22),rgba(61,139,253,.14));color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.lib-cta:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,92,255,.25)}.lib-cta .ic{color:#c9a7ff}.lib-cta .dn{position:static}
+.libtypes{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.libtypes button{display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:13px;cursor:pointer}
+.libtypes button .ic{width:16px;height:16px}.libtypes button i{font-style:normal;font-size:11.5px;opacity:.7}
+.libtypes button:hover{color:var(--text)}
+.libtypes button.on{color:var(--text);border-color:color-mix(in srgb,#5b9dff 55%,transparent);background:color-mix(in srgb,#5b9dff 14%,transparent)}.libtypes button.on .ic{color:#8fb8ff}
+@media(max-width:600px){.lib-cta{margin-left:0;width:100%;justify-content:center}.libtypes{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.libtypes button{flex:none}}
+.os-chk{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin:6px 0;background:rgba(255,255,255,.02)}
+.os-chk .mk{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:rgba(255,255,255,.06);color:var(--muted)}
+.os-chk.ok .mk{background:rgba(74,222,128,.15);color:#7ee2a0}.os-chk.bad{border-color:rgba(248,113,113,.45)}.os-chk.bad .mk{background:rgba(248,113,113,.15);color:#ff9d96}
+.os-chk b{font-weight:600;font-size:14px}.os-chk .hint{margin:2px 0 0}
+.os-chk.box{cursor:pointer}.os-chk.box input{width:auto;flex:none;margin-top:3px}
+.rp-cfg{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 12px;width:100%;text-align:left;margin:0 0 14px;padding:14px 16px;border-radius:14px;border:1px solid color-mix(in srgb,#6262f2 50%,transparent);background:linear-gradient(135deg,rgba(98,98,242,.2),rgba(98,98,242,.06));color:var(--text);cursor:pointer}
+.rp-cfg .ic{grid-row:span 2;width:26px;height:26px;color:#a9a2ff}.rp-cfg span{font-weight:700;font-size:15px}.rp-cfg b{font-size:13px;padding:3px 10px;border-radius:999px;background:#5b5bf0;color:#fff}
+.rp-cfg i{grid-column:2/4;font-style:normal;color:var(--muted);font-size:13px}.rp-cfg:hover{border-color:#8f8af7}
+.pt-how{border:1px solid color-mix(in srgb,#e0803a 45%,transparent);background:linear-gradient(135deg,rgba(224,128,58,.12),transparent);border-radius:14px;padding:12px 18px;margin:0 0 16px}
+.pt-how h3{margin:4px 0 8px;font-size:15px}.pt-how ol{margin:0;padding-left:20px}.pt-how li{margin:8px 0}.pt-how li .hint{margin:3px 0 0}.pt-how li b{margin-right:8px}
+.gpatch{cursor:pointer}
+.x-src{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 4px}.x-src .x-l{font-size:13px;color:var(--muted);margin-right:2px}
+.x-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:13px;color:var(--text);cursor:pointer;line-height:1.2;width:auto;margin:0}
+.x-pill:hover{border-color:color-mix(in srgb,#5b9dff 45%,var(--line))}.x-pill .ic{width:16px;height:16px;color:#8fb8ff;margin:0}
+.x-pill .x-wd{color:var(--muted);font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.x-mini{padding:2px 8px;font-size:12px;border-radius:7px}
+.x-sw{appearance:none;-webkit-appearance:none;width:30px;height:17px;border-radius:9px;background:#2a3240;position:relative;cursor:pointer;margin:0 0 0 2px;flex:none;transition:background .2s}
+.x-sw::after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#7b8696;transition:transform .2s,background .2s}
+.x-sw:checked{background:#2f6fe0}.x-sw:checked::after{transform:translateX(13px);background:#fff}
+.x-info{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--line);font-size:11px;font-style:normal;color:var(--muted);margin-left:6px;cursor:help;vertical-align:1px}
+.x-fmts{margin:6px 0 2px;font-size:13px}.x-fmts summary{cursor:pointer;color:#8fb3ff;list-style:none}.x-fmts summary::before{content:"▸ "}.x-fmts[open] summary::before{content:"▾ "}
+.x-fmts .srcchips{margin-top:8px}
+.drophint{display:none}.drophint.flash{display:block}
+.sc-cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 18px}
+.sc-cat{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;text-align:left}
+.sc-cat:hover{border-color:color-mix(in srgb,var(--c) 55%,var(--line));transform:translateY(-2px)}.sc-cat{transition:transform .15s,border-color .15s}
+.sc-cat .sci{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border:1px solid color-mix(in srgb,var(--c) 32%,transparent)}.sc-cat .sci .ic{width:21px;height:21px}
+.sc-cat b{font-size:15px;flex:1}.sc-cat i{font-style:normal;font-size:12px;padding:2px 9px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted)}
+.sqrow{display:grid;grid-auto-flow:column;grid-auto-columns:128px;gap:14px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:thin}
+.sq{display:flex;flex-direction:column;gap:3px;background:none;border:none;padding:0;color:var(--text);cursor:pointer;text-align:left;position:relative;min-width:0}
+.sqi{position:relative;display:grid;place-items:center;width:128px;height:128px;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,var(--g1),var(--g2));border:1px solid rgba(255,255,255,.08);transition:transform .2s,box-shadow .2s}
+.sqi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.sqi b{padding:8px;font-size:13px;text-align:center}
+.sq:hover .sqi{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.45)}
+.sqn{font-weight:650;font-size:13.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.sqa{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sq .rk{position:absolute;left:8px;top:8px;z-index:2;width:24px;height:24px;border-radius:50%;background:rgba(10,12,16,.75);border:1px solid rgba(255,255,255,.25);font-style:normal;font-size:12px;font-weight:700;display:grid;place-items:center}
+.dsc-scene{margin:0 0 22px}
+@media(max-width:700px){.sc-cats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sc-cat{padding:9px 10px;gap:8px}.sc-cat .sci{width:32px;height:32px}.sc-cat b{font-size:13.5px}.sc-cat i{padding:1px 7px}.sqrow{grid-auto-columns:104px}.sqi{width:104px;height:104px;border-radius:20px}}
+.nwcard{position:relative}.covsw{position:absolute;top:8px;right:8px;z-index:5;width:30px;height:30px;padding:0;display:grid;place-items:center;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(10,12,16,.6);color:#fff;opacity:0;transition:opacity .15s;cursor:pointer}
+.nwcard:hover .covsw,.covsw:focus{opacity:1}@media(hover:none){.covsw{opacity:.85}}
+.hvcard{position:fixed;z-index:80;background:var(--panel2);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.6);overflow:hidden;max-height:calc(100vh - 24px);overflow-y:auto;animation:hvin .15s ease-out}
+.hvcard.pin{border-color:#3d6fd8}@keyframes hvin{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.hvimg{aspect-ratio:16/9;background:#0c0f14}.hvimg img{width:100%;height:100%;object-fit:cover;display:block}
+.hvb{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px}.hvb p{margin:0;font-size:13.5px;line-height:1.45}.hvd{color:var(--muted);white-space:pre-line}
+.hvh{display:flex;gap:10px;align-items:center}.hvh b{font-size:16px}.hvic{width:44px;height:44px;border-radius:11px;object-fit:cover;flex:none}
+.hvshots{display:flex;gap:6px;overflow-x:auto}.hvshots img{height:70px;border-radius:8px;flex:none}
+.hvb .act{display:flex;gap:6px;flex-wrap:wrap}
+.sqrow{scrollbar-color:#3a4456 transparent}.sqrow::-webkit-scrollbar{height:8px}.sqrow::-webkit-scrollbar-track{background:transparent}.sqrow::-webkit-scrollbar-thumb{background:#3a4456;border-radius:8px}.sqrow::-webkit-scrollbar-thumb:hover{background:#4d5a70}
+.dsc-news+.sc-cats{margin-top:14px}
+#dscUpd .dsc-upd{margin:0 0 14px}
+.whenpill{position:absolute;left:10px;top:10px;z-index:4;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:650;background:rgba(10,12,16,.72);backdrop-filter:blur(6px);color:#ffcf6b;border:1px solid rgba(255,207,107,.45)}
+.whenpill.new{color:#7ee2a0;border-color:rgba(126,226,160,.5)}
 /* ✨ Descubrir */
 .tabs button{position:relative}.tdot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#5aa9ff;box-shadow:0 0 0 2px var(--bg)}
-.dsc-nav{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:0 0 14px}
+.dsc-nav{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin:0 0 14px}
 .dsc-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:12px 6px 10px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;line-height:1.2;text-align:center;min-width:0;transition:transform .15s,border-color .15s,background .15s,color .15s}
 .dsc-nav button:hover{color:var(--text);transform:translateY(-2px);border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
 .dsc-nav button.on{color:var(--text);font-weight:650;border-color:color-mix(in srgb,var(--c) 70%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 20%,transparent),color-mix(in srgb,var(--c) 6%,transparent))}
@@ -537,19 +609,28 @@ a.btn-a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:9p
 @media(max-width:600px){.recgrid.row4,.dsc-news{display:grid;grid-auto-flow:column;grid-template-columns:none!important;grid-auto-columns:78%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:thin}.recgrid.row4>*,.dsc-news>*{scroll-snap-align:start}.recgrid.row4>:nth-child(4){display:flex}.dsc-sh .hint{display:none}.dsc-sh h3{font-size:15px}}
 .reccard{padding:0;overflow:hidden;background:var(--panel2);gap:0;transition:transform .25s,box-shadow .25s}
 .reccard:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.4)}
-.rc-cov{position:relative;height:118px;flex:none;background:linear-gradient(135deg,var(--g1),var(--g2));overflow:hidden;color:#fff}
-.rc-cov::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 10%,rgba(255,255,255,.18),transparent 55%),repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 9px)}
-.rc-cov .gl{position:absolute;right:-6px;top:50%;transform:translateY(-50%) rotate(-8deg);font-size:76px;line-height:1;opacity:.28;filter:saturate(.6)}
-.rc-cov .sy{position:absolute;right:12px;top:8px;font-weight:900;font-size:24px;letter-spacing:.5px;opacity:.22;text-transform:uppercase;white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
-.rc-cov .nm{position:absolute;left:14px;bottom:10px;right:14px;font-weight:800;font-size:19px;line-height:1.12;text-shadow:0 2px 10px rgba(0,0,0,.45);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.rc-cov .nm.long{font-size:16px}.rc-cov.hasic .nm{right:76px}
-.rc-b .sysl{display:flex;gap:8px;align-items:center}.rc-b .sysl .rc-gh{margin-left:auto;font-size:12px}
-.rc-cov .st{position:absolute;left:12px;top:10px;display:flex;gap:5px;flex-wrap:wrap}
-.rc-cov .st .bdg{background:rgba(10,12,16,.6);backdrop-filter:blur(4px)}
-.rc-cov img.ic{position:absolute;right:12px;bottom:10px;width:54px;height:54px;border-radius:12px;object-fit:cover;border:2px solid rgba(255,255,255,.85);box-shadow:0 6px 16px rgba(0,0,0,.45);background:#111}
+.rc-cov{position:relative;height:132px;flex:none;background:linear-gradient(135deg,var(--g1),var(--g2));overflow:hidden;color:#fff;isolation:isolate}
+.rc-cov.plain::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 0%,rgba(255,255,255,.16),transparent 60%)}
+.rc-cov .hb[src*="svg"]{padding:26px 30px;box-sizing:border-box}
+.rc-cov .hb.fill{object-fit:cover;filter:none}
+.nwcard .rc-cov{height:170px}
+.nwmore{text-align:center;margin:14px 0 4px}
+.rc-cov .hb{z-index:1;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:transform .5s;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
+.reccard:hover .rc-cov .hb{transform:scale(1.04)}
+.rc-cov .bl{z-index:0;position:absolute;left:-25%;top:-60%;width:150%;height:220%;object-fit:cover;filter:blur(26px) saturate(1.35) brightness(.62)}
+.rc-cov .shade{z-index:2;position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,10,14,0) 55%,rgba(8,10,14,.55))}
+.rc-cov .ico2{z-index:3;position:absolute;left:12px;bottom:10px;width:44px;height:44px;border-radius:13px;object-fit:cover;background:#111;border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.rc-cov.has-icon:not(.has-hero) .ico2{height:72%;width:auto;aspect-ratio:1;left:50%;bottom:50%;transform:translate(-50%,50%);border-radius:22%}
+.rc-cov .nm{z-index:3;position:absolute;left:14px;bottom:11px;right:14px;font-weight:750;font-size:18px;line-height:1.15;text-shadow:0 2px 10px rgba(0,0,0,.5);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rc-cov.has-hero .nm,.rc-cov.has-icon .nm{display:none}
+.rc-b .ttl{font-size:15px;font-weight:700;color:var(--text);line-height:1.25}
+.nwb .ttl{font-size:14.5px;font-weight:700;color:var(--text)}
+.rc-cov.plain .nm{font-size:22px;bottom:50%;transform:translateY(50%);text-align:center;left:16px;right:16px}
+.rc-cov .nm.long{font-size:15.5px}
 .rc-b{padding:10px 14px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
 .rc-b .what{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .rc-b details{font-size:13px}.rc-b details summary{cursor:pointer;color:var(--muted)}
-.rc-b .sysl{font-size:12px;color:var(--muted)}
+.rc-b .sysl{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}.rc-b .sysl .rc-gh{margin-left:auto;font-size:12px}
 .dsc-news{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
 .dsc-news .nwcard{cursor:pointer}.dsc-news .nwb p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rc-act .ico{padding:4px 8px}
@@ -574,8 +655,11 @@ a.btn-a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:9p
 .gmore summary::-webkit-details-marker{display:none}.gmore[open] summary{background:rgba(255,255,255,.06)}
 .gmenu{position:absolute;right:0;bottom:calc(100% + 4px);z-index:20;display:flex;flex-direction:column;gap:4px;min-width:130px;padding:6px;border:1px solid var(--line);border-radius:10px;background:#161b22;box-shadow:0 10px 30px -8px rgba(0,0,0,.6)}
 .gmenu button{width:100%;text-align:left}
-.gact{display:flex;gap:6px;margin-top:auto;padding-top:6px;flex-wrap:wrap}
-.gact button{padding:4px 6px;font-size:12px;flex:1 1 auto;min-width:0}
+.gact{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:auto;padding-top:8px}
+.gact .gi,.gact .gmore>summary{display:flex;align-items:center;justify-content:center;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;list-style:none}
+.gact .gi:hover:not(:disabled),.gact .gmore>summary:hover{color:var(--text);border-color:color-mix(in srgb,#5b9dff 45%,var(--line));background:rgba(91,157,255,.1)}
+.gact .gi:disabled{opacity:.3;cursor:default}.gact .gi .ic{width:17px;height:17px}
+.gact .gmore>summary::-webkit-details-marker{display:none}.gact .gmore{position:relative;display:flex;flex-direction:column}.gact .gmore>summary{width:100%;box-sizing:border-box}
 header h1{white-space:nowrap}
 @media(max-width:1640px){header .sub{display:none}}@media(max-width:1440px){header{gap:10px}}
 @media(max-width:1400px){header{gap:7px;flex-wrap:wrap;row-gap:8px;padding-left:16px;padding-right:16px}header button.small{padding-left:10px;padding-right:10px}}
@@ -603,6 +687,11 @@ header h1{white-space:nowrap}
 .su-x{display:flex;align-items:center;gap:12px;margin-top:8px;padding:9px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--hc) 40%,var(--line));background:color-mix(in srgb,var(--hc) 8%,transparent)}
 .su-x>span{font-size:20px}.su-x>div{flex:1}
 .acttable button{white-space:nowrap}
+.acttable td.num{white-space:nowrap}#actBody td:first-child,#bkList td:first-child{white-space:nowrap}
+@media(max-width:600px){.acttable thead{display:none}.acttable,.acttable tbody,.acttable tr,.acttable td{display:block;width:100%;box-sizing:border-box}
+  .acttable tr{border-bottom:1px solid var(--line);padding:8px 0}.acttable td{border:none;padding:2px 0;text-align:left!important}
+  .acttable td:empty{display:none}.acttable td button{margin-top:4px}#actBody td:first-child,#bkList td:first-child{white-space:normal;font-size:12px;color:var(--muted)}}
+
 #bigAlerts{position:fixed;left:50%;transform:translateX(-50%);top:14px;z-index:90;display:flex;flex-direction:column;gap:8px;width:min(440px,94vw)}
 .balert{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:0 14px 40px -10px rgba(0,0,0,.7);cursor:pointer;
   opacity:0;transform:translateY(-12px);transition:opacity .25s,transform .25s}
@@ -699,10 +788,10 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
 .nwcard:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.4)}
 .nwhero{aspect-ratio:16/8;background:linear-gradient(135deg,#1f2a3a,#2a1f3d);position:relative}.nwhero .hb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.nwhero .ini{display:none}.nwhero.nohero{aspect-ratio:auto;height:64px}.nwhero.nohero .ini{display:block;position:absolute;right:12px;top:14px;font-weight:800;font-size:22px;letter-spacing:2px;opacity:.35}
 .nwhero img.ic{position:absolute;left:10px;bottom:-18px;width:52px;height:52px;border-radius:12px;border:2px solid var(--panel2);background:#111;object-fit:cover}
-.nwb{padding:22px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}.nwb p{margin:0;font-size:13px}
+.nwb{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}.nwb p{margin:0;font-size:13px}
 .nwb .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .nwb details{font-size:13px}.nwb .act{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap}
-#nwCat{flex-wrap:wrap}
+#nwCat{flex-wrap:wrap}#nwCat button i{font-style:normal;opacity:.6;font-size:12px}
 .gdgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}
 .gdbig{font-size:15px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2)}
 .gdbig.bad{border-color:#7a2d29;background:linear-gradient(135deg,rgba(229,83,75,.16),transparent)}.gdbig.ok{border-color:#235c34}
@@ -769,21 +858,22 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
 <main id="tabTransfers">
   <section class="card">
     <h2>Nueva transferencia</h2>
-    <label for="lines">Enlaces directos: pega todas las partes juntas (.part1.rar, .part2.rar… o .001, .002…), uno por línea o dentro de cualquier texto.</label>
+    <label for="lines">Enlaces, rutas de tu PC o torrents <span class="x-info" tabindex="0" title="Pega todas las partes juntas (.part1.rar, .part2.rar… o .001, .002…), una por línea o dentro de cualquier texto: las separo por paquetes y, antes de empezar, te aviso si algún enlace no funciona o falta alguna parte.">i</span></label>
     <textarea id="lines" placeholder="https://servidor/archivo.part1.rar&#10;https://servidor/archivo.part2.rar&#10;&#10;También vale la ruta de un archivo o carpeta de tu PC (D:\Descargas\archivo.rar), un enlace ftp:// de tu NAS o un torrent (magnet o .torrent)"></textarea>
-    <label class="check cliprow" id="clipRow"><input type="checkbox" id="clipOn"> 📋 <span>Captar los enlaces de descarga que copies</span> <span class="hint">(.rar, .7z, .zip, partes, .pkg, imágenes, torrents: de cualquier web o programa, llegan solos a esta caja)</span></label>
-    <div class="cliprow watchrow" id="watchRow">📁 <span>Carpeta vigilada:</span> <span class="mono" id="watchDir" data-noi18n></span> <button type="button" class="small" id="watchPick">Elegir…</button><button type="button" class="small" id="watchOff" hidden>Quitar</button> <span class="hint">(lo que termine de bajar ahí con otro programa, como FDM o JDownloader, llega solo a esta caja)</span></div>
-    <div class="drophint" id="drophint">Archivos de tu PC: suéltalos en esta página y los busco en tu PC, o arrástralos sobre el <b>icono de PS5 Directo</b><span class="winonly">, o clic derecho → <b>Enviar a → PS5 Directo</b></span>.</div>
-    <div class="pickrow">
-      <button class="small" id="btnPickFiles">Elegir archivos…</button>
-      <button class="small" id="btnPickFolder">Elegir carpeta…</button>
-      <button class="small" id="btnCloud" title="Google Drive, OneDrive, Dropbox, MEGA… con rclone">☁️ Mis almacenamientos</button>
-      <span class="hint">Una carpeta se manda tal cual (si tiene sce_sys, como aplicación) y salta lo que ya esté igual en la consola.</span>
+    <div class="x-src"><span class="x-l">Añadir desde:</span>
+      <button type="button" class="x-pill" id="btnPickFiles">📁 Archivos</button>
+      <button type="button" class="x-pill" id="btnPickFolder" title="Una carpeta se manda tal cual (si tiene sce_sys, como aplicación) y salta lo que ya esté igual en la consola.">📂 Carpeta</button>
+      <button type="button" class="x-pill" id="btnCloud" title="Google Drive, OneDrive, Dropbox, MEGA… con rclone">☁️ Mis almacenamientos</button>
+      <label class="x-pill tg" id="clipRow" title="Los enlaces de descarga que copies (.rar, .7z, .zip, partes, .pkg, imágenes, torrents) de cualquier web o programa llegan solos a esta caja.">📋 Captar lo que copies <input type="checkbox" id="clipOn" class="x-sw"></label>
+      <span class="x-pill" id="watchRow" title="Lo que termine de bajar ahí con otro programa, como FDM o JDownloader, llega solo a esta caja.">🗄 <span>Carpeta vigilada</span><span class="mono x-wd" id="watchDir" data-noi18n></span><button type="button" class="x-mini" id="watchPick">Elegir…</button><button type="button" class="x-mini" id="watchOff" hidden>Quitar</button></span>
+      <span class="x-info" tabindex="0" title="También puedes soltar archivos en esta página, o arrastrarlos sobre el icono de PS5 Directo (en Windows, también clic derecho › Enviar a › PS5 Directo).">i</span>
     </div>
-    <div class="srcchips"><span class="hint">Vale cualquiera de estos:</span><span class="schip" style="--c:#4fc9a4">Carpeta</span><span class="schip" style="--c:#9aa4b2">.zip</span><span class="schip" style="--c:#9aa4b2">.7z</span><span class="schip" style="--c:#9aa4b2">.rar</span><span class="schip" style="--c:#ec6fb4">.exfat</span><span class="schip" style="--c:#5b9dff">.ffpkg</span><span class="schip" style="--c:#45c3dc">.ffpfs</span><span class="schip" style="--c:#f29e4c">.ffpfsc</span><span class="schip" style="--c:#7ad37f">.fpkg</span><span class="schip" style="--c:#eec34a">LZ4</span><span class="schip" style="--c:#c084fc" title="Un enlace magnet o un archivo .torrent: se baja primero al PC (con aria2, que se descarga solo la primera vez) y luego sigue como un archivo del PC: se envía, se descomprime o se convierte.">Torrent</span><span class="hint">y se puede pasar de uno a otro abajo.</span></div>
+    <div class="drophint" id="drophint"></div>
+    <details class="x-fmts"><summary>¿Qué formatos sirven?</summary><div class="srcchips"><span class="schip" style="--c:#4fc9a4">Carpeta</span><span class="schip" style="--c:#9aa4b2">.zip</span><span class="schip" style="--c:#9aa4b2">.7z</span><span class="schip" style="--c:#9aa4b2">.rar</span><span class="schip" style="--c:#ec6fb4">.exfat</span><span class="schip" style="--c:#5b9dff">.ffpkg</span><span class="schip" style="--c:#45c3dc">.ffpfs</span><span class="schip" style="--c:#f29e4c">.ffpfsc</span><span class="schip" style="--c:#7ad37f">.fpkg</span><span class="schip" style="--c:#eec34a">LZ4</span><span class="schip" style="--c:#c084fc" title="Un enlace magnet o un archivo .torrent: se baja primero al PC (con aria2, que se descarga solo la primera vez) y luego sigue como un archivo del PC: se envía, se descomprime o se convierte.">Torrent</span><span class="hint">y se puede pasar de uno a otro abajo.</span></div></details>
     <div class="tomode" id="toMode"><span class="tm-l">¿A dónde va?</span><div class="totiles" role="radiogroup">
       <button type="button" class="totile on" data-to="ps5" role="radio" style="--c:#5b9dff"><span class="tico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="11" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M10 9.2l3.2 1.8L10 12.8z" fill="currentColor"/></svg></span><span class="ttx"><b>A la PS5</b><small>Se descarga y se manda</small></span></button>
-      <button type="button" class="totile" data-to="pc" role="radio" style="--c:#4fc9a4"><span class="tico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M2 20h20"/><path d="M12 7.8v5.4M9.6 10.9 12 13.3l2.4-2.4"/></svg></span><span class="ttx"><b>Solo a mi PC</b><small>Se queda en una carpeta</small></span></button></div>
+      <button type="button" class="totile" data-to="pc" role="radio" style="--c:#4fc9a4"><span class="tico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M2 20h20"/><path d="M12 7.8v5.4M9.6 10.9 12 13.3l2.4-2.4"/></svg></span><span class="ttx"><b>Solo a mi PC</b><small>Se queda en una carpeta</small></span></button>
+      <button type="button" class="totile" data-to="zdl" role="radio" style="--c:#c9a7ff" title="Sin pasar por el PC: la descarga la hace la propia consola con zftpd"><span class="tico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19a5 5 0 0 1-.7-9.95A6.5 6.5 0 0 1 18.8 10.5 4.25 4.25 0 0 1 17.5 19z"/><path d="M12 10v6M9.5 13.5 12 16l2.5-2.5"/></svg></span><span class="ttx"><b>La PS5 lo baja sola</b><small>Sin pasar por el PC</small></span></button></div>
       <span class="hint" id="toHint" hidden></span></div>
     <div class="row tri">
       <div>
@@ -801,7 +891,7 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
           <option value="ps5">En la PS5 (BFpilot)</option>
           <option value="pc">En el PC (7-Zip)</option>
           <option value="keep" hidden>Solo a mi PC</option>
-          <option value="zdl">La PS5 lo baja sola (zftpd)</option>
+          <option value="zdl" hidden>La PS5 lo baja sola (zftpd)</option>
         </select>
         <div class="hint" id="zdlHint" hidden>Sin pasar por el PC: lo descarga la propia consola con zftpd (cárgalo en Descubrir › Herramientas). Los .zip se descomprimen en el destino; lo demás queda en /data/ps5directo/descargas. Sin conversión de formato.</div>
       </div>
@@ -847,7 +937,6 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
     </div>
     <div class="actions">
       <button class="primary" id="btnAdd">Añadir a la cola</button>
-      <span class="hint">Pega todos los enlaces de golpe, uno por línea o dentro de cualquier texto: los separo por paquetes (todas las partes de cada cosa juntas) y, antes de empezar, te aviso si algún enlace no funciona o falta alguna parte.</span>
     </div>
   </section>
 
@@ -864,7 +953,8 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
 </main>
 
 <main id="tabLibrary" hidden>
-  <div class="libview seg" id="libView" role="tablist"><button type="button" data-v="console" class="on">En la consola</button><button type="button" data-v="pc">En tu PC</button><button type="button" data-v="all">Todo</button><button type="button" data-go="rec" class="libgo">⭐ Recomendados</button><button type="button" data-go="news" class="libgo">📰 Novedades <span class="dn" id="newsN2" hidden></span></button></div>
+  <div class="libtop"><div class="libview seg" id="libView" role="tablist"><button type="button" data-v="console" class="on">En la consola</button><button type="button" data-v="pc">En tu PC</button><button type="button" data-v="all">Todo</button></div><button type="button" class="lib-cta" id="libDisc" title="Emuladores, aplicaciones, herramientas y lo último de la scene">✨ Descubre y añade más a tu biblioteca <span class="dn" id="newsN2" hidden></span> →</button></div>
+  <div class="libtypes" id="libTypes" role="tablist"></div>
   <section class="card" id="libCard">
     <div class="fm-head"><h2>Aplicaciones de la consola</h2><div class="spacer"></div>
       <button class="small" id="libUpd" title="Qué tiene una versión más nueva que la tuya">🔔 Actualizaciones</button>
@@ -883,8 +973,6 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
         <option value="image">Imágenes</option>
         <option value="lz4">LZ4 y zstd</option>
         <option value="installed">Instalado en la consola</option>
-        <option value="emu">Emuladores</option>
-        <option value="apps">Apps y herramientas</option>
         <option value="ps4">PS4</option>
         <option value="nofw">No arrancan en mi firmware</option>
         <option value="old">Sin abrir en 2 meses (para archivar)</option>
@@ -927,14 +1015,16 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
 </main>
 
 <main id="tabApps" hidden>
+  <div id="dscUpd" hidden></div>
   <nav class="dsc-nav" id="appView" role="tablist">
     <button type="button" data-a="home" class="on" style="--c:#c9a7ff"><span class="di">✨</span><span class="dl">Inicio</span></button>
-    <button type="button" data-a="news" style="--c:#7cc4ff"><span class="di">📰</span><span class="dl">Novedades de la scene</span><span class="dn" id="newsN" hidden></span></button>
-    <button type="button" data-a="emu" style="--c:#8fb3ff"><span class="di">🕹</span><span class="dl">Emuladores</span><span class="dc" data-n="emu"></span></button>
-    <button type="button" data-a="media" style="--c:#ffb27a"><span class="di">🎬</span><span class="dl">Multimedia</span><span class="dc" data-n="media"></span></button>
-    <button type="button" data-a="rp" style="--c:#a9a2ff"><span class="di">🎮</span><span class="dl">Remote Play</span><span class="dc" data-n="rp"></span></button>
+    <button type="button" data-a="news" style="--c:#7cc4ff"><span class="di">📰</span><span class="dl">Novedades de la scene</span><span class="dc" id="newsC"></span><span class="dn" id="newsN" hidden></span></button>
+    <button type="button" data-a="emu" style="--c:#8fb3ff"><span class="di">🎮</span><span class="dl">Emuladores</span><span class="dc" data-n="emu"></span></button>
+    <button type="button" data-a="media" style="--c:#ffb27a"><span class="di">🎬</span><span class="dl">Apps y multimedia</span><span class="dc" data-n="media"></span></button>
+    <button type="button" data-a="rp" style="--c:#a9a2ff"><span class="di">📺</span><span class="dl">Remote Play</span><span class="dc" data-n="rp"></span></button>
     <button type="button" data-a="tool" style="--c:#7ee2c8"><span class="di">🛠</span><span class="dl">Herramientas</span><span class="dc" data-n="tool"></span></button>
-    <button type="button" data-a="os" style="--c:#ffd76b"><span class="di">🐧</span><span class="dl">Linux y Steam</span><span class="dc" data-n="os"></span></button>
+    <button type="button" data-a="patch" style="--c:#f0a35e"><span class="di">🧩</span><span class="dl">Mejorar tus títulos</span><span class="dc" data-n="patch"></span></button>
+    <button type="button" data-a="os" style="--c:#ffd76b"><span class="di">🖥</span><span class="dl">PC en la PS5</span><span class="dc" data-n="os"></span></button>
   </nav>
   <section class="card" id="recCard">
     <div class="fm-head"><h2 id="recTitle">✨ Descubrir</h2><div class="spacer"></div><input id="recQ" class="rec-q" placeholder="Buscar: PS2, Switch, vídeo, FTP…"><button class="small" id="recRe">Volver a mirar</button></div>
@@ -1806,6 +1896,26 @@ Object.assign(I18N_EXACT,{"La idea de «Ordenar nombres»": "The idea behind \"T
 Object.assign(I18N_EXACT,{"Bienvenido a PS5 Directo 2.0": "Welcome to PS5 Directo 2.0", "Mucho más que enviar archivos: es el centro de control de tu PS5 desde el PC y el móvil. En dos minutos te enseño todo lo que puede hacer. Puedes saltarlo y volver a verlo cuando quieras en el menú ⋯ › Guía de uso.": "Much more than sending files: it's the control center for your PS5 from your PC and your phone. In two minutes I'll show you everything it can do. You can skip it and see it again any time from the ⋯ menu › User guide.", "Verde: la PS5 está lista. Rojo: pulsa encima y PS5 Directo carga solo lo que falta con Payload Manager.": "Green: the PS5 is ready. Red: click it and PS5 Directo loads what's missing with Payload Manager by itself.", "Pega, suelta o capta": "Paste, drop or catch", "Enlaces de descarga (con todas sus partes), torrents, archivos o carpetas de tu PC, o lo que tengas en tus nubes (Google Drive, OneDrive, MEGA…). Marca «Captar los enlaces que copies» y llegan solos.": "Download links (with all their parts), torrents, files or folders from your PC, or what you have in your clouds (Google Drive, OneDrive, MEGA…). Tick \"Catch the links you copy\" and they arrive by themselves.", "Conviértelo por el camino": "Convert it on the way", "Si quieres, lo pasa en tu PC a carpeta, .exfat, LZ4, .ffpkg y más mientras lo envía. «¿Cuál elijo?» te recomienda el mejor para cada caso.": "If you want, it converts it on your PC to a folder, .exfat, LZ4, .ffpkg and more while sending it. \"Which one?\" recommends the best for each case.", "Úsalo también como gestor de descargas: solo bajar, descomprimir o convertir en el PC, sin mandar nada a la consola.": "Use it as a download manager too: just download, extract or convert on the PC, without sending anything to the console.", "Un clic y listo": "One click and done", "Se descarga, se envía, se descomprime en la consola y se coloca en su sitio. Cuando pone Listo, ya está en el menú de la PS5.": "It's downloaded, sent, extracted on the console and put in place. When it says Done, it's on the PS5 menu.", "Tu cola, bajo control": "Your queue, under control", "Progreso y tiempo restante, pausar y seguir donde iba, ordenar la cola, «Usar menos el PC» y, si algo falla, «Diagnóstico» con la causa y cómo arreglarlo.": "Progress and time left, pause and resume where it was, reorder the queue, \"Use less of the PC\" and, if something fails, \"Diagnosis\" with the cause and how to fix it.", "Todo lo de la consola con portada, versión y firmware. Te avisa de lo que no arranca, de los repetidos y de las versiones nuevas. «Ordenar nombres» deja tus imágenes con nombres claros, y la ficha de cada título trae «Sobre este título» y «Abrir en la consola».": "Everything on the console with cover, version and firmware. It warns you about what won't launch, duplicates and new versions. \"Tidy up names\" gives your images clear names, and each title's page has \"About this title\" and \"Open on the console\".", "Emuladores y apps": "Emulators and apps", "Más de 30 emuladores y apps que se instalan con un clic, con una guía paso a paso la primera vez. También Remote Play para manejar la consola desde el PC, Linux y Steam en la PS5, y las Novedades de la scene.": "30+ emulators and apps installed with one click, with a step-by-step guide the first time. Also Remote Play to control the console from your PC, Linux and Steam on the PS5, and the Scene news.", "Explora la PS5 como una carpeta: copiar, mover, renombrar, descomprimir, instalar .pkg y bajar o subir archivos.": "Browse the PS5 like a folder: copy, move, rename, extract, install .pkg files and download or upload files.", "Espacio y papelera": "Space and trash", "Qué ocupa cada cosa, restos que puedes borrar y «Hacer sitio». Lo que borras va a la papelera: tienes 7 días para recuperarlo.": "What takes up space, leftovers you can delete and \"Make room\". What you delete goes to the trash: you have 7 days to get it back.", "Tus partidas, las de los emuladores y los ajustes de la consola guardados en el PC, a mano o cada día, por si algo falla.": "Your saves, emulator saves and console settings stored on your PC, manually or every day, in case something goes wrong.", "Las capturas y vídeos de la consola se bajan solos al PC y, si quieres, se publican en tu grupo de Telegram o tu canal de Discord.": "The console's screenshots and videos download to your PC by themselves and, if you want, get posted to your Telegram group or Discord channel.", "Sistema y protección": "System and protection", "Temperatura, ventilador, FPS y qué títulos calientan más la consola. Y lo más importante: el Guardián del firmware, que te avisa si la consola descarga una actualización, y «Payloads al día».": "Temperature, fan, FPS and which titles heat the console the most. And most importantly: the Firmware guard, which warns you if the console downloads an update, and \"Payloads up to date\".", "El historial de todo lo enviado: vuelve a descargar cualquier cosa con un clic.": "The history of everything sent: download anything again with one click.", "Desde el móvil": "From your phone", "Escanea el QR y úsalo desde el sofá: app para Android y, en iPhone, desde Safari con un atajo para «Compartir». Te avisa cuando termina.": "Scan the QR code and use it from the couch: an Android app and, on iPhone, from Safari with a \"Share\" shortcut. It lets you know when it's done.", "Para Chrome, Edge o Firefox: lo que descargues en el navegador llega solo a PS5 Directo.": "For Chrome, Edge or Firefox: what you download in the browser goes to PS5 Directo by itself.", "Avisos": "Notifications", "Aquí te avisa de lo importante: lo que termina, una actualización del sistema descargada, payloads con versión nueva o algo que se ha cerrado al arrancar, con la causa más probable.": "This is where it tells you what matters: what finishes, a downloaded system update, payloads with a new version or something that closed on launch, with the likely cause.", "Menú ⋯": "⋯ menu", "Idioma, esta guía, Novedades, Créditos y «Ir a…» (Ctrl+K): escribe lo que buscas y te lleva directo.": "Language, this guide, What's new, Credits and \"Go to…\" (Ctrl+K): type what you're looking for and it takes you straight there.", "¿Algo no va bien?": "Something not right?", "Pulsa «Informar de un fallo» y el informe se rellena solo para enviarlo a GitHub, sin contraseñas. Y si PS5 Directo detecta un fallo suyo, te lo propone él mismo.": "Click \"Report a problem\" and the report fills itself in to send to GitHub, without passwords. And if PS5 Directo detects a bug of its own, it offers it to you itself.", "¡Todo listo!": "All set!", "Empieza pegando un enlace, o date una vuelta por «Emuladores y apps» y el Guardián del firmware. Que lo disfrutes.": "Start by pasting a link, or take a look at \"Emulators and apps\" and the Firmware guard. Enjoy!", "🕹 Emuladores, apps y herramientas": "🕹 Emulators, apps and tools", "🕹 Emuladores y apps para tu PS5": "🕹 Emulators and apps for your PS5", "No, gracias": "No, thanks", "📲 Instalar como app": "📲 Install as an app"}); // i18n_206
 Object.assign(I18N_EXACT,{"Inicio": "Home", "Linux y Steam": "Linux and Steam", "Recomendados": "Recommended", "📰 Novedades": "📰 What's new", "Ver todas": "See all", "Ver todos ({0})": "See all ({0})", "Apps y herramientas": "Apps and tools", "Lo que necesitas": "What you need", "📖 Guía rápida y requisitos": "📖 Quick guide and requirements", "✨ Descubrir": "✨ Discover", "🕹 Emuladores": "🕹 Emulators", "🎬 Multimedia": "🎬 Media", "🎮 Remote Play": "🎮 Remote Play", "🛠 Herramientas": "🛠 Tools", "🐧 Linux y Steam": "🐧 Linux and Steam", "Lo mejor para tu PS5 de un vistazo: lo último de la scene y lo que merece la pena instalar, por categorías. Todo se baja de la página oficial de su autor en GitHub (PS5 Directo no aloja nada). Las BIOS, claves y el contenido tienen que ser tuyos.": "The best for your PS5 at a glance: the latest from the scene and what's worth installing, by category. Everything is downloaded from its author's official GitHub page (PS5 Directo hosts nothing). BIOS, keys and content must be your own.", "Instálalos con un clic y te guío con lo que necesita cada uno. Ninguno trae BIOS, claves, firmware ni contenido: lo tuyo lo pones tú.": "Install them with one click and I'll guide you through what each one needs. None include BIOS, keys, firmware or content: you bring your own.", "Tus vídeos, tu música y tus servidores en la tele, desde la consola.": "Your videos, music and servers on the TV, from the console.", "Ver y manejar la consola desde el PC.": "See and control the console from your PC.", "Utilidades que funcionan en la consola: transferir, vigilar, actualizar y manejarla desde el PC.": "Utilities that run on the console: transfer, monitor, update and control it from your PC.", "Más allá de la consola: Linux y Steam en la PS5.": "Beyond the console: Linux and Steam on the PS5.", "Lo último publicado para la PS5": "The latest released for the PS5", "Tienes actualizaciones": "Updates available", "Se copian encima: se conservan tus ajustes, partidas, BIOS y contenido": "Copied on top: your settings, saves, BIOS and content are kept", "Lo último de la scene y más de 30 emuladores, apps y herramientas que se instalan con un clic, cada cosa en su categoría y con una guía paso a paso la primera vez. El punto azul te avisa cuando sale algo nuevo.": "The latest from the scene and 30+ emulators, apps and tools that install with one click, each in its own category, with a step-by-step guide the first time. The blue dot tells you when something new comes out."}); // i18n_207 descubrir
 Object.assign(I18N_EXACT,{"Sobre este título":"About this title","📖 Sobre este título":"📖 About this title"});
+Object.assign(I18N_EXACT,{"Ajustes › Sistema › Ahorro de energía › Funciones disponibles en modo de reposo › Suministrar energía a los puertos USB: Siempre.": "Settings › System › Power Saving › Features Available in Rest Mode › Supply Power to USB Ports: Always.", "Ajustes › Sistema › HDMI › Activar vínculo de dispositivo HDMI: desactivado.": "Settings › System › HDMI › Enable HDMI Device Link: off.", "Ajustes › Sistema › Software del sistema › Actualización y configuración. El Guardián del firmware de PS5 Directo te avisa si se cuela una.": "Settings › System › System Software › System Software Update and Settings. PS5 Directo's Firmware guard warns you if one sneaks in.", "Arranca desde un USB o un M.2: al apagar, vuelve el sistema de la PS5 sin tocarlo.": "Boots from a USB drive or an M.2: when you power off, the PS5's own system comes back untouched.", "Añadido a la cola: {0}. Se baja a tu carpeta de Descargas › PS5 Directo.": "Added to the queue: {0}. It downloads to your Downloads › PS5 Directo folder.", "Baja la imagen a tu PC": "Download the image to your PC", "Bajar la imagen a mi PC": "Download the image to my PC", "Bajar al PC (sale luego en «En tu PC»)": "Download to PC (it then shows in \"On your PC\")", "Comprobar: si no abre o se cierra al arrancar, revisa la carpeta y busca registros y capturas": "Check: if it won't open or closes on launch, it checks the folder and looks for logs and captures", "Con Balena Etcher (Windows, Mac y Linux): elige la imagen que has bajado, elige el USB y pulsa Flash. Graba también los .xz tal cual, sin descomprimir. Ojo: borra todo lo que haya en ese USB.": "With Balena Etcher (Windows, Mac and Linux): pick the image you downloaded, pick the USB drive and press Flash. It writes .xz files as they are, no need to extract. Careful: it erases everything on that drive.", "Conecta el USB": "Plug in the USB drive", "En un puerto de atrás o en el USB-C de delante. El USB de delante de arriba es más lento (USB 2.0): mejor no.": "Use a rear port or the front USB-C. The top front USB port is slower (USB 2.0): better not.", "En una PS5 Pro, este firmware no vale.": "On a PS5 Pro, this firmware won't work.", "Energía USB en reposo: Siempre": "USB power in rest mode: Always", "Grábala en el USB": "Write it to the USB drive", "Guía completa (en inglés)": "Full guide", "La primera vez completa el asistente de Steam.": "The first time, complete Steam's setup.", "Linux en la PS5": "Linux on the PS5", "Lo que necesita en la consola": "What it needs on the console", "Mejor un SSD externo: va mucho más rápido. Se borra entero.": "An external SSD is better: much faster. It gets fully erased.", "No sé tu firmware": "I don't know your firmware", "No veo Payload Manager en la consola": "I can't see Payload Manager on the console", "Opcional: adaptador Wi-Fi USB y Bluetooth para el mando.": "Optional: USB Wi-Fi adapter and Bluetooth for the controller.", "Para volver y si algo falla": "Going back, and if something fails", "Ponlo en Ajustes (o conecta la consola) y pulsa «Volver a comprobar».": "Set it in Settings (or connect the console) and press \"Check again\".", "Prepara la consola (una sola vez)": "Prepare the console (just once)", "Programas de Windows dentro de la PS5": "Windows programs inside the PS5", "Pulsa «Enviar el cargador»: la consola pasa a reposo. Cuando la luz naranja deje de parpadear, enciéndela: la luz blanca indica que ha entrado.": "Press \"Send the loader\": the console goes into rest mode. When the orange light stops blinking, turn it on: a white light means it's in.", "Qué puedes esperar": "What to expect", "Recomendado: sin actualizaciones automáticas": "Recommended: no automatic updates", "Sale en el menú de la PS5 cuando ShadowMountPlus lo monta. La primera vez tarda un poco más. Se actualiza solo cada vez que lo abres.": "It shows in the PS5 menu once ShadowMountPlus mounts it. The first time takes a bit longer. It updates itself every time you open it.", "Si restableces la consola o reinstalas el firmware, hay que volver a ponerlo.": "If you reset the console or reinstall the firmware, set these again.", "Sin cambiar de sistema: se abre como una aplicación más.": "No system switch: it opens like any other app.", "Sin etaHEN cargado": "No etaHEN loaded", "Solo esos payloads y ninguno más. Payload Manager no siempre muestra kstuff: si lo cargaste, sigue. Probado en 10.01 (Pro) y 13.40 a 13.60.": "Only those payloads and nothing else. Payload Manager doesn't always show kstuff: if you loaded it, carry on. Tested on 10.01 (Pro) and 13.40 to 13.60.", "Te lleva paso a paso: comprueba tu consola, baja la imagen y arranca": "Takes you step by step: checks your console, downloads the image and boots", "Teclado y ratón USB": "USB keyboard and mouse", "Un USB de 64 GB o más": "A USB drive of 64 GB or more", "Usa la consola como un PC: Linux completo, Steam como en la Steam Deck o tus programas de Windows. Con guía paso a paso en tu idioma.": "Use the console as a PC: full Linux, Steam like on the Steam Deck, or your Windows programs. With a step-by-step guide in your language.", "Vínculo HDMI desactivado": "HDMI Device Link off", "Ya está instalado.": "Already installed.", "en marcha": "running", "etaHEN está cargado: con MihawkOS no puede haber nada más": "etaHEN is loaded: MihawkOS needs nothing else running", "no lo veo en marcha": "I don't see it running", "¿Tu consola sirve?": "Is your console supported?", "Ábrelo": "Open it", "Ábrelo en la PS5 para que pueda comprobar qué payloads tienes en marcha.": "Open it on the PS5 so I can check which payloads are running.", "🖥 PC en la PS5": "🖥 PC on the PS5", "PC en la PS5": "PC on the PS5", "Paso a paso": "Step by step", "Empezar paso a paso": "Start step by step", "Firmware {0}": "Firmware {0}", "compatible": "supported", "no está en la lista": "not on the list", "También puedes usar un M.2 solo para Linux.": "You can also use an M.2 just for Linux.", "Sin M.2: solo desde USB.": "No M.2: USB only.", "Funciona en 3.00 a 7.61 y 11.00 a 13.60 (no en 8.xx ni 10.xx).": "Works on 3.00 to 7.61 and 11.00 to 13.60 (not on 8.xx or 10.xx).", "Kstuff Lite 1.11 Beta o posterior": "Kstuff Lite 1.11 Beta or later", "Cargador de ELF": "ELF loader", "Servidor web de la consola": "Console web server", "Beta 11 o posterior": "Beta 11 or later", "La última versión de Bazzite Deck (la marcada como Latest) desde su GitHub. Pesa varios GB: va a tu carpeta de Descargas › PS5 Directo y la ves en la cola.": "The latest Bazzite Deck release (the one marked Latest) from its GitHub. It's several GB: it goes to your Downloads › PS5 Directo folder and you'll see it in the queue.", "La última imagen de Ubuntu para la PS5 desde su GitHub. Pesa varios GB: va a tu carpeta de Descargas › PS5 Directo y la ves en la cola.": "The latest Ubuntu image for the PS5 from its GitHub. It's several GB: it goes to your Downloads › PS5 Directo folder and you'll see it in the queue.", "Descargar Balena Etcher": "Download Balena Etcher", "Arranca Bazzite": "Boot Bazzite", "Arranca Linux": "Boot Linux", "Tienes etaHEN o kstuff cargado": "You have etaHEN or kstuff loaded", "Sin etaHEN ni kstuff cargados": "No etaHEN or kstuff loaded", "No son compatibles: reinicia la consola, haz el jailbreak y no los cargues.": "They're not compatible: restart the console, run the jailbreak and don't load them.", "Bien: así arranca a la primera.": "Good: that way it boots first time.", "Para volver a la PS5: apaga y enciende normal. El sistema de la PS5 no se toca.": "To go back to the PS5: power off and on as usual. The PS5's system isn't touched.", "Pantalla en negro: en la partición FAT32 del USB, añade amdgpu.force_1080p=1 a cmdline.txt.": "Black screen: on the USB's FAT32 partition, add amdgpu.force_1080p=1 to cmdline.txt.", "Si la luz se queda parpadeando, desenchufa el USB, enciende normal y vuelve a empezar desde el jailbreak.": "If the light keeps blinking, unplug the USB drive, turn it on as usual and start again from the jailbreak.", "Es un proyecto de la comunidad, no oficial de Bazzite: las dudas, en su Discord o su wiki, no en los de Bazzite.": "It's a community project, not an official Bazzite one: ask on its Discord or wiki, not Bazzite's.", "Un escritorio como el de Windows con explorador, navegador y Steam oficial (tu cuenta y tu biblioteca).": "A Windows-like desktop with a file explorer, a browser and the official Steam (your account and library).", "No funciona lo que lleva DRM como Denuvo ni los antitrampas (EAC, BattlEye).": "Anything with DRM like Denuvo or anti-cheat (EAC, BattlEye) doesn't work.", "Es experimental: si algo falla, reinicia la consola y vuelve a cargar solo esos payloads.": "It's experimental: if something fails, restart the console and load only those payloads again.", "Títulos": "Titles", "Descubre y añade más a tu biblioteca": "Discover and add more to your library", "✨ Descubre y añade más a tu biblioteca": "✨ Discover and add more to your library", "Emuladores, aplicaciones, herramientas y lo último de la scene": "Emulators, apps, tools and the latest from the scene", "🎮 Emuladores": "🎮 Emulators", "📺 Remote Play": "📺 Remote Play", "Enviar de nuevo": "Send again", "Se vuelve a enviar desde tu PC": "It's sent again from your PC", "Se vuelve a descargar y enviar, como si pegaras el enlace otra vez": "It's downloaded and sent again, as if you pasted the link again", "pide usuario y contraseña, 401": "it asks for a username and password, 401", "el servidor no deja descargarlo, 403": "the server won't allow the download, 403", "no existe en el servidor, 404": "it doesn't exist on the server, 404", "ya no existe en el servidor, 410": "it no longer exists on the server, 410", "el servidor pide esperar un rato, 429": "the server asks to wait a while, 429", "no encuentro ese servidor: revisa el enlace y que haya internet": "I can't find that server: check the link and your internet", "el proxy de tu red no deja pasar": "your network's proxy is blocking it", "el servidor tarda demasiado en contestar": "the server takes too long to answer", "el servidor no acepta la conexión": "the server refuses the connection", "se cortó la conexión": "the connection dropped", "problema con el certificado seguro del servidor": "problem with the server's security certificate", "no hay conexión a internet": "there's no internet connection", "GitHub ha limitado las consultas desde tu conexión: prueba otra vez en un rato": "GitHub has rate-limited your connection: try again in a while"}); // i18n_208 2.0.1
+I18N_RX.push(...[["^el servidor tiene un problema ahora mismo, (\\d+)$", "the server is having a problem right now, {0}"], ["^el servidor contesta (\\d+)$", "the server answers {0}"], ["^No he podido consultar GitHub \\(([\\s\\S]*?)\\)$", "Couldn't reach GitHub ({0})"], ["^La última versión \\(([\\s\\S]*?)\\) no trae una imagen que reconozca\\. Míralo en ([\\s\\S]*)$", "The latest release ({0}) has no image I recognise. Check {1}"]]);
+Object.assign(I18N_EXACT,{"He revisado los enlaces y hay un paquete con problemas:":"I checked the links and one package has problems:"});
+Object.assign(I18N_EXACT,{"Logo e imagen de la tarjeta de Bazzite Deck en Descubrir":"Logo and image of the Bazzite Deck card in Discover"});
+Object.assign(I18N_EXACT,{"Linux en la PS5 (Ubuntu)":"Linux on the PS5 (Ubuntu)","Bazzite Deck (Steam como en la Steam Deck)":"Bazzite Deck (Steam like on the Steam Deck)"});
+Object.assign(I18N_EXACT,{"Ver más ({0} en total)":"Show more ({0} in total)","{0} en el catálogo de RecompStore para PS5":"{0} in RecompStore's PS5 catalog"});
+Object.assign(I18N_EXACT,{"Traducido automáticamente del inglés":"Machine-translated from English","Configurar Remote Play":"Set up Remote Play","Tu cuenta, activada sin conexión":"Your account, offline-activated","Con el jailbreak la consola no entra en PSN. Para Remote Play la cuenta tiene que estar activada sin conexión con offact (de websrv). El ID que genera solo vale para chiaki-ng; para la app oficial de PlayStation hace falta tu ID de cuenta real.":"With the jailbreak the console can't sign in to PSN. For Remote Play the account must be offline-activated with offact (from websrv). The ID it generates only works with chiaki-ng; the official PlayStation app needs your real account ID.","Mi cuenta ya está activada sin conexión":"My account is already offline-activated","Si acabas de hacerlo, reinicia la consola antes de seguir.":"If you just did it, restart the console before continuing.","Saca el PIN y tu ID de cuenta":"Get the PIN and your account ID","Pulsa el botón: PS5 Directo envía el payload y en la PS5 sale una notificación con el PIN para vincular y tu ID de cuenta. Apúntalos. Para cancelar el vínculo, envíalo otra vez.":"Press the button: PS5 Directo sends the payload and the PS5 shows a notification with the pairing PIN and your account ID. Note them down. To cancel pairing, send it again.","Ya tengo el PIN y el ID":"I have the PIN and the ID","Instala chiaki-ng en tu PC":"Install chiaki-ng on your PC","Es el Remote Play libre para Windows, Mac, Linux, Steam Deck y Android. Se baja de su página oficial.":"It's the free Remote Play for Windows, Mac, Linux, Steam Deck and Android. Get it from its official page.","Ya tengo chiaki-ng instalado":"I have chiaki-ng installed","Descargar chiaki-ng":"Download chiaki-ng","Vincula la consola":"Pair the console","En chiaki-ng: añade una consola a mano con la IP de tu PS5, pulsa «Register» y escribe tu ID de cuenta y el PIN del paso 2. Solo vale el ID de la cuenta que está abierta en la consola.":"In chiaki-ng: add a console manually with your PS5's IP, press \"Register\" and enter your account ID and the PIN from step 2. Only the ID of the account signed in on the console works.","La IP de tu PS5":"Your PS5's IP","Copiar":"Copy","Copiado":"Copied","Vinculada":"Paired","Si falla, reinicia la consola, vuelve a sacar el PIN y prueba otra vez.":"If it fails, restart the console, get the PIN again and retry.","Prepara la consola para conectarte":"Get the console ready to connect","Remote Play activado y encendido desde la red":"Remote Play on and wake from network","Ajustes › Sistema › Juego remoto: activar. Y en Ahorro de energía › Funciones disponibles en modo de reposo: «Mantener la conexión a internet» y «Permitir encender la PS5 desde la red».":"Settings › System › Remote Play: enable. And in Power Saving › Features Available in Rest Mode: \"Stay Connected to the Internet\" and \"Enable Turning On PS5 from Network\".","Así puedes despertarla desde chiaki-ng sin levantarte.":"That way you can wake it from chiaki-ng without getting up.","Juega":"Play","Abre chiaki-ng y elige tu consola: si está en reposo, la despierta.":"Open chiaki-ng and pick your console: if it's in rest mode, it wakes it up.","Va mucho mejor con cable o con Wi-Fi de 5 GHz. Empieza en 1080p a 60 fps y sube si va fino.":"It works much better wired or on 5 GHz Wi-Fi. Start at 1080p 60 fps and go up if it runs smoothly.","El vínculo se guarda: la próxima vez solo tienes que abrir chiaki-ng.":"Pairing is saved: next time just open chiaki-ng.","Unos pocos pasos, una sola vez: la lista hace lo que puede por ti y marca cada paso hecho.":"A few steps, just once: the list does what it can for you and ticks off each step."});
+Object.assign(I18N_EXACT,{"La PS5 lo baja sola":"The PS5 downloads it","Sin pasar por el PC":"Without going through the PC","Sin pasar por el PC: la descarga la hace la propia consola con zftpd":"Without going through the PC: the console downloads it itself with zftpd"});
+Object.assign(I18N_EXACT,{"Se baja la última versión de su GitHub y se instala en la consola": "The latest release is downloaded from its GitHub and installed on the console", "Añadido a la cola: {0}. Va a /data/pkg: luego, en Biblioteca › ⋯ › «Instalar en la consola».": "Added to the queue: {0}. It goes to /data/pkg: then, in Library › ⋯ › \"Install on the console\".", "Elige tu versión (.zip, .7z, .rar o .pkg)": "Pick your build (.zip, .7z, .rar or .pkg)", "Añadido a la cola: se manda a la consola y se coloca solo.": "Added to the queue: it's sent to the console and placed automatically.", "Instalar tu propia versión (una build que tengas en el PC)": "Install your own build (one you have on your PC)", "Instalar tu propia versión": "Install your own build", "Más emuladores de la scene": "More emulators from the scene", "Del catálogo de RecompStore: también se instalan con un clic desde su GitHub.": "From RecompStore's catalog: they also install with one click from their GitHub.", "Parches de juegos (ps-patch-system)": "Game patches (ps-patch-system)", "NeoEnabler (PS4 en modo Pro)": "NeoEnabler (PS4 in Pro mode)", "Mejoras para títulos de PS4 y PS5 que hace la comunidad: más fps, más resolución, arreglos… Se activan una a una en su web. PS5 Directo lo carga y te pone los parches en la consola con un botón.": "Community improvements for PS4 and PS5 titles: higher fps, higher resolution, fixes… You turn them on one by one in its web page. PS5 Directo loads it and puts the patches on the console with one button.", "Firmware de PS5 3.00 a 12.70 (según su autor). Se vuelve a cargar tras cada reinicio. Los parches solo cambian el ejecutable al arrancar: el título no se toca.": "PS5 firmware 3.00 to 12.70 (per its author). Load it again after every restart. Patches only change the executable at launch: the title itself isn't touched.", "Hace que los títulos de PS4 de su lista arranquen como en una PS4 Pro y suban de resolución (hasta 4K) con sus parches. Necesita ps-patch-system cargado antes.": "Makes the PS4 titles on its list start as on a PS4 Pro and raise their resolution (up to 4K) with their patches. Needs ps-patch-system loaded first.", "Firmware 4.00 a 13.60 y ps-patch-system cargado primero, después de cada reinicio. Solo sirve con los títulos que tienen parche.": "Firmware 4.00 to 13.60 and ps-patch-system loaded first, after every restart. Only useful for titles that have a patch."});
+Object.assign(I18N_EXACT,{"Baja los parches de la comunidad (PS-Game-Patch) y los deja en /data/user/patches":"Downloads the community patches (PS-Game-Patch) and puts them in /data/user/patches","Poner los parches":"Install the patches","Bajando los parches y copiándolos a la consola…":"Downloading the patches and copying them to the console…","{0} parches en /data/user/patches. Ahora inicia ps-patch-system y actívalos en su web.":"{0} patches in /data/user/patches. Now start ps-patch-system and turn them on in its web page."});
+Object.assign(I18N_EXACT,{"Mejorar tus títulos": "Improve your titles", "🧩 Mejorar tus títulos": "🧩 Improve your titles", "Parches de la comunidad para tus títulos de PS4 y PS5: más fps, más resolución y arreglos. Se activan uno a uno y no tocan tus archivos.": "Community patches for your PS4 and PS5 titles: higher fps, higher resolution and fixes. You turn them on one by one and they don't touch your files.", "Cómo se usa": "How it works", "Inicia ps-patch-system en la consola": "Start ps-patch-system on the console", "Hay que volver a iniciarlo después de cada reinicio.": "Start it again after every restart.", "Pon los parches en la consola": "Put the patches on the console", "Los de la comunidad (PS-Game-Patch). Vuelve a pulsarlo de vez en cuando para tener los nuevos.": "The community ones (PS-Game-Patch). Press it again now and then to get new ones.", "Elige qué activar": "Choose what to turn on", "En su web (también desde el móvil) buscas tu título y activas el parche que quieras: 60 fps, resolución… Se aplica al abrirlo.": "In its web page (also from your phone) find your title and turn on the patch you want: 60 fps, resolution… It applies when you open the title.", "Opcional, para PS4: NeoEnabler": "Optional, for PS4: NeoEnabler", "Después de ps-patch-system. Arranca en modo PS4 Pro los títulos de su lista para que suban de resolución.": "After ps-patch-system. Starts the titles on its list in PS4 Pro mode so they run at higher resolution.", "{0} de tus títulos tienen parches (salen marcados en Biblioteca):": "{0} of your titles have patches (marked in Library):", "Ninguno de los títulos de tu biblioteca tiene parche ahora mismo.": "None of your library titles has a patch right now.", "Hay parches de la comunidad para este título: ": "There are community patches for this title: ", "Parches": "Patches"});
+Object.assign(I18N_EXACT,{"Más de la scene": "More from the scene", "Apps y multimedia": "Apps and media", "🎬 Apps y multimedia": "🎬 Apps and media", "Tus vídeos, tu música, tus servidores y más aplicaciones para la consola.": "Your videos, music, servers and more apps for the console."});
+Object.assign(I18N_EXACT,{"Enlaces, rutas de tu PC o torrents": "Links, PC paths or torrents", "Añadir desde:": "Add from:", "📁 Archivos": "📁 Files", "Captar lo que copies": "Catch what you copy", "📋 Captar lo que copies": "📋 Catch what you copy", "Carpeta vigilada": "Watched folder", "¿Qué formatos sirven?": "Which formats work?", "Pega todas las partes juntas (.part1.rar, .part2.rar… o .001, .002…), una por línea o dentro de cualquier texto: las separo por paquetes y, antes de empezar, te aviso si algún enlace no funciona o falta alguna parte.": "Paste all the parts together (.part1.rar, .part2.rar… or .001, .002…), one per line or inside any text: I split them into packages and, before starting, warn you if a link doesn't work or a part is missing.", "Los enlaces de descarga que copies (.rar, .7z, .zip, partes, .pkg, imágenes, torrents) de cualquier web o programa llegan solos a esta caja.": "Download links you copy (.rar, .7z, .zip, parts, .pkg, images, torrents) from any website or program land in this box by themselves.", "Lo que termine de bajar ahí con otro programa, como FDM o JDownloader, llega solo a esta caja.": "Whatever another program like FDM or JDownloader finishes downloading there lands in this box by itself.", "También puedes soltar archivos en esta página, o arrastrarlos sobre el icono de PS5 Directo (en Windows, también clic derecho › Enviar a › PS5 Directo).": "You can also drop files on this page, or drag them onto the PS5 Directo icon (on Windows, also right-click › Send to › PS5 Directo)."});
+Object.assign(I18N_EXACT,{"Comprobando qué tienes instalado en la consola…":"Checking what you have installed on the console…"});
+Object.assign(I18N_EXACT,{"Más populares": "Most popular", "Lo más nuevo": "Newest", "Lo que hay para la PS5 en RecompStore, por categorías": "What's on RecompStore for the PS5, by category", "Cambiar la imagen de su tarjeta": "Change this card's image", "Cambiar imagen": "Change image", "Ver vídeo": "Watch video"});
+Object.assign(I18N_EXACT,{"Más novedades":"More new releases"});
+Object.assign(I18N_EXACT,{"Recién llegados":"Newest arrivals","Emuladores de la scene":"Emulators from the scene"});
+Object.assign(I18N_EXACT,{"Actualizados hace poco":"Recently updated","Cargando novedades y lo que tienes en la consola…":"Loading news and what's on your console…"});
+Object.assign(I18N_EXACT,{"Nuevo: {0}":"New: {0}","Actualizado {0}":"Updated {0}","Lo último que se ha publicado o actualizado para la PS5":"The latest released or updated for the PS5"});
+Object.assign(I18N_EXACT,{"No he podido mirar si hay versión nueva en GitHub:":"I couldn't check GitHub for a new version:","¿Quieres instalar una desde un .zip?":"Do you want to install one from a .zip?","Instalar desde un .zip":"Install from a .zip"});
 // --- idioma: español (original) o inglés. Traduce el texto de la página y los mensajes del programa.
 const LANG=(()=>{try{const v=localStorage.getItem('ps5d_lang');if(v==='es'||v==='en')return v}catch(e){}
   return (navigator.language||'es').toLowerCase().startsWith('es')?'es':'en'})();
@@ -1829,7 +1939,12 @@ function tr(s){
     if(core.includes('\n')) r=core.split('\n').map(trLine).join('\n');
     else{
       for(const sep of [' -- ',' · ']){ if(core.includes(sep)){ r=core.split(sep).map(tr).join(sep); break } }
-      if(r==null){ const parts=core.replace(/([.!?:])\s+(?=[A-ZÁÉÍÓÚ¿¡(])/g,'$1\u0000').split('\u0000'); if(parts.length>1){ const t=parts.map(tr); r=t.join(' ') } }
+      if(r==null){ const parts=core.replace(/([.!?:])\s+(?=[A-ZÁÉÍÓÚ¿¡(«])/g,'$1\u0000').split('\u0000');
+        if(parts.length>1){ const out=[]; let i=0;           // frases sueltas o juntas: la traducción más larga que exista
+          while(i<parts.length){ let hit=null, j=parts.length;
+            for(;j>i;j--){ const c=parts.slice(i,j).join(' '); const t=j-i===parts.length?null:trCore(c); if(t!=null){ hit=t; break } }
+            if(hit!=null){ out.push(hit); i=j } else { out.push(tr(parts[i])); i++ } }
+          r=out.join(' ') } }
     }
   }
   const out=lead+(r==null?core:r)+trail;
@@ -1867,6 +1982,103 @@ function takeAdd(){ try{ const q=new URLSearchParams(location.hash.slice(1)), a=
   const ta=document.getElementById('lines'); if(!ta) return; ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+a;
   const w=()=>{ try{ showTab('Transfers'); ta.scrollIntoView({block:'center'}); toast(tr('Recibido: revísalo y pulsa «Añadir a la cola».')) }catch(e){ setTimeout(w,500) } }; setTimeout(w,800) }catch(e){} }
 window.addEventListener('hashchange',takeAdd); window.addEventListener('load',takeAdd);
+// --- iconos de línea (propios, estilo de las tarjetas de formato): sustituyen a los emojis en toda la interfaz
+const ICP={
+ sparkles:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+ folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+ folderOpen:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v1"/><path d="M3 19l2.6-7.2A2 2 0 0 1 7.5 10.5H21l-2.7 7.3a2 2 0 0 1-1.9 1.2H3z"/>',
+ film:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+ clapper:'<path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 10l-.6-3.3a1 1 0 0 1 .8-1.2l13.8-2.4a1 1 0 0 1 1.2.8L19.6 7z"/><path d="M8.5 5l2.2 3.6M13.5 4.2l2.2 3.6"/>',
+ upload:'<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+ download:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+ gamepad:'<path d="M7 7h10a4 4 0 0 1 4 4l.6 4.2a2.6 2.6 0 0 1-4.6 2.1L15.3 15H8.7l-1.7 2.3a2.6 2.6 0 0 1-4.6-2.1L3 11a4 4 0 0 1 4-4z"/><path d="M7.5 10v3M6 11.5h3"/><circle cx="15.5" cy="10.5" r=".6"/><circle cx="17" cy="12.5" r=".6"/>',
+ joystick:'<path d="M5 21h14a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1z"/><path d="M12 17V9"/><circle cx="12" cy="6" r="3"/>',
+ box:'<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+ news:'<path d="M5 4h12a2 2 0 0 1 2 2v12a2 2 0 0 0 2 2H6a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2z"/><path d="M19 9h2v9a2 2 0 0 1-2 2M7 8h8M7 12h8M7 16h5"/>',
+ puzzle:'<path d="M10 4a2 2 0 1 1 4 0v1h3a1 1 0 0 1 1 1v3h1a2 2 0 1 1 0 4h-1v3a1 1 0 0 1-1 1h-3v-1a2 2 0 1 0-4 0v1H7a1 1 0 0 1-1-1v-3H5a2 2 0 1 1 0-4h1V6a1 1 0 0 1 1-1h3z"/>',
+ phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/>',
+ archive:'<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/>',
+ wrench:'<path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-1.5 1.5-1.3-1.3-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9-1.3-1.3L15.4 7.4z" transform="translate(-2 -2)"/>',
+ tools:'<path d="M14.5 5.5a3.5 3.5 0 0 0 4.4 4.4L20.5 11.5 12 20a2 2 0 0 1-2.8-2.8l8.5-8.5"/><path d="M4 4l5 5M3 8l5-5 3 3-5 5z"/>',
+ terminal:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12.5 15H17"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.4 13.4 8.5 15.5l2.1-4.9z"/>',
+ upCircle:'<circle cx="12" cy="12" r="9"/><path d="M12 16.5v-9M8.5 11 12 7.5l3.5 3.5"/>',
+ drive:'<rect x="3" y="13" width="18" height="7" rx="2"/><path d="M5 13 7.5 5.5A2 2 0 0 1 9.4 4h5.2a2 2 0 0 1 1.9 1.5L19 13"/><path d="M7 16.5h.01M10.5 16.5h.01"/>',
+ image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.8"/><path d="M21 16l-5-5-9 9"/>',
+ cloud:'<path d="M7 19a5 5 0 0 1-.7-9.95A6.5 6.5 0 0 1 18.8 10.5 4.25 4.25 0 0 1 17.5 19z"/>',
+ monitor:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16v4"/>',
+ pulse:'<path d="M3 12h4l2.5-6 5 12 2.5-6H21"/>',
+ bug:'<rect x="7" y="7" width="10" height="13" rx="5"/><path d="M9 7.5V6a3 3 0 0 1 6 0v1.5M3 13h4M17 13h4M4 7l3 2M20 7l-3 2M4 19l3-2M20 19l-3-2M12 11v9"/>',
+ zap:'<path d="M13 3 4.5 13.5H12L11 21l8.5-10.5H12z"/>',
+ gear:'<path d="M12 2.8l1.7 2.1 2.7-.5.7 2.6 2.4 1.3-1 2.7 1 2.7-2.4 1.3-.7 2.6-2.7-.5L12 21.2l-1.7-2.1-2.7.5-.7-2.6-2.4-1.3 1-2.7-1-2.7 2.4-1.3.7-2.6 2.7.5z"/><circle cx="12" cy="12" r="3"/>',
+ book:'<path d="M3 5.5c3-1.4 6-1.3 9 .6 3-1.9 6-2 9-.6V19c-3-1.4-6-1.3-9 .6-3-1.9-6-2-9-.6z"/><path d="M12 6.1v13.5"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+ chart:'<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/>',
+ star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
+ bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>',
+ tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
+ trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>',
+ hourglass:'<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/>',
+ chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx=".8"/><path d="M9 2.5V6M15 2.5V6M9 18v3.5M15 18v3.5M2.5 9H6M2.5 15H6M18 9h3.5M18 15h3.5"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ heart:'<path d="M12 20s-7.5-4.6-9-9.2A4.8 4.8 0 0 1 12 6.6a4.8 4.8 0 0 1 9 4.2C19.5 15.4 12 20 12 20z"/>',
+ lifebuoy:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.8"/><path d="M5.6 5.6l3.7 3.7M14.7 14.7l3.7 3.7M18.4 5.6l-3.7 3.7M9.3 14.7l-3.7 3.7"/>',
+ thermo:'<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 11v6"/>',
+ shield:'<path d="M12 3l8 3v6c0 4.5-3.4 7.8-8 9-4.6-1.2-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+ refresh:'<path d="M20 11a8 8 0 0 0-14.6-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.6 4.5L20 16M20 20v-4h-4"/>',
+ undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+ gauge:'<path d="M4.5 18a9 9 0 1 1 15 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13.5" r="1.3"/>',
+ file:'<path d="M6 3h8l5 5v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M8.5 13h7M8.5 17h5"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+ clipboard:'<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M9 11h6M9 15h4"/>',
+ eraser:'<path d="M7 20h13M4.6 15.4 13.8 6.2a2 2 0 0 1 2.8 0l2.8 2.8a2 2 0 0 1 0 2.8L11 20H8.2z"/><path d="M9.5 10.5l5.5 5.5"/>',
+ library:'<path d="M4 4v16M8 4v16M12 5l4.5 15M17 4.5l3.5 15"/>',
+ laptop:'<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19.5h20"/>',
+ pause:'<rect x="6.5" y="5" width="3.5" height="14" rx="1"/><rect x="14" y="5" width="3.5" height="14" rx="1"/>',
+ power:'<path d="M12 3v8"/><path d="M6.4 6.6a8 8 0 1 0 11.2 0"/>',
+ contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor" stroke="none"/>',
+ tv:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 2.5 12 6l4-3.5"/>',
+ link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+ key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14.5 8.5l2 2"/>',
+ aperture:'<circle cx="12" cy="12" r="9"/><path d="M14.3 3.3 9 12.5M20.7 9.5H10.2M18.7 18 13.4 8.8M9.7 20.7l5.3-9.2M3.3 14.5h10.5M5.3 6l5.3 9.2"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
+ alert:'<path d="M12 4 2.8 19.5a1 1 0 0 0 .9 1.5h16.6a1 1 0 0 0 .9-1.5z"/><path d="M12 10v4.5M12 17.5h.01"/>',
+ play:'<path d="M7 4.5v15a.8.8 0 0 0 1.2.7l12-7.5a.8.8 0 0 0 0-1.4l-12-7.5A.8.8 0 0 0 7 4.5z"/>',
+ check:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/>',
+ apple:'<path d="M12 7c-1-2.5 1-4.5 3-4.5 0 2-1.3 4-3 4.5z"/><path d="M12 8c-2-1.4-6-1-6.6 3.4C4.8 16 8 21 10 21c1 0 1.2-.5 2-.5s1 .5 2 .5c2 0 5.2-5 4.6-9.6C18 7 14 6.6 12 8z"/>',
+ penguin:'<path d="M12 3c-2.8 0-4 2.3-4 5 0 1.2-1.2 2.5-2 4-1.2 2.3-1.3 5.5.5 7 1 .8 2.6 1 5.5 1s4.5-.2 5.5-1c1.8-1.5 1.7-4.7.5-7-.8-1.5-2-2.8-2-4 0-2.7-1.2-5-4-5z"/><path d="M10 9.5c.6.6 3.4.6 4 0"/><circle cx="10.5" cy="7" r=".5"/><circle cx="13.5" cy="7" r=".5"/>',
+ rocket:'<path d="M5 15c-1.5 1-2 3.5-2 6 2.5 0 5-.5 6-2"/><path d="M9 15l-2-2c1-4 4-9 12-10-1 8-6 11-10 12z"/><circle cx="14.5" cy="9.5" r="1.5"/>',
+ dots:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+ home:'<path d="M3 11 12 3l9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
+ grid:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
+ music:'<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+ camera:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
+ windows:'<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1"/><rect x="13" y="13" width="7.5" height="7.5" rx="1"/>',
+ steam:'<circle cx="12" cy="12" r="9"/><circle cx="15" cy="9.5" r="2.5"/><circle cx="9" cy="15" r="1.6"/><path d="M10.4 14.3 13 11"/>',
+};
+const ICE={'✨':'sparkles','📁':'folder','📂':'folderOpen','🎬':'clapper','🎞':'film','📤':'upload','📥':'download','⬇':'download','🎮':'gamepad','🕹':'joystick','📦':'box','📰':'news','🧩':'puzzle','📲':'phone','📱':'phone',
+ '🗄':'archive','🛠':'tools','🧰':'tools','🐧':'penguin','🧭':'compass','⬆':'upCircle','💾':'drive','🖼':'image','☁':'cloud','🖥':'monitor','💻':'laptop','🩺':'pulse','🐞':'bug','⚡':'zap','⚙':'gear',
+ '📖':'book','🔎':'search','📊':'chart','📈':'chart','⭐':'star','🔔':'bell','🏷':'tag','🗑':'trash','⏳':'hourglass','🧬':'chip','⏱':'clock','⏰':'clock','❤':'heart','🛟':'lifebuoy','🌡':'thermo',
+ '🛡':'shield','🔄':'refresh','↩':'undo','🐢':'gauge','📄':'file','🌐':'globe','📋':'clipboard','🧹':'eraser','📚':'library','🍎':'apple','⏸':'pause','📴':'power','⏻':'power','🌗':'contrast','📺':'tv',
+ '🔗':'link','🔑':'key','🌀':'aperture','➕':'plus','💡':'bulb','⚠':'alert','▶':'play','✅':'check','🗂':'grid','🚀':'rocket','🎵':'music','📷':'camera','🪟':'windows'};
+function ico(n,cls){ const p=ICP[n]; return p?`<svg class="ic${cls?' '+cls:''}" viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`:'' }
+const ICE_RX=new RegExp('('+Object.keys(ICE).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')\\uFE0F?','gu');
+const ICE_SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,OPTION:1,PRE:1,TITLE:1,SVG:1,svg:1};
+function icoText(n){
+  const p=n.parentNode; if(!p||p.nodeType!==1||ICE_SKIP[p.nodeName]||p.closest('[data-noico],select')) return;
+  const v=n.nodeValue; ICE_RX.lastIndex=0; if(!ICE_RX.test(v)) return; ICE_RX.lastIndex=0;
+  const f=document.createDocumentFragment(); let last=0, m;
+  while((m=ICE_RX.exec(v))){ if(m.index>last) f.appendChild(document.createTextNode(v.slice(last,m.index)));
+    const t=document.createElement('template'); t.innerHTML=ico(ICE[m[1]]); const s=t.content.firstChild; s.setAttribute('data-e',m[1]); f.appendChild(s); last=m.index+m[0].length }
+  if(last<v.length) f.appendChild(document.createTextNode(v.slice(last)));
+  p.replaceChild(f,n) }
+function icoTree(root){ if(root.nodeType===3) return icoText(root); if(root.nodeType!==1||ICE_SKIP[root.nodeName]) return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT); const ns=[]; let n; while((n=w.nextNode())) ns.push(n); ns.forEach(icoText) }
+icoTree(document.body);
+new MutationObserver(ms=>{ for(const m of ms){ if(m.type==='characterData') icoText(m.target); else m.addedNodes.forEach(icoTree) } }).observe(document.body,{subtree:true,childList:true,characterData:true});
+
+function LOC(){ return LANG==='en'?'en-GB':'es-ES' }
 function setLang(l){try{localStorage.setItem('ps5d_lang',l)}catch(e){} location.reload()}
 </script>
 
@@ -2122,12 +2334,16 @@ let keepPrevWhere='ps5';
 function keepSteps(){ const c=document.querySelector('#keepSteps input:checked'); return c?c.value:'extract' }
 function setTo(to){
   if(to==='pc'&&$('where').value!=='keep'){ keepPrevWhere=$('where').value||'ps5'; $('where').value='keep' }
-  if(to!=='pc'&&$('where').value==='keep'){ $('where').value=keepPrevWhere==='keep'?'ps5':keepPrevWhere }
+  if(to==='zdl'){ $('where').value='zdl' }
+  if(to==='ps5'&&$('where').value==='zdl'){ $('where').value='ps5' }
+  if(to!=='pc'&&$('where').value==='keep'){ $('where').value=keepPrevWhere==='keep'||keepPrevWhere==='zdl'?'ps5':keepPrevWhere }
+  $('where').dispatchEvent(new Event('change'));
   $('where').dataset.touched='1'; paintKeep() }
 async function paintKeep(){
   const k=$('where').value==='keep', st=keepSteps();
   document.body.classList.toggle('keepmode',k);
-  $('toMode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.to==='pc')===k));
+  const cur=k?'pc':$('where').value==='zdl'?'zdl':'ps5';
+  $('toMode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.to===cur));
 
   $('keepRow').hidden=!k;
   document.querySelector('.fmt-sec').hidden=k&&st!=='convert';
@@ -2152,7 +2368,7 @@ let pcmT=0;
 function pcmSave(){ if(!pcModeOn()) return; clearTimeout(pcmT); pcmT=setTimeout(()=>{ const st=keepSteps(), f=st==='convert'?$('fmt').value:'';
   state.settings.pc_mode_steps=st; state.settings.pc_mode_fmt=f; api('/api/settings',{pc_mode_steps:st,pc_mode_fmt:f}).catch(()=>{}) },400) }
 $('fmt').addEventListener('change',pcmSave);
-function watchPaint(){ const d=(state.settings||{}).watch_dir||''; $('watchDir').textContent=d||tr('ninguna'); $('watchOff').hidden=!d; $('watchRow').hidden=!!state.remote }
+function watchPaint(){ const d=(state.settings||{}).watch_dir||''; $('watchDir').textContent=d||''; $('watchOff').hidden=!d; $('watchRow').hidden=!!state.remote }
 $('watchPick').onclick=async()=>{ let paths=[]; try{const r=await api('/api/pick',{kind:'folder',title:tr('Carpeta que vigilo')}); paths=r.paths||[]}catch(e){}
   if(!paths.length){ const v=prompt(tr('Ruta de la carpeta (por ejemplo C:\\Users\\tú\\Downloads):'),(state.settings||{}).watch_dir||''); if(v) paths=[v] }
   if(!paths.length) return; try{ await api('/api/settings',{watch_dir:paths[0],watch_since:Date.now()/1000}); state.settings.watch_dir=paths[0]; watchPaint(); toast(tr('Listo: lo que termine de bajar en esa carpeta llegará a la caja de enlaces.')) }catch(e){ toast(e.message) } };
@@ -2454,7 +2670,7 @@ function palBase(){
 function palItems(q){
   q=q.trim().toLowerCase(); let out=palBase();
   ((lib.res&&lib.res.items)||[]).filter(x=>!x.extra).forEach(x=>out.push({l:(x.title||x.name)+(x.tid?' · '+x.tid:''),ic:'🎮',raw:true,go:()=>{ showTab('Library'); openFicha(x) }}));
-  (rec.items||[]).forEach(x=>out.push({l:x.name+(x.sys?' · '+tr(x.sys):''),ic:x.group==='emu'?'🕹':'⭐',raw:true,go:()=>{ goApps(x.group); if(x.emu) setTimeout(()=>emuWizard(x.id),600) }}));
+  (rec.items||[]).forEach(x=>out.push({l:x.name+(x.sys?' · '+tr(x.sys):''),ic:({emu:'🎮',media:'🎬',rp:'📺',tool:'🛠',os:'🖥'})[x.group]||'✨',raw:true,go:()=>{ goApps(x.group); if(x.emu) setTimeout(()=>emuWizard(x.id),600) }}));
   if(!q) return out.slice(0,23);
   const words=q.split(/\s+/);
   return out.filter(x=>words.every(w=>x.l.toLowerCase().includes(w))).slice(0,30);
@@ -2669,7 +2885,7 @@ $('updFile').onchange=async()=>{
 $('btnUpdCheck').onclick=async()=>{
   const o=$('updOut'); o.textContent='Buscando…';
   try{await saveSettings(); const r=await api('/api/update/check',{});
-    if(!r.ok){o.textContent=r.error;return}
+    if(!r.ok){o.innerHTML=esc(r.error)+' <button class="small" id="btnUpdZip2">'+esc(tr('Instalar desde un .zip'))+'</button>'; $('btnUpdZip2').onclick=()=>$('updFile').click(); return}
     if(!r.newer){o.textContent='Ya tienes la última (v'+r.current+').';return}
     o.innerHTML='Hay una versión nueva: <b>v'+esc(r.latest)+'</b> (tienes la v'+esc(r.current)+'). <button class="small" id="btnUpdGo">Actualizar ahora</button>';
     $('btnUpdGo').onclick=async()=>{o.textContent='Descargando e instalando…';try{const x=await api('/api/update/github',{});afterUpdate(x.version)}catch(e){o.textContent=e.message}};
@@ -2740,7 +2956,7 @@ $('btnUpdHead').onclick=async()=>{
     $('updFile').click(); return;
   }
   try{const r=await api('/api/update/check',{});
-    if(!r.ok){toast(r.error);return}
+    if(!r.ok){ if(confirm(tr('No he podido mirar si hay versión nueva en GitHub:')+'\n'+r.error+'\n\n'+tr('¿Quieres instalar una desde un .zip?'))) $('updFile').click(); return }
     if(!r.newer){
       if(confirm('Ya tienes la última (v'+r.current+'). ¿Quieres instalar una desde un .zip?')) $('updFile').click();
       return}
@@ -2838,7 +3054,7 @@ function bkWatch(){ clearInterval(bkPoll); bkPoll=setInterval(bkState,900); bkSt
 async function bkState(){
   let r; try{r=await api('/api/bk/state',{})}catch(e){return}
   const b=r.bk; $('bkProg').hidden=!b.busy; $('bkRun').disabled=b.busy;
-  $('bkDir').textContent=tr('Se guardan en: {0}').replace('{0}',b.dir)+(b.last_t?' · '+tr('última copia: {0}').replace('{0}',new Date(b.last_t*1000).toLocaleString()):'');
+  $('bkDir').textContent=tr('Se guardan en: {0}').replace('{0}',b.dir)+(b.last_t?' · '+tr('última copia: {0}').replace('{0}',new Date(b.last_t*1000).toLocaleString(LOC())):'');
   if(b.busy){ const pct=b.total?Math.min(100,b.done*100/b.total):0; $('bkBar').style.width=pct.toFixed(1)+'%';
     $('bkTxt').textContent=(b.what==='restore'?tr('Restaurando'):tr('Copiando'))+(b.total?` ${human(b.done)} / ${human(b.total)}`:'')+(b.current?' · '+b.current:''); }
   else { clearInterval(bkPoll); if(b.error) toast(b.error); bkList(); }
@@ -2848,7 +3064,7 @@ async function bkList(){
   const it=r.items||[];
   if(!it.length){ $('bkList').innerHTML=`<tr><td colspan="4" class="hint">${esc(tr('Todavía no hay copias. Pulsa «Hacer copia ahora».'))}</td></tr>`; return }
   const secN={saves:tr('partidas'),emu:tr('emuladores'),config:tr('ajustes'),appdb:tr('base de datos'),list:tr('lista')};
-  $('bkList').innerHTML=it.map((x,i)=>`<tr><td data-noi18n>${esc(new Date(x.t*1000).toLocaleString())}${/antes-de-restaurar/.test(x.name)?' <span class="bdg info">'+esc(tr('antes de restaurar'))+'</span>':''}</td>
+  $('bkList').innerHTML=it.map((x,i)=>`<tr><td data-noi18n>${esc(new Date(x.t*1000).toLocaleString(LOC()))}${/antes-de-restaurar/.test(x.name)?' <span class="bdg info">'+esc(tr('antes de restaurar'))+'</span>':''}</td>
     <td>${esc((x.sections||[]).map(k=>secN[k]||k).join(', '))}${x.saves&&x.saves.length?' · '+esc(tr('{0} con partidas').replace('{0}',x.saves.length)):''}${x.emus&&x.emus.length?' · '+esc(x.emus.map(i=>(x.emu_names||{})[i]||i).join(', ')):''}</td>
     <td class="num">${human(x.size)}</td>
     <td>${(x.saves&&x.saves.length)||(x.emus&&x.emus.length)?`<button class="small" data-rs="${i}">${esc(tr('Restaurar partidas…'))}</button>`:''}</td></tr>`).join('');
@@ -2897,7 +3113,7 @@ async function sdLoad(arg){
   $('sdSend').value=r.send; $('sdChat').value=r.tg_chat; $('sdTok').value=r.tg_token?'••••':''; $('sdHook').value=r.dc_hook?'••••':'';
   const titles={}; (md.items||[]).forEach(x=>{ if(x.tid) titles[x.tid]=x.app||x.tid }); Object.keys(r.route||{}).forEach(t=>{ titles[t]=titles[t]||t });
   $('sdRoute').innerHTML=Object.keys(titles).length?`<table class="acttable"><tbody>${Object.entries(titles).map(([t,n])=>`<tr><td data-noi18n>${esc(n)}</td><td><select data-rt="${esc(t)}"><option value="">${esc(tr('Como el resto'))}</option>${['tg','dc','both','none'].map(v=>`<option value="${v}"${(r.route||{})[t]===v?' selected':''}>${esc(tr(DEST_LBL[v]))}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table>`:`<p class="hint">${esc(tr('Aparecen aquí los títulos de los que tienes capturas.'))}</p>`;
-  $('sdHist').innerHTML=(r.history||[]).length?`<table class="acttable"><tbody>${r.history.map(x=>`<tr><td>${esc(new Date(x.t*1000).toLocaleString())}</td><td data-noi18n>${esc(x.title||'')}<div class="hint">${esc(x.name)}</div></td><td>${esc(DEST_LBL[x.dest]||x.dest)}</td><td>${x.ok?'<span class="okline">✔</span>':`<span class="err" title="${esc(x.err)}">✖ ${esc(tr(x.err||''))}</span> <button class="small" data-rf="${esc(x.file)}" data-rd="${esc(x.dest)}">${esc(tr('Reintentar'))}</button>`}</td></tr>`).join('')}</tbody></table>`:`<p class="hint">${esc(tr('Todavía no se ha enviado nada.'))}</p>`;
+  $('sdHist').innerHTML=(r.history||[]).length?`<table class="acttable"><tbody>${r.history.map(x=>`<tr><td>${esc(new Date(x.t*1000).toLocaleString(LOC()))}</td><td data-noi18n>${esc(x.title||'')}<div class="hint">${esc(x.name)}</div></td><td>${esc(DEST_LBL[x.dest]||x.dest)}</td><td>${x.ok?'<span class="okline">✔</span>':`<span class="err" title="${esc(x.err)}">✖ ${esc(tr(x.err||''))}</span> <button class="small" data-rf="${esc(x.file)}" data-rd="${esc(x.dest)}">${esc(tr('Reintentar'))}</button>`}</td></tr>`).join('')}</tbody></table>`:`<p class="hint">${esc(tr('Todavía no se ha enviado nada.'))}</p>`;
   $('sdHist').querySelectorAll('[data-rf]').forEach(b=>b.onclick=async()=>{ b.disabled=true; await sdLoad({retry:{file:b.dataset.rf,dest:b.dataset.rd}}); setTimeout(()=>sdLoad(),4000) });
   return r;
 }
@@ -2979,7 +3195,7 @@ function addLinesOf(text){
   return out }
 async function precheckLinks(lines){
   const urls=lines.filter(x=>/^(https?|ftp):\/\//i.test(x));
-  if(urls.length<2) return {ok:true};
+  if(!urls.length) return {ok:true};
   try{ const r=await api('/api/grab/start',{text:urls.join('\n')}); if(!r.ok) return {ok:true} }catch(e){ return {ok:true} }
   let g; for(let k=0;k<600;k++){ await new Promise(r=>setTimeout(r,500)); try{g=(await api('/api/grab/state',{})).grab}catch(e){}
     if(g&&!g.busy) break; if(g) $('btnAdd').textContent=tr('Comprobando enlaces: {0} de {1}…').replace('{0}',g.done).replace('{1}',g.total) }
@@ -2988,7 +3204,7 @@ async function precheckLinks(lines){
   return {ok:!bad.length, bad, good:g.packages.filter(p=>!p.offline&&!p.missing.length)} }
 function askAddChk(res){ return new Promise(done=>{
   const d=$('dlgAddChk');
-  $('acSum').textContent=tr('He revisado los enlaces y hay {0} paquetes con problemas:').replace('{0}',res.bad.length);
+  $('acSum').textContent=res.bad.length===1?tr('He revisado los enlaces y hay un paquete con problemas:'):tr('He revisado los enlaces y hay {0} paquetes con problemas:').replace('{0}',res.bad.length);
   $('acList').innerHTML=res.bad.map(p=>`<div class="gr-pk"><div><b data-noi18n>${esc(p.name)}</b>${p.offline?`<div class="gr-st bad">✖ ${esc(p.offline===1&&p.parts.length===1?tr('El enlace no funciona'):tr('{0} enlaces no funcionan').replace('{0}',p.offline))}</div>`:''}${p.missing.length?`<div class="gr-st warn">⚠ ${esc(tr('Faltan partes: {0}').replace('{0}',p.missing.join(', ')))}</div>`:''}</div>
     <details><summary>${esc(tr('Ver enlaces'))} (${p.parts.length})</summary>${p.parts.map(x=>`<div>${x.ok?'✔':'✖'} <span data-noi18n>${esc(x.name)}</span>${x.ok?'':' · '+esc(tr(x.err||''))}</div>`).join('')}</details></div>`).join('')
     +(res.good.length?`<div class="hint" style="margin-top:8px">✔ ${esc(tr('Los otros {0} están bien.').replace('{0}',res.good.length))}</div>`:'');
@@ -3083,20 +3299,21 @@ $('rsdScan').onclick=rsdScan;
 let col={roots:[],items:null,poll:null};
 $('libView').addEventListener('click',e=>{const b=e.target.closest('button[data-v]'); if(!b) return;
   $('libView').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
-  const v=b.dataset.v; $('libCard').hidden=v!=='console'; $('colCard').hidden=v!=='pc'; $('allCard').hidden=v!=='all'; 
+  const v=b.dataset.v; $('libTypes').hidden=v==='pc'; $('libCard').hidden=v!=='console'; $('colCard').hidden=v!=='pc'; $('allCard').hidden=v!=='all'; 
   if(v==='pc') colEnter(); if(v==='all') allEnter();});
 // --- ✨ Descubrir: recomendados por categorías (de la página oficial de cada autor) + novedades de la scene
 let appV='home', recFam='';
 const rec={items:[],console:true,loaded:false};
 const DSC={home:{t:'✨ Descubrir',h:'Lo mejor para tu PS5 de un vistazo: lo último de la scene y lo que merece la pena instalar, por categorías. Todo se baja de la página oficial de su autor en GitHub (PS5 Directo no aloja nada). Las BIOS, claves y el contenido tienen que ser tuyos.'},
-  emu:{t:'🕹 Emuladores',h:'Instálalos con un clic y te guío con lo que necesita cada uno. Ninguno trae BIOS, claves, firmware ni contenido: lo tuyo lo pones tú.',ic:'🕹'},
-  media:{t:'🎬 Multimedia',h:'Tus vídeos, tu música y tus servidores en la tele, desde la consola.',ic:'🎬'},
-  rp:{t:'🎮 Remote Play',h:'Ver y manejar la consola desde el PC.',ic:'🎮'},
+  emu:{t:'🎮 Emuladores',h:'Instálalos con un clic y te guío con lo que necesita cada uno. Ninguno trae BIOS, claves, firmware ni contenido: lo tuyo lo pones tú.',ic:'🕹'},
+  media:{t:'🎬 Apps y multimedia',h:'Tus vídeos, tu música, tus servidores y más aplicaciones para la consola.',ic:'🎬'},
+  rp:{t:'📺 Remote Play',h:'Ver y manejar la consola desde el PC.',ic:'🎮'},
   tool:{t:'🛠 Herramientas',h:'Utilidades que funcionan en la consola: transferir, vigilar, actualizar y manejarla desde el PC.',ic:'🛠'},
-  os:{t:'🐧 Linux y Steam',h:'Más allá de la consola: Linux y Steam en la PS5.',ic:'🐧'}};
-const DSC_ORDER=['emu','media','rp','tool','os'];
+  patch:{t:'🧩 Mejorar tus títulos',h:'Parches de la comunidad para tus títulos de PS4 y PS5: más fps, más resolución y arreglos. Se activan uno a uno y no tocan tus archivos.',ic:'🧩'},
+  os:{t:'🖥 PC en la PS5',h:'Usa la consola como un PC: Linux completo, Steam como en la Steam Deck o tus programas de Windows. Con guía paso a paso en tu idioma.',ic:'🖥'}};
+const DSC_ORDER=['emu','media','rp','tool','patch','os'];
 const DSC_FAM=[['','Todos'],['ps','PlayStation'],['nin','Nintendo'],['sega','Sega, arcade y PC Engine'],['xbox','Xbox'],['multi','Varios sistemas']];
-const DSC_COL={ps:['#2f63e0','#0d1b48'],nin:['#d83a4c','#4a0c19'],sega:['#7c45e6','#22104a'],xbox:['#2fa04c','#0b2c15'],multi:['#119c9c','#07303a'],other:['#68708a','#1c2230'],
+const DSC_COL={patch:['#e0803a','#46200a'],ps:['#2f63e0','#0d1b48'],nin:['#d83a4c','#4a0c19'],sega:['#7c45e6','#22104a'],xbox:['#2fa04c','#0b2c15'],multi:['#119c9c','#07303a'],other:['#68708a','#1c2230'],
   media:['#f08a3c','#55200c'],rp:['#6262f2','#19154d'],tool:['#1ea58b','#0a2e29'],os:['#e2a524','#3a2804']};
 const DSC_GL={vlc:'🎬',jelly5:'🎞',emby5:'📺',pshare:'📤',chiral:'🔗',rpgetpin:'🔑',chiaki:'🖥',patchdl:'⬇',forge:'🧰',overlay:'📊',exporter:'📈',pkgmanager:'📦',
   ps5linux:'🐧',bazzite:'🖥',mihawkos:'🌀',smplusgui:'🧩',tailscale:'🌐',zftpd:'📁',ruffle:'⚡',retroarch:'🕹'};
@@ -3108,53 +3325,73 @@ function appShow(v){ if(!DSC[v]&&v!=='news') v='home'; appV=v;
 function appEnter(){ appShow(appV) }
 function goApps(v){ appV=v==='rec'?'home':(v||'home'); showTab('Apps') }
 $('appView').addEventListener('click',e=>{const b=e.target.closest('button[data-a]'); if(b) appShow(b.dataset.a)});
-$('libView').addEventListener('click',e=>{const b=e.target.closest('button[data-go]'); if(b) goApps(b.dataset.go)});
-function recShow(){ if(rec.loaded) recPaint(); recLoad() }
-async function recLoad(){ const box=$('recBody'); if(!rec.loaded) box.innerHTML=loadingHTML('Mirando qué tienes en la consola…',1);
-  if(!nw.items.length&&!nw.err) nwGet().then(()=>{ if(appV==='home'&&!$('tabApps').hidden) recPaint() });
+function recShow(){ if(appV==='patch') patchIdxLoad(); if(rec.loaded) recPaint(); recLoad() }
+async function recLoad(){ const box=$('recBody'); if(!rec.loaded) box.innerHTML=loadingHTML('Cargando novedades y lo que tienes en la consola…',1);
+  if(!nw.items.length&&!nw.err) nwGet().then(()=>{ if(!$('tabApps').hidden&&DSC[appV]&&rec.loaded) recPaint() });
   let r; try{ r=await api('/api/rec/list',{}); if(!r.ok) throw new Error(r.error) }catch(e){ if(!rec.loaded) box.innerHTML=`<p class="err">${esc(e.message)}</p>`; return }
   rec.items=r.items; rec.console=r.console; rec.loaded=true; recPaint() }
+function artURL(u){ return u?`/api/art?u=${encodeURIComponent(u)}&t=${encodeURIComponent(TOKEN)}`:'' }
+// portada con arte real: fondo (hero) › icono difuminado › degradado; icono del proyecto delante
+function artCover(o){ const long=Math.max(...String(o.name||'').split(/\s+/).map(w=>w.length))>11;
+  const cls=['rc-cov',o.hero?'has-hero':'',o.icon?'has-icon':'',!o.hero&&!o.icon?'plain':''].filter(Boolean).join(' ');
+  return `<div class="${cls}" style="--g1:${o.col[0]};--g2:${o.col[1]}">`
+    +(o.hero||o.icon?`<img class="bl" src="${esc(o.hero||o.icon)}" alt="" loading="lazy" onerror="this.remove()">`:'')
+    +(o.hero?`<img class="hb${o.fill?' fill':''}" src="${esc(o.hero)}" alt="" loading="lazy" onload="artFit(this)" onerror="artGone(this,'has-hero')">`:'')
+    +`<div class="shade"></div>`
+    +(o.icon&&!o.hero?`<img class="ico2" src="${esc(o.icon)}" alt="" loading="lazy" onerror="artGone(this,'has-icon')">`:'')
+    +`<span class="nm${long?' long':''}" data-noi18n>${esc(o.name)}</span></div>` }
+// la portada ocupa todo el hueco cuando su forma se parece a la de la tarjeta (o si es arte de un título);
+// los banners muy alargados o los logos se ven enteros sobre su propio fondo difuminado
+function artFit(img){ if(img.classList.contains('fill')||/svg/i.test(img.src)) return; const b=img.parentNode, w=img.naturalWidth, h=img.naturalHeight; if(!b||!w||!h) return;
+  const r=(w/h)/(b.clientWidth/b.clientHeight); if(r>0.7&&r<1.45) img.classList.add('fill') }
+function artGone(img,c){ const p=img.parentNode; img.remove(); if(!p) return; p.classList.remove(c); if(c==='has-icon') p.querySelectorAll('.bl').forEach(x=>x.remove());
+  if(!p.classList.contains('has-hero')&&!p.classList.contains('has-icon')) p.classList.add('plain') }
 function recCard(it){ let st='', btn='';
   if(it.exp) st+=`<span class="bdg warn" title="${esc(tr('Funciona, pero muchos títulos aún fallan o van lentos'))}">${esc(tr('En pruebas'))}</span>`;
   const newer=it.kind==='app'&&it.installed&&it.latest&&it.latest!==it.ver;
   if(it.kind==='app'){ st+=it.installed===true?`<span class="bdg ok">${esc(tr('Instalado'))} ✓</span>`:'';
     if(newer) st+=`<span class="bdg warn">${esc(it.ver?tr('Hay versión nueva: {0}').replace('{0}',it.latest):tr('Última versión: {0}').replace('{0}',it.latest))}</span>`;
-    const wiz=it.emu?(it.installed?`<button class="small ico" data-ew="${esc(it.id)}" title="${esc(tr('Primeros pasos'))}" aria-label="${esc(tr('Primeros pasos'))}">🧭</button>`:`<button class="small" data-ew="${esc(it.id)}" title="${esc(tr('Te lleva paso a paso: instalarlo, lo que necesita y tu contenido'))}">🧭 ${esc(tr('Primeros pasos'))}</button>`):'';
+    const wiz=it.group==='os'?`<button class="small" data-ow="${esc(it.id)}">🧭 ${esc(tr('Paso a paso'))}</button>`:it.emu?(it.installed?`<button class="small ico" data-ew="${esc(it.id)}" title="${esc(tr('Primeros pasos'))}" aria-label="${esc(tr('Primeros pasos'))}">🧭</button>`:`<button class="small" data-ew="${esc(it.id)}" title="${esc(tr('Te lleva paso a paso: instalarlo, lo que necesita y tu contenido'))}">🧭 ${esc(tr('Primeros pasos'))}</button>`):'';
     btn=it.installed?(newer?`<button class="small primary" data-ru="${esc(it.id)}" title="${esc(tr('Copia lo nuevo encima: se conservan tus ajustes, partidas, BIOS y contenido'))}">${esc(tr('Actualizar'))}</button>`:'')
       +`<button class="small" data-rl="${esc(it.tid||'')}" title="${esc(tr('Lo abre en la consola (con zftpd)'))}">▶ ${esc(tr('Abrir'))}</button>`+wiz
       +(it.emu&&!state.remote&&it.has_bios?`<button class="small ico" data-ee="${esc(it.id)}" data-w="bios" title="${esc(tr('Poner tu BIOS'))}" aria-label="${esc(tr('Poner tu BIOS'))}">🧬</button>`:'')
       +(it.emu&&!state.remote&&it.has_games?`<button class="small ico" data-ee="${esc(it.id)}" data-w="games" title="${esc(tr(it.games_label?'Enviar '+it.games_label:'Enviar contenido'))}" aria-label="${esc(tr(it.games_label?'Enviar '+it.games_label:'Enviar contenido'))}">🎮</button>`:'')
+      +(it.emu?`<button class="small ico" data-own="${esc(it.id)}" title="${esc(tr('Instalar tu propia versión (una build que tengas en el PC)'))}" aria-label="${esc(tr('Instalar tu propia versión'))}">${ico('upload')}</button>`:'')
       +(it.emu?`<button class="small ico" data-eo="${esc(it.id)}" title="${esc(tr('Ajustes y registros'))}" aria-label="${esc(tr('Ajustes y registros'))}">⚙</button>`:'')
-      :`<button class="small primary" data-ri="${esc(it.id)}">${esc(tr('Instalar en la PS5'))}</button>`+wiz }
+      :`<button class="small primary" data-ri="${esc(it.id)}">${esc(tr('Instalar en la PS5'))}</button>`+wiz+(it.emu&&!state.remote?`<button class="small ico" data-own="${esc(it.id)}" title="${esc(tr('Instalar tu propia versión (una build que tengas en el PC)'))}" aria-label="${esc(tr('Instalar tu propia versión'))}">${ico('upload')}</button>`:'') }
   else if(it.kind==='pc'){
-    btn=`<a class="btn-a" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(tr('Descargar'))}</a>${it.ip?`<span class="hint">${esc(tr('IP de tu PS5: {0}').replace('{0}',it.ip))}</span>`:''}` }
+    btn=`<a class="btn-a" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(tr('Descargar'))}</a>`+(it.group==='rp'?`<button class="small" data-rpw="1">🧭 ${esc(tr('Paso a paso'))}</button>`:'') }
   else if(it.kind==='guide'){
-    btn=(it.payload&&!state.remote?`<button class="small primary" data-lx="${esc(it.payload)}" title="${esc(tr('La consola pasa a reposo; al encenderla arranca lo que tengas en el USB o el M.2'))}">🐧 ${esc(tr('Enviar el cargador'))}</button>`:'')
-      +(it.doc?`<a class="btn-a" href="${esc(it.doc)}" target="_blank" rel="noopener">📖 ${esc(tr('Guía completa'))} ↗</a>`:'') }
-  else if(it.once){ btn=`<button class="small primary" data-rp="${esc(it.id)}">${esc(tr('Sacar el PIN'))}</button>` }
+    btn=`<button class="small primary" data-ow="${esc(it.id)}" title="${esc(tr('Te lleva paso a paso: comprueba tu consola, baja la imagen y arranca'))}">🧭 ${esc(tr('Empezar paso a paso'))}</button>` }
+  else if(it.once){ btn=`<button class="small primary" data-rp="${esc(it.id)}">${esc(tr(it.group==='rp'?'Sacar el PIN':'Iniciar en la PS5'))}</button>`+(it.group==='rp'?`<button class="small" data-rpw="1">🧭 ${esc(tr('Paso a paso'))}</button>`:'') }
   else { st+=it.running?`<span class="bdg ok">${esc(tr('Funcionando'))}</span>`:'';
-    btn=it.running?`<a class="btn-a" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(tr('Abrir su web'))}</a>`:`<button class="small primary" data-rp="${esc(it.id)}">${esc(tr('Iniciar en la PS5'))}</button>` }
-  const key=it.group==='emu'?(it.fam||'other'):it.group, col=DSC_COL[key]||DSC_COL.other;
-  const sy=it.group==='emu'&&it.sys?String(tr(it.sys)).split(/\s*\/\s*/)[0]:'';
-  const gl=DSC_GL[it.id]||(DSC[it.group]||{}).ic||'✨';
-  const ic=it.kind==='app'&&it.installed&&it.tid?`<img class="ic" loading="lazy" src="/api/cover?p=${encodeURIComponent('/user/appmeta/'+it.tid)}&t=${encodeURIComponent(TOKEN)}" alt="" onerror="this.remove()">`:'';
+    btn=(it.running?`<a class="btn-a" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(tr('Abrir su web'))}</a>`:`<button class="small primary" data-rp="${esc(it.id)}">${esc(tr('Iniciar en la PS5'))}</button>`)
+      +(it.id==='patchsys'&&!state.remote?`<button class="small" data-psync="1" title="${esc(tr('Baja los parches de la comunidad (PS-Game-Patch) y los deja en /data/user/patches'))}">⬇ ${esc(tr('Poner los parches'))}</button>`:'') }
+  const key=it.group==='emu'?(it.fam||'other'):it.group, col=(it.bg&&it.bg.length===2)?it.bg:(DSC_COL[key]||DSC_COL.other);
+  const icon=it.icon?artURL(it.icon):(it.kind==='app'&&it.installed&&it.tid?`/api/cover?p=${encodeURIComponent('/user/appmeta/'+it.tid)}&t=${encodeURIComponent(TOKEN)}`:'');
+  const cov=artCover({hero:it.hero?artURL(it.hero):'',icon,name:it.name,col});
   const more=[it.needs?`<p class="hint"><b>${esc(tr('Necesitas:'))}</b> ${esc(tr(it.needs))}</p>`:'', it.ver?`<p class="hint">${esc(tr('Versión instalada: {0}').replace('{0}',it.ver))}</p>`:'',
-    it.update&&it.installed?`<p class="hint">${esc(tr(it.update))}</p>`:'', it.guide&&it.guide.length?`<ul>${it.guide.map(g=>`<li>${esc(tr(g))}</li>`).join('')}</ul>`:''].join('');
+    it.update&&it.installed?`<p class="hint">${esc(tr(it.update))}</p>`:'', it.guide&&it.guide.length&&it.kind!=='guide'?`<ul>${it.guide.map(g=>`<li>${esc(tr(g))}</li>`).join('')}</ul>`:''].join('');
   return `<div class="reccard" data-q="${esc((it.name+' '+(it.sys||'')+' '+tr(it.sys||'')+' '+tr(it.what||'')).toLowerCase())}">
-    <div class="rc-cov${ic?' hasic':''}" style="--g1:${col[0]};--g2:${col[1]}"><span class="gl">${gl}</span>${sy?`<span class="sy">${esc(sy)}</span>`:''}<span class="nm${Math.max(...it.name.split(/\s+/).map(w=>w.length))>11?' long':''}" data-noi18n>${esc(it.name)}</span>${ic}</div>
-    <div class="rc-b"><div class="sysl"><span>${esc(it.sys?tr(it.sys):tr(it.kind==='pc'?'Para tu PC':it.kind==='guide'?'Guía paso a paso':''))}</span><a class="rc-gh" href="https://github.com/${esc(it.repo)}" target="_blank" rel="noopener">GitHub ↗</a></div>${st?`<div class="badges">${st}</div>`:''}
+    ${cov}
+    <div class="rc-b"><b class="ttl" data-noi18n>${esc(it.kind==='guide'?tr(it.name):it.name)}</b><div class="sysl"><span>${esc(it.sys?tr(it.sys):tr(it.kind==='pc'?'Para tu PC':it.kind==='guide'?'Guía paso a paso':''))}</span><a class="rc-gh" href="https://github.com/${esc(it.repo)}" target="_blank" rel="noopener">GitHub ↗</a></div>${st?`<div class="badges">${st}</div>`:''}
       <p class="what">${esc(tr(it.what))}</p>
-      ${more?`<details><summary>${esc(tr(it.guide&&it.guide.length?'📖 Guía rápida y requisitos':'Lo que necesitas'))}</summary>${more}</details>`:''}
+      ${more?`<details><summary>${esc(tr(it.guide&&it.guide.length&&it.kind!=='guide'?'📖 Guía rápida y requisitos':'Lo que necesitas'))}</summary>${more}</details>`:''}
       <div class="rc-act">${btn}</div></div></div>` }
 function dscNews(n){ const list=nw.items.filter(x=>!x.soon).slice(0,n);
   if(!list.length) return nw.err?`<p class="hint">${esc(tr('No he podido leer el catálogo de RecompStore. ¿Hay internet en el PC? Pulsa «Volver a mirar» en un rato.'))}</p>`:loadingHTML('Leyendo el catálogo…',1);
-  return `<div class="dsc-news">${list.map(x=>{ const ini=esc((x.name||'?').replace(/[^\p{L}\p{N} ]/gu,'').split(/\s+/).map(w=>w[0]||'').join('').slice(0,3).toUpperCase());
-    return `<div class="nwcard" data-nw="1"><div class="nwhero${x.hero?'':' nohero'}">${x.hero?`<img class="hb" src="${esc(x.hero)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('nohero');this.remove()">`:''}<span class="ini" data-noi18n>${ini}</span>${x.icon?`<img class="ic" src="${esc(x.icon)}" alt="" loading="lazy" onerror="this.remove()">`:''}</div>
-    <div class="nwb"><div class="row"><b data-noi18n>${esc(x.name)}</b>${x.new?`<span class="bdg ok">${esc(tr('Nuevo'))}</span>`:''}</div>
-    <div class="row hint"><span>${esc(tr(NW_CAT[x.cat]||x.cat))}</span>${x.when?`<span>· ${esc(nwWhen(x.when))}</span>`:''}</div>${x.blurb?`<p data-noi18n>${esc(x.blurb)}</p>`:''}</div></div>` }).join('')}</div>` }
+  return `<div class="dsc-news">${list.map(x=>{
+    return `<div class="nwcard" data-nw="1" data-home="1">${artCover({hero:artURL(x.hero),icon:artURL(x.icon),name:x.name,col:NW_COL[x.cat]||NW_COL.apps,fill:true})}${nwPill(x,true)}
+    <div class="nwb"><b class="ttl" data-noi18n>${esc(x.name)}</b>${x.new?`<div class="row"><span class="bdg ok">${esc(tr('Nuevo'))}</span></div>`:''}
+    <div class="row hint"><span>${esc(tr(NW_CAT[x.cat]||x.cat))}</span></div>${x.blurb?`<p data-noi18n data-tb="${esc(x.id)}"${x.blurb_t?` title="${esc(tr('Traducido automáticamente del inglés'))}"`:''}>${esc(x.blurb_t||x.blurb)}</p>`:''}</div></div>` }).join('')}</div>` }
+// lo del catálogo de RecompStore que no está ya en Descubrir: se suma a su categoría (y a su número)
+const SCENE_CAT={emu:'emulators',media:'apps',tool:'tools'};
+const SCENE_SKIP=/playden|art.?swap|trophy|savegam|save.?manager|cheat/i;    // lo que decidimos no recomendar
+function sceneExtra(g){ const mine=new Set((rec.items||[]).map(x=>(x.repo||'').toLowerCase()).filter(Boolean)), names=new Set((rec.items||[]).map(x=>x.name.toLowerCase()));
+  return nw.items.filter(x=>x.cat===SCENE_CAT[g]&&!x.soon&&!mine.has((x.repo||'').toLowerCase())&&!names.has((x.name||'').toLowerCase())&&!SCENE_SKIP.test(x.name+' '+(x.repo||''))) }
 function recPaint(){ if(!DSC[appV]) return; const box=$('recBody'), v=appV, q=($('recQ').value||'').trim().toLowerCase(), all=rec.items;
   const by=g=>all.filter(x=>x.group===g);
-  $('appView').querySelectorAll('.dc[data-n]').forEach(c=>{ c.textContent=by(c.dataset.n).length||'' });
+  $('appView').querySelectorAll('.dc[data-n]').forEach(c=>{ c.textContent=(by(c.dataset.n).length+(SCENE_CAT[c.dataset.n]?sceneExtra(c.dataset.n).length:0))||'' });
   $('recTitle').textContent=tr(DSC[v].t); $('recHint').textContent=tr(DSC[v].h);
   const fam=$('recFam'); fam.hidden=v!=='emu'||!!q;
   if(v==='emu') fam.innerHTML=DSC_FAM.map(([f,t])=>{ const n=f?by('emu').filter(x=>f==='multi'?['multi','other'].includes(x.fam||'other'):x.fam===f).length:by('emu').length;
@@ -3164,22 +3401,45 @@ function recPaint(){ if(!DSC[appV]) return; const box=$('recBody'), v=appV, q=($
   if(q){ const l=all.filter(x=>(x.name+' '+(x.sys||'')+' '+tr(x.sys||'')+' '+tr(x.what||'')+' '+(x.what||'')).toLowerCase().includes(q));
     h+=l.length?grid(l):`<p class="hint">${esc(tr('Nada por aquí con ese filtro.'))}</p>` }
   else if(v==='home'){
-    h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>📰 ${esc(tr('Novedades de la scene'))}</h3><span class="hint">${esc(tr('Lo último publicado para la PS5'))}</span><button class="more" data-go="news">${esc(tr('Ver todas'))} →</button></div>${dscNews(4)}</section>`;
-    const up=all.filter(x=>x.kind==='app'&&x.installed&&x.latest&&x.latest!==x.ver);
-    if(up.length) h+=`<div class="dsc-upd"><div class="dsc-sh" style="margin:0"><h3>⬆ ${esc(tr('Tienes actualizaciones'))}</h3><span class="hint">${esc(tr('Se copian encima: se conservan tus ajustes, partidas, BIOS y contenido'))}</span></div>${up.map(x=>`<div class="ur"><b data-noi18n>${esc(x.name)}</b><span class="hint" data-noi18n>${esc(x.ver?x.ver+' → '+x.latest:tr('Última versión: {0}').replace('{0}',x.latest))}</span><button class="small primary" data-ru="${esc(x.id)}">${esc(tr('Actualizar'))}</button></div>`).join('')}</div>`;
+    h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>📰 ${esc(tr('Novedades de la scene'))}</h3><span class="hint">${esc(tr('Lo último que se ha publicado o actualizado para la PS5'))}</span><button class="more" data-go="news">${esc(tr('Ver todas'))} →</button></div>${dscNews(4)}${sceneCats()}</section>`;
+    const sc=sceneRows();
     DSC_ORDER.forEach(g=>{ const l=by(g); if(!l.length) return;
-      h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>${esc(tr(DSC[g].t))}</h3><span class="hint">${esc(tr(DSC[g].h).split(/(?<=\.) /)[0])}</span>${l.length>4?`<button class="more" data-go="${g}">${esc(tr('Ver todos ({0})').replace('{0}',l.length))} →</button>`:''}</div>${grid(l.slice(0,4),'row4',Math.min(4,l.length))}</section>` }) }
+      if(g==='emu') h+=sc.pop; if(g==='media') h+=sc.fresh; if(g==='rp') h+=sc.ports;
+      h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>${esc(tr(DSC[g].t))}</h3><span class="hint">${esc(tr(DSC[g].h).split(/(?<=\.) /)[0])}</span>${(()=>{ const n=l.length+(SCENE_CAT[g]?sceneExtra(g).length:0); return n>4?`<button class="more" data-go="${g}">${esc(tr('Ver todos ({0})').replace('{0}',n))} →</button>`:'' })()}</div>${grid(l.slice(0,4),'row4',Math.min(4,l.length))}</section>`;  }) }
+  else if(v==='rp'){ h+=`<button class="rp-cfg" data-rpw="1">${ico('tv')}<span>${esc(tr('Configurar Remote Play'))}</span><b>${rpDone()}/${RP_KEYS.length}</b><i>${esc(tr('Unos pocos pasos, una sola vez: la lista hace lo que puede por ti y marca cada paso hecho.'))}</i></button>`+grid(by('rp')) }
+  else if(v==='patch'){ const ip=((state.settings||{}).ps5_ip||'').split(':')[0], pw=all.find(x=>x.id==='patchsys')||{};
+    const mine=(lib.res&&lib.res.items||[]).filter(x=>x.tid&&(patchIdx||{})[x.tid.toUpperCase()]);
+    h+=`<div class="pt-how"><h3>${esc(tr('Cómo se usa'))}</h3><ol>
+      <li><b>${esc(tr('Inicia ps-patch-system en la consola'))}</b> ${pw.running?`<span class="bdg ok">${esc(tr('Funcionando'))}</span>`:`<button class="small primary" data-rp="patchsys">${esc(tr('Iniciar en la PS5'))}</button>`}<div class="hint">${esc(tr('Hay que volver a iniciarlo después de cada reinicio.'))}</div></li>
+      <li><b>${esc(tr('Pon los parches en la consola'))}</b> <button class="small" data-psync="1">⬇ ${esc(tr('Poner los parches'))}</button><div class="hint">${esc(tr('Los de la comunidad (PS-Game-Patch). Vuelve a pulsarlo de vez en cuando para tener los nuevos.'))}</div></li>
+      <li><b>${esc(tr('Elige qué activar'))}</b> ${ip?`<a class="btn-a" href="http://${esc(ip)}:23900" target="_blank" rel="noopener">${esc(tr('Abrir su web'))} ↗</a>`:''}<div class="hint">${esc(tr('En su web (también desde el móvil) buscas tu título y activas el parche que quieras: 60 fps, resolución… Se aplica al abrirlo.'))}</div></li>
+      <li><b>${esc(tr('Opcional, para PS4: NeoEnabler'))}</b><div class="hint">${esc(tr('Después de ps-patch-system. Arranca en modo PS4 Pro los títulos de su lista para que suban de resolución.'))}</div></li></ol>
+      ${patchIdx?`<p class="hint">${esc(mine.length?tr('{0} de tus títulos tienen parches (salen marcados en Biblioteca):').replace('{0}',mine.length):tr('Ninguno de los títulos de tu biblioteca tiene parche ahora mismo.'))} ${mine.slice(0,12).map(x=>`<span class="bdg warn" data-noi18n>${esc(x.title||x.tid)}</span>`).join(' ')}</p>`:''}</div>`+grid(by('patch')) }
+  else if(v==='os'){ const lx=by('os').filter(x=>x.kind==='guide'), pc=by('os').filter(x=>x.kind!=='guide');
+    if(lx.length) h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>${esc(tr('Linux en la PS5'))}</h3><span class="hint">${esc(tr('Arranca desde un USB o un M.2: al apagar, vuelve el sistema de la PS5 sin tocarlo.'))}</span></div>${grid(lx)}</section>`;
+    if(pc.length) h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>${esc(tr('Programas de Windows dentro de la PS5'))}</h3><span class="hint">${esc(tr('Sin cambiar de sistema: se abre como una aplicación más.'))}</span></div>${grid(pc)}</section>` }
+  else if(SCENE_CAT[v]&&!(v==='emu'&&recFam)){ const more=sceneExtra(v);
+    h+=grid(by(v));
+    if(more.length) h+=`<section class="dsc-sec" style="margin-top:22px"><div class="dsc-sh"><h3>${esc(tr('Más de la scene'))} <span class="hint">${more.length}</span></h3><span class="hint">${esc(tr('Del catálogo de RecompStore: también se instalan con un clic desde su GitHub.'))}</span></div><div class="nwgrid">${more.map(nwCardHTML).join('')}</div></section>`;
+    else if(!nw.items.length) nwGet().then(()=>{ if(appV===v&&nw.items.length) recPaint() }) }
   else { let l=by(v); if(v==='emu'&&recFam) l=l.filter(x=>recFam==='multi'?['multi','other'].includes(x.fam||'other'):x.fam===recFam); h+=grid(l) }
-  box.innerHTML=h; recBind(box) }
+  { const up=all.filter(x=>x.kind==='app'&&x.installed&&x.latest&&x.latest!==x.ver), u=$('dscUpd');
+    u.hidden=!up.length; u.innerHTML=up.length?`<div class="dsc-upd"><div class="dsc-sh" style="margin:0"><h3>⬆ ${esc(tr('Tienes actualizaciones'))}</h3><span class="hint">${esc(tr('Se copian encima: se conservan tus ajustes, partidas, BIOS y contenido'))}</span></div>${up.map(x=>`<div class="ur"><b data-noi18n>${esc(x.name)}</b><span class="hint" data-noi18n>${esc(x.ver?x.ver+' → '+x.latest:tr('Última versión: {0}').replace('{0}',x.latest))}</span><button class="small primary" data-ru="${esc(x.id)}">${esc(tr('Actualizar'))}</button></div>`).join('')}</div>`:''; recBind(u) }
+  box.innerHTML=h; recBind(box); if(v==='home') nwTranslate() }
 $('recQ').oninput=()=>{ if(rec.loaded) recPaint() };
 $('recFam').addEventListener('click',e=>{ const b=e.target.closest('button[data-f]'); if(!b) return; recFam=b.dataset.f; recPaint() });
+async function sendLoader(b){
+  if(!confirm(tr('¿Enviar el cargador de Linux?')+'\n\n'+tr('La consola pasa a modo reposo. Cuando la luz naranja deje de parpadear, enciéndela y arrancará lo que tengas en el USB o el M.2. Antes: energía USB en reposo «Siempre», vínculo HDMI desactivado y sin etaHEN ni kstuff cargados. Para volver a la PS5, apaga y enciende normal.'))) return;
+  b.disabled=true; try{ const x=await api('/api/extra_payload',{id:b.dataset.lx,send:1}); if(!x.ok) throw new Error(x.error); toast(tr('Cargador enviado: espera a que la consola entre en reposo.')) }catch(e){ toast(e.message) } b.disabled=false }
 function recBind(box){
   box.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{ appShow(b.dataset.go); $('tabApps').scrollIntoView({block:'start'}) });
   box.querySelectorAll('.nwcard[data-nw]').forEach(c=>c.onclick=e=>{ if(!e.target.closest('a')) appShow('news') });
   box.querySelectorAll('[data-ew]').forEach(b=>b.onclick=()=>emuWizard(b.dataset.ew));
-  box.querySelectorAll('[data-lx]').forEach(b=>b.onclick=async()=>{
-    if(!confirm(tr('¿Enviar el cargador de Linux?')+'\n\n'+tr('La consola pasa a modo reposo. Cuando la luz naranja deje de parpadear, enciéndela y arrancará lo que tengas en el USB o el M.2. Antes: energía USB en reposo «Siempre», vínculo HDMI desactivado y sin etaHEN ni kstuff cargados. Para volver a la PS5, apaga y enciende normal.'))) return;
-    b.disabled=true; try{ const x=await api('/api/extra_payload',{id:b.dataset.lx,send:1}); if(!x.ok) throw new Error(x.error); toast(tr('Cargador enviado: espera a que la consola entre en reposo.')) }catch(e){ toast(e.message) } b.disabled=false });
+  box.querySelectorAll('[data-lx]').forEach(b=>b.onclick=()=>sendLoader(b));
+  box.querySelectorAll('[data-ow]').forEach(b=>b.onclick=()=>osWizard(b.dataset.ow));
+  box.querySelectorAll('[data-rpw]').forEach(b=>b.onclick=()=>rpWizard());
+  box.querySelectorAll('[data-psync]').forEach(b=>b.onclick=async()=>{ b.disabled=true; toast(tr('Bajando los parches y copiándolos a la consola…'));
+    try{ const x=await api('/api/patches/sync',{}); if(!x.ok) throw new Error(x.error); toast(tr('{0} parches en /data/user/patches. Ahora inicia ps-patch-system y actívalos en su web.').replace('{0}',x.files)) }catch(e){ toast(e.message) } b.disabled=false });
   box.querySelectorAll('[data-rl]').forEach(b=>b.onclick=()=>titleLaunch(b.dataset.rl,b));
   box.querySelectorAll('[data-ri]').forEach(b=>b.onclick=async()=>{ b.disabled=true;
     try{ const x=await api('/api/rec/install',{id:b.dataset.ri}); if(!x.ok) throw new Error(x.error);
@@ -3194,37 +3454,158 @@ function recBind(box){
       toast(x.sent?tr('Enviado. Mira la notificación de la PS5: sale el PIN y el ID de cuenta para vincular.'):x.running?tr('{0} funcionando: abre su web.').replace('{0}',x.name):tr('{0} enviado, pero su web todavía no contesta. Espera unos segundos y pulsa «Volver a mirar».').replace('{0}',x.name)); recLoad() }catch(e){ toast(e.message); b.disabled=false } });
 }
 $('recRe').onclick=recLoad;
+
+// --- tipos en la biblioteca: lo que es emulador, aplicación o herramienta se reconoce por su Title ID (catálogo de «Descubrir»)
+let libType='';
+const LIB_TYPES=[['','Todo','grid'],['title','Títulos','film'],['emu','Emuladores','gamepad'],['media','Multimedia','clapper'],['tool','Herramientas','tools']];
+
+// parches de la comunidad que existen para tus títulos (para marcarlos en la biblioteca)
+let patchIdx=null;
+function patchIdxLoad(){ if(patchIdx!==null) return; patchIdx=undefined; api('/api/patches/index',{}).then(r=>{ patchIdx=(r&&r.idx)||{}; if(lib.res) libRender(); if(appV==='patch'&&!$('tabApps').hidden) recPaint() }).catch(()=>{ patchIdx=null }) }
+document.addEventListener('click',e=>{ if(e.target.closest('.gpatch')){ e.stopPropagation(); goApps('patch') } },true);
+function libTypeOf(tid){ const k=(recKinds||{})[(tid||'').toUpperCase()]; return !k?'title':k==='emu'?'emu':k==='media'?'media':'tool' }
+function libTypesPaint(all){ const box=$('libTypes'); if(!box) return; const n={'':all.length}; all.forEach(x=>{ const t=libTypeOf(x.tid); n[t]=(n[t]||0)+1 });
+  box.innerHTML=LIB_TYPES.filter(([k])=>!k||n[k]||k===libType).map(([k,l,ic])=>`<button type="button" data-t="${k}" class="${k===libType?'on':''}">${ico(ic)}<span>${esc(tr(l))}</span><i>${n[k]||0}</i></button>`).join('') }
+$('libTypes').addEventListener('click',e=>{ const b=e.target.closest('button[data-t]'); if(!b) return; libType=b.dataset.t; libRender(); if(!$('allCard').hidden) allPaint() });
+$('libDisc').onclick=()=>goApps(nw.items.some(x=>x.new)?'news':'home');
 // tipo en la biblioteca (Emuladores / Apps y herramientas), por Title ID y sin red
-let recKinds=null; api('/api/rec/kinds',{}).then(r=>{ if(r&&r.ok){ recKinds=r.kinds; if(['emu','apps'].includes($('libFilter').value)) libRender() } }).catch(()=>{});
+let recKinds=null, recArt=null; api('/api/rec/kinds',{}).then(r=>{ if(r&&r.ok){ recKinds=r.kinds; recArt=r.art||{}; if(lib.res) libRender() } }).catch(()=>{});
 // --- 📰 novedades de la scene (catálogo de RecompStore, solo para leer)
 const nw={items:[],cat:'',err:''};
+const NW_COL={games:['#3a4fd6','#171c4a'],emulators:['#2f63e0','#0d1b48'],apps:['#d0603c','#4a1a0c'],tools:['#1ea58b','#0a2e29']};
 const NW_CAT={games:'Ports nativos',emulators:'Emuladores',apps:'Aplicaciones',tools:'Herramientas'};
 const NW_REQ={loader:'cargador de payloads',smp:'ShadowMountPlus',kstuff:'kstuff',etahen:'etaHEN',internet:'internet',usb:'un USB'};
 function nwWhen(w){ if(!w) return ''; const d=new Date(w); if(isNaN(d)) return w; const days=Math.floor((Date.now()-d)/864e5);
   return days<1?tr('hoy'):days<2?tr('ayer'):days<31?tr('hace {0} días').replace('{0}',days):d.toLocaleDateString(LANG==='en'?'en-GB':'es-ES',{day:'numeric',month:'short',year:'numeric'}) }
 async function nwGet(force){ try{ const r=await api('/api/recomp',force?{refresh:1}:{}); if(!r.ok) throw new Error(r.error);
-    nw.items=r.items||[]; nw.err=(r.error&&!nw.items.length)?r.error:'' }catch(e){ if(!nw.items.length) nw.err=e.message } nwBadge(); return nw }
-function nwBadge(){ const n=nw.items.filter(x=>x.new).length;
+    nw.items=r.items||[]; nw.covers=r.covers||{}; nw.err=(r.error&&!nw.items.length)?r.error:'' }catch(e){ if(!nw.items.length) nw.err=e.message } nwBadge(); return nw }
+function nwBadge(){ const n=nw.items.filter(x=>x.new).length; const c=$('newsC'); if(c) c.textContent=nw.items.filter(x=>!x.soon).length||'';
   ['newsN','newsN2'].forEach(id=>{ const b=$(id); if(b){ b.textContent=n; b.hidden=!n } }); const d=$('dscDot'); if(d) d.hidden=!n }
 async function nwLoad(force){ const box=$('nwBody'); if(!nw.items.length||force) box.innerHTML=loadingHTML('Leyendo el catálogo…',1);
   await nwGet(force);
   if(nw.err&&!nw.items.length){ box.innerHTML=`<p class="err">${esc(tr('No he podido leer el catálogo de RecompStore. ¿Hay internet en el PC? Pulsa «Volver a mirar» en un rato.'))}</p><p class="hint mono" data-noi18n>${esc(nw.err)}</p>`; return }
   nwPaint(); api('/api/recomp',{seen:1}).then(()=>{ setTimeout(()=>{ nw.items.forEach(x=>x.new=false); nwBadge() },4000) }).catch(()=>{}) }
 setTimeout(()=>nwGet(),5000); setInterval(()=>nwGet(),30*60*1000);
-function nwPaint(){ const q=($('nwQ').value||'').toLowerCase().trim(), c=nw.cat;
-  const list=nw.items.filter(x=>(!c||(c==='soon'?x.soon:(x.cat===c&&!x.soon)))&&(!q||(x.name+' '+x.author+' '+x.blurb+' '+(x.tags||[]).join(' ')).toLowerCase().includes(q)));
-  $('nwBody').innerHTML=list.length?`<div class="nwgrid">${list.slice(0,120).map(x=>{
+// las descripciones llegan en inglés: con la app en español se traducen solas (una vez; se guardan en el PC)
+let nwTrBusy=false;
+async function nwTranslate(){ if(LANG==='en'||nwTrBusy) return;
+  const ids=[...new Set([...document.querySelectorAll('[data-tb]')].map(e=>e.dataset.tb))];
+  const items=ids.map(id=>nw.items.find(x=>x.id===id)).filter(x=>x&&x.blurb&&!x.blurb_t&&!x.tr_fail);
+  if(!items.length) return; nwTrBusy=true;
+  try{ for(let i=0;i<items.length;i+=40){ const part=items.slice(i,i+40);
+      const r=await api('/api/tr',{texts:part.map(x=>x.blurb),to:'es'});
+      part.forEach((x,k)=>{ const t=(r.out||[])[k]; if(t){ x.blurb_t=t; document.querySelectorAll(`[data-tb="${CSS.escape(x.id)}"]`).forEach(e=>{ e.textContent=t; e.title=tr('Traducido automáticamente del inglés') }) } else x.tr_fail=true }) } }
+  catch(e){} nwTrBusy=false }
+document.addEventListener('toggle',async e=>{ const d=e.target; if(LANG==='en'||!d.open||!d.querySelector) return; const p=d.querySelector('[data-td]'); if(!p) return;
+  const x=nw.items.find(y=>y.id===p.dataset.td); if(!x||x.desc_t||!x.desc) return;
+  try{ const r=await api('/api/tr',{texts:[x.desc],to:'es'}); const t=(r.out||[])[0]; if(t){ x.desc_t=t; p.textContent=t } }catch(_){} },true);
+
+// instalar algo del catálogo de la scene (la última versión de su GitHub, como los de Descubrir)
+document.addEventListener('click',async e=>{ const b=e.target.closest('[data-ni]'); if(!b) return; e.stopPropagation(); b.disabled=true;
+  try{ const x=await api('/api/recomp/install',{id:b.dataset.ni}); if(!x.ok) throw new Error(x.error);
+    toast(x.pkg?tr('Añadido a la cola: {0}. Va a /data/pkg: luego, en Biblioteca › ⋯ › «Instalar en la consola».').replace('{0}',x.file):tr('Añadido a la cola: {0}. Se baja de GitHub y se instala en /data/homebrew.').replace('{0}',x.file)); refresh() }
+  catch(err){ toast(err.message); b.disabled=false } },true);
+// tu propia versión de un emulador (una build que tengas en el PC): se manda a /data/homebrew como cualquier otra
+document.addEventListener('click',async e=>{ const b=e.target.closest('[data-own]'); if(!b) return; let paths=[];
+  try{ const r=await api('/api/pick',{kind:'files',title:tr('Elige tu versión (.zip, .7z, .rar o .pkg)')}); paths=r.paths||[] }catch(err){ toast(err.message); return }
+  if(!paths.length) return;
+  try{ const pkg=paths.every(x=>/\.pkg$/i.test(x)); const r=await api('/api/add',{lines:paths.join('\n'),dest:pkg?'/data/pkg':'/data/homebrew',where:'ps5',raw:pkg});
+    if(!r.ok) throw new Error(r.error); toast(tr('Añadido a la cola: se manda a la consola y se coloca solo.')); refresh() }catch(err){ toast(err.message) } });
+// --- portada de cada cosa de la scene: la del autor, salvo corrección (portadas.json) o lo que elijas tú en la tarjeta
+function nwCovKey(x){ return 'ps5d_cov_'+x.id }
+function nwModes(x){ const m=[]; if(x.hero) m.push('hero'); if((x.shots||[]).length) m.push('shot'); if(x.icon) m.push('icon'); return m }
+function nwMode(x){ const m=nwModes(x); let want='';
+  try{ want=localStorage.getItem(nwCovKey(x))||'' }catch(e){}
+  if(!want){ const f=(nw.covers||{})[(x.id||'').toLowerCase()]||(nw.covers||{})[(x.name||'').toLowerCase()]; if(f) want=f.url?'fix':(f.use||'') }
+  if(want==='fix') return 'fix'; if(want&&m.includes(want)) return want; if(want==='shot'&&m.includes('icon')) return 'icon'; return m[0]||'' }
+function nwArt(x){ const mode=nwMode(x), col=NW_COL[x.cat]||NW_COL.apps;
+  if(mode==='fix'){ const f=(nw.covers||{})[(x.id||'').toLowerCase()]||(nw.covers||{})[(x.name||'').toLowerCase()]; return {hero:artURL(f.url),icon:'',name:x.name,col,fill:true} }
+  if(mode==='shot') return {hero:artURL(x.shots[0]),icon:'',name:x.name,col,fill:true};
+  if(mode==='icon') return {hero:'',icon:artURL(x.icon),name:x.name,col};
+  return {hero:artURL(x.hero),icon:artURL(x.icon),name:x.name,col,fill:true} }
+function nwCycle(id){ const x=nw.items.find(y=>y.id===id); if(!x) return; const m=nwModes(x); if(m.length<2) return;
+  const cur=nwMode(x), nx=m[(m.indexOf(cur)+1)%m.length]; try{ localStorage.setItem(nwCovKey(x),nx) }catch(e){}
+  document.querySelectorAll(`[data-nwid="${CSS.escape(id)}"] .rc-cov`).forEach(c=>{ c.outerHTML=artCover(nwArt(x)) }) }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-cs]'); if(!b) return; e.stopPropagation(); e.preventDefault(); nwCycle(b.dataset.cs) },true);
+
+// --- tarjetas cuadradas (como en RecompStore) para Inicio
+function sqTile(x,rank){ const icon=x.icon||'', img=icon||x.hero||'';
+  return `<button type="button" class="sq" data-sq="${esc(x.id)}">${rank?`<i class="rk">${rank}</i>`:''}
+    <span class="sqi${icon?'':' hero'}" style="--g1:${(NW_COL[x.cat]||NW_COL.apps)[0]};--g2:${(NW_COL[x.cat]||NW_COL.apps)[1]}">${img?`<img src="${esc(artURL(img))}" alt="" loading="lazy" onerror="this.remove()">`:''}<b data-noi18n>${esc(img?'':x.name)}</b></span>
+    <span class="sqn" data-noi18n>${esc(x.name)}</span><span class="sqa" data-noi18n>${esc([x.author,x.version?'v'+x.version.replace(/^v/i,''):''].filter(Boolean).join(' · '))}</span></button>` }
+function sqRow(title,list,go){ if(!list.length) return '';
+  return `<section class="dsc-sec"><div class="dsc-sh"><h3>${esc(title)}</h3>${go?`<button class="more" data-ncat="${go}">${esc(tr('Ver todos'))} →</button>`:''}</div><div class="sqrow">${list.map(x=>sqTile(x,title===tr('Más populares')?x._rk:0)).join('')}</div></section>` }
+function sceneCats(){ if(!nw.items.length) return ''; const live=nw.items.filter(x=>!x.soon), n=k=>live.filter(x=>x.cat===k).length;
+  const cats=[['games','Ports nativos','gamepad','#3a8ef0'],['emulators','Emuladores','joystick','#45c3dc'],['apps','Aplicaciones','grid','#4fc9a4'],['tools','Herramientas','tools','#e0a24a']];
+  return `<div class="sc-cats">${cats.map(([k,l,ic,c])=>`<button type="button" class="sc-cat" data-ncat="${k}" style="--c:${c}"><span class="sci">${ico(ic)}</span><b>${esc(tr(l))}</b><i>${n(k)}</i></button>`).join('')}</div>` }
+// dos carruseles de la scene repartidos por Inicio: los ports tras los emuladores, y lo popular (o lo siguiente más nuevo) antes de las apps
+function sceneRows(){ const E={pop:'',fresh:'',ports:''}; if(!nw.items.length) return E; const live=nw.items.filter(x=>!x.soon);
+  let pop=live.filter(x=>x.prank).sort((a,b)=>a.prank-b.prank); if(pop.length<4) pop=live.filter(x=>x.pop>0).sort((a,b)=>b.pop-a.pop);
+  pop.forEach((x,i)=>x._rk=i+1); if(pop.length>=4&&pop.length<10){ const seen=new Set(pop.map(x=>x.id)); pop=pop.concat(live.filter(x=>!seen.has(x.id)&&x.cat!=='tools').slice(0,10-pop.length).map(x=>Object.assign(x,{_rk:0}))) }
+  E.pop=pop.length>=4?sqRow(tr('Más populares'),pop.slice(0,14),''):sqRow(tr('Emuladores de la scene'),live.filter(x=>x.cat==='emulators').slice(0,14),'emulators');
+  // recién llegados: por fecha de alta si el catálogo la trae; si no, lo que PS5 Directo ha visto aparecer y, de base,
+  // lo último del catálogo (la lista de «newer» primero y, dentro de cada lista, lo añadido al final)
+  const srcW=k=>/newer|new|v2/i.test(k||'')?1:0;
+  const fresh=live.slice().sort((a,b)=>(a.added&&b.added?String(b.added).localeCompare(String(a.added)):0)||((b.seen||0)-(a.seen||0))||(srcW(b.src)-srcW(a.src))||((b.pos||0)-(a.pos||0)));
+  E.fresh=sqRow(tr('Recién llegados'),fresh.slice(0,14),'all');
+  E.ports=sqRow(tr('Ports nativos'),live.filter(x=>x.cat==='games').slice(0,14),'games');
+  return E }
+// --- ficha al pasar el ratón (o al tocar): imagen grande, descripción traducida, capturas, vídeo e instalar
+let hvT=null, hvPinned=false;
+function hvShow(el,id,pin){ const x=nw.items.find(y=>y.id===id); if(!x) return; let p=$('hvCard');
+  if(!p){ p=document.createElement('div'); p.id='hvCard'; p.className='hvcard'; document.body.appendChild(p);
+    p.addEventListener('mouseenter',()=>clearTimeout(hvT)); p.addEventListener('mouseleave',()=>{ if(!hvPinned) hvHide() }) }
+  const big=x.hero||(x.shots||[])[0]||'', req=(x.requires||[]).map(r=>tr(NW_REQ[r]||r)).join(', ');
+  const desc=LANG!=='en'&&x.desc_t?x.desc_t:x.desc, blurb=LANG!=='en'&&x.blurb_t?x.blurb_t:x.blurb;
+  p.innerHTML=`${big?`<div class="hvimg"><img src="${esc(artURL(big))}" alt=""></div>`:''}
+    <div class="hvb"><div class="hvh">${x.icon?`<img class="hvic" src="${esc(artURL(x.icon))}" alt="">`:''}<div><b data-noi18n>${esc(x.name)}</b><div class="hint"><span>${esc(tr(NW_CAT[x.cat]||x.cat))}</span>${x.author?` · <span data-noi18n>${esc(x.author)}</span>`:''}${x.version?` · <span data-noi18n>v${esc(x.version.replace(/^v/i,''))}</span>`:''}${x.when?' · '+esc(nwWhenLbl(x)):''}</div></div></div>
+    ${blurb?`<p data-noi18n data-hvbl>${esc(blurb)}</p>`:''}${desc&&desc!==blurb?`<p class="hvd" data-noi18n data-hvd="${esc(x.id)}">${esc(desc.slice(0,600))}${desc.length>600?'…':''}</p>`:''}
+    ${x.needs?`<p class="hint" data-noi18n><b>${esc(tr('Necesitas:'))}</b> ${esc(x.needs)}</p>`:''}${req?`<p class="hint"><b>${esc(tr('Pide en la consola:'))}</b> ${esc(req)}</p>`:''}
+    ${(x.shots||[]).length>(x.hero?0:1)?`<div class="hvshots">${x.shots.slice(x.hero?0:1,5).map(u=>`<img src="${esc(artURL(u))}" alt="" loading="lazy" onerror="this.remove()">`).join('')}</div>`:''}
+    <div class="act">${x.repo&&!x.soon&&!state.remote&&!SCENE_SKIP.test(x.name+' '+x.repo)?`<button class="small primary" data-ni="${esc(x.id)}">${esc(tr('Instalar en la PS5'))}</button>`:''}${x.video?`<a class="small btnlink" href="${esc(x.video)}" target="_blank" rel="noopener">▶ ${esc(tr('Ver vídeo'))}</a>`:''}${x.repo?`<a class="small btnlink" href="https://github.com/${esc(x.repo)}" target="_blank" rel="noopener">GitHub ↗</a>`:''}${nwModes(x).length>1?`<button class="small" data-cs="${esc(x.id)}" title="${esc(tr('Cambiar la imagen de su tarjeta'))}">${ico('image')} ${esc(tr('Cambiar imagen'))}</button>`:''}</div></div>`;
+  const r=el.getBoundingClientRect(), W=Math.min(420,innerWidth-24); p.style.width=W+'px';
+  let left=r.right+10; if(left+W>innerWidth-12) left=r.left-W-10; if(left<12) left=Math.max(12,(innerWidth-W)/2);
+  p.style.left=left+'px'; p.style.top='0px'; p.hidden=false; p.classList.toggle('pin',!!pin); hvPinned=!!pin;
+  const h=p.offsetHeight; let top=r.top+r.height/2-h/2; top=Math.max(12,Math.min(top,innerHeight-h-12)); p.style.top=top+'px';
+  if(LANG!=='en'&&((x.desc&&!x.desc_t)||(x.blurb&&!x.blurb_t))) api('/api/tr',{texts:[x.blurb||'',x.desc||''],to:'es'}).then(t=>{ const [b2,d2]=t.out||[];
+    if(b2){ x.blurb_t=b2; const e=p.querySelector('[data-hvbl]'); if(e) e.textContent=b2 }
+    if(d2){ x.desc_t=d2; const d=p.querySelector(`[data-hvd="${CSS.escape(x.id)}"]`); if(d) d.textContent=d2.slice(0,600)+(d2.length>600?'…':'') } }).catch(()=>{}) }
+function hvHide(){ const p=$('hvCard'); if(p) p.hidden=true; hvPinned=false }
+const hvCan=matchMedia('(hover:hover)').matches;
+document.addEventListener('mouseover',e=>{ if(!hvCan||hvPinned) return; const t=e.target.closest('[data-sq],.nwcard[data-nwid]'); if(!t||t.contains(e.relatedTarget)) return;
+  clearTimeout(hvT); hvT=setTimeout(()=>hvShow(t,t.dataset.sq||t.dataset.nwid),450) });
+document.addEventListener('mouseout',e=>{ if(!hvCan||hvPinned) return; const t=e.target.closest('[data-sq],.nwcard[data-nwid]'); if(!t||t.contains(e.relatedTarget)) return;
+  clearTimeout(hvT); hvT=setTimeout(()=>{ const p=$('hvCard'); if(p&&!p.matches(':hover')) hvHide() },250) });
+document.addEventListener('click',e=>{ const t=e.target.closest('[data-sq]'); if(t){ e.preventDefault(); clearTimeout(hvT); hvShow(t,t.dataset.sq,true); return }
+  const nc=e.target.closest('[data-ncat]'); if(nc){ hvHide(); nw.cat=nc.dataset.ncat==='all'?'':nc.dataset.ncat; $('nwCat').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.c===nw.cat)); appShow('news'); $('tabApps').scrollIntoView({block:'start'}); return }
+  if(hvPinned&&!e.target.closest('#hvCard')) hvHide() });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') hvHide() });
+addEventListener('scroll',()=>{ if(!hvPinned) hvHide() },{passive:true});
+// qué fecha es: si el catálogo dice cuándo se añadió, distingue «Nuevo» de «Actualizado»; si no, es la de su última versión
+function nwWhenLbl(x){ const w=nwWhen(x.when); if(!x.when) return '';
+  if(x.added){ const a=new Date(x.added), u=new Date(x.when); if(!isNaN(a)&&!isNaN(u)&&Math.abs(u-a)<3*864e5) return tr('Nuevo: {0}').replace('{0}',w) }
+  return tr('Actualizado {0}').replace('{0}',w) }
+function nwPill(x,always){ if(!x.when||x.soon) return ''; if(!always){ const d=new Date(x.when); if(isNaN(d)||Date.now()-d>14*864e5) return '' } const lbl=nwWhenLbl(x), isNew=lbl.indexOf(tr('Nuevo: {0}').split('{0}')[0])===0;
+  return `<span class="whenpill${isNew?' new':''}">${esc(lbl)}</span>` }
+function nwCardHTML(x){
     const req=(x.requires||[]).map(r=>tr(NW_REQ[r]||r)).join(', ');
-    const ini=esc((x.name||'?').replace(/[^\p{L}\p{N} ]/gu,'').split(/\s+/).map(w=>w[0]||'').join('').slice(0,3).toUpperCase());
-    return `<div class="nwcard"><div class="nwhero${x.hero?'':' nohero'}">${x.hero?`<img class="hb" src="${esc(x.hero)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('nohero');this.remove()">`:''}<span class="ini" data-noi18n>${ini}</span>${x.icon?`<img class="ic" src="${esc(x.icon)}" alt="" loading="lazy" onerror="this.remove()">`:''}</div>
-    <div class="nwb"><div class="row"><b data-noi18n>${esc(x.name)}</b>${x.new?`<span class="bdg ok">${esc(tr('Nuevo'))}</span>`:''}${x.soon?`<span class="bdg warn">${esc(tr('Próximamente'))}</span>`:''}</div>
-      <div class="row hint"><span>${esc(tr(NW_CAT[x.cat]||x.cat))}</span>${x.author?`<span data-noi18n>· ${esc(x.author)}</span>`:''}${x.version?`<span data-noi18n>· v${esc(x.version.replace(/^v/i,''))}</span>`:''}${x.when?`<span>· ${esc(nwWhen(x.when))}</span>`:''}</div>
-      ${x.blurb?`<p data-noi18n>${esc(x.blurb)}</p>`:''}
-      ${x.desc||x.needs||x.news||req?`<details><summary>${esc(tr('Más'))}</summary>${x.desc?`<p data-noi18n style="white-space:pre-line">${esc(x.desc)}</p>`:''}${x.needs?`<p class="hint" data-noi18n><b>${esc(tr('Necesitas:'))}</b> ${esc(x.needs)}</p>`:''}${req?`<p class="hint"><b>${esc(tr('Pide en la consola:'))}</b> ${esc(req)}</p>`:''}${x.news?`<p class="hint" data-noi18n>${esc(x.news)}</p>`:''}</details>`:''}
-      <div class="act">${x.repo?`<a class="small btnlink" href="https://github.com/${esc(x.repo)}" target="_blank" rel="noopener">GitHub ↗</a>`:''}<a class="small btnlink" href="https://recompstore.com" target="_blank" rel="noopener">recompstore.com ↗</a></div></div></div>` }).join('')}</div>`
-    :`<p class="hint">${esc(tr('Nada por aquí con ese filtro.'))}</p>` }
-$('nwCat').addEventListener('click',e=>{ const b=e.target.closest('button[data-c]'); if(!b) return; nw.cat=b.dataset.c; $('nwCat').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); nwPaint() });
-$('nwQ').oninput=nwPaint; $('nwRe').onclick=()=>nwLoad(true);
+    return `<div class="nwcard" data-nwid="${esc(x.id)}">${artCover(nwArt(x))}${nwPill(x)}${nwModes(x).length>1?`<button type="button" class="covsw" data-cs="${esc(x.id)}" title="${esc(tr('Cambiar la imagen de su tarjeta'))}" aria-label="${esc(tr('Cambiar imagen'))}">${ico('image')}</button>`:''}
+    <div class="nwb"><b class="ttl" data-noi18n>${esc(x.name)}</b>${x.new||x.soon?`<div class="row">${x.new?`<span class="bdg ok">${esc(tr('Nuevo'))}</span>`:''}${x.soon?`<span class="bdg warn">${esc(tr('Próximamente'))}</span>`:''}</div>`:''}
+      <div class="row hint"><span>${esc(tr(NW_CAT[x.cat]||x.cat))}</span>${x.author?`<span data-noi18n>· ${esc(x.author)}</span>`:''}${x.version?`<span data-noi18n>· v${esc(x.version.replace(/^v/i,''))}</span>`:''}${x.when&&!nwPill(x)?`<span>· ${esc(nwWhen(x.when))}</span>`:''}</div>
+      ${x.blurb?`<p data-noi18n data-tb="${esc(x.id)}"${x.blurb_t?` title="${esc(tr('Traducido automáticamente del inglés'))}"`:''}>${esc(x.blurb_t||x.blurb)}</p>`:''}
+      ${x.desc||x.needs||x.news||req?`<details><summary>${esc(tr('Más'))}</summary>${x.desc?`<p data-noi18n data-td="${esc(x.id)}" style="white-space:pre-line">${esc(x.desc_t||x.desc)}</p>`:''}${x.needs?`<p class="hint" data-noi18n><b>${esc(tr('Necesitas:'))}</b> ${esc(x.needs)}</p>`:''}${req?`<p class="hint"><b>${esc(tr('Pide en la consola:'))}</b> ${esc(req)}</p>`:''}${x.news?`<p class="hint" data-noi18n>${esc(x.news)}</p>`:''}</details>`:''}
+      <div class="act">${x.repo&&!x.soon&&!state.remote&&!SCENE_SKIP.test(x.name+' '+x.repo)?`<button class="small primary" data-ni="${esc(x.id)}" title="${esc(tr('Se baja la última versión de su GitHub y se instala en la consola'))}">${esc(tr('Instalar en la PS5'))}</button>`:''}${x.repo?`<a class="small btnlink" href="https://github.com/${esc(x.repo)}" target="_blank" rel="noopener">GitHub ↗</a>`:''}<a class="small btnlink" href="https://recompstore.com" target="_blank" rel="noopener">recompstore.com ↗</a></div></div></div>` }
+function nwPaint(){ const q=($('nwQ').value||'').toLowerCase().trim(), c=nw.cat;
+  $('nwCat').querySelectorAll('button[data-c]').forEach(b=>{ const k=b.dataset.c, n=nw.items.filter(x=>!k?!x.soon:k==='soon'?x.soon:x.cat===k&&!x.soon).length; let i=b.querySelector('i'); if(!i){ i=document.createElement('i'); b.appendChild(i) } i.textContent=n?' '+n:'' });
+  const list=nw.items.filter(x=>(!c||(c==='soon'?x.soon:(x.cat===c&&!x.soon)))&&(!q||(x.name+' '+x.author+' '+x.blurb+' '+(x.tags||[]).join(' ')).toLowerCase().includes(q)));
+  const shown=list.slice(0,nw.lim||60);
+  $('nwBody').innerHTML=list.length?`<div class="nwgrid">${shown.map(nwCardHTML).join('')}</div>`
+    :`<p class="hint">${esc(tr('Nada por aquí con ese filtro.'))}</p>`;
+  if(list.length>shown.length){ $('nwBody').insertAdjacentHTML('beforeend',`<div class="nwmore"><button class="small" id="nwMore">${esc(tr('Ver más ({0} en total)').replace('{0}',list.length))}</button></div>`); $('nwMore').onclick=()=>{ nw.lim=(nw.lim||60)+60; nwPaint() } }
+  else if(list.length) $('nwBody').insertAdjacentHTML('beforeend',`<p class="hint nwmore">${esc(tr('{0} en el catálogo de RecompStore para PS5').replace('{0}',list.length))}</p>`)
+  nwTranslate() }
+$('nwCat').addEventListener('click',e=>{ const b=e.target.closest('button[data-c]'); if(!b) return; nw.cat=b.dataset.c; nw.lim=60; $('nwCat').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); nwPaint() });
+$('nwQ').oninput=()=>{ nw.lim=60; nwPaint() }; $('nwRe').onclick=()=>nwLoad(true);
 // --- 🏷 ordenar nombres (imágenes y .pkg con un nombre claro, desde su propio param.json)
 const ren={items:[]};
 async function renOpen(){ $('dlgRen').showModal(); await renLoad() }
@@ -3429,7 +3810,7 @@ const wz={id:null,steps:[],i:0,info:null,it:null};
 function wzSeen(id){ try{ return localStorage.getItem('ps5d_wiz_'+id)==='1' }catch(e){ return true } }
 function wzMark(id){ try{ localStorage.setItem('ps5d_wiz_'+id,'1') }catch(e){} }
 async function emuWizard(id,keepStep){
-  wz.id=id; wzMark(id); wz.it=(rec.items||[]).find(x=>x.id===id)||{};
+  wz.kind='emu'; wz.id=id; wzMark(id); wz.it=(rec.items||[]).find(x=>x.id===id)||{};
   if(!$('dlgWiz').open) $('dlgWiz').showModal();
   $('wzTitle').textContent=(wz.it.name||'')+' · '+tr('Primeros pasos');
   $('wzBody').innerHTML=loadingHTML('Mirando la consola…',1);
@@ -3463,8 +3844,9 @@ function wzPaint(){
   $('wzDots').innerHTML=st.map((y,k)=>`<button class="wz-dot${k===wz.i?' on':''}${y.done?' done':''}" data-k="${k}" title="${esc(y.t)}">${y.done?'✓':k+1}</button>`).join('');
   $('wzDots').querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ wz.i=+b.dataset.k; wzPaint() });
   $('wzBody').innerHTML=`<div class="wz-step"><div class="wz-n">${esc(tr('Paso {0} de {1}').replace('{0}',wz.i+1).replace('{1}',st.length))}${x.opt?' · '+esc(tr('opcional')):''}</div>
-    <h3>${x.done?'✅ ':''}${esc(x.t)}</h3><p class="wz-p">${esc(x.p)}</p>${x.b?`<div class="actions">${x.b}</div>`:''}</div>`;
-  $('wzBody').querySelectorAll('[data-wa]').forEach(b=>b.onclick=()=>wzAct(b.dataset.wa,b));
+    <h3>${x.done?'✅ ':''}${esc(x.t)}</h3>${x.p?`<p class="wz-p">${esc(x.p)}</p>`:''}${x.h||''}${x.b?`<div class="actions">${x.b}</div>`:''}</div>`;
+  $('wzBody').querySelectorAll('[data-wa]').forEach(b=>b.onclick=()=>b.dataset.wa.startsWith('os:')?osAct(b.dataset.wa,b):b.dataset.wa.startsWith('rp:')?rpAct(b.dataset.wa,b):wzAct(b.dataset.wa,b));
+  $('wzBody').querySelectorAll('[data-lx]').forEach(b=>b.onclick=()=>sendLoader(b));
   $('wzPrev').disabled=wz.i===0; $('wzNext').textContent=wz.i===st.length-1?tr('Terminar'):tr('Siguiente →');
 }
 async function wzAct(a,b){
@@ -3489,8 +3871,116 @@ async function titleLaunch(tid,b){ if(!tid) return; if(b) b.disabled=true;
   try{ const x=await api('/api/title/launch',{tid}); if(!x.ok) throw new Error(x.error); toast(tr('Abriéndolo en la consola…')) }catch(e){ toast(e.message) } if(b) b.disabled=false }
 $('wzPrev').onclick=()=>{ if(wz.i>0){ wz.i--; wzPaint() } };
 $('wzNext').onclick=()=>{ if(wz.i<wz.steps.length-1){ wz.i++; wzPaint() } else $('dlgWiz').close() };
-$('wzRe').onclick=()=>emuWizard(wz.id,true);
+$('wzRe').onclick=()=>wz.kind==='os'?osWizard(wz.id,true):wz.kind==='rp'?rpWizard(true):emuWizard(wz.id,true);
 $('wzClose').onclick=()=>$('dlgWiz').close();
+// --- 🖥 PC en la PS5: asistentes propios para Linux, Bazzite y MihawkOS (comprueban lo que se puede y hacen lo automatizable)
+const OS_FW={ph:['3.00','3.10','3.20','3.21','4.00','4.02','4.03','4.50','4.51','5.00','5.02','5.10','5.50','6.00','6.02','6.50','7.00','7.01','7.20','7.40','7.60','7.61','11.00','11.20','11.40','11.60','12.00','12.02','12.20','12.40','12.60','12.70','13.00','13.20','13.40','13.42','13.60'],
+  pro:['11.00','11.20','11.40','11.60','12.00','12.02','12.20','12.40','12.60','12.70','13.20','13.40','13.42','13.60']};
+function osFw(v){ const m=/^\s*(\d{1,2})[.,](\d{1,2})/.exec(v||''); return m?(+m[1])+'.'+m[2].padEnd(2,'0'):'' }
+function osChk(ok,txt,sub){ return `<div class="os-chk ${ok===true?'ok':ok===false?'bad':'unk'}"><span class="mk">${ok===true?'✓':ok===false?'✕':'?'}</span><div><b>${esc(txt)}</b>${sub?`<div class="hint">${esc(sub)}</div>`:''}</div></div>` }
+function osTick(k){ try{ return localStorage.getItem('ps5d_os_'+k)==='1' }catch(e){ return false } }
+function osBox(k,txt,sub){ return `<label class="os-chk box"><input type="checkbox" data-ot="${k}"${osTick(k)?' checked':''}><div><b>${esc(txt)}</b>${sub?`<div class="hint">${esc(sub)}</div>`:''}</div></label>` }
+async function osWizard(id,keepStep){
+  wz.kind='os'; wz.id=id; wz.it=(rec.items||[]).find(x=>x.id===id)||{};
+  if(!$('dlgWiz').open) $('dlgWiz').showModal();
+  $('wzTitle').textContent=tr(wz.it.name||'')+' · '+tr('Paso a paso');
+  $('wzBody').innerHTML=loadingHTML('Mirando la consola…',1);
+  let c={}; try{ c=await api('/api/os/check',{}) }catch(e){}
+  const fw=osFw(c.fw), procs=(c.procs||[]).map(x=>x.toLowerCase()), has=rx=>procs.some(n=>rx.test(n));
+  const etahen=has(/etahen/), kst=has(/kstuff/), st=[];
+  if(id==='mihawkos'){
+    const need=[['kstuff',/kstuff/,'Kstuff Lite 1.11 Beta o posterior'],['elfldr',/elfldr|elf.?loader/,'Cargador de ELF'],['websrv',/websrv/,'Servidor web de la consola'],['ShadowMountPlus',/shadowmount|smp/,'Beta 11 o posterior']];
+    const okAll=c.pm&&!etahen&&need.every(([,rx])=>has(rx));
+    st.push({t:tr('Lo que necesita en la consola'),done:okAll,
+      h:(c.pm?need.map(([n,rx,sub])=>osChk(has(rx)?true:null,n+(has(rx)?' · '+tr('en marcha'):' · '+tr('no lo veo en marcha')),tr(sub))).join('')
+         +osChk(etahen?false:true,etahen?tr('etaHEN está cargado: con MihawkOS no puede haber nada más'):tr('Sin etaHEN cargado'))
+        :osChk(null,tr('No veo Payload Manager en la consola'),tr('Ábrelo en la PS5 para que pueda comprobar qué payloads tienes en marcha.')))
+        +`<p class="hint">${esc(tr('Solo esos payloads y ninguno más. Payload Manager no siempre muestra kstuff: si lo cargaste, sigue. Probado en 10.01 (Pro) y 13.40 a 13.60.'))}</p>`});
+    st.push({t:tr('Instálalo en la consola'),done:!!wz.it.installed,p:wz.it.installed?tr('Ya está instalado.'):tr('Se baja de la página oficial de su autor en GitHub y se coloca en /data/homebrew. Cuando termine en la cola, pulsa «Volver a comprobar».'),
+      b:wz.it.installed?'':`<button class="small primary" data-wa="os:install">${esc(tr('Instalar en la PS5'))}</button>`});
+    st.push({t:tr('Ábrelo'),done:false,p:tr('Sale en el menú de la PS5 cuando ShadowMountPlus lo monta. La primera vez tarda un poco más. Se actualiza solo cada vez que lo abres.'),
+      b:wz.it.installed?`<button class="small" data-wa="os:launch">▶ ${esc(tr('Abrir en la consola'))}</button>`:''});
+    st.push({t:tr('Qué puedes esperar'),done:false,tips:true,p:['Un escritorio como el de Windows con explorador, navegador y Steam oficial (tu cuenta y tu biblioteca).','No funciona lo que lleva DRM como Denuvo ni los antitrampas (EAC, BattlEye).','Es experimental: si algo falla, reinicia la consola y vuelve a cargar solo esos payloads.'].map(x=>'• '+tr(x)).join('\n')});
+  } else {
+    const isB=id==='bazzite', inPh=fw&&OS_FW.ph.includes(fw), inPro=fw&&OS_FW.pro.includes(fw), m2=fw&&parseFloat(fw)>=4;
+    st.push({t:tr('¿Tu consola sirve?'),done:!!inPh,
+      h:(fw?osChk(inPh?true:false,tr('Firmware {0}').replace('{0}',fw)+' · '+tr(inPh?'compatible':'no está en la lista'),
+          tr(inPh?(m2?'También puedes usar un M.2 solo para Linux.':'Sin M.2: solo desde USB.'):'Funciona en 3.00 a 7.61 y 11.00 a 13.60 (no en 8.xx ni 10.xx).')+(inPh&&!inPro?' '+tr('En una PS5 Pro, este firmware no vale.'):''))
+          :osChk(null,tr('No sé tu firmware'),tr('Ponlo en Ajustes (o conecta la consola) y pulsa «Volver a comprobar».')))
+        +osChk(null,tr('Un USB de 64 GB o más'),tr('Mejor un SSD externo: va mucho más rápido. Se borra entero.'))
+        +osChk(null,tr('Teclado y ratón USB'),tr('Opcional: adaptador Wi-Fi USB y Bluetooth para el mando.'))});
+    st.push({t:tr('Baja la imagen a tu PC'),done:false,
+      p:tr(isB?'La última versión de Bazzite Deck (la marcada como Latest) desde su GitHub. Pesa varios GB: va a tu carpeta de Descargas › PS5 Directo y la ves en la cola.':'La última imagen de Ubuntu para la PS5 desde su GitHub. Pesa varios GB: va a tu carpeta de Descargas › PS5 Directo y la ves en la cola.'),
+      b:`<button class="small primary" data-wa="os:img">⬇ ${esc(tr('Bajar la imagen a mi PC'))}</button>`});
+    st.push({t:tr('Grábala en el USB'),done:false,
+      p:tr('Con Balena Etcher (Windows, Mac y Linux): elige la imagen que has bajado, elige el USB y pulsa Flash. Graba también los .xz tal cual, sin descomprimir. Ojo: borra todo lo que haya en ese USB.'),
+      b:`<a class="btn-a" href="https://etcher.balena.io/" target="_blank" rel="noopener">${esc(tr('Descargar Balena Etcher'))} ↗</a>`});
+    st.push({t:tr('Prepara la consola (una sola vez)'),done:osTick('usb')&&osTick('hdmi'),
+      h:osBox('usb',tr('Energía USB en reposo: Siempre'),tr('Ajustes › Sistema › Ahorro de energía › Funciones disponibles en modo de reposo › Suministrar energía a los puertos USB: Siempre.'))
+        +osBox('hdmi',tr('Vínculo HDMI desactivado'),tr('Ajustes › Sistema › HDMI › Activar vínculo de dispositivo HDMI: desactivado.'))
+        +osBox('upd',tr('Recomendado: sin actualizaciones automáticas'),tr('Ajustes › Sistema › Software del sistema › Actualización y configuración. El Guardián del firmware de PS5 Directo te avisa si se cuela una.'))
+        +`<p class="hint">${esc(tr('Si restableces la consola o reinstalas el firmware, hay que volver a ponerlo.'))}</p>`});
+    st.push({t:tr('Conecta el USB'),done:false,p:tr('En un puerto de atrás o en el USB-C de delante. El USB de delante de arriba es más lento (USB 2.0): mejor no.')});
+    st.push({t:tr(isB?'Arranca Bazzite':'Arranca Linux'),done:false,
+      h:(c.pm?osChk((etahen||kst)?false:true,tr((etahen||kst)?'Tienes etaHEN o kstuff cargado':'Sin etaHEN ni kstuff cargados'),tr((etahen||kst)?'No son compatibles: reinicia la consola, haz el jailbreak y no los cargues.':'Bien: así arranca a la primera.')):'')
+        +`<p class="wz-p">${esc(tr('Pulsa «Enviar el cargador»: la consola pasa a reposo. Cuando la luz naranja deje de parpadear, enciéndela: la luz blanca indica que ha entrado.'))}${isB?' '+esc(tr('La primera vez completa el asistente de Steam.')):''}</p>`,
+      b:state.remote?'':`<button class="small primary" data-lx="linuxloader">${esc(tr('Enviar el cargador'))}</button>`});
+    st.push({t:tr('Para volver y si algo falla'),done:false,tips:true,
+      p:[ 'Para volver a la PS5: apaga y enciende normal. El sistema de la PS5 no se toca.',
+          'Pantalla en negro: en la partición FAT32 del USB, añade amdgpu.force_1080p=1 a cmdline.txt.',
+          isB?'Desbloquear las unidades de cálculo extra de la GPU es opcional y puede dar fallos: déjalo para el final.':'Si la luz se queda parpadeando, desenchufa el USB, enciende normal y vuelve a empezar desde el jailbreak.',
+          isB?'Es un proyecto de la comunidad, no oficial de Bazzite: las dudas, en su Discord o su wiki, no en los de Bazzite.':'' ].filter(Boolean).map(x=>'• '+tr(x)).join('\n'),
+      b:`<a class="btn-a" href="${esc(wz.it.doc||'https://wiki.ps5-linux.eu')}" target="_blank" rel="noopener">📖 ${esc(tr('Guía completa (en inglés)'))} ↗</a>`});
+  }
+  wz.steps=st;
+  if(!keepStep){ const k=st.findIndex(x=>!x.done&&!x.opt); wz.i=k<0?st.length-1:k }
+  wzPaint();
+}
+async function osAct(a,b){
+  if(a==='os:install'){ b.disabled=true; try{ const x=await api('/api/rec/install',{id:wz.id}); if(!x.ok) throw new Error(x.error); toast(tr('Añadido a la cola: {0}. Se baja de GitHub y se instala en /data/homebrew.').replace('{0}',x.file)); refresh() }catch(e){ toast(e.message); b.disabled=false } return }
+  if(a==='os:launch'){ titleLaunch(wz.it.tid,b); return }
+  if(a==='os:img'){ b.disabled=true; try{ const x=await api('/api/os/image',{id:wz.id}); if(!x.ok) throw new Error(x.error);
+      toast(tr('Añadido a la cola: {0}. Se baja a tu carpeta de Descargas › PS5 Directo.').replace('{0}',x.file)+(x.size?' ('+human(x.size)+')':'')); refresh() }catch(e){ toast(e.message); b.disabled=false } }
+}
+// --- 📺 Configurar Remote Play paso a paso (chiaki-ng + el PIN del payload); PS5 Directo no hace streaming propio
+const RP_KEYS=['rp_act','rp_pin','rp_app','rp_reg','rp_ps5'];
+function rpDone(){ return RP_KEYS.filter(osTick).length }
+async function rpWizard(keepStep){
+  wz.kind='rp'; wz.id='rp'; if(!$('dlgWiz').open) $('dlgWiz').showModal();
+  $('wzTitle').textContent=tr('Configurar Remote Play');
+  const ip=((state.settings||{}).ps5_ip||'').split(':')[0], st=[];
+  st.push({t:tr('Tu cuenta, activada sin conexión'),done:osTick('rp_act'),
+    h:`<p class="wz-p">${esc(tr('Con el jailbreak la consola no entra en PSN. Para Remote Play la cuenta tiene que estar activada sin conexión con offact (de websrv). El ID que genera solo vale para chiaki-ng; para la app oficial de PlayStation hace falta tu ID de cuenta real.'))}</p>`
+      +osBox('rp_act',tr('Mi cuenta ya está activada sin conexión'),tr('Si acabas de hacerlo, reinicia la consola antes de seguir.')),
+    b:`<a class="btn-a" href="https://github.com/ps5-payload-dev/websrv/releases" target="_blank" rel="noopener">websrv (offact) ↗</a>`});
+  st.push({t:tr('Saca el PIN y tu ID de cuenta'),done:osTick('rp_pin'),
+    h:`<p class="wz-p">${esc(tr('Pulsa el botón: PS5 Directo envía el payload y en la PS5 sale una notificación con el PIN para vincular y tu ID de cuenta. Apúntalos. Para cancelar el vínculo, envíalo otra vez.'))}</p>`+osBox('rp_pin',tr('Ya tengo el PIN y el ID')),
+    b:state.remote?'':`<button class="small primary" data-wa="rp:pin">${esc(tr('Sacar el PIN'))}</button>`});
+  st.push({t:tr('Instala chiaki-ng en tu PC'),done:osTick('rp_app'),
+    h:`<p class="wz-p">${esc(tr('Es el Remote Play libre para Windows, Mac, Linux, Steam Deck y Android. Se baja de su página oficial.'))}</p>`+osBox('rp_app',tr('Ya tengo chiaki-ng instalado')),
+    b:`<a class="btn-a" href="https://github.com/streetpea/chiaki-ng/releases/latest" target="_blank" rel="noopener">⬇ ${esc(tr('Descargar chiaki-ng'))} ↗</a>`});
+  st.push({t:tr('Vincula la consola'),done:osTick('rp_reg'),
+    h:`<p class="wz-p">${esc(tr('En chiaki-ng: añade una consola a mano con la IP de tu PS5, pulsa «Register» y escribe tu ID de cuenta y el PIN del paso 2. Solo vale el ID de la cuenta que está abierta en la consola.'))}</p>`
+      +(ip?`<div class="os-chk"><span class="mk">IP</span><div><b class="mono" data-noi18n>${esc(ip)}</b><div class="hint">${esc(tr('La IP de tu PS5'))}</div></div><button class="small" data-wa="rp:copy" style="margin-left:auto">${esc(tr('Copiar'))}</button></div>`:'')
+      +osBox('rp_reg',tr('Vinculada'),tr('Si falla, reinicia la consola, vuelve a sacar el PIN y prueba otra vez.'))});
+  st.push({t:tr('Prepara la consola para conectarte'),done:osTick('rp_ps5'),
+    h:osBox('rp_ps5',tr('Remote Play activado y encendido desde la red'),tr('Ajustes › Sistema › Juego remoto: activar. Y en Ahorro de energía › Funciones disponibles en modo de reposo: «Mantener la conexión a internet» y «Permitir encender la PS5 desde la red».'))
+      +`<p class="hint">${esc(tr('Así puedes despertarla desde chiaki-ng sin levantarte.'))}</p>`});
+  st.push({t:tr('Juega'),done:false,tips:true,
+    p:['Abre chiaki-ng y elige tu consola: si está en reposo, la despierta.','Va mucho mejor con cable o con Wi-Fi de 5 GHz. Empieza en 1080p a 60 fps y sube si va fino.','El vínculo se guarda: la próxima vez solo tienes que abrir chiaki-ng.'].map(x=>'• '+tr(x)).join('\n')});
+  wz.steps=st;
+  if(!keepStep){ const k=st.findIndex(x=>!x.done); wz.i=k<0?st.length-1:k }
+  wzPaint(); rpBadge();
+}
+async function rpAct(a,b){
+  if(a==='rp:copy'){ const ip=((state.settings||{}).ps5_ip||'').split(':')[0]; try{ await navigator.clipboard.writeText(ip); toast(tr('Copiado')) }catch(e){ toast(ip) } return }
+  if(a==='rp:pin'){ b.disabled=true; toast(tr('Bajándolo de GitHub e iniciándolo en la consola… (puede tardar un poco)'));
+    try{ const x=await api('/api/extra_payload',{id:'rpgetpin',send:1}); if(!x.ok) throw new Error(x.error); toast(tr('Enviado. Mira la notificación de la PS5: sale el PIN y el ID de cuenta para vincular.')) }catch(e){ toast(e.message) } b.disabled=false }
+}
+function rpBadge(){ const n=rpDone(); document.querySelectorAll('.rp-cfg b').forEach(x=>x.textContent=n+'/'+RP_KEYS.length) }
+document.addEventListener('change',e=>{ const c=e.target.closest('[data-ot]'); if(!c) return; try{ localStorage.setItem('ps5d_os_'+c.dataset.ot,c.checked?'1':'0') }catch(_){}
+  if(wz.kind==='rp'&&wz.steps&&wz.steps[wz.i]){ wz.steps[wz.i].done=c.checked; const d=$('wzDots').querySelectorAll('.wz-dot')[wz.i]; if(d) d.classList.toggle('done',c.checked); rpBadge() }
+  if(wz.kind==='os'&&wz.steps&&wz.steps[wz.i]){ wz.steps[wz.i].done=osTick('usb')&&osTick('hdmi'); const d=$('wzDots').querySelectorAll('.wz-dot')[wz.i]; if(d) d.classList.toggle('done',wz.steps[wz.i].done) } });
 async function emuOpen(id,noWiz){
   if(!noWiz&&!wzSeen(id)) return emuWizard(id);
   emu.id=id; const b=$('emBody'); if(!$('dlgEmu').open) $('dlgEmu').showModal(); b.innerHTML=`<p class="hint">${esc(tr('Leyendo la consola…'))}</p>`; $('emView').hidden=true;
@@ -3549,7 +4039,7 @@ async function syLoad(){
       +(ram.total?tile('Memoria',human(ram.used||0)+' / '+human(ram.total),Math.round((ram.used||0)*100/ram.total)+' %'):'')
       +tile('Disco interno',dk.disk_total?human(dk.disk_free||0)+' '+tr('libres'):'—',dk.disk_total?human(dk.disk_used||0)+' / '+human(dk.disk_total):'')
       +tile('Encendida',syDur(r.uptime_seconds))
-      +(r.power_hours?tile('Horas de uso',Math.round(r.power_hours).toLocaleString()+' h',r.power_cycles?esc(tr('{0} encendidos desde nueva').replace('{0}',Math.round(r.power_cycles))):''):'')
+      +(r.power_hours?tile('Horas de uso',Math.round(r.power_hours).toLocaleString(LOC())+' h',r.power_cycles?esc(tr('{0} encendidos desde nueva').replace('{0}',Math.round(r.power_cycles))):''):'')
       +(r.gpu_mhz?tile('Frecuencias',(r.cpu_mhz?Math.round(r.cpu_mhz)+' / ':'')+Math.round(r.gpu_mhz)+' MHz',esc(tr('CPU / GPU'))):'')
       +`</div>`+sySpark(r.hist,r.hist_names);
     if(t!=null&&t>=85) h+=`<p class="err">${esc(tr('Está muy caliente. Deja espacio alrededor de la consola, límpiale el polvo y no la tapes.'))}</p>`;
@@ -3575,8 +4065,8 @@ async function arLoad(){
     :x.state==='ok'?`<span class="bdg ok">${esc(tr('Entero'))} ✓</span>`:x.state==='sumando'?`<span class="bdg info">${esc(tr('Calculando las sumas…'))}</span>`
     :x.state==='mal'?`<span class="bdg warn">${esc(tr('Con problemas'))}</span>`:x.state==='error'?`<span class="bdg warn">${esc(tr('Error'))}</span>`:'';
   $('arList').innerHTML=it.length?`<table class="acttable"><thead><tr><th>${esc(tr('Fecha'))}</th><th>${esc(tr('Contenido'))}</th><th class="num">${esc(tr('Tamaño'))}</th><th></th><th></th></tr></thead><tbody>${it.map(x=>`<tr>
-    <td>${esc(new Date(x.t*1000).toLocaleDateString())}</td>
-    <td><b data-noi18n>${esc(x.title||x.name)}</b><div class="hint" data-noi18n>${esc(x.pc)}</div>${x.msg?`<div class="hint">${esc(tr(x.msg))}</div>`:''}${x.checked?`<div class="hint">${esc(tr('Última comprobación: {0}').replace('{0}',new Date(x.checked*1000).toLocaleString()))}</div>`:''}</td>
+    <td>${esc(new Date(x.t*1000).toLocaleDateString(LOC()))}</td>
+    <td><b data-noi18n>${esc(x.title||x.name)}</b><div class="hint" data-noi18n>${esc(x.pc)}</div>${x.msg?`<div class="hint">${esc(tr(x.msg))}</div>`:''}${x.checked?`<div class="hint">${esc(tr('Última comprobación: {0}').replace('{0}',new Date(x.checked*1000).toLocaleString(LOC())))}</div>`:''}</td>
     <td class="num">${esc(human(x.size||0))}</td><td>${stTxt(x)}</td>
     <td style="white-space:nowrap"><button class="small" data-av="${esc(x.id)}" ${x.busy||!x.exists||x.state==='sumando'?'disabled':''}>${esc(tr('Comprobar'))}</button> <button class="small" data-ao="${esc(x.id)}" ${x.exists?'':'disabled'}>📂</button> <button class="small" data-af="${esc(x.id)}" title="${esc(tr('Quitar de esta lista (no borra nada)'))}">✕</button></td></tr>`).join('')}</tbody></table>`
     :`<div class="empty">${esc(tr('Todavía no has archivado nada. En la Biblioteca, menú «⋯» de una aplicación › «Archivar en el PC».'))}</div>`;
@@ -3604,11 +4094,12 @@ function allPaint(){
   let gs=allGroups();
   const nc=gs.filter(x=>x.con.length&&!x.pc.length).length, np=gs.filter(x=>x.pc.length&&!x.con.length).length, nb=gs.filter(x=>x.con.length&&x.pc.length).length;
   $('allSum').textContent=tr('{0} títulos').replace('{0}',gs.length)+' · '+tr('{0} solo en la consola').replace('{0}',nc)+' · '+tr('{0} solo en el PC').replace('{0}',np)+' · '+tr('{0} en los dos').replace('{0}',nb);
-  gs=gs.filter(x=>(!q||((x.title||'')+' '+x.tid).toLowerCase().includes(q))&&(!f||(f==='con'?x.con.length&&!x.pc.length:f==='pc'?x.pc.length&&!x.con.length:x.con.length&&x.pc.length)));
+  gs=gs.filter(x=>(!libType||libTypeOf(x.tid)===libType)&&(!q||((x.title||'')+' '+x.tid).toLowerCase().includes(q))&&(!f||(f==='con'?x.con.length&&!x.pc.length:f==='pc'?x.pc.length&&!x.con.length:x.con.length&&x.pc.length)));
   gs.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
   allView=gs;
   $('allGrid').innerHTML=gs.length?gs.map((x,i)=>{
     const c0=x.con.find(y=>!y.extra)||x.con[0], p0=x.pc[0];
+    const artFb=artURL((recArt||{})[(x.tid||'').toUpperCase()]||'');
     const cov=c0&&c0.cover?(c0.kind==='image'&&!c0.cover_path?`/api/cover?tid=${encodeURIComponent(c0.tid||'')}&t=${encodeURIComponent(TOKEN)}`:`/api/cover?p=${encodeURIComponent(c0.cover_path||c0.path)}&t=${encodeURIComponent(TOKEN)}`)
       :p0?(p0.kind==='folder'&&p0.icon?`/api/colicon?p=${encodeURIComponent(p0.path)}&t=${encodeURIComponent(TOKEN)}`:(p0.tid?`/api/cover?tid=${encodeURIComponent(p0.tid)}&t=${encodeURIComponent(TOKEN)}`:'')):'';
     const ph=esc((x.tid||x.title||'?').slice(0,9));
@@ -3618,7 +4109,7 @@ function allPaint(){
     const places=[...x.con.map(y=>`<div><b>PS5</b> <span data-noi18n>${esc(y.path)}</span>${y.size?' · '+esc(human(y.size)):''}</div>`),...x.pc.map(y=>`<div><b>PC</b> <span data-noi18n>${esc(y.path)}</span>${y.size?' · '+esc(human(y.size)):''}</div>`)].join('');
     const canDl=c0&&(c0.kind==='folder'||c0.kind==='image')&&/^\/(data|mnt)\//.test(c0.path);
     const act=!x.con.length&&p0?`<button class="primary" data-a="send" data-i="${i}">${esc(tr('Enviar a la consola'))}</button>`:(!x.pc.length&&canDl?`<button data-a="dl" data-i="${i}">${esc(tr('Bajar al PC'))}</button>`:'');
-    return `<div class="gcard"><div class="gcov">${cov?`<img loading="lazy" src="${cov}" alt="" data-ph="${ph}" onerror="libImgErr(this)">`:`<div class="ph">${ph}</div>`}</div>
+    return `<div class="gcard"><div class="gcov">${cov?`<img loading="lazy" src="${cov}" alt="" data-ph="${ph}"${artFb&&cov!==artFb?` data-art="${artFb}"`:''} onerror="libImgErr(this)">`:`<div class="ph">${ph}</div>`}</div>
       <div class="gbody"><div class="gtitle" data-noi18n>${esc(x.title||x.tid)}</div><div class="gmeta" data-noi18n>${esc(x.tid||'')}</div>
       <div class="badges">${b.join('')}</div><details class="places"><summary>${esc(tr('Dónde está'))} (${x.con.length+x.pc.length})</summary>${places}</details>
       <div class="gact">${act}</div></div></div>` }).join(''):`<div class="empty" style="grid-column:1/-1">${esc(tr('Nada coincide con el filtro.'))}</div>`;
@@ -3927,7 +4418,7 @@ const ARCH_RX=/\.(part0*1\.rar|rar|7z|7z\.0*1|zip)$/i;
 function joinPath(a,b){return (a.replace(/\/+$/,'')+'/'+b).replace(/\/+/g,'/')}
 function parentOf(p){const x=p.replace(/\/+$/,'').split('/');x.pop();return x.join('/')||'/'}
 function baseName(p){return p.replace(/\/+$/,'').split('/').pop()}
-function fmtDate(t){if(!t)return '';const d=new Date(t*1000);return d.toLocaleDateString()+' '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
+function fmtDate(t){if(!t)return '';const d=new Date(t*1000);return d.toLocaleDateString(LOC())+' '+d.toLocaleTimeString(LOC(), {hour:'2-digit',minute:'2-digit'})}
 function fmtMode(m){return m==null?'':(m&0o777).toString(8)}
 function lsGet(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -4281,7 +4772,7 @@ fmWatch(); fmLoadDrives(); setInterval(()=>{if(curTab==='Files')fmLoadDrives()},
 // ===================== campana de notificaciones =====================
 let notifs=[], nFresh=new Set();
 function paintBell(n){const b=$('bellN'); b.hidden=!n; b.textContent=n>99?'99+':String(n); $('btnBell').classList.toggle('has',!!n)}
-function ago(t){const s=Math.max(0,Date.now()/1000-t); if(s<60) return tr('ahora'); if(s<3600) return tr('hace {0} min').replace('{0}',Math.floor(s/60)); if(s<86400) return tr('hace {0} h').replace('{0}',Math.floor(s/3600)); return new Date(t*1000).toLocaleDateString()}
+function ago(t){const s=Math.max(0,Date.now()/1000-t); if(s<60) return tr('ahora'); if(s<3600) return tr('hace {0} min').replace('{0}',Math.floor(s/60)); if(s<86400) return tr('hace {0} h').replace('{0}',Math.floor(s/3600)); return new Date(t*1000).toLocaleDateString(LOC())}
 async function loadNotifs(){try{const r=await api('/api/notifs',{}); notifs=r.items||[]; paintBell(r.unread||0); renderNotifs()}catch(e){}}
 function renderNotifs(){
   const box=$('nList');
@@ -4323,12 +4814,13 @@ async function loadActivity(){
   $('actBody').innerHTML=items.length?items.map(h=>{
     const ok=h.status==='hecho', d=new Date(h.t*1000), m=Math.floor((h.secs||0)/60);
     const dur=h.secs>=3600?Math.floor(h.secs/3600)+' h '+(m%60)+' min':(m?m+' min '+(h.secs%60)+' s':(h.secs||0)+' s');
-    return `<tr><td class="mono">${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</td>
+    return `<tr><td class="mono">${d.toLocaleDateString(LOC())} ${d.toLocaleTimeString(LOC(), {hour:'2-digit',minute:'2-digit'})}</td>
       <td data-noi18n>${esc(h.title)}</td>
       <td><span class="chip ${ok?'hecho':'error'}">${esc(h.status)}</span>${h.error?`<div class="hint">${esc(h.error.slice(0,160))}</div>`:''}</td>
       <td class="num">${h.size>0?human(h.size):''}</td><td>${dur}</td>
       <td class="mono" data-noi18n>${esc((h.result||[]).join(', ')||h.dest||'')}</td>
-      <td class="num">${h.redo&&h.redo.lines&&h.redo.lines.length?`<button class="small" data-redo="${esc(h.id)}">${esc(tr('Descargar de nuevo'))}</button>`:''}</td></tr>`}).join('')
+      <td class="num">${h.redo&&h.redo.lines&&h.redo.lines.length?(()=>{ const url=h.redo.lines.some(l=>/^(https?|ftp|magnet):/i.test(String(l).trim()));
+        return `<button class="small" data-redo="${esc(h.id)}" title="${esc(tr(url?'Se vuelve a descargar y enviar, como si pegaras el enlace otra vez':'Se vuelve a enviar desde tu PC'))}">${esc(tr(url?'Descargar de nuevo':'Enviar de nuevo'))}</button>` })():''}</td></tr>`}).join('')
     :`<tr><td colspan="7" class="hint" style="padding:18px;text-align:center">${esc(tr('Todavía no hay nada en el historial.'))}</td></tr>`;
 }
 $('actBody').addEventListener('click',async e=>{const b=e.target.closest('button[data-redo]'); if(!b) return;
@@ -4468,7 +4960,7 @@ function applyRemote(){
 }
 
 // --- programar la cola
-function hhmm(t){const d=new Date(t*1000);return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
+function hhmm(t){const d=new Date(t*1000);return d.toLocaleTimeString(LOC(), {hour:'2-digit',minute:'2-digit'})}
 function renderSched(){
   const sc=state.sched||{}, box=$('schedBar'); let h='';
   if(sc.countdown){
@@ -4723,16 +5215,22 @@ setTimeout(()=>fgLoad(),2500); setInterval(()=>fgLoad(),10*60*1000);
 
 // ===================== Biblioteca =====================
 const lib={res:null,poll:null,loaded:false};
-function libImgErr(img){const d=document.createElement('div');d.className='ph';d.textContent=img.dataset.ph||'?';img.replaceWith(d)}
+function libImgErr(img){ if(img.dataset.art&&img.src.indexOf('/api/art?')<0){ img.src=img.dataset.art; return }
+  const d=document.createElement('div');d.className='ph';d.textContent=img.dataset.ph||'?';img.replaceWith(d)}
 function fwT(s){const m=/^\s*(\d{1,2})[.,](\d{1,2})/.exec(s||'');return m?[+m[1],+(m[2].padEnd(2,'0'))]:null}
 function fwOk(mine,need){const a=fwT(mine),b=fwT(need);if(!a||!b)return null;return b[0]<a[0]||(b[0]===a[0]&&b[1]<=a[1])}
+// avisos que se pueden cerrar para siempre (✕)
+function hid(k){ try{ return localStorage.getItem('ps5d_hide_'+k)==='1' }catch(e){ return false } }
+function hideX(k){ return `<button type="button" class="tipx" data-hide="${k}" title="${esc(tr('No volver a mostrar'))}" aria-label="${esc(tr('No volver a mostrar'))}">✕</button>` }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-hide]'); if(!b) return; try{ localStorage.setItem('ps5d_hide_'+b.dataset.hide,'1') }catch(_){}
+  const bar=b.closest('.gubar,.tipbar,.hintbox'); if(bar) bar.remove() });
 async function guPaint(){
   const box=$('libGU'); let st; try{st=await api('/api/gu/status',{})}catch(e){box.hidden=true;return}
   let h='';
   if(st.fix_from) h=`<div class="gubar warn"><span>⚠ ${esc(tr('PS5 Game Updater no está bien colocado:'))} <span data-noi18n class="mono">${esc(st.fix_from)}</span> → <span class="mono">/data/homebrew/PPSA99440</span></span><div class="spacer"></div><button class="small primary" id="guFix">${esc(tr('Colocarlo bien'))}</button></div>`;
-  else if(st.present) h=`<div class="gubar"><span>🔄 ${esc(tr(st.running?'PS5 Game Updater está abierto en la consola: busca e instala las actualizaciones oficiales de lo instalado.':'Tienes PS5 Game Updater en la consola. Ábrelo allí para poder usarlo desde aquí.'))}</span><div class="spacer"></div><a class="small btnlink ${st.running?'primary':''}" href="${esc(st.url)}" target="_blank" rel="noopener" ${st.running?'':'aria-disabled="true"'} id="guOpen">${esc(tr('Abrir Game Updater'))}</a></div>`;
+  else if(st.present&&!hid('gu')) h=`<div class="gubar"><span>🔄 ${esc(tr(st.running?'PS5 Game Updater está abierto en la consola: busca e instala las actualizaciones oficiales de lo instalado.':'Tienes PS5 Game Updater en la consola. Ábrelo allí para poder usarlo desde aquí.'))}</span><div class="spacer"></div><a class="small btnlink ${st.running?'primary':''}" href="${esc(st.url)}" target="_blank" rel="noopener" ${st.running?'':'aria-disabled="true"'} id="guOpen">${esc(tr('Abrir Game Updater'))}</a>${hideX('gu')}</div>`;
   else if(st.problem) h=`<div class="gubar warn"><span>⚠ ${esc(tr(st.problem))}</span></div>`;
-  h+=`<div class="gubar"><span>💡 ${esc(tr('Para actualizar sin instalar nada en la consola, prueba PatchDL: se carga como payload y lo usas desde el navegador.'))}</span><div class="spacer"></div><button class="small" id="guPdl">${esc(tr('Ver en Descubrir'))}</button></div>`;
+  if(!hid('pdl')) h+=`<div class="gubar"><span>💡 ${esc(tr('Para actualizar sin instalar nada en la consola, prueba PatchDL: se carga como payload y lo usas desde el navegador.'))}</span><div class="spacer"></div><button class="small" id="guPdl">${esc(tr('Ver en Descubrir'))}</button>${hideX('pdl')}</div>`;
   box.innerHTML=h; box.hidden=!h;
   const fx=$('guFix'); if(fx) fx.onclick=async()=>{try{const r=await api('/api/gu/fix',{}); if(!r.ok) throw new Error(r.error); toast(tr('Colocado en /data/homebrew/PPSA99440')); guPaint(); libScan(false)}catch(e){toast(e.message)}};
   const pd=$('guPdl'); if(pd) pd.onclick=()=>goApps('tool');
@@ -4762,11 +5260,11 @@ function libItems(){
   const q=$('libSearch').value.trim().toLowerCase(), f=$('libFilter').value, mine=(state.settings||{}).console_fw;
   let a=lib.res.items.filter(it=>{
     if(q && !((it.title||'')+' '+(it.tid||'')+' '+it.name).toLowerCase().includes(q)) return false;
+    if(libType && libTypeOf(it.tid)!==libType) return false;
     if(f==='folder') return it.kind==='folder'&&!it.incomplete;
     if(f==='image') return it.kind==='image';
     if(f==='lz4') return !!(it.lz4||it.zstd);
     if(f==='installed') return it.kind==='installed';
-    if(f==='emu'||f==='apps'){ const k=(recKinds||{})[(it.tid||'').toUpperCase()]; return f==='emu'?k==='emu':!!k&&k!=='emu' }
     if(f==='ps4') return it.platform==='PS4'||/^CUSA/i.test(it.tid||'');
     if(f==='nofw') return fwOk(mine,it.need_fw)===false;
     if(f==='old'){ const pl=(lib.played||{})[(it.tid||'').toUpperCase()]; return (it.kind==='folder'||it.kind==='image')&&!it.extra&&(!pl||!pl.last||Date.now()/1000-pl.last>60*86400) }
@@ -4783,6 +5281,7 @@ function libItems(){
 }
 function libRender(){
   const all=lib.res?lib.res.items:[], mine=(state.settings||{}).console_fw;
+  libTypesPaint(all); if(all.length) patchIdxLoad();
   const items=libItems(), tot=all.reduce((s,x)=>s+(x.size||0),0);
   const nofw=all.filter(x=>fwOk(mine,x.need_fw)===false).length, dups=all.filter(x=>x.dup&&x.dup.length).length;
   let sum=tr('{0} elementos').replace('{0}',all.length)+(tot?' · '+human(tot):'');
@@ -4796,11 +5295,13 @@ function libRender(){
   if(!items.length){$('libGrid').innerHTML=`<div class="empty" style="grid-column:1/-1">${esc(tr(all.length?'Nada coincide con el filtro.':'No hay nada en /data/homebrew todavía.'))}</div>`;return}
   $('libGrid').innerHTML=items.map((it,i)=>{
     const ok=fwOk(mine,it.need_fw);
-    const cov=it.cover?(it.kind==='image'&&!it.cover_path?`/api/cover?tid=${encodeURIComponent(it.tid||'')}&t=${encodeURIComponent(TOKEN)}`:`/api/cover?p=${encodeURIComponent(it.cover_path||it.path)}&t=${encodeURIComponent(TOKEN)}`):'';
+    const cov0=it.cover?(it.kind==='image'&&!it.cover_path?`/api/cover?tid=${encodeURIComponent(it.tid||'')}&t=${encodeURIComponent(TOKEN)}`:`/api/cover?p=${encodeURIComponent(it.cover_path||it.path)}&t=${encodeURIComponent(TOKEN)}`):'';
+    const artFb=artURL((recArt||{})[(it.tid||'').toUpperCase()]||''), cov=cov0||artFb;
     const fmt=it.kind==='installed'?(it.platform+' · '+tr('instalado')):it.kind==='image'?'.'+(it.ext||'img')+(it.lz4?' · LZ4':''):it.lz4?'LZ4':tr('Carpeta');
     const b=[];
     if(it.need_fw&&parseFloat(it.need_fw)>0) b.push(ok===false?`<span class="bdg bad" title="${esc(tr('Pide un firmware más nuevo que el de tu PS5'))}">${esc(tr('Pide FW {0}').replace('{0}',it.need_fw))}</span>`:`<span class="bdg ${ok?'ok':''}">FW ${esc(it.need_fw)}${ok?' ✓':''}</span>`);
     if(it.backport) b.push(`<span class="bdg info">Backport</span>`);
+    if(it.tid&&(patchIdx||{})[it.tid.toUpperCase()]) b.push(`<span class="bdg warn gpatch" title="${esc(tr('Hay parches de la comunidad para este título: ')+patchIdx[it.tid.toUpperCase()].slice(0,4).join(', '))}" data-noi18n>🧩 ${esc(tr('Parches'))}</span>`);
     if(it.extra) b.push(`<span class="bdg info">${esc(tr('DLC / actualización'))}</span>`);
     if(it.dup&&it.dup.length) b.push(`<span class="bdg warn" title="${esc(it.dup.join(', '))}">${esc(tr('Repetido'))}</span>`);
     if(it.incomplete) b.push(`<span class="bdg bad" title="${esc(tr('No tiene sce_sys: envío cortado o copia a medias'))}">${esc(tr('Incompleto'))}</span>`);
@@ -4811,12 +5312,12 @@ function libRender(){
     const pl=(lib.played||{})[(it.tid||'').toUpperCase()];
     const playLine=pl&&pl.last?`<div class="gplay" title="${esc(tr('Desde que PS5 Directo lo mira (lo saca del registro de ShadowMountPlus)'))}">▶ ${esc(tr('Abierto {0}').replace('{0}',agoTxt(pl.last)))}${pl.secs>=60?' · '+esc(durTxt(pl.secs)):''}</div>`:'';
     return `<div class="gcard ${ok===false?'bad':''}" data-i="${i}" data-path="${esc(it.path)}">
-      <div class="gcov" data-g="info" title="${esc(tr('Ver su ficha'))}">${cov?`<img loading="lazy" src="${cov}" alt="" data-ph="${ph}" onerror="libImgErr(this)">`:`<div class="ph">${ph}</div>`}<span class="fmtb">${esc(fmt)}</span>${it.size?`<span class="sizeb" title="${esc(tr('Lo que ocupa en la consola'))}">${esc(human(it.size))}</span>`:''}</div>
+      <div class="gcov" data-g="info" title="${esc(tr('Ver su ficha'))}">${cov?`<img loading="lazy" src="${cov}" alt="" data-ph="${ph}"${artFb&&cov!==artFb?` data-art="${artFb}"`:''} onerror="libImgErr(this)">`:`<div class="ph">${ph}</div>`}<span class="fmtb">${esc(fmt)}</span>${it.size?`<span class="sizeb" title="${esc(tr('Lo que ocupa en la consola'))}">${esc(human(it.size))}</span>`:''}</div>
       <div class="gbody"><div class="gtitle" data-noi18n title="${esc(it.title||it.name)}">${esc(it.title||it.name)}</div>
         <div class="gmeta" data-noi18n title="${esc(it.path)}">${esc(meta)}</div>${playLine}
         <div class="badges">${b.join('')}</div>
         ${/^PPSA\d{5}$/i.test(it.tid||'')&&!it.extra&&!(it.need_fw&&parseFloat(it.need_fw)===0)?`<a class="gupd" href="https://prosperopatches.com/${esc(it.tid.toUpperCase())}" target="_blank" rel="noopener noreferrer" title="${esc(updHint())}">↗ ${esc(tr('Ver actualizaciones'))}</a>`:''}
-        <div class="gact">${it.kind!=='installed'&&!it.incomplete?`<button data-g="check" title="${esc(tr('Si no abre o se cierra al arrancar: revisa la carpeta y busca registros y capturas'))}">${esc(tr('Comprobar'))}</button>`:''}${it.kind==='installed'&&!/^\/user\/app\//.test(it.path)?'':`<button data-g="open" title="${esc(tr('Ver su carpeta en Archivos de la consola'))}">📂 ${esc(tr('Carpeta'))}</button>`}${(it.kind==='folder'||it.kind==='image')&&!it.incomplete&&/^\/(data|mnt)\//.test(it.path)?`<button data-g="dl" title="${esc(tr('Copia este título a la carpeta de PS5 Directo en tu PC (sale luego en «En tu PC»)'))}">${esc(tr('Bajar al PC'))}</button>`:''}${gMore(it)}</div></div></div>`;
+        <div class="gact">${gActs(it)}</div></div></div>`;
   }).join('');
   libDlMark(libDl.busy?libDl.pct:null);
 }
@@ -4836,6 +5337,14 @@ function updHint(){
          :tr('Ojo: las que piden firmware 14.00 o superior no se pueden instalar. Pon el firmware de tu PS5 en Ajustes para afinar el aviso.'));
 }
 // acciones menos usadas de cada tarjeta, en un menú «⋯» (y «Borrar» ahí, para no pulsarlo sin querer)
+// botones de cada tarjeta: siempre los mismos huecos y en el mismo orden (lo que no se puede, apagado)
+function gActs(it){
+  const inst=it.kind==='installed', off=inst?tr('Instalado por la consola: se desinstala desde su menú, no desde aquí.'):'';
+  const B=(g,ic,t,on)=>`<button class="gi" ${on?`data-g="${g}"`:'disabled'} title="${esc(on?t:(off||t))}" aria-label="${esc(t)}">${ico(ic)}</button>`;
+  return B('check','pulse',tr('Comprobar: si no abre o se cierra al arrancar, revisa la carpeta y busca registros y capturas'),!inst&&!it.incomplete)
+    +B('open','folderOpen',tr('Ver su carpeta en Archivos de la consola'),!(inst&&!/^\/user\/app\//.test(it.path)))
+    +B('dl','download',tr('Bajar al PC (sale luego en «En tu PC»)'),(it.kind==='folder'||it.kind==='image')&&!it.incomplete&&/^\/(data|mnt)\//.test(it.path))
+    +(gMore(it)||`<button class="gi" disabled title="${esc(off||tr('Más acciones'))}">${ico('dots')}</button>`) }
 function gMore(it){
   const m=[];
   if(it.kind==='folder'&&!it.incomplete) m.push(`<button data-g="perm" title="${esc(tr('Permisos 777 (si da CE-107750-0)'))}">${esc(tr('Permisos'))}</button>`);
@@ -4844,8 +5353,7 @@ function gMore(it){
   if(it.installed||it.kind==='folder'||it.kind==='image') { if(/^(PPSA|CUSA)\d{5}$/.test(it.tid||'')&&!it.extra) m.push(`<button data-g="launch">▶ ${esc(tr('Abrir en la consola'))}</button>`) }
   if((it.kind==='folder'||it.kind==='image')&&!it.incomplete&&/^\/(data|mnt)\//.test(it.path)&&!state.remote) m.push(`<button data-g="archive" title="${esc(tr('Lo copia a tu PC, comprueba que ha llegado entero y lo quita de la consola. Lo devuelves cuando quieras desde «En tu PC».'))}">🗄 ${esc(tr('Archivar en el PC'))}</button>`);
   if(it.kind!=='installed') m.push(`<button class="danger" data-g="del">${esc(tr('Borrar'))}</button>`);
-  const hint=it.kind==='installed'?`<span class="hint" title="${esc(tr('Instalado por la consola: se desinstala desde su menú, no desde aquí.'))}">${esc(tr('Se gestiona desde la consola'))}</span>`:'';
-  return (m.length?`<details class="gmore"><summary title="${esc(tr('Más acciones'))}">⋯</summary><div class="gmenu">${m.join('')}</div></details>`:'')+hint }
+  return m.length?`<details class="gmore"><summary class="gi" title="${esc(tr('Más acciones'))}">${ico('dots')}</summary><div class="gmenu">${m.join('')}</div></details>`:'' }
 document.addEventListener('click',e=>{ document.querySelectorAll('details.gmore[open]').forEach(d=>{ if(!d.contains(e.target)||e.target.closest('.gmenu button')) d.open=false }) });
 
 // --- 🩺 Revisar todo
@@ -4885,7 +5393,7 @@ async function openFicha(it){ fiIt=it; const tid=(it.tid||'').toUpperCase();
     +row('En tu PC',(m.pc||[]).map(x=>`<div class="mono" data-noi18n>${esc(x.path)}${x.size?' · '+esc(human(x.size)):''}</div>`).join('')||esc(tr('No')))
     +row('Pide firmware',fw)
     +row('Uso',pl&&pl.last?esc(tr('Abierto {0}').replace('{0}',agoTxt(pl.last)))+(pl.secs>=60?' · '+esc(durTxt(pl.secs)):'')+(pl.times?' · '+esc(tr('{0} veces').replace('{0}',pl.times)):''):esc(tr('Sin datos todavía')))
-    +row('Copias de sus partidas',(m.backups||[]).length?esc(tr('{0} (la última {1})').replace('{0}',m.backups.length).replace('{1}',new Date(m.backups[0].t*1000).toLocaleDateString())):esc(tr('Ninguna')))
+    +row('Copias de sus partidas',(m.backups||[]).length?esc(tr('{0} (la última {1})').replace('{0}',m.backups.length).replace('{1}',new Date(m.backups[0].t*1000).toLocaleDateString(LOC()))):esc(tr('Ninguna')))
     +(/^PPSA\d{5}$/.test(tid)?row('Actualizaciones',`<a href="https://prosperopatches.com/${esc(tid)}" target="_blank" rel="noopener noreferrer">↗ ${esc(tr('Ver actualizaciones'))}</a>`):'');
   $('fiNote').value=(m.meta||{}).note||''; $('fiNote').disabled=!tid;
   const acts=[['open','📂 '+tr('Carpeta')],['check',tr('Comprobar')]];
