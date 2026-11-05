@@ -765,6 +765,9 @@ EXTRA_PAYLOADS = [
      "what": "Títulos de PS4 en modo PS4 Pro (hasta 4K) con sus parches; va después de ps-patch-system"},
     {"id": "patchdl", "name": "PatchDL", "repo": "knutwurst/ps5-patchdl", "port": 12880,
      "what": "Actualizaciones oficiales de lo instalado, desde el navegador (puerto 12880)"},
+    {"id": "alembic", "name": "Alembic", "repo": "fthdgn-gh/Alembic", "port": 5940,
+     "pick": [r"(?i)^alembic-[\d.]+\.elf$", r"(?i)^alembic.*\.elf$"],
+     "what": "Conversor de formatos dentro de la consola (carpeta, exFAT, FFPKG, FFPFS, FFPFSC, paquete), desde su web (puerto 5940)"},
     {"id": "forge", "name": "PS5 Dump Forge", "repo": "quer3q/ps5-dump-forge", "port": 8095,
      "what": "Conversor e instalador de .pkg dentro de la consola (se usa desde su web, puerto 8095)"},
     {"id": "overlay", "name": "PS5 Hardware Overlay", "repo": "smoxa/ps5-new-overlay", "port": 8585,
@@ -1067,6 +1070,12 @@ CATALOG = [
     {"id": "forge", "kind": "payload", "group": "tool", "name": "PS5 Dump Forge", "repo": "quer3q/ps5-dump-forge",
      "what": "Convierte formatos e instala .pkg dentro de la propia consola, desde su web.",
      "needs": "Nada instalado en la consola: se carga como payload."},
+    {"id": "alembic", "kind": "payload", "group": "tool", "name": "Alembic", "repo": "fthdgn-gh/Alembic", "exp": True,
+     "what": "Convierte tu contenido entre formatos dentro de la propia consola: carpeta, exFAT, FFPKG, FFPFS, FFPFSC "
+             "(comprimido) y paquete, sin copias temporales. Lee también de un NAS (SMB, NFS, WebDAV, FTP) y puede "
+             "emparejarse con su versión de PC para convertir con el procesador del PC y escribir directo en la consola. "
+             "Se maneja desde su web en el puerto 5940.",
+     "needs": "En desarrollo: guarda copia de lo que conviertas hasta comprobarlo en la consola. Se carga como payload."},
     {"id": "overlay", "kind": "payload", "group": "tool", "name": "PS5 Hardware Overlay", "repo": "smoxa/ps5-new-overlay",
      "what": "Como MangoHud en el PC: pone encima de la imagen (en el menú y dentro de las aplicaciones) los FPS, la "
              "temperatura de la CPU, la GPU y el SSD, las frecuencias, el uso de RAM y VRAM, el ventilador y el consumo. "
@@ -2629,6 +2638,7 @@ CATALOG_ART = {
     'chiral': {"icon": 'https://raw.githubusercontent.com/Herbrax/Chiral-FTP/main/ps5/sce_sys/icon0.png', "hero": ''},
     'chiaki': {"icon": 'https://raw.githubusercontent.com/streetpea/chiaki-ng/main/assets/official-artwork/Chiaki-ng%20logo%20color.png', "hero": 'https://raw.githubusercontent.com/streetpea/chiaki-ng/main/gui/res/chiaking-logo.svg', "bg": ["#0e1626", "#05080f"]},
     'patchdl': {"icon": 'https://raw.githubusercontent.com/knutwurst/ps5-patchdl/main/assets/icon0.png', "hero": ''},
+    'alembic': {"icon": 'https://raw.githubusercontent.com/fthdgn-gh/Alembic/main/assets/icon/icon0.png', "hero": 'https://raw.githubusercontent.com/fthdgn-gh/Alembic/main/docs/screenshots/files.png'},
     'forge': {"icon": 'https://raw.githubusercontent.com/quer3q/ps5-dump-forge/main/ps5/icon0.png', "hero": ''},
     'pkgmanager': {"icon": 'https://raw.githubusercontent.com/itsPLK/ps5-pkg-manager/main/assets/icon0.png', "hero": ''},
     'ps5linux': {"bg": ["#2b2f3a", "#0f1116"], "icon": 'https://raw.githubusercontent.com/ps5-linux/ps5-linux-loader/main/logo.webp', "hero": ''},

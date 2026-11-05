@@ -441,8 +441,13 @@ def _single(url, cancel, meter):
             yield data
 
 
-def _fetch_range(url, a, b, cancel, meter, tries=6, on_trouble=None, ka=None):
+class SlowConn(PipeError):
+    """Una conexión que va mucho más lenta que las demás: se deja y el trozo se pide por otra."""
+
+
+def _fetch_range(url, a, b, cancel, meter, tries=6, on_trouble=None, ka=None, slow=None):
     want = b - a + 1
+    step = 256 * 1024 if slow else MiB
     last = None
     rng = {"Range": "bytes=%d-%d" % (a, b)}
     for attempt in range(tries):
@@ -457,14 +462,17 @@ def _fetch_range(url, a, b, cancel, meter, tries=6, on_trouble=None, ka=None):
             try:
                 if r.status != 206:
                     raise PipeError("el servidor no respeto el rango pedido")
+                t_start = time.time()
                 while len(got) < want:
                     if cancel.is_set():
                         raise Cancelled()
-                    piece = r.read(min(MiB, want - len(got)))
+                    piece = r.read(min(step, want - len(got)))
                     if not piece:
                         break
                     got += piece
                     meter(len(piece))
+                    if slow is not None and slow(len(got), time.time() - t_start):
+                        raise SlowConn("conexión lenta")
             except BaseException:
                 if reused:
                     ka.close()
@@ -483,10 +491,10 @@ def _fetch_range(url, a, b, cancel, meter, tries=6, on_trouble=None, ka=None):
             raise
         except urllib.error.HTTPError as e:
             last = "HTTP %s" % e.code
-            if e.code in (429, 503, 509) and on_trouble:
+            if e.code in (403, 429, 503, 509) and on_trouble:
                 on_trouble(last)
-            if e.code == 429:
-                time.sleep(10)
+            if e.code in (429, 503):
+                time.sleep(_retry_after(e) or (10 if e.code == 429 else 3))
         except Exception as e:
             last = str(e)
             if on_trouble:
@@ -495,8 +503,10 @@ def _fetch_range(url, a, b, cancel, meter, tries=6, on_trouble=None, ka=None):
     raise PipeError("Fallo al descargar un trozo: %s" % last)
 
 
-# Alojamientos que limitan o castigan muchas conexiones a la vez (cuentas gratis,
-# enlaces de un solo uso, debrid). Con ellos se usan pocas conexiones y sin rescates.
+# Alojamientos que pueden limitar o castigar muchas conexiones a la vez (cuentas gratis,
+# enlaces de un solo uso, debrid). Con ellos se empieza con pocas conexiones y se van
+# sumando de una en una mientras el servidor lo aguante (como un gestor de descargas);
+# al primer rechazo se vuelve atrás y ese es el techo. Sin copias de rescate.
 LIMITED_HOSTS = ("akirabox.", "datanodes.to", "vikingfile.com", "fileditch", "1fichier.com",
                  "rapidgator.net", "ddownload.com", "katfile.com", "nitroflare.com",
                  "torbox", "tb-cdn", "real-debrid", "rdb.gg", "alldebrid", "debrid-link",
@@ -509,6 +519,358 @@ DEBRID_HOSTS = ("torbox", "tb-cdn", "real-debrid", "rdb.gg", "alldebrid", "debri
 def host_conn_cap(url):
     host = urllib.parse.urlparse(url).netloc.lower()
     return LIMITED_CAP if any(h in host for h in LIMITED_HOSTS) else None
+
+
+class _Diag:
+    """Diagnóstico de velocidad: cada 15 s deja en el registro una línea con lo que limita la descarga
+    (conexiones, velocidad por conexión, rechazos del servidor, conexiones lentas, disco, CPU, la consola)."""
+
+    def __init__(self, log, every=15.0):
+        self.log = log or (lambda m: None)
+        self.every = every
+        self.lock = threading.Lock()
+        self.bytes = 0
+        self.chunks = 0
+        self.chunk_t = 0.0
+        self.kinds = {}
+        self.slow = 0
+        self.write_t = 0.0
+        self.t = time.time()
+        self.cpu = time.process_time()
+        self.stop = threading.Event()
+
+    def wrap(self, meter):
+        def m(n):
+            with self.lock:
+                self.bytes += n
+            meter(n)
+        return m
+
+    def kind(self, k):
+        with self.lock:
+            self.kinds[k] = self.kinds.get(k, 0) + 1
+
+    def chunk(self, secs):
+        with self.lock:
+            self.chunks += 1
+            self.chunk_t += secs
+
+    def start(self, extra):
+        def run():
+            while not self.stop.wait(self.every):
+                try:
+                    self.line(extra())
+                except Exception:
+                    pass
+        threading.Thread(target=run, daemon=True).start()
+
+    def line(self, extra):
+        with self.lock:
+            now, cpu = time.time(), time.process_time()
+            dt = max(0.001, now - self.t)
+            rate = self.bytes / dt / 1e6
+            per = (self.chunk_t / self.chunks) if self.chunks else 0
+            parts = ["📊 %.1f MB/s" % rate]
+            if extra.get("conns"):
+                a, act, cei, mx = extra["conns"]
+                parts.append("conexiones %d en uso de %d permitidas (techo %d de %d)" % (act, a, cei, mx))
+                if act:
+                    parts.append("%.2f MB/s por conexión" % (rate / act))
+            if self.chunks:
+                parts.append("%d trozos, %.1f s cada uno" % (self.chunks, per))
+            if self.kinds:
+                parts.append("problemas del servidor: " + ", ".join("%s ×%d" % kv for kv in sorted(self.kinds.items())))
+            if self.slow:
+                parts.append("conexiones lentas cambiadas ×%d" % self.slow)
+            if self.write_t > 0.05:
+                parts.append("escribiendo en disco %.0f%% del tiempo" % min(100, self.write_t / dt * 100))
+            parts.append("CPU del programa %.0f%% de un núcleo" % ((cpu - self.cpu) / dt * 100))
+            if extra.get("ready") is not None:
+                r, w = extra["ready"]
+                parts.append("trozos listos esperando %d de %d" % (r, w) +
+                             (" → el freno es el envío a la consola" if r >= 0.8 * w else
+                              " → el freno es la descarga" if r <= 1 else ""))
+            self.bytes = self.chunks = 0
+            self.chunk_t = self.write_t = 0.0
+            self.kinds = {}
+            self.slow = 0
+            self.t, self.cpu = now, cpu
+        self.log(" · ".join(parts))
+
+
+def _merge_iv(iv):
+    out = []
+    for a, b in sorted(iv):
+        if out and a <= out[-1][1]:
+            out[-1][1] = max(out[-1][1], b)
+        else:
+            out.append([a, b])
+    return out
+
+
+def _retry_after(e):
+    try:
+        v = e.headers.get("Retry-After") if getattr(e, "headers", None) else None
+        return max(1.0, min(60.0, float(v))) if v else 0.0
+    except Exception:
+        return 0.0
+
+
+def segmented_to_file(url, path, size, cfg, cancel, meter, progress=None, log=None, prefix=0):
+    """Descarga a un archivo como Free Download Manager: el archivo se reparte en tramos grandes y cada conexión
+    baja SU tramo con una sola petición larga, escribiendo en su sitio según llega (TCP coge toda la velocidad y
+    el servidor ve pocas peticiones, así que no se enfada con 429). Cuando una conexión acaba, parte por la mitad
+    el tramo que más le falta a otra y se queda con la segunda mitad. Una conexión que se queda lenta se corta y
+    se vuelve a abrir. Recuerda lo bajado (path + ".trozos") para seguir donde iba. progress(bytes_hechos)."""
+    log = log or (lambda m: None)
+    diag = _Diag(log)
+    meter = diag.wrap(meter)
+    MIN = 2 * MiB                       # tramo mínimo que merece la pena partir
+    base = max(1, int(cfg.get("streams", 8)))
+    cap = 2                    # se empieza con 2 y se va sumando, sin avalancha inicial de peticiones
+    workers = max(base, RAMP_MAX)
+    ramp = True
+    mapf = path + ".trozos"
+    done_iv = []
+    try:
+        with open(mapf, encoding="utf-8") as fh:
+            m = json.load(fh)
+        if m.get("size") == size:
+            if m.get("v") == 2:
+                done_iv = [[int(a), int(b)] for a, b in m.get("done") or []]
+            elif m.get("chunk"):
+                ck = int(m["chunk"])
+                done_iv = [[int(a) * ck, min(size, (int(b) + 1) * ck)] for a, b in m.get("done") or []]
+    except Exception:
+        pass
+    if prefix and not done_iv:
+        done_iv = [[0, int(prefix)]]
+    if not os.path.isfile(path):
+        open(path, "wb").close()
+        done_iv = []
+    done_iv = _merge_iv([[max(0, a), min(size, b)] for a, b in done_iv if b > a])
+    # lo que falta: los huecos
+    segs, pos = [], 0
+    for a, b in done_iv + [[size, size]]:
+        if a > pos:
+            segs.append({"p": pos, "e": a, "busy": False})
+        pos = max(pos, b)
+    cond = threading.Condition()
+    flock = threading.Lock()
+    st = {"allowed": cap if ramp else workers, "ceiling": workers, "ramp_t": time.time(), "trouble_t": 0.0,
+          "active": 0, "error": None, "saved_t": 0.0, "fails": 0, "pause_until": 0.0,
+          "done": sum(b - a for a, b in done_iv)}
+    rates = {}                          # conexión -> MB/s de su petición actual
+
+    def save(force=False):
+        now = time.time()
+        if not force and now - st["saved_t"] < 2:
+            return
+        st["saved_t"] = now
+        done_iv[:] = _merge_iv(done_iv)
+        try:
+            tmp = mapf + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as fh:
+                json.dump({"v": 2, "size": size, "done": done_iv}, fh)
+            os.replace(tmp, mapf)
+        except OSError:
+            pass
+
+    def trouble(kind, wait=0.0):
+        diag.kind(kind)
+        with cond:
+            now = time.time()
+            if wait:
+                st["pause_until"] = max(st["pause_until"], now + wait)
+            if st["allowed"] > 1 and now - st["trouble_t"] > 10:
+                st["allowed"] -= 1
+                st["trouble_t"] = now
+                st["ceiling"] = max(1, st["allowed"])
+                log("El servidor va con problemas (%s): bajo a %d conexiones" % (kind, st["allowed"]))
+
+    def grow():
+        now = time.time()
+        if st["ceiling"] < workers and st["trouble_t"] and now - st["trouble_t"] > 90 and now - st["ramp_t"] > 90:
+            st["ceiling"] += 1        # cada minuto y medio sin problemas se vuelve a probar una más
+        step = 0.5 if st["allowed"] < 8 else 1.5
+        if st["allowed"] < st["ceiling"] and now - st["ramp_t"] > step and now - st["trouble_t"] > 20:
+            st["allowed"] += 1
+            st["ramp_t"] = now
+            if st["allowed"] == workers and ramp:
+                log("El servidor aguanta %d conexiones" % st["allowed"])
+            cond.notify_all()
+
+    def pick():
+        """(con cond) un tramo libre, o la segunda mitad del tramo que más le falta a otra conexión."""
+        free = [g for g in segs if not g["busy"] and g["e"] - g["p"] > 0]
+        if free:
+            g = min(free, key=lambda g: g["p"])
+            g["busy"] = True
+            return g
+        busy = [g for g in segs if g["busy"] and g["e"] - g["p"] >= 2 * MIN]
+        if not busy:
+            return None
+        g = max(busy, key=lambda g: g["e"] - g["p"])
+        mid = g["p"] + (g["e"] - g["p"]) // 2
+        n = {"p": mid, "e": g["e"], "busy": True}
+        g["e"] = mid
+        segs.append(n)
+        return n
+
+    def worker(wid):
+        while True:
+            with cond:
+                while True:
+                    grow()
+                    if st["error"] is not None or cancel.is_set():
+                        return
+                    if st["done"] >= size:
+                        return
+                    if st["active"] < st["allowed"] and time.time() >= st["pause_until"]:
+                        g = pick()
+                        if g is not None:
+                            break
+                        if not any(x["busy"] for x in segs):
+                            return
+                    cond.wait(0.5)
+                st["active"] += 1
+            ok = run(wid, g)
+            with cond:
+                st["active"] -= 1
+                g["busy"] = False
+                rates.pop(wid, None)
+                if g["p"] >= g["e"] and g in segs:
+                    segs.remove(g)
+                cond.notify_all()
+            if ok is False:
+                cancel.wait(min(20, 2 ** min(5, st["fails"])))
+
+    def run(wid, g):
+        """Baja el tramo g con una petición; devuelve True si fue bien, False si hay que esperar un poco."""
+        with cond:
+            a, e = g["p"], g["e"]
+        if a >= e:
+            return True
+        t0 = time.time()
+        got = 0
+        try:
+            r = _open(url, {"Range": "bytes=%d-%d" % (a, size - 1 if e >= size else e - 1)}, timeout=30)
+        except urllib.error.HTTPError as ex:
+            code = ex.code
+            if code in (429, 503, 509, 403):
+                trouble("HTTP %d" % code, _retry_after(ex) or (10 if code == 429 else 3))
+                with cond:
+                    st["fails"] += 1
+                    if st["fails"] > 40:
+                        st["error"] = PipeError("El servidor rechaza la descarga (HTTP %d)" % code)
+                return False
+            with cond:
+                st["fails"] += 1
+                if st["fails"] > 12 or code in (404, 410):
+                    st["error"] = PipeError("No se puede bajar (HTTP %d)" % code)
+            return False
+        except Exception:
+            trouble("corte")
+            with cond:
+                st["fails"] += 1
+                if st["fails"] > 30:
+                    st["error"] = PipeError("La conexión con el servidor falla una y otra vez")
+            return False
+        try:
+            if r.status != 206 and not (r.status == 200 and a == 0):
+                with cond:
+                    st["error"] = PipeError("El servidor no deja bajar a trozos")
+                return True
+            pos = a
+            while not cancel.is_set():
+                with cond:
+                    lim = g["e"]
+                if pos >= lim:
+                    break
+                piece = r.read(min(512 * 1024, lim - pos))
+                if not piece:
+                    break
+                with cond:
+                    lim = g["e"]                 # otra conexión ha podido quedarse con el final
+                if pos + len(piece) > lim:
+                    piece = piece[:max(0, lim - pos)]
+                if piece:
+                    tw = time.time()
+                    with flock:
+                        fh_out.seek(pos)
+                        fh_out.write(piece)
+                    diag.write_t += time.time() - tw
+                    meter(len(piece))
+                    with cond:
+                        done_iv.append([pos, pos + len(piece)])
+                        pos += len(piece)
+                        g["p"] = pos
+                        st["done"] += len(piece)
+                        st["fails"] = 0
+                        got += len(piece)
+                        el = time.time() - t0
+                        rates[wid] = got / max(0.5, el)
+                        dn = st["done"]
+                        save()
+                        # ¿esta conexión se arrastra comparada con las demás? se corta y se vuelve a abrir
+                        slow = False
+                        if el > 12 and len(rates) >= 3:
+                            others = sorted(v for k, v in rates.items() if k != wid)
+                            med = others[len(others) // 2]
+                            slow = rates[wid] < 0.2 * med
+                    if progress:
+                        progress(dn)
+                    if slow:
+                        diag.slow += 1
+                        return True
+            diag.chunk(time.time() - t0)
+            return True
+        except Exception:
+            trouble("corte")
+            with cond:
+                st["fails"] += 1
+            return False
+        finally:
+            try:
+                r.close()
+            except Exception:
+                pass
+
+    if ramp:
+        log("Empiezo con %d conexiones y subo hasta %d mientras el servidor lo aguante" % (cap, workers))
+    if progress:
+        progress(st["done"])
+    fh_out = open(path, "r+b")
+    diag.start(lambda: {"conns": (st["allowed"], st["active"], st["ceiling"], workers)})
+    threads = [threading.Thread(target=worker, args=(k,), daemon=True) for k in range(workers)]
+    try:
+        for t in threads:
+            t.start()
+        for t in threads:
+            while t.is_alive():
+                t.join(0.5)
+    finally:
+        diag.stop.set()
+        with cond:
+            save(force=True)
+        with flock:
+            try:
+                fh_out.close()
+            except OSError:
+                pass
+    if cancel.is_set():
+        raise Cancelled()
+    if st["error"] is not None:
+        raise st["error"]
+    if st["done"] < size or _merge_iv(done_iv) != [[0, size]]:
+        raise PipeError("La descarga se ha quedado a medias: pulsa Reintentar (sigue donde iba)")
+    with open(path, "r+b") as fh:
+        fh.truncate(size)
+    try:
+        os.remove(mapf)
+    except OSError:
+        pass
+    return size
 
 
 class _Limiter:
@@ -537,29 +899,48 @@ class _Limiter:
 LIMITER = _Limiter()
 
 
+RAMP_MAX = 16      # hasta cuántas conexiones se sube con los alojamientos que van sumando
+
+
 def _ranged(url, start, end, cfg, cancel, meter):
     chunk = max(1, int(cfg.get("chunk_mb", 8))) * MiB
     workers = max(1, int(cfg.get("streams", 8)))
     log = cfg.get("_log") or (lambda m: None)
+    diag = _Diag(cfg.get("_log"))
+    meter = diag.wrap(meter)
     cap = host_conn_cap(url)
-    if cap and workers > cap:
-        workers = cap
-        log("Este alojamiento limita las conexiones: uso %d por archivo" % cap)
-    can_hedge = cap is None
+    chunk = max(chunk, 8 * MiB)      # menos peticiones: los servidores castigan muchas peticiones seguidas (429)
+    if cap:
+        # como un gestor de descargas: se va subiendo (hasta 16) mientras el servidor lo aguante
+        workers = max(workers, RAMP_MAX)
+    ramp = bool(cap and workers > cap)
+    if ramp:
+        log("Este alojamiento puede limitar las conexiones: empiezo con %d y subo hasta %d si lo aguanta"
+            % (cap, workers))
+    can_hedge = True      # con todos: un trozo atascado no puede parar el envío entero
     window = max(workers + 1, int(cfg.get("buffer_mb", 256)) * MiB // chunk)
+    if cap:
+        window = max(window, 2 * workers + 2)   # que un trozo lento no deje paradas a las demás conexiones
     total = int(math.ceil((end - start) / float(chunk)))
     results = {}
     cond = threading.Condition()
     state = {"next_task": 0, "needed": 0, "error": None, "stop": False,
-             "allowed": workers, "active": 0, "trouble_t": 0.0}
+             "allowed": cap if ramp else workers, "active": 0, "trouble_t": 0.0,
+             "ceiling": workers, "ramp_t": time.time()}
 
     def trouble(kind):
-        """El servidor da problemas (429, 503, cortes): usar una conexion menos."""
+        """El servidor da problemas (403, 429, 503, cortes): usar una conexion menos."""
+        diag.kind(kind)
         with cond:
             now = time.time()
+            if "429" in kind or "503" in kind:
+                state["pause_until"] = max(state.get("pause_until", 0), now + 8)   # todos esperan un poco
+                state["calm_t"] = now
             if state["allowed"] > 1 and now - state["trouble_t"] > 10:
                 state["allowed"] -= 1
                 state["trouble_t"] = now
+                if ramp:      # ya sabemos cuántas aguanta: no volver a pasarse
+                    state["ceiling"] = max(1, state["allowed"])
                 log("El servidor va con problemas (%s): bajo a %d conexiones" % (kind, state["allowed"]))
 
     use_ka = _KeepAlive.usable(url)
@@ -572,17 +953,31 @@ def _ranged(url, start, end, cfg, cancel, meter):
             if ka is not None:
                 ka.close()
 
+    def grow():
+        """(con cond cogido) sumar conexiones: rápido al principio, con calma después, como FDM."""
+        now = time.time()
+        if ramp:
+            step = 0.5 if state["allowed"] < 8 else 1.5
+            if (state["allowed"] < state["ceiling"] and now - state["ramp_t"] > step
+                    and now - state["trouble_t"] > 20):
+                state["allowed"] += 1
+                state["ramp_t"] = now
+                if state["allowed"] == state["ceiling"]:
+                    log("El alojamiento aguanta %d conexiones" % state["allowed"])
+                cond.notify_all()
+        elif (state["allowed"] < workers and state["trouble_t"]
+                and now - state["trouble_t"] > 120):
+            state["allowed"] += 1
+            state["trouble_t"] = now
+
     def _worker(ka):
         while True:
             with cond:
-                # recuperar conexiones si lleva un rato sin problemas
-                if (state["allowed"] < workers and state["trouble_t"]
-                        and time.time() - state["trouble_t"] > 120):
-                    state["allowed"] += 1
-                    state["trouble_t"] = time.time()
-                while (state["active"] >= state["allowed"] and not state["stop"]
-                       and not cancel.is_set()):
+                grow()
+                while ((state["active"] >= state["allowed"] or time.time() < state.get("pause_until", 0))
+                       and not state["stop"] and not cancel.is_set()):
                     cond.wait(0.5)
+                    grow()
                 i = state["next_task"]
                 if i >= total or state["stop"]:
                     return
@@ -605,8 +1000,26 @@ def _ranged(url, start, end, cfg, cancel, meter):
         a = start + i * chunk
         b = min(end, a + chunk) - 1
         t0 = time.time()
+
+        def too_slow(got, el):
+            # una conexión que se arrastra frena todo el envío (va en orden): se cambia por otra
+            if el < 8 or len(durations) < 6:
+                return False
+            med = sorted(durations)[len(durations) // 2]
+            return got / el < 0.25 * (chunk / max(0.05, med)) and el > 2.5 * med
         try:
-            data = _fetch_range(url, a, b, cancel, meter, on_trouble=trouble, ka=ka)
+            for attempt in range(4):
+                try:
+                    data = _fetch_range(url, a, b, cancel, meter, on_trouble=trouble, ka=ka,
+                                        slow=too_slow if attempt < 3 else None)
+                    break
+                except SlowConn:
+                    diag.slow += 1
+                    if ka is not None:
+                        ka.close()
+                    with cond:
+                        if i < state["needed"] or i in results:
+                            return            # la otra copia ya llegó
         except Exception as e:
             with cond:
                 # si es la copia de rescate, o el original ya llego, no es grave
@@ -614,6 +1027,7 @@ def _ranged(url, start, end, cfg, cancel, meter):
                     state["error"] = e
                 cond.notify_all()
             return
+        diag.chunk(time.time() - t0)
         with cond:
             durations.append(time.time() - t0)
             del durations[:-32]
@@ -625,6 +1039,9 @@ def _ranged(url, start, end, cfg, cancel, meter):
     durations = []
     hedged = set()
     threads = [threading.Thread(target=worker, daemon=True) for _ in range(min(workers, total))]
+    if cfg.get("_log"):
+        diag.start(lambda: {"conns": (state["allowed"], state["active"], state.get("ceiling", workers), workers),
+                            "ready": (len(results), window)})
     for t in threads:
         t.start()
     try:
@@ -638,7 +1055,8 @@ def _ranged(url, start, end, cfg, cancel, meter):
                     # Un trozo atascado frena todo el envio a la PS5: si tarda mucho
                     # mas de lo normal, se pide otra vez por otra conexion y gana
                     # la que llegue antes (como hacen los gestores de descargas).
-                    if can_hedge and i in started and i not in hedged and durations:
+                    if (can_hedge and i in started and i not in hedged and durations
+                            and time.time() - state.get("calm_t", 0) > 60):
                         typical = sorted(durations)[len(durations) // 2]
                         if time.time() - started[i] > max(4.0, 3 * typical):
                             hedged.add(i)
@@ -649,6 +1067,7 @@ def _ranged(url, start, end, cfg, cancel, meter):
                 cond.notify_all()
             yield data
     finally:
+        diag.stop.set()
         with cond:
             state["stop"] = True
             cond.notify_all()

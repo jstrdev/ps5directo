@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.2 — USER GUIDE (English)
+PS5 DIRECTO 2.0.3 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,7 +342,7 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
-2.0.2 - Titles installed on the M.2 SSD / extended storage now show their real
+2.0.3 - Titles installed on the M.2 SSD / extended storage now show their real
   path. "Reinstall from GitHub" in Update. Emulators with several builds (e.g.
   EglantinePS5): pick which one to download, add another GitHub build or install
   your own .zip. New-arrivals notice in Discover. Library export (CSV or web
@@ -355,7 +355,7 @@ WHAT'S NEW
   window, a progress bar and downloads that resume if cut. Discover › Remote
   Play › "Play on PC" opens chiaki-ng straight on your PS5 (PS5 Directo
   streams nothing itself). Your PC collection warns when a folder couldn't be
-  read. Fixed: Library's 🔔 Updates button opened the wrong window. Sliding
+  read. Downloads from hosts like Akirabox, 1fichier or Rapidgator are no longer stuck at 2 connections: they add more while the server copes, like a download manager. New in Discover: Alembic (on-console format converter, experimental). New versions of PS5 Directo download in the background ("Restart now" when ready). The What's new window keeps Close and OK always visible. "See them" in the scene arrivals notice now takes you to "Newest arrivals". A one-time notice reminds you that titles can be converted to LZ4 or zstd to take up much less space. Library: zstd-packed titles show as "zstd" (they said LZ4). Fixed: Library's 🔔 Updates button opened the wrong window. Sliding
   "glass" tabs, dialogs that ease in, no white focus frame, dark scrollbars.
 2.0.1 - New icons across the app: line icons in the same style as the format
   cards instead of emojis. Discover shows each project's real artwork (its

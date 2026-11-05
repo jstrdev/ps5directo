@@ -50,7 +50,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.2"
+VERSION = "2.0.3"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -99,7 +99,7 @@ DEFAULTS = {
     "pc_mode_fmt": "",         # en Modo PC con convert: formato
     "forge_auto_update": False,  # bajar solo las versiones nuevas de PS5 Dump Forge (si no, avisa y pregunta)
     "tour_done": False,       # la guia de bienvenida ya se vio
-    "tour20_done": False, "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
+    "tour20_done": False, "spot_packs": False, "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
     "seen_version": "",       # ultima version cuyas novedades ya se ensenaron
     "shortcut_done": False,   # ya se creo el acceso directo del escritorio una vez
     "icon_ver": "",           # version cuyo icono ya se dejo en la cache de la ventana
@@ -4536,6 +4536,7 @@ def fetch_to_pc(job, srcs, cfg, cancel, meter, folder):
     if any(any(h in host for h in E.LIMITED_HOSTS) and not any(d in host for d in E.DEBRID_HOSTS) for host in hosts):
         at_once = 1      # cuentas gratis de alojamientos: suelen dejar solo una descarga a la vez
     pcfg = dict(cfg)
+    pcfg["_log"] = lambda m: jlog(job, m)
     if at_once > 1:
         pcfg["streams"] = max(2, int(cfg.get("streams", 8)) // at_once)
         jlog(job, "Bajo %d partes a la vez (%d conexiones cada una)" % (at_once, pcfg["streams"]))
@@ -4574,10 +4575,40 @@ def fetch_to_pc(job, srcs, cfg, cancel, meter, folder):
                     json.dump(stamp, fh)
             except OSError:
                 pass
-        if off:
+        seg = getattr(s, "kind", "") == "url" and getattr(s, "ranges", False) and s.size > 0
+        if not off and seg and os.path.isfile(part + ".trozos"):
+            off = 1      # hay trozos de antes (el tamaño del .part no dice cuánto hay)
+        if off and not (seg and os.path.isfile(part + ".trozos")):
             jlog(job, "%s: continuando desde %s" % (s.name, human(off)))
+        elif off:
+            jlog(job, "%s: continuando con los trozos que ya había" % s.name)
         if at_once == 1:
             setj(job, phase="Bajando al PC: parte %d de %d (%s)" % (k, len(urls), s.name))
+        if seg:
+            # como un gestor de descargas: cada conexión escribe su trozo en su sitio, sin esperar a las demás
+            if not off:
+                for x in (part, part + ".trozos"):
+                    try:
+                        os.remove(x)
+                    except OSError:
+                        pass
+            had = os.path.isfile(part + ".trozos")
+            prefix = 0 if had else (os.path.getsize(part) if off and os.path.isfile(part) else 0)
+            E.segmented_to_file(s.url, part, s.size, pcfg, cancel, meter, progress=lambda n: bump(s.name, n),
+                                log=lambda m: jlog(job, m), prefix=min(prefix, s.size))
+            got = s.size
+            hasher = part_hasher(job, s)
+            if hasher is not None:
+                hasher.valid = False          # bajado a trozos desordenados: se comprueba leyendo el archivo
+            verify_part(job, s, hasher, on_bad=lambda: os.remove(part), local=part)
+            os.replace(part, final)
+            for x in (part + ".huella", part + ".trozos"):
+                try:
+                    os.remove(x)
+                except OSError:
+                    pass
+            jlog(job, "En el PC: %s" % s.name)
+            return
         got = off
         bump(s.name, got)
         hasher = part_hasher(job, s)
@@ -6744,7 +6775,7 @@ def library_scan(refresh=False):
                     continue
                 mp = mb + "/" + n
                 c = ents.get("mount:" + mp)
-                if c and c.get("mtime") == v.get("mtime") and (c.get("facts") or {}).get("v") == 4:
+                if c and c.get("mtime") == v.get("mtime") and (c.get("facts") or {}).get("v") == 5:
                     facts = c["facts"]
                 else:
                     try:
@@ -6755,9 +6786,11 @@ def library_scan(refresh=False):
                         if not any(k == "sce_sys" and w["type"] == "dir" for k, w in sub):
                             continue
                         facts = E.Ftp(cfg).call(lambda fx: F.inspect_remote_game(fx, mp, sub))
-                        if any(k.lower().startswith(("ampr_assets", "ampr_emu")) for k, w in sub):
+                        if any(k.lower().startswith(("ampr_assets", "ampr_emu", "ampr_zstd")) for k, w in sub):
                             facts["lz4"] = True
-                        facts["v"] = 4 if facts.get("tid") else 0
+                            if any(k.lower().startswith("ampr_zstd") for k, w in sub):
+                                facts["pack"] = "zstd"    # ampr-emu-ng (zstd), no LZ4
+                        facts["v"] = 5 if facts.get("tid") else 0
                     except ftplib.all_errors:
                         continue
                     ents["mount:" + mp] = {"mtime": v.get("mtime"), "facts": facts}
@@ -6783,7 +6816,7 @@ def library_scan(refresh=False):
             drive = "USB" if base.startswith("/mnt/") else "Interno"
             if x["type"] == "dir":
                 c = ents.get(path)
-                if c and not refresh and c.get("mtime") == x.get("mtime") and (c.get("facts") or {}).get("v") == 4:
+                if c and not refresh and c.get("mtime") == x.get("mtime") and (c.get("facts") or {}).get("v") == 5:
                     facts = c["facts"]
                 else:
                     try:
@@ -6795,11 +6828,13 @@ def library_scan(refresh=False):
                             if not facts.get("tid") and facts.get("icon"):
                                 facts = E.Ftp(cfg).call(lambda fx: F.inspect_remote_game(fx, path, listing))
                             # carpeta empaquetada en LZ4 (PS5 Dump Forge): lleva ampr_assets.index
-                            if any(n.lower().startswith(("ampr_assets", "ampr_emu")) for n, v in listing):
+                            if any(n.lower().startswith(("ampr_assets", "ampr_emu", "ampr_zstd")) for n, v in listing):
                                 facts["lz4"] = True
+                                if any(n.lower().startswith("ampr_zstd") for n, v in listing):
+                                    facts["pack"] = "zstd"
                         else:
                             facts = {"incomplete": True}
-                        facts["v"] = 4 if (facts.get("tid") or facts.get("incomplete") or not facts.get("icon")) else 0
+                        facts["v"] = 5 if (facts.get("tid") or facts.get("incomplete") or not facts.get("icon")) else 0
                     except ftplib.all_errors as e:
                         facts = {"error": str(e)}
                     c = {"mtime": x.get("mtime"), "facts": facts}
@@ -6809,6 +6844,9 @@ def library_scan(refresh=False):
                           cover=bool(facts.get("icon")))
                 if not it.get("incomplete") and LZ4_NAME_RE.search(name):
                     it["lz4"] = True
+                if not it.get("incomplete") and re.search(r"(?i)(^|[-_. \[(])zstd([-_. \])]|$)", name):
+                    it["lz4"] = True
+                    it["pack"] = "zstd"
                 if not it.get("tid") and not it.get("incomplete"):
                     # sin param.json legible: el Title ID del nombre y el titulo si ya lo conociamos
                     tn = E.title_id(name)
@@ -6833,6 +6871,7 @@ def library_scan(refresh=False):
                 mf = m["facts"] if m else {}
                 it = {"path": path, "name": name, "kind": "image", "drive": drive,
                       "lz4": bool(LZ4_NAME_RE.search(name)) or bool(mf.get("lz4")),
+                      "pack": mf.get("pack") or ("zstd" if re.search(r"(?i)(^|[-_. \[(])zstd([-_. \])]|$)", name) else ""),
                       "ext": LIB_IMAGE_RE.search(name).group(1).lower(), "size": x.get("size"),
                       "tid": tid, "title": mf.get("title") or t.get("title"),
                       "version": mf.get("version"), "need_fw": mf.get("need_fw") or t.get("need_fw"),
@@ -9812,9 +9851,6 @@ def calibrate(url):
         src = E.UrlSource(url).probe()
         if not src.ranges or src.size <= 0:
             raise E.PipeError("Este servidor no deja partir la descarga en trozos: da igual cuántas conexiones uses.")
-        if E.host_conn_cap(src.url):
-            raise E.PipeError("Este alojamiento limita las conexiones (usa %d por archivo pase lo que pase): prueba "
-                              "con un enlace de otro sitio." % E.LIMITED_CAP)
         res = []
         for n in (2, 4, 8, 16):
             with LOCK:
@@ -10290,6 +10326,33 @@ def _download_update(url, limit=60 * 1024 * 1024):
     return bytes(buf)
 
 
+UPD_PREP = {"ver": "", "data": None, "busy": False, "error": ""}
+
+
+def update_prepare():
+    """Baja en segundo plano la versión nueva (solo la baja: se instala cuando pulses «Reiniciar ahora»)."""
+    if UPD_PREP["busy"]:
+        return
+
+    def run():
+        try:
+            ver, url, _ = github_latest(update_repo())
+            if not url or _ver_tuple(ver) <= _ver_tuple(VERSION) or (UPD_PREP["ver"] == ver and UPD_PREP["data"]):
+                return
+            data = _download_update(url)
+            import io
+            import zipfile
+            zipfile.ZipFile(io.BytesIO(data)).testzip()
+            UPD_PREP.update(ver=ver, data=data, error="")
+        except Exception as e:
+            UPD_PREP["error"] = str(e)
+        finally:
+            UPD_PREP["busy"] = False
+    UPD_PREP["busy"] = True
+    UPD_PREP["error"] = ""
+    threading.Thread(target=run, daemon=True).start()
+
+
 def _github_latest_web(repo):
     """Lo mismo que github_latest sin la API de GitHub (que limita a 60 consultas por hora): la página «latest»
     redirige a la etiqueta de la última versión, y el zip se llama como lo publica la acción de GitHub."""
@@ -10748,11 +10811,16 @@ class Handler(BaseHTTPRequestHandler):
                 ver, url, _ = github_latest(update_repo())
                 if not url:
                     raise E.PipeError("Esa release no tiene un .zip")
-                ver = install_zip(_download_update(url))
+                data = UPD_PREP["data"] if UPD_PREP.get("ver") == ver and UPD_PREP.get("data") else None
+                ver = install_zip(data or _download_update(url))
             except Exception as e:
                 return self._send(400, {"ok": False, "error": str(e)})
             restart_soon()
             return self._send(200, {"ok": True, "version": ver})
+        if p == "/api/update/prepare":
+            update_prepare()
+            return self._send(200, {"ok": True, "busy": UPD_PREP["busy"], "ready": UPD_PREP["ver"] if UPD_PREP["data"] else "",
+                                    "error": UPD_PREP["error"], **UPD_DL})
         if p == "/api/update/progress":
             return self._send(200, {"ok": True, **UPD_DL})
         if p == "/api/whatsnew":

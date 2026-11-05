@@ -639,7 +639,7 @@ html,textarea,.sqrow,dialog,.hvcard{scrollbar-color:#3a4456 transparent;scrollba
 @media(max-width:900px){.dsc-nav{display:flex;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.dsc-nav::-webkit-scrollbar{display:none}.dsc-nav button{flex:0 0 auto;min-width:96px;padding:9px 12px}.dsc-nav .di{font-size:19px}}
 .rec-q{max-width:260px}.rec-fam{margin:0 0 12px}
 @media(max-width:600px){#recCard .fm-head{flex-wrap:wrap}.rec-q{max-width:none;flex:1 1 100%;order:5}}
-.dsc-sec{margin:4px 0 22px}.dsc-sh{display:flex;align-items:baseline;gap:10px;margin:0 0 10px}.dsc-sh h3{margin:0;font-size:16px}.dsc-sh .hint{margin:0}
+.dsc-sec{margin:4px 0 22px;border-radius:14px;transition:box-shadow .4s,background .4s}.dsc-sec.flash{box-shadow:0 0 0 2px rgba(255,214,102,.75);background:rgba(255,214,102,.06)}.dsc-sh{display:flex;align-items:baseline;gap:10px;margin:0 0 10px}.dsc-sh h3{margin:0;font-size:16px}.dsc-sh .hint{margin:0}
 .dsc-sh .more{margin-left:auto;background:none;border:none;color:#8fb3ff;cursor:pointer;font-size:13.5px;white-space:nowrap;padding:2px 0}.dsc-sh .more:hover{text-decoration:underline}
 .recgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .recgrid.row4{grid-template-columns:repeat(var(--n,4),minmax(0,1fr))}
@@ -745,6 +745,16 @@ header h1{white-space:nowrap}
 #updBar .ub-ic{font-size:20px}#updBar .nb-t{flex:1;min-width:220px}#updBar .nb-t b{display:block}#updBar .nb-x{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px}
 @keyframes updIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 @media(max-width:1060px){#updBar{margin:10px 10px 0}}
+.dlg-scroll[open]{display:flex;flex-direction:column;max-height:88vh}.dlg-scroll>.body{overflow:auto;flex:1;min-height:0}
+.dlg-foot{display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--line);background:var(--panel)}
+.fmt-alt{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-top:12px;padding:9px 12px;border:1px dashed var(--line);border-radius:10px;font-size:12.5px;color:var(--muted)}.fmt-alt b{color:var(--text)}
+.spot .sp-hero{padding:22px 22px 16px;background:radial-gradient(500px 200px at 0% 0%,rgba(79,201,164,.22),transparent 70%),radial-gradient(400px 200px at 100% 0%,rgba(176,108,255,.2),transparent 70%);border-bottom:1px solid var(--line)}
+.spot h2{margin:6px 0 8px;font-size:22px}.spot .sp-hero p{margin:0 0 12px;line-height:1.5}.spot .sp-badge{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#4fc9a4}
+.sp-bar{display:grid;grid-template-columns:62px 1fr;gap:6px 10px;align-items:center;font-size:12.5px;color:var(--muted)}.sp-bar i{display:block;height:10px;border-radius:6px;width:0;background:#6b7a90;animation:spw 1.1s .2s cubic-bezier(.3,1,.4,1) forwards}.sp-bar i.l{background:#5b8cff}.sp-bar i.z{background:linear-gradient(90deg,#4fc9a4,#b06cff)}
+@keyframes spw{to{width:var(--w)}}.sp-cap{font-size:12px;color:var(--muted)!important;margin:8px 0 0!important}
+.sp-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sp-card{border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px;color:var(--muted)}.sp-card b{display:block;color:#7fa8ff;font-size:15px;margin-bottom:3px}.sp-card.z b{color:#4fc9a4}
+.sp-how{margin:12px 0 4px;padding-left:18px;line-height:1.5;font-size:13.5px}.sp-how li{margin:4px 0}
+@media(max-width:560px){.sp-cards{grid-template-columns:1fr}}
 .upd-foot{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:14px;flex-wrap:wrap}
 .upd-warn{margin:10px 0 0;color:#f2c46d;font-size:13px}
 .upd-prog{margin-top:12px;display:flex;flex-direction:column;gap:5px}.upd-prog .bar{height:8px;border-radius:6px;background:var(--line);overflow:hidden}.upd-prog .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5b8cff,#b06cff);transition:width .4s}
@@ -989,6 +999,7 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
         <button type="button" data-c="fast">Rápida</button><button type="button" data-c="balanced">Equilibrada</button><button type="button" data-c="smallest">Mínimo tamaño</button><button type="button" data-c="stored">Sin comprimir</button></div><span class="hint" id="fmtCompNote"></span></div>
       <label class="check fmt-img" id="fmtImgRow" hidden><input type="checkbox" id="fmtImg"> En un solo archivo: dentro de una imagen .ffpkg <span class="hint">(si no, queda como carpeta)</span></label>
       <div class="fmt-info" id="fmtNote" hidden></div>
+      <div class="fmt-alt">🧪 <span>¿Algo que ya está en la consola? <b>Alembic</b> (en pruebas) lo convierte dentro de la propia PS5 entre carpeta, exFAT, FFPKG, FFPFS y FFPFSC, sin pasar por el PC.</span> <button type="button" class="linkbtn" id="fmtAlembic">Ver Alembic →</button></div>
       </div>
     </div>
     <div class="actions">
@@ -1364,10 +1375,28 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
     <div id="cnNotes" class="upd-notes"></div>
     <div class="upd-foot"><label class="check" id="cnOrigL" hidden><input type="checkbox" id="cnOrig"> Ver el texto original</label><div class="spacer"></div><a class="btn-a" id="cnGh" href="#" target="_blank" rel="noopener">GitHub ↗</a><button class="primary" id="cnGo" hidden>Actualizar</button></div></div>
 </dialog>
-<dialog id="dlgNews">
-  <div class="head"><h2 id="newsTitle">Novedades</h2><div class="spacer"></div></div>
-  <div class="body"><div id="newsBody"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="primary" id="btnNewsOk">Entendido</button></div></div>
+<dialog id="dlgSpot" class="spot" style="width:min(640px,95vw)">
+  <div class="sp-hero"><div class="sp-badge">Nuevo en PS5 Directo</div><h2>Títulos que ocupan mucho menos</h2>
+    <p id="spP">PS5 Directo puede convertir tus títulos a <b>LZ4</b> o <b>zstd</b>: empaqueta sus datos para que ocupen bastante menos y la consola los lee al vuelo, casi sin perder velocidad. Menos gigas: envíos más cortos y más sitio en tu SSD.</p>
+    <div class="sp-bar"><span>Original</span><i style="--w:100%"></i><span>LZ4</span><i class="l" style="--w:68%"></i><span>zstd</span><i class="z" style="--w:43%"></i></div>
+    <p class="sp-cap">Ejemplo real: 26 GB de datos quedaron en 17,5 GB con LZ4 y en 11 GB con zstd.</p></div>
+  <div class="body">
+    <div class="sp-cards">
+      <div class="sp-card"><b>LZ4</b><span>La más rápida de crear y la más probada. La lee el emulador AMPR (ampr_emu).</span></div>
+      <div class="sp-card z"><b>zstd</b><span>Ocupa aún menos. La lee ampr-emu-ng; es lo que recomienda ahora PS5 Dump Forge.</span></div>
+    </div>
+    <ul class="sp-how" id="spHow">
+      <li><b>Al mandar a la PS5:</b> en Transferencias, «Formato en la PS5» › «Convertir a otro formato» › LZ4 o zstd. Se convierte en tu PC y se manda ya convertido.</li>
+      <li><b>Si solo lo bajas a tu PC:</b> elige LZ4 o zstd en el formato y se convierte solo al terminar de bajar.</li>
+    </ul>
+    <p class="hint">Solo sirve para títulos AMPR (la mayoría); si no lo es, se manda sin convertir. Comprueba que arranca antes de borrar el original.</p>
+    <div class="upd-foot"><button id="spLater">Ahora no</button><button class="primary" id="spGo">Probarlo ahora</button></div>
+  </div>
+</dialog>
+<dialog id="dlgNews" class="dlg-scroll">
+  <div class="head"><h2 id="newsTitle">Novedades</h2><div class="spacer"></div><button class="small" id="btnNewsX">Cerrar</button></div>
+  <div class="body"><div id="newsBody"></div></div>
+  <div class="dlg-foot"><button class="primary" id="btnNewsOk">Entendido</button></div>
 </dialog>
 
 <dialog id="dlgSpeed">
@@ -1989,6 +2018,15 @@ Object.assign(I18N_EXACT,{"Avisar en la pantalla de la PS5 cuando termina un env
 Object.assign(I18N_EXACT,{"Dibuja el mando DualSense en una esquina de la pantalla mientras juegas: los botones, sticks y gatillos se iluminan al pulsarlos. Ideal para grabar o hacer directos. No toca la memoria del juego.": "Draws the DualSense controller in a corner of the screen while you play: buttons, sticks and triggers light up as you press them. Great for recording or streaming. It doesn't touch game memory.", "Se carga una vez por arranque (con kstuff-lite). No lo uses a la vez que otros contadores de FPS.": "Load it once per boot (with kstuff-lite). Don't use it together with other FPS counters.", "Lanzador de emuladores clásicos nativo (NES, Super Nintendo, Mega Drive, PS1 y arcade) con su propia interfaz. PS5 Directo envía su instalador y luego lo abres desde el menú de juegos.": "Native launcher for classic emulators (NES, Super Nintendo, Mega Drive, PS1 and arcade) with its own interface. PS5 Directo sends its installer and then you open it from the games menu.", "En pruebas. No trae ROMs ni BIOS: lo tuyo lo pones tú.": "Experimental. No ROMs or BIOS included: you bring your own.", "NES / SNES / Mega Drive / PS1 / Arcade": "NES / SNES / Mega Drive / PS1 / Arcade", "Port nativo del código libre de DOOM para la PS5, con mando, vibración y su música. Trae el episodio shareware gratuito; para los demás juegos de la saga necesitas tus propios archivos (o los libres de Freedoom).": "Native PS5 port of DOOM's open-source code, with controller, rumble and its music. It includes the free shareware episode; for the other games in the series you need your own files (or the free Freedoom ones).", "kstuff y ShadowMountPlus.": "kstuff and ShadowMountPlus."});
 Object.assign(I18N_EXACT,{"Abre chiaki-ng directamente en la imagen de tu PS5, sin buscar la consola ni pulsar nada más. Antes tienes que haberla vinculado una vez (abajo, «Configurar Remote Play»).": "Opens chiaki-ng straight on your PS5's screen, without searching for the console or clicking anything else. You need to have paired it once first (below, “Set up Remote Play”).", "Actualizar y reiniciar": "Update and restart", "Buscando chiaki-ng y tu consola…": "Looking for chiaki-ng and your console…", "Consola en reposo": "Console in rest mode", "Consola encendida": "Console on", "La consola no contesta": "The console doesn't answer", "Sin IP de la consola": "No console IP", "chiaki-ng no encontrado": "chiaki-ng not found", "Pantalla completa": "Full screen", "▶ Jugar": "▶ Play", "▶ Abrir chiaki-ng": "▶ Open chiaki-ng", "Abrir chiaki-ng normal": "Open chiaki-ng normally", "Usar otro chiaki-ng…": "Use another chiaki-ng…", "¿No es este? Elegir chiaki-ng…": "Not this one? Choose chiaki-ng…", "Ya lo tengo: elegir dónde está…": "I have it: choose where it is…", "Abriendo la imagen de tu PS5 en chiaki-ng…": "Opening your PS5's screen in chiaki-ng…", "Abriendo chiaki-ng…": "Opening chiaki-ng…", "Descargando la versión nueva…": "Downloading the new version…", "DualSense por cable (hápticos y gatillos)": "Wired DualSense (haptics and triggers)", "Enciéndela o comprueba que está en la misma red. Si está en reposo y no contesta, activa en la PS5 «Mantener la conexión a internet» y «Permitir encender la PS5 desde la red».": "Turn it on or check it's on the same network. If it's in rest mode and doesn't answer, turn on “Stay connected to the internet” and “Enable turning on PS5 from network” on the PS5.", "Está en reposo: «Jugar» abre chiaki-ng y, al elegir tu consola, la despierta.": "It's in rest mode: “Play” opens chiaki-ng, and choosing your console wakes it up.", "Hay transferencias en marcha. Actualizar reinicia el programa y tendrás que pulsar Reintentar en ellas (siguen donde iban). ¿Seguir?": "There are transfers running. Updating restarts the program and you'll need to press Retry on them (they continue where they were). Continue?", "⚠ Hay transferencias en marcha: al actualizar se reinicia el programa y tendrás que pulsar Reintentar en ellas (siguen donde iban).": "⚠ There are transfers running: updating restarts the program and you'll need to press Retry on them (they continue where they were).", "Instalar un .zip que ya tengo": "Install a .zip I already have", "Jugar en el PC": "Play on PC", "Jugar en el PC (Remote Play)": "Play on PC (Remote Play)", "Las novedades de la versión nueva, antes de actualizar": "What's new in the new version, before you update", "Leyendo las notas de la versión…": "Reading the release notes…", "Lo que trae la versión que tienes:": "What the version you have brings:", "No cierres esta ventana: en cuanto termine, PS5 Directo se reinicia solo.": "Don't close this window: as soon as it finishes, PS5 Directo restarts by itself.", "No he encontrado notas de esa versión en GitHub.": "I couldn't find notes for that version on GitHub.", "No he podido mirar si hay versión nueva": "I couldn't check for a new version", "No se ha podido actualizar": "The update failed", "Ocultar hasta la próxima versión": "Hide until the next version", "Ocultar": "Hide", "PS5 Directo v{0} ya está disponible": "PS5 Directo v{0} is available", "Por si se ha publicado un arreglo sin cambiar el número de versión. Se conservan tus ajustes, la cola y el historial.": "In case a fix was published without changing the version number. Your settings, queue and history are kept.", "Puedes leerlas en GitHub con el botón de abajo.": "You can read them on GitHub with the button below.", "Qué cambia": "What's new", "Qué cambia en {0}": "What's new in {0}", "Qué trae": "What's new", "Reinstalar la v{0} desde GitHub": "Reinstall v{0} from GitHub", "Si GitHub ha limitado las consultas, espera unos minutos.": "If GitHub has rate-limited you, wait a few minutes.", "Sigue donde se quedó la descarga.": "Continues the download where it stopped.", "Tienes la v{0}. Esto es lo que cambia:": "You have v{0}. This is what changes:", "Tienes la v{0}. Mira qué trae y actualiza cuando quieras: se reinicia en unos segundos y no pierdes nada.": "You have v{0}. See what's new and update whenever you like: it restarts in a few seconds and you lose nothing.", "Tienes la {0} y la última es la {1}.": "You have {0} and the latest is {1}.", "Una versión que has bajado a mano o te han pasado. Se conservan tus ajustes, la cola y el historial.": "A version you downloaded yourself or someone gave you. Your settings, queue and history are kept.", "Vibración HD y gatillos adaptativos. Solo con el DualSense conectado por cable.": "HD rumble and adaptive triggers. Only with the DualSense connected by cable.", "Ya tienes la última versión (v{0})": "You have the latest version (v{0})", "{0} carpetas no se han podido leer: la lista puede estar incompleta": "{0} folders couldn't be read: the list may be incomplete", "¿Cómo se llama tu consola en chiaki-ng? (tal como sale en su lista)": "What's your console called in chiaki-ng? (as it appears in its list)", "Volver a intentarlo": "Try again", "Actualizar PS5 Directo": "Update PS5 Directo", "Actualizar · v{0}": "Update · v{0}", "Mirando GitHub…": "Checking GitHub…", "Esta versión no trae notas.": "This version has no notes.", "Ver el texto original": "Show the original text", "Pulsa «Jugar en el PC» en Descubrir › Remote Play: abre chiaki-ng directo en tu consola. Si está en reposo, la despierta al elegirla.": "Press “Play on PC” in Discover › Remote Play: it opens chiaki-ng straight on your console. If it's in rest mode, choosing it wakes it up.", "El vínculo se guarda: la próxima vez basta con «Jugar».": "The pairing is saved: next time just press “Play”.", "También arranca tus discos originales de PS2 desde el lector de la consola (en beta).": "It also boots your original PS2 discs from the console's disc drive (beta).", "No encuentro chiaki-ng en este PC: instálalo o dime dónde está": "I can't find chiaki-ng on this PC: install it or tell me where it is", "No sé el nombre de tu consola: escríbelo tal como sale en chiaki-ng": "I don't know your console's name: type it as it appears in chiaki-ng", "GitHub ha limitado las consultas desde tu conexión: prueba en un rato o léelas en GitHub": "GitHub has rate-limited your connection: try again in a while or read them on GitHub", "Dónde está chiaki-ng (chiaki.exe, la .app o la AppImage)": "Where chiaki-ng is (chiaki.exe, the .app or the AppImage)"});
 I18N_RX.push(...[["^No he podido leer las notas en GitHub \\((.+)\\)$", "I couldn't read the notes on GitHub ({0})"], ["^No he podido consultar GitHub \\((.+)\\)$", "I couldn't reach GitHub ({0})"], ["^La descarga de la actualización se cortó \\((.+)\\)\\. Prueba otra vez: sigue donde iba$", "The update download was cut off ({0}). Try again: it continues where it was"]]);
+Object.assign(I18N_EXACT,{"Conversor de formatos dentro de la consola (carpeta, exFAT, FFPKG, FFPFS, FFPFSC, paquete), desde su web (puerto 5940)": "Format converter on the console itself (folder, exFAT, FFPKG, FFPFS, FFPFSC, package), from its web page (port 5940)", "Convierte tu contenido entre formatos dentro de la propia consola: carpeta, exFAT, FFPKG, FFPFS, FFPFSC (comprimido) y paquete, sin copias temporales. Lee también de un NAS (SMB, NFS, WebDAV, FTP) y puede emparejarse con su versión de PC para convertir con el procesador del PC y escribir directo en la consola. Se maneja desde su web en el puerto 5940.": "Converts your content between formats on the console itself: folder, exFAT, FFPKG, FFPFS, FFPFSC (compressed) and package, with no temporary copies. It also reads from a NAS (SMB, NFS, WebDAV, FTP) and can pair with its PC version to convert on the PC's processor and write straight to the console. You use it from its web page on port 5940.", "En desarrollo: guarda copia de lo que conviertas hasta comprobarlo en la consola. Se carga como payload.": "Work in progress: keep a backup of what you convert until you've checked it on the console. Loaded as a payload."});
+I18N_RX.push(...[["^Este alojamiento puede limitar las conexiones: empiezo con (\\d+) y subo hasta (\\d+) si lo aguanta$", "This host may limit connections: starting with {0} and going up to {1} while it copes"], ["^El alojamiento aguanta (\\d+) conexiones$", "The host copes with {0} connections"]]);
+Object.assign(I18N_EXACT,{"La descarga se ha quedado a medias: pulsa Reintentar (sigue donde iba)": "The download stopped halfway: press Retry (it continues where it was)"});
+I18N_RX.push(...[["^(.+): continuando con los trozos que ya había$", "{0}: continuing with the pieces already downloaded"]]);
+I18N_RX.push(...[["^Empiezo con (\\d+) conexiones y subo hasta (\\d+) mientras el servidor lo aguante$", "Starting with {0} connections and going up to {1} while the server copes"], ["^📊 (.+)$", "📊 {0}"]]);
+Object.assign(I18N_EXACT,{"La conexión con el servidor falla una y otra vez": "The connection to the server keeps failing", "El servidor no deja bajar a trozos": "The server doesn't allow downloading in pieces"});
+I18N_RX.push(...[["^El servidor aguanta (\\d+) conexiones$", "The server copes with {0} connections"], ["^El servidor rechaza la descarga \\(HTTP (\\d+)\\)$", "The server refuses the download (HTTP {0})"], ["^No se puede bajar \\(HTTP (\\d+)\\)$", "Can't download (HTTP {0})"]]);
+Object.assign(I18N_EXACT,{"PS5 Directo v{0} lista para instalar": "PS5 Directo v{0} ready to install", "Reiniciar ahora": "Restart now", "Descargando…": "Downloading…", "¿Algo que ya está en la consola? Alembic (en pruebas) lo convierte dentro de la propia PS5 entre carpeta, exFAT, FFPKG, FFPFS y FFPFSC, sin pasar por el PC.": "Something already on the console? Alembic (experimental) converts it on the PS5 itself between folder, exFAT, FFPKG, FFPFS and FFPFSC, without going through the PC.", "¿Algo que ya está en la consola?": "Something already on the console?", "(en pruebas) lo convierte dentro de la propia PS5 entre carpeta, exFAT, FFPKG, FFPFS y FFPFSC, sin pasar por el PC.": "(experimental) converts it on the PS5 itself between folder, exFAT, FFPKG, FFPFS and FFPFSC, without going through the PC.", "Ver Alembic →": "See Alembic →"});
+Object.assign(I18N_EXACT,{"Nuevo en PS5 Directo": "New in PS5 Directo", "Títulos que ocupan mucho menos": "Titles that take up much less space", "Ejemplo real con zstd: 26 GB de datos quedaron en 11 GB.": "Real example with zstd: 26 GB of data became 11 GB.", "La más rápida de crear y la más probada. La lee el emulador AMPR (ampr_emu).": "The fastest to create and the most tested. Read by the AMPR emulator (ampr_emu).", "Ocupa aún menos. La lee ampr-emu-ng; es lo que recomienda ahora PS5 Dump Forge.": "Takes up even less. Read by ampr-emu-ng; it's what PS5 Dump Forge now recommends.", "Solo sirve para títulos AMPR (la mayoría); si no lo es, se manda sin convertir. Comprueba que arranca antes de borrar el original.": "Only for AMPR titles (most of them); otherwise it's sent unconverted. Check it boots before deleting the original.", "Ahora no": "Not now", "Probarlo ahora": "Try it now", "Original": "Original"});
 // --- idioma: español (original) o inglés. Traduce el texto de la página y los mensajes del programa.
 const LANG=(()=>{try{const v=localStorage.getItem('ps5d_lang');if(v==='es'||v==='en')return v}catch(e){}
   return (navigator.language||'es').toLowerCase().startsWith('es')?'es':'en'})();
@@ -3029,7 +3067,17 @@ function updBar(r){ const b=$('updBar'); let later=''; try{later=localStorage.ge
     <button class="small" id="ubSee">${esc(tr('Qué trae'))}</button><button class="small primary" id="ubGo">${esc(tr('Actualizar y reiniciar'))}</button><button class="nb-x" id="ubX" title="${esc(tr('Ocultar hasta la próxima versión'))}" aria-label="${esc(tr('Ocultar'))}">✕</button>`;
   b.hidden=false;
   $('ubSee').onclick=()=>showUpdDialog(r); $('ubGo').onclick=()=>updInstall();
-  $('ubX').onclick=()=>{ try{localStorage.setItem('ps5d_upd_later',r.latest)}catch(e){} b.hidden=true } }
+  $('ubX').onclick=()=>{ try{localStorage.setItem('ps5d_upd_later',r.latest)}catch(e){} b.hidden=true };
+  updPrep(r) }
+// como PSUpload: la versión nueva se baja sola en segundo plano y luego basta con «Reiniciar ahora»
+let updPrepT=null;
+async function updPrep(r){ if(updPrepT) return; const b=$('updBar');
+  const tick=async()=>{ let x; try{ x=await api('/api/update/prepare',{}) }catch(e){ updPrepT=null; return }
+    const go=$('ubGo'), t=b.querySelector('.nb-t b'); if(!go||b.hidden){ updPrepT=null; return }
+    if(x.ready){ t.textContent=tr('PS5 Directo v{0} lista para instalar').replace('{0}',x.ready); go.textContent=tr('Reiniciar ahora'); go.disabled=false; updPrepT=null; return }
+    if(x.busy){ go.disabled=true; go.textContent=tr('Descargando…')+(x.size?' '+Math.floor(x.got*100/x.size)+'%':''); updPrepT=setTimeout(tick,800); return }
+    go.disabled=false; go.textContent=tr('Actualizar y reiniciar'); updPrepT=null };
+  updPrepT=setTimeout(tick,50) }
 async function checkUpdateQuiet(){
   if(!state.repo||state.remote) return;
   try{const r=await api('/api/update/check',{}); if(!(r.ok&&r.newer)) return; updR=r;
@@ -3436,7 +3484,12 @@ function arrivalsPopup(){ let last=0; try{ last=+localStorage.getItem('ps5d_arri
     <div class="act"><button class="small" data-x="1">${esc(tr('Ahora no'))}</button><button class="small primary" data-v="1">${esc(tr('Verlas'))}</button></div>`;
   document.body.appendChild(d);
   d.querySelector('[data-x]').onclick=()=>d.remove();
-  d.querySelector('[data-v]').onclick=()=>{ d.remove(); nw.cat=''; appShow('home'); setTimeout(()=>{ const r=[...document.querySelectorAll('#recBody .dsc-sh h3')].find(h=>h.textContent===tr('Recién llegados')); (r||$('recBody')).scrollIntoView({behavior:'smooth',block:'center'}) },300) };
+  d.querySelector('[data-v]').onclick=()=>{ d.remove(); nw.cat=''; if($('tabApps').hidden) showTab('Apps'); appShow('home');
+    // Inicio tarda un momento en pintarse: se espera a que salga la fila «Recién llegados» y se lleva ahí, resaltada
+    let n=0; const look=()=>{ const h=[...document.querySelectorAll('#recBody .dsc-sh h3')].find(h=>h.textContent===tr('Recién llegados'));
+      if(h){ const sec=h.closest('.dsc-sec'); sec.scrollIntoView({behavior:'smooth',block:'center'}); sec.classList.add('flash'); setTimeout(()=>sec.classList.remove('flash'),2600); return }
+      if(++n<40) setTimeout(look,150); else { appShow('news') } };
+    setTimeout(look,150) };
   setTimeout(()=>{ if(d.isConnected) d.style.opacity='.98' },100) }
 function appShow(v){ if(!DSC[v]&&v!=='news') v='home'; appV=v;
   $('appView').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.a===v));
@@ -4447,8 +4500,19 @@ async function showNews(all){
   $('dlgNews').showModal();
 }
 $('btnNewsOk').onclick=()=>{$('dlgNews').close(); setTimeout(maybeTour20,300)};
+$('fmtAlembic').onclick=()=>{ goApps('tool'); setTimeout(()=>{ const q=$('recQ'); if(q){ q.value='Alembic'; q.dispatchEvent(new Event('input')) } },700) };
+$('btnNewsX').onclick=()=>$('btnNewsOk').click();
 // la primera vez con la 2.0 (si ya venías de antes): la guía de lo que hay, una sola vez
-function maybeTour20(){ if(state.remote||!state.settings||state.settings.tour20_done||tourEls||$('dlgNews').open||document.querySelector('dialog[open]')) return; startTour() }
+function maybeTour20(){ if(state.remote||!state.settings||tourEls||$('dlgNews').open||document.querySelector('dialog[open]')) return;
+  if(!state.settings.spot_packs) return showSpot();
+  if(state.settings.tour20_done) return; startTour() }
+// una vez: recordar que existe LZ4 / zstd (ocupan mucho menos)
+function showSpot(){
+  if(LANG==='en'){ $('spP').innerHTML='PS5 Directo can convert your titles to <b>LZ4</b> or <b>zstd</b>: it packs their data so they take up much less space and the console reads it on the fly, with almost no loss of speed. Fewer gigabytes: shorter transfers and more room on your SSD.';
+    $('spHow').innerHTML='<li><b>When sending to the PS5:</b> in Transfers, “Format on the PS5” › “Convert to another format” › LZ4 or zstd. It\'s converted on your PC and sent already converted.</li><li><b>If you only download it to your PC:</b> pick LZ4 or zstd as the format and it\'s converted by itself when the download ends.</li>' }
+  state.settings.spot_packs=true; api('/api/settings',{spot_packs:true}).catch(()=>{}); $('dlgSpot').showModal() }
+$('spLater').onclick=()=>{ $('dlgSpot').close(); setTimeout(maybeTour20,300) };
+$('spGo').onclick=()=>{ $('dlgSpot').close(); showTab('Transfers'); setTimeout(()=>{ if($('fmtBody').hidden) $('fmtBar').click(); $('fmtBar').scrollIntoView({behavior:'smooth',block:'center'}) },250) };
 $('btnNews').onclick=()=>showNews(true);
 // --- créditos: autores de los proyectos libres que usa o recomienda la app
 const CR_KIND={core:'Base',payload:'Payloads',emu:'Emuladores',media:'Multimedia',rp:'Remote Play',tool:'Herramientas',app:'Aplicaciones'};
@@ -5504,7 +5568,7 @@ function libRender(){
     const ok=fwOk(mine,it.need_fw);
     const cov0=it.cover?(it.kind==='image'&&!it.cover_path?`/api/cover?tid=${encodeURIComponent(it.tid||'')}&t=${encodeURIComponent(TOKEN)}`:`/api/cover?p=${encodeURIComponent(it.cover_path||it.path)}&t=${encodeURIComponent(TOKEN)}`):'';
     const artFb=artURL((recArt||{})[(it.tid||'').toUpperCase()]||''), cov=cov0||artFb;
-    const fmt=it.kind==='installed'?(it.platform+' · '+tr('instalado')):it.kind==='image'?'.'+(it.ext||'img')+(it.lz4?' · LZ4':''):it.lz4?'LZ4':tr('Carpeta');
+    const fmt=it.kind==='installed'?(it.platform+' · '+tr('instalado')):it.kind==='image'?'.'+(it.ext||'img')+(it.lz4?(it.pack==='zstd'?' · zstd':' · LZ4'):''):it.lz4?(it.pack==='zstd'?'zstd':'LZ4'):tr('Carpeta');
     const b=[];
     if(it.need_fw&&parseFloat(it.need_fw)>0) b.push(ok===false?`<span class="bdg bad" title="${esc(tr('Pide un firmware más nuevo que el de tu PS5'))}">${esc(tr('Pide FW {0}').replace('{0}',it.need_fw))}</span>`:`<span class="bdg ${ok?'ok':''}">FW ${esc(it.need_fw)}${ok?' ✓':''}</span>`);
     if(it.backport) b.push(`<span class="bdg info">Backport</span>`);

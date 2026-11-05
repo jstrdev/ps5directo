@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.2
+PS5 DIRECTO 2.0.3
 =================
 (English: see README_EN.txt)
 
@@ -332,7 +332,7 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   del cortafuegos de Windows.
 
 
-NOVEDADES 2.0.2
+NOVEDADES 2.0.3
 - Biblioteca: los títulos instalados en el SSD M.2 o en almacenamiento
   ampliado salen con su ruta real (/mnt/ext0/user/app/...) y como
   «Ampliado (M.2/USB)». Antes salía una ruta que no era la suya.
@@ -368,6 +368,39 @@ NOVEDADES 2.0.2
   PS5 Directo no emite nada: lo hace chiaki-ng.
 - Tu colección del PC avisa si alguna carpeta no se ha podido leer (un
   disco dormido o un NAS caído), para que no creas que no está.
+- Descargas de alojamientos como Akirabox, 1fichier o Rapidgator: ya no
+  se quedan en 2 conexiones fijas. Empiezan con 2 y van sumando (rápido
+  al principio, hasta 16) mientras el servidor lo aguante, como Free
+  Download Manager, con trozos más grandes por conexión; al primer
+  rechazo se quedan en las que funcionan. Al bajar al PC, cada conexión
+  escribe su trozo en su sitio sin esperar a las demás, y una conexión
+  que se queda lenta se suelta y su trozo se pide por otra: velocidad
+  estable, como en un gestor de descargas.
+  Con cualquier servidor, al bajar al PC se empieza con las conexiones
+  de Ajustes y se sube hasta 16.
+- Bajar al PC funciona como Free Download Manager: el archivo se reparte
+  en tramos grandes, cada conexión baja el suyo con una sola petición
+  larga y, al acabar, se queda con la mitad del tramo que más le falta a
+  otra. Menos peticiones (los servidores ya no responden «demasiadas
+  peticiones», 429) y cada conexión coge toda su velocidad.
+- La versión nueva de PS5 Directo se baja sola en segundo plano: la
+  franja de arriba enseña el progreso y luego «Reiniciar ahora».
+- Novedades: el botón Cerrar está arriba y «Entendido» siempre a la
+  vista, sin tener que bajar hasta el final.
+- El aviso de novedades de la scene: «Verlas» te lleva a «Recién
+  llegados» y lo resalta.
+- Convertir: una nota sugiere Alembic para convertir lo que ya está en
+  la consola, con acceso directo a su ficha.
+- Una vez, al abrir esta versión: un aviso que recuerda que puedes
+  convertir tus títulos a LZ4 o zstd para que ocupen mucho menos.
+- Biblioteca: los títulos empaquetados en zstd salen como «zstd» (antes
+  ponía LZ4).
+- Diagnóstico de velocidad: cada 15 s el registro del envío dice (📊) la
+  velocidad, cuántas conexiones hay, lo que da cada una, los rechazos del
+  servidor, las conexiones lentas cambiadas, el disco, la CPU y, al mandar
+  a la consola a la vez, si el freno es la descarga o el envío.
+- Descubrir › Herramientas: Alembic (en pruebas), conversor de formatos
+  dentro de la consola desde su web.
 - PS5SX2: la ficha dice que ya arranca discos originales de PS2 (beta).
 - Arreglado: el botón 🔔 Actualizaciones de la Biblioteca abría la
   ventana equivocada.
