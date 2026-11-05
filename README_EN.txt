@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.1 — USER GUIDE (English)
+PS5 DIRECTO 2.0.2 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,21 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.0.2 - Titles installed on the M.2 SSD / extended storage now show their real
+  path. "Reinstall from GitHub" in Update. Emulators with several builds (e.g.
+  EglantinePS5): pick which one to download, add another GitHub build or install
+  your own .zip. New-arrivals notice in Discover. Library export (CSV or web
+  page) and a type row that always shows every category. A notice on the PS5
+  when a transfer ends (with zftpd). New in Discover: DualSense Overlay, Retro
+  Papa and the native DOOM port. "What's new" before updating any emulator,
+  app or payload: the release notes of every version you're missing,
+  translated, with the original one click away. App updates: a strip under
+  the header with "What's new" and "Update and restart", a clearer update
+  window, a progress bar and downloads that resume if cut. Discover › Remote
+  Play › "Play on PC" opens chiaki-ng straight on your PS5 (PS5 Directo
+  streams nothing itself). Your PC collection warns when a folder couldn't be
+  read. Fixed: Library's 🔔 Updates button opened the wrong window. Sliding
+  "glass" tabs, dialogs that ease in, no white focus frame, dark scrollbars.
 2.0.1 - New icons across the app: line icons in the same style as the format
   cards instead of emojis. Discover shows each project's real artwork (its
   official icon and image, or RecompStore's), cached on your PC. Library: a

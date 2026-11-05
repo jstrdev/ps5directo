@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.1
+PS5 DIRECTO 2.0.2
 =================
 (English: see README_EN.txt)
 
@@ -332,6 +332,48 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   del cortafuegos de Windows.
 
 
+NOVEDADES 2.0.2
+- Biblioteca: los títulos instalados en el SSD M.2 o en almacenamiento
+  ampliado salen con su ruta real (/mnt/ext0/user/app/...) y como
+  «Ampliado (M.2/USB)». Antes salía una ruta que no era la suya.
+- Actualizar › «Reinstalar desde GitHub»: vuelve a instalar la última
+  versión publicada aunque tengas el mismo número.
+- Emuladores con varias versiones (como EglantinePS5): eliges de cuál
+  se baja (la oficial u otra conocida), añades otra de GitHub o instalas
+  tu propia versión desde un .zip del PC. Se avisa de las nuevas de la
+  que elijas.
+- Aviso al entrar en Descubrir cuando llegan cosas nuevas a la scene
+  (una vez por novedad).
+- Biblioteca: la fila de tipos enseña siempre todas las categorías, y
+  «Exportar lista» guarda lo que tienes como hoja de cálculo (CSV) o
+  página web.
+- Aviso en la pantalla de la PS5 cuando termina un envío (con zftpd
+  cargado; se puede quitar en Ajustes).
+- Descubrir: DualSense Overlay (el mando en pantalla), Retro Papa
+  (lanzador de emuladores clásicos) y el port nativo de DOOM.
+- Pestañas y filtros con un «cristal» que se desliza entre opciones.
+- Sin el marco blanco al pulsar botones y con barras de desplazamiento
+  oscuras.
+- «Qué cambia»: antes de actualizar un emulador, una app o un payload,
+  ves las notas de la versión nueva (todas las que te faltan),
+  traducidas a tu idioma, con un botón para ver el texto original.
+- Actualizar PS5 Directo: una franja bajo la cabecera avisa de la
+  versión nueva con «Qué trae» y «Actualizar y reiniciar». La ventana
+  de actualizar enseña lo que cambia y te deja elegir con botones
+  claros (reinstalar desde GitHub o instalar un .zip tuyo). La descarga
+  lleva barra de progreso y, si se corta, sigue donde iba.
+- Descubrir › Remote Play › «Jugar en el PC»: abre chiaki-ng
+  directamente en la imagen de tu PS5 (pantalla completa y DualSense
+  por cable opcionales). Dice si la consola está encendida o en reposo.
+  PS5 Directo no emite nada: lo hace chiaki-ng.
+- Tu colección del PC avisa si alguna carpeta no se ha podido leer (un
+  disco dormido o un NAS caído), para que no creas que no está.
+- PS5SX2: la ficha dice que ya arranca discos originales de PS2 (beta).
+- Arreglado: el botón 🔔 Actualizaciones de la Biblioteca abría la
+  ventana equivocada.
+- Las ventanas y el panel de notificaciones entran con una animación
+  suave y el fondo se difumina.
+
 NOVEDADES 2.0.1
 - Iconos nuevos en toda la app: de línea, del mismo estilo que las
   tarjetas de formato, en vez de emojis (pestañas, barra del móvil, menú
@@ -369,9 +411,12 @@ NOVEDADES 2.0.1
   almacenamientos, captar lo que copies y carpeta vigilada) en una sola
   fila, las explicaciones en una «i» y los formatos en «¿Qué formatos
   sirven?». No se pierde ninguna opción.
-- Inicio de Descubrir al estilo de RecompStore: categorías con su número
-  (Ports nativos, Emuladores, Aplicaciones, Herramientas), «Más
-  populares», «Lo más nuevo» y «Ports nativos» en tarjetas cuadradas.
+- Inicio de Descubrir al estilo de RecompStore: bajo las novedades, las
+  categorías con su número (Ports nativos, Emuladores, Aplicaciones,
+  Herramientas), y tres carruseles repartidos entre secciones: «Más
+  populares», «Recién llegados» y «Ports nativos». Las portadas de
+  novedades llevan «Actualizado hace…» o «Nuevo», y las actualizaciones
+  que tienes pendientes salen aparte, arriba del todo.
 - Al pasar el ratón (o al tocar) por algo de la scene sale su ficha:
   imagen grande, descripción traducida, capturas, vídeo si lo tiene,
   requisitos y botón de instalar.
@@ -383,9 +428,9 @@ NOVEDADES 2.0.1
 - Mejorar tus títulos (Descubrir): ps-patch-system y NeoEnabler con los
   pasos para usarlos, y la etiqueta «Parches» en la Biblioteca en los
   títulos que tienen parches de la comunidad.
-- Parches de juegos (Herramientas): ps-patch-system con un botón para
-  poner en la consola los parches de la comunidad (PS-Game-Patch), y
-  NeoEnabler (PS4 en modo Pro).
+- Parches de juegos: ps-patch-system con un botón para poner en la
+  consola los parches de la comunidad (PS-Game-Patch), y NeoEnabler (PS4
+  en modo Pro).
 - «¿A dónde va?» tiene una tercera opción: «La PS5 lo baja sola» (zftpd).
 - EglantinePS5 (Switch 2) se baja de la versión que sí publica builds.
 - Errores que se entienden: «no encuentro ese servidor», «no existe en
@@ -394,6 +439,10 @@ NOVEDADES 2.0.1
 - Antes de añadir a la cola se comprueba también un enlace suelto (antes
   solo si eran varios).
 - Fechas en el formato del idioma de la app.
+- Actualizar: si GitHub limita las consultas («rate limit exceeded»), la
+  app busca la versión nueva por otro camino o te ofrece instalar el
+  .zip, en vez de quedarse en el error.
+- BFpilot 0.4.9 ya abre los ZIP con cifrado AES: el aviso te lo dice.
 - Arreglado: en el móvil, Actividad y Copia de seguridad se salían de la
   pantalla; textos a medio traducir en inglés; en Sistema, un recuadro
   se quedaba solo en otra fila; «Descargar de nuevo» ahora dice «Enviar

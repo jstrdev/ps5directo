@@ -751,6 +751,12 @@ PAYLOADS = [
 EXTRA_PAYLOADS = [
     {"id": "rpgetpin", "name": "Remote Play: PIN para vincular", "repo": "idlesauce/ps5-remoteplay-get-pin", "port": None,
      "what": "Saca el PIN y el ID de cuenta para vincular un programa de Remote Play sin PSN"},
+    {"id": "dsoverlay", "name": "DualSense Overlay", "repo": "erickdavestech/ps5-dualsense-overlay", "port": None,
+     "pick": [r"(?i)^ps5-dualsense-overlay.*\.elf$", r"(?i)\.elf$"],
+     "what": "Dibuja el mando en una esquina mientras juegas y se iluminan los botones que pulsas"},
+    {"id": "retropapa", "name": "Retro Papa", "repo": "zx0CF1/RetroPapaPS5-Beta", "port": None,
+     "pick": [r"(?i)^RetroPapa-Installer\.elf$", r"(?i)installer.*\.elf$"],
+     "what": "Instala Retro Papa, un lanzador de emuladores clásicos nativo"},
     {"id": "patchsys", "name": "ps-patch-system", "repo": "illusionyy/ps-patch-system", "port": 23900,
      "pick": [r"(?i)^patch-bundle-loader-prospero\.elf$", r"(?i)^patch-bundle-prospero\.elf$"],
      "what": "Parches para títulos de PS4 y PS5 (60 fps, resolución…), se eligen en su web (puerto 23900)"},
@@ -849,6 +855,7 @@ CATALOG = [
              "guide": ["Instálalo con el botón de arriba: queda en /data/homebrew/PPSA99203.",
                        "BIOS: la de tu propia PS2 va en /data/PCSX2/bios.",
                        "Contenido: /data/PCSX2/games, o un USB con una carpeta games, PCSX2/games o PS5SX2/games.",
+                       "También arranca tus discos originales de PS2 desde el lector de la consola (en beta).",
                        "Parches .pnach en /data/PCSX2/patches: se activan por título en sus ajustes.",
                        "Teclado y ratón USB funcionan como mando (no en firmware 11.x y 12.00)."]}},
     {"id": "psxs5", "kind": "app", "group": "emu", "fam": "ps", "name": "PSXS5", "sys": "PS1", "tid": "PPSA97510",
@@ -899,6 +906,7 @@ CATALOG = [
                        "Usa el mismo Helper que PS5SX2 para salir de su caja: cárgalo si no ve tus carpetas."]}},
     {"id": "eglantine", "kind": "app", "group": "emu", "fam": "nin", "name": "EglantinePS5", "sys": "Switch 2",
      "tid": "PPSA98515", "repo": "mucahidkambur/EglantinePS5", "asset": [r"(?i)PPSA98515.*\.zip$", r"(?i)\.zip$"], "exp": True,
+     "alts": ["viejunerd/Eglantine-PS5-", "heydemoura/EglantinePS5"],
      "what": "Emulador de Nintendo Switch 2 (adaptación de Eglantine, basado en Eden). Muy experimental.",
      "needs": "Las claves y el firmware de tu propia consola y tu contenido (.nsp o .xci).",
      "update": "Avisa de versión nueva al abrirlo.",
@@ -993,6 +1001,11 @@ CATALOG = [
              "guide": ["Archivos .swf en /data/ruffle/games (los que traen más archivos, en una carpeta propia).",
                        "Carátulas en /data/ruffle/covers con el mismo nombre."]}},
     # --- multimedia (tus propios vídeos, música y servidores)
+    {"id": "doom", "kind": "app", "group": "media", "name": "DOOM (port nativo)", "tid": "PPSA99666",
+     "repo": "lowbit/ps5-doom", "asset": [r"(?i)PPSA99666.*\.zip$", r"(?i)\.zip$"],
+     "what": "Port nativo del código libre de DOOM para la PS5, con mando, vibración y su música. Trae el episodio "
+             "shareware gratuito; para los demás juegos de la saga necesitas tus propios archivos (o los libres de Freedoom).",
+     "needs": "kstuff y ShadowMountPlus."},
     {"id": "vlc", "kind": "app", "group": "media", "name": "VLC", "tid": "PPSA85300", "repo": "ZiZc3/VLC",
      "asset": [r"(?i)PPSA85300.*\.zip$", r"(?i)\.zip$"],
      "what": "VLC para PS5: vídeo hasta 4K con HDR, música, subtítulos, listas, carpetas compartidas y DLNA.",
@@ -1015,6 +1028,16 @@ CATALOG = [
      "asset": [r"(?i)PPSA96024.*\.zip$", r"(?i)\.zip$"],
      "what": "Gestor de archivos de dos paneles y cliente FTP/SFTP en la propia consola, con el mando.",
      "needs": "ShadowMountPlus y el cargador de ELF en el puerto 9021. Sus ajustes quedan en /data/chiral-ftp."},
+    {"id": "dsoverlay", "kind": "payload", "group": "tool", "name": "DualSense Overlay",
+     "repo": "erickdavestech/ps5-dualsense-overlay",
+     "what": "Dibuja el mando DualSense en una esquina de la pantalla mientras juegas: los botones, sticks y gatillos se "
+             "iluminan al pulsarlos. Ideal para grabar o hacer directos. No toca la memoria del juego.",
+     "needs": "Se carga una vez por arranque (con kstuff-lite). No lo uses a la vez que otros contadores de FPS."},
+    {"id": "retropapa", "kind": "payload", "group": "emu", "fam": "multi", "sys": "NES / SNES / Mega Drive / PS1 / Arcade",
+     "name": "Retro Papa", "repo": "zx0CF1/RetroPapaPS5-Beta", "exp": True,
+     "what": "Lanzador de emuladores clásicos nativo (NES, Super Nintendo, Mega Drive, PS1 y arcade) con su propia "
+             "interfaz. PS5 Directo envía su instalador y luego lo abres desde el menú de juegos.",
+     "needs": "En pruebas. No trae ROMs ni BIOS: lo tuyo lo pones tú."},
     {"id": "patchsys", "kind": "payload", "group": "patch", "name": "Parches de juegos (ps-patch-system)",
      "repo": "illusionyy/ps-patch-system",
      "what": "Mejoras para títulos de PS4 y PS5 que hace la comunidad: más fps, más resolución, arreglos… Se activan una a "
@@ -2615,5 +2638,6 @@ CATALOG_ART = {
     'tailscale': {"icon": 'https://raw.githubusercontent.com/holdmysocks/ps5-tailscale/main/appicon/icon0.png', "hero": ''},
     'patchsys': {"icon": '', "hero": 'https://github.com/user-attachments/assets/fd047e71-391e-46d2-91a8-5bde99dfdf7d'},
     'neoenabler': {"icon": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/assets/icon0.png', "hero": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/docs/panel-games.jpg'},
+    'doom': {"icon": '', "hero": '', "bg": ["#7a1e12", "#1c0805"]},
     'zftpd': {"icon": 'https://raw.githubusercontent.com/seregonwar/zftpd/main/assets/zftpd-logo.png', "hero": ''},
 }

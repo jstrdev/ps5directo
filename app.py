@@ -12,6 +12,7 @@ import os
 import posixpath
 import secrets
 import socket
+import subprocess
 import sys
 import threading
 import time
@@ -49,7 +50,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -98,7 +99,7 @@ DEFAULTS = {
     "pc_mode_fmt": "",         # en Modo PC con convert: formato
     "forge_auto_update": False,  # bajar solo las versiones nuevas de PS5 Dump Forge (si no, avisa y pregunta)
     "tour_done": False,       # la guia de bienvenida ya se vio
-    "tour20_done": False,     # la guia de la 2.0 (lo nuevo) ya se vio
+    "tour20_done": False, "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
     "seen_version": "",       # ultima version cuyas novedades ya se ensenaron
     "shortcut_done": False,   # ya se creo el acceso directo del escritorio una vez
     "icon_ver": "",           # version cuyo icono ya se dejo en la cache de la ventana
@@ -848,8 +849,10 @@ def record_history(job):
         link = {"tab": "Transfers", "job": job["id"]}
         if job.get("status") == "hecho":
             notify("ok", "Terminado: %s" % title, ", ".join(job.get("result") or [])[:300], link)
+            ps5_toast("PS5 Directo: listo %s" % title)
         elif job.get("status") == "error":
             notify("err", "Error: %s" % title, job.get("error") or "", link)
+            ps5_toast("PS5 Directo: error en %s" % title)
     except Exception:
         traceback.print_exc()
 
@@ -3116,7 +3119,8 @@ def collection_scan():
             if not os.path.isdir(root):
                 items.append({"path": root, "kind": "missing", "name": root})
                 continue
-            for d, dirs, fs in os.walk(root):
+            unread = []
+            for d, dirs, fs in os.walk(root, onerror=lambda e: unread.append(getattr(e, "filename", "") or str(e))):
                 depth = d[len(root):].count(os.sep)
                 with LOCK:
                     COL["current"] = d
@@ -3160,6 +3164,9 @@ def collection_scan():
                     t = (lib_load().get("titles") or {}).get((tid or "").upper()) or {}
                     items.append({"path": fp, "kind": kind, "name": n, "tid": tid, "title": t.get("title"),
                                   "size": sz, "ext": posixpath.splitext(low)[1].lstrip(".")})
+            # una carpeta que no se pudo leer (disco dormido, NAS caído, permisos): se dice, para no creer que no está
+            for u in unread[:20]:
+                items.append({"path": u, "kind": "missing", "name": u, "unread": True})
         with LOCK:
             COL.update(items=items, t=time.time())
     except Exception as e:
@@ -6855,6 +6862,20 @@ def library_scan(refresh=False):
             user_app = {n.upper() for n, v in listdir("/user/app")}
         except ftplib.all_errors:
             user_app = set()
+        # lo instalado en el SSD M.2 o en un disco de almacenamiento ampliado está en /mnt/extN/user/app
+        ext_app = {}
+        for xb in ("/mnt/ext0", "/mnt/ext1", "/mnt/ext2"):
+            try:
+                for n2, v2 in listdir(xb + "/user/app"):
+                    if v2["type"] == "dir":
+                        ext_app.setdefault(n2.upper(), (xb + "/user/app/" + n2, n2))
+            except ftplib.all_errors:
+                try:
+                    for n2, v2 in E.ftp_listdir(ftp(), xb + "/user/app"):
+                        if v2["type"] == "dir":
+                            ext_app.setdefault(n2.upper(), (xb + "/user/app/" + n2, n2))
+                except ftplib.all_errors:
+                    pass
         for n, v in sorted(meta_list):
             tidu = n.upper()
             if v["type"] != "dir" or not re.match(r"^(PPSA|CUSA)\d{5}$", tidu) or tidu in have:
@@ -6883,11 +6904,17 @@ def library_scan(refresh=False):
             if mf.get("title"):
                 titles.setdefault(tidu, {})["title"] = mf["title"]
             ps4 = tidu.startswith("CUSA")
-            items.append({"path": "/user/app/" + n if tidu in user_app else mp, "name": n, "kind": "installed",
-                          "platform": "PS4" if ps4 else "PS5", "drive": "Interno", "tid": tidu,
+            if tidu in user_app:
+                ipath, idrive = "/user/app/" + n, "Interno"
+            elif tidu in ext_app:
+                ipath, idrive = ext_app[tidu][0], "Ampliado (M.2/USB)"
+            else:
+                ipath, idrive = mp, "Interno"
+            items.append({"path": ipath, "name": n, "kind": "installed",
+                          "platform": "PS4" if ps4 else "PS5", "drive": idrive, "tid": tidu,
                           "title": mf.get("title"), "version": mf.get("version"), "need_fw": mf.get("need_fw"),
                           "cover": bool(mf.get("icon")), "cover_path": mp if mf.get("icon") else None,
-                          "size": (ents.get("/user/app/" + n) or {}).get("size")})
+                          "size": (ents.get(ipath) or ents.get("/user/app/" + n) or {}).get("size")})
         need = [it for it in items if it.get("tid") and not it.get("incomplete") and it["kind"] != "installed"
                 and (not it.get("cover") or not it.get("title"))]
         if need:
@@ -6926,7 +6953,7 @@ def library_scan(refresh=False):
                     it["fw_from_param"] = True
         # tamano de las carpetas (rapido con BFpilot; por FTP seria muy lento)
         if alive:
-            todo = [it for it in items if (it["kind"] == "folder" or (it["kind"] == "installed" and it["path"].startswith("/user/app/")))
+            todo = [it for it in items if (it["kind"] == "folder" or (it["kind"] == "installed" and re.match(r"^(/mnt/ext\d)?/user/app/", it["path"])))
                     and it.get("size") is None]
             for k, it in enumerate(todo):
                 if LIB_CANCEL.is_set():
@@ -8408,7 +8435,10 @@ def rec_list():
             it["installed"] = any(t in have for t in tids) if ok else None
             it["emu"] = bool(c.get("emu"))
             it["ver"] = _emu_vers().get(c["id"]) or ""
-            it["latest"] = rec_latest(c["repo"]) if it["installed"] else ""
+            it["latest"] = rec_latest(rec_repo(c)) if it["installed"] else ""
+            it["repo"] = rec_repo(c)
+            it["official"] = c["repo"]
+            it["alts"] = [c["repo"]] + [r for r in (c.get("alts") or []) if r.lower() != c["repo"].lower()]
             it["guide"] = (c.get("emu") or {}).get("guide") or []
             em = c.get("emu") or {}
             it["has_bios"] = bool(em.get("bios"))
@@ -8603,6 +8633,26 @@ def patches_sync():
     return {"files": n}
 
 
+
+# ---------------------------------------------------------------------------
+# Aviso en la pantalla de la PS5 al terminar un envío (con zftpd cargado: su web acepta /api/notify)
+# ---------------------------------------------------------------------------
+def ps5_toast(text):
+    if not SETTINGS.get("ps5_toasts", True):
+        return
+    host = (SETTINGS.get("ps5_ip") or "").split(":")[0]
+    if not host:
+        return
+    def go():
+        try:
+            u = "http://%s:%d/api/notify?text=%s" % (host, F.Zftpd.PORT, urllib.parse.quote(str(text)[:120]))
+            urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "PS5Directo/" + VERSION}), timeout=4).read(64)
+        except Exception:
+            pass                                  # sin zftpd no hay aviso, y no pasa nada
+    threading.Thread(target=go, daemon=True).start()
+
+
+
 def os_check():
     """Firmware que tienes puesto, si hay Payload Manager y qué tiene en marcha (sin lo del propio sistema)."""
     cfg = cfg_snapshot()
@@ -8644,18 +8694,49 @@ def os_image(oid):
     save_jobs()
     return {"file": a["name"], "size": a.get("size") or 0, "tag": tag}
 
+
+def rec_repo(c):
+    """De qué GitHub se baja este programa: el oficial, otra versión conocida (fork) o una que hayas añadido tú."""
+    want = (SETTINGS.get("rec_src") or {}).get(c["id"]) or ""
+    return want if re.match(r"^[\w.-]+/[\w.-]+$", want) else c["repo"]
+
+
+def rec_source(cid, repo):
+    c = next((x for x in F.CATALOG if x["id"] == cid and x["kind"] == "app"), None)
+    if not c:
+        raise E.PipeError("No lo conozco")
+    repo = (repo or "").strip()
+    m = re.match(r"^(?:https?://github\.com/)?([\w.-]+/[\w.-]+?)(?:\.git)?(?:/.*)?$", repo)
+    if repo and not m:
+        raise E.PipeError("Pon el enlace de GitHub del proyecto (github.com/usuario/proyecto)")
+    repo = m.group(1) if repo else ""
+    if repo and repo.lower() != c["repo"].lower():
+        tag, assets = F.github_release(repo)          # que exista y tenga una versión con algo instalable
+        if not F.pick_asset(assets, c["asset"]):
+            raise E.PipeError("La última versión de %s (%s) no trae un .zip que sepa instalar" % (repo, tag or "?"))
+    src = dict(SETTINGS.get("rec_src") or {})
+    if repo and repo.lower() != c["repo"].lower():
+        src[cid] = repo
+    else:
+        src.pop(cid, None)
+    SETTINGS["rec_src"] = src
+    save_settings()
+    REC_LATEST.pop(rec_repo(c), None)
+    return {"repo": rec_repo(c)}
+
 def rec_install(cid, update=False):
     """Pone en la cola la ultima version oficial (su GitHub) de un programa de «Recomendados». Con update, lo nuevo
     se copia encima de lo que hay (se conservan ajustes, partidas y lo que tengas dentro de su carpeta)."""
     c = next((x for x in F.CATALOG if x["id"] == cid and x["kind"] == "app"), None)
     if not c:
         raise E.PipeError("No lo conozco")
-    tag, assets = F.github_release(c["repo"])
-    REC_LATEST[c["repo"]] = (time.time(), tag)
+    repo = rec_repo(c)
+    tag, assets = F.github_release(repo)
+    REC_LATEST[repo] = (time.time(), tag)
     a = F.pick_asset(assets, c["asset"])
     if not a:
         raise E.PipeError("La última versión de %s (%s) no trae un archivo que sepa instalar. Míralo en su GitHub: "
-                          "github.com/%s/releases" % (c["name"], tag or "?", c["repo"]))
+                          "github.com/%s/releases" % (c["name"], tag or "?", repo))
     job = new_job([a["browser_download_url"]], "", "/data/homebrew", title="%s %s" % (c["name"], tag), where="ps5")
     job["exact_name"] = True
     job["fmt_set"] = True
@@ -8701,17 +8782,193 @@ def rec_latest(repo, max_age=6 * 3600):
     return tag
 
 
+GH_NOTES = {}        # repo -> (hora, [releases])
+
+
+def _md_translate(body, to):
+    """Traduce las notas de una versión línea a línea, sin romper listas, títulos ni código."""
+    lines = body.split("\n")
+    idx, texts, code = [], [], False
+    for i, ln in enumerate(lines):
+        if ln.strip().startswith("```"):
+            code = not code
+            continue
+        m = re.match(r"^(\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s*)*)(.*)$", ln)
+        txt = m.group(2).strip()
+        if code or not re.search(r"[A-Za-zÀ-ÿ]{3}", txt) or re.fullmatch(r"(!?\[[^\]]*\]\([^)]*\)|<[^>]+>|https?://\S+)\s*", txt):
+            continue
+        idx.append((i, m.group(1)))
+        texts.append(txt)
+        if len(texts) >= 160:
+            break
+    if not texts:
+        return body
+    out = tr_texts(texts, to)
+    for (i, pre), t in zip(idx, out):
+        if t:
+            t = re.sub(r"\*\*\s*(.+?)\s*\*\*", r"**\1**", t)
+            t = re.sub(r"`\s*([^`]+?)\s*`", r"`\1`", t)
+            lines[i] = pre + t
+    return "\n".join(lines)
+
+
+def gh_notes(repo, have="", to=""):
+    """Las notas de las versiones de un proyecto de GitHub más nuevas que la que tienes (como mucho 6)."""
+    repo = (repo or "").strip().strip("/")
+    if not re.match(r"^[\w.-]+/[\w.-]+$", repo):
+        raise E.PipeError("Ese proyecto no está en GitHub")
+    hit = GH_NOTES.get(repo.lower())
+    if hit and time.time() - hit[0] < 1800:
+        rels = hit[1]
+    else:
+        try:
+            req = urllib.request.Request(F.GH_API + "/repos/%s/releases?per_page=15" % repo, headers=F._ua())
+            with urllib.request.urlopen(req, timeout=20) as r:
+                rels = [x for x in json.load(r) if not x.get("draft")]
+        except urllib.error.HTTPError as e:
+            if e.code in (403, 429):
+                raise E.PipeError("GitHub ha limitado las consultas desde tu conexión: prueba en un rato o léelas en GitHub")
+            raise E.PipeError("No he podido leer las notas en GitHub (%s)" % E.net_reason(e))
+        except Exception as e:
+            raise E.PipeError("No he podido leer las notas en GitHub (%s)" % E.net_reason(e))
+        GH_NOTES[repo.lower()] = (time.time(), rels)
+    norm = lambda t: re.sub(r"^[vV]", "", (t or "").strip()).lower()
+    have_n = norm(have)
+    out = []
+    for x in rels:
+        tag = x.get("tag_name") or ""
+        if have_n and have_n not in ("propio",):
+            if norm(tag) == have_n:
+                break
+            if re.search(r"\d", have_n) and re.search(r"\d", tag) and _vtuple(tag) < _vtuple(have_n):
+                break
+        if x.get("prerelease") and out == [] and any(not y.get("prerelease") for y in rels):
+            continue          # las de prueba solo si no hay otra cosa
+        out.append({"tag": tag, "name": (x.get("name") or tag).strip(), "date": (x.get("published_at") or "")[:10],
+                    "url": x.get("html_url") or "", "body": (x.get("body") or "").strip()[:8000]})
+        if len(out) >= (6 if have_n else 1):
+            break
+    if to:
+        for it in out:
+            it["body"] = _md_translate(it["body"], to)
+    return {"items": out, "url": "https://github.com/%s/releases" % repo}
+
+
+# ---------------------------------------------------------------------------
+# Jugar en el PC: PS5 Directo no emite nada; abre chiaki-ng (si lo tienes) directo en tu consola
+# ---------------------------------------------------------------------------
+CHIAKI_FLATPAK = "io.github.streetpea.Chiaki4deck"
+
+
+def chiaki_find():
+    """El chiaki-ng del PC: el que elegiste, o el de los sitios donde suele instalarse."""
+    import glob
+    import shutil
+    own = (SETTINGS.get("chiaki_path") or "").strip()
+    if own and os.path.isfile(own):
+        return [own]
+    cands = []
+    if os.name == "nt":
+        for base in (os.environ.get("ProgramFiles"), os.environ.get("ProgramFiles(x86)"),
+                     os.path.join(os.environ.get("LOCALAPPDATA") or "", "Programs"), os.environ.get("LOCALAPPDATA"),
+                     os.path.join(os.path.expanduser("~"), "Downloads"), os.path.join(os.path.expanduser("~"), "Desktop")):
+            if base:
+                cands += glob.glob(os.path.join(base, "chiaki*", "chiaki*.exe")) + \
+                    glob.glob(os.path.join(base, "chiaki*", "*", "chiaki*.exe"))
+    elif sys.platform == "darwin":
+        cands += glob.glob("/Applications/chiaki*.app/Contents/MacOS/chiaki*") + \
+            glob.glob(os.path.expanduser("~/Applications/chiaki*.app/Contents/MacOS/chiaki*"))
+    else:
+        for n in ("chiaki-ng", "chiaki"):
+            w = shutil.which(n)
+            if w:
+                cands.append(w)
+        cands += glob.glob(os.path.expanduser("~/Applications/chiaki*.AppImage")) + \
+            glob.glob(os.path.expanduser("~/Downloads/chiaki*.AppImage"))
+    cands = [c for c in cands if os.path.isfile(c) and not re.search(r"(?i)unins|setup|install", os.path.basename(c))]
+    if cands:
+        return [sorted(cands, key=lambda c: ("ng" not in c.lower(), len(c)))[0]]
+    if os.name != "nt" and sys.platform != "darwin" and shutil.which("flatpak"):
+        try:
+            r = subprocess.run(["flatpak", "info", CHIAKI_FLATPAK], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=8)
+            if r.returncode == 0:
+                return ["flatpak", "run", CHIAKI_FLATPAK]
+        except Exception:
+            pass
+    return None
+
+
+def ps5_discover(host, timeout=1.5):
+    """Pregunta a la consola por la red local si está encendida o en reposo (el «SRCH» que usa cualquier
+    Remote Play: sin cuentas ni claves). Devuelve {"state": "on"|"standby", "name": ...} o None."""
+    import socket
+    if not host:
+        return None
+    msg = b"SRCH * HTTP/1.1\ndevice-discovery-protocol-version:00030010\n"
+    try:
+        sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sk.settimeout(timeout)
+        try:
+            for _ in range(2):
+                sk.sendto(msg, (host, 9302))
+                try:
+                    data = sk.recv(2048).decode("utf-8", "replace")
+                    break
+                except socket.timeout:
+                    data = ""
+        finally:
+            sk.close()
+    except OSError:
+        return None
+    if not data:
+        return None
+    head = data.split("\n", 1)[0]
+    kv = dict(ln.split(":", 1) for ln in data.splitlines()[1:] if ":" in ln)
+    return {"state": "on" if " 200" in head else "standby" if "620" in head else "other",
+            "name": (kv.get("host-name") or "").strip()}
+
+
+def rp_state():
+    exe = chiaki_find()
+    host = E.clean_host(SETTINGS.get("ps5_ip") or "")[0]
+    d = ps5_discover(host)
+    return {"chiaki": bool(exe), "path": (exe or [""])[-1] if exe and exe[0] != "flatpak" else ("Flatpak" if exe else ""),
+            "own": bool(SETTINGS.get("chiaki_path")), "host": host, "console": d,
+            "nick": SETTINGS.get("rp_nick") or (d or {}).get("name") or ""}
+
+
+def rp_play(open_only=False, full=False, ds=False, nick=""):
+    exe = chiaki_find()
+    if not exe:
+        raise E.PipeError("No encuentro chiaki-ng en este PC: instálalo o dime dónde está")
+    host = E.clean_host(SETTINGS.get("ps5_ip") or "")[0]
+    nick = (nick or SETTINGS.get("rp_nick") or "").strip()
+    if not open_only:
+        d = ps5_discover(host) or {}
+        nick = nick or d.get("name") or ""
+        if not host or not nick:
+            raise E.PipeError("No sé el nombre de tu consola: escríbelo tal como sale en chiaki-ng")
+        if d.get("state") == "standby":
+            open_only = True       # dormida: chiaki-ng normal la despierta al elegirla
+    args = list(exe) + ([] if open_only else ["stream", nick, host] + (["--fullscreen"] if full else []) +
+                        (["--dualsense"] if ds else []))
+    kw = {"creationflags": 0x00000008 | 0x00000200} if os.name == "nt" else {"start_new_session": True}
+    subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                     cwd=os.path.dirname(exe[-1]) if exe[0] != "flatpak" else None, **kw)
+    return {"opened": "app" if open_only else "stream"}
+
+
 def emu_news():
     """Cada 6 h: si hay version nueva de un emulador que tienes, avisa en la campana (una vez por version)."""
     vers = _emu_vers()
     for c in F.CATALOG:
         if c.get("kind") != "app" or c["id"] not in vers:
             continue
-        new = rec_latest(c["repo"])
+        new = rec_latest(rec_repo(c))
         if new and new != vers[c["id"]]:
             notify("info", "Versión nueva de %s: %s" % (c["name"], new),
-                   "Tienes la %s. Actualízalo en Biblioteca › ⭐ Recomendados: se conservan tus ajustes, partidas, "
-                   "BIOS y contenido." % vers[c["id"]], {"tab": "Library", "view": "rec"}, key="emu:%s:%s" % (c["id"], new))
+                   "Tienes la %s. En Descubrir, «Qué cambia» te enseña sus novedades y «Actualizar» la pone sin tocar "
+                   "tus ajustes, partidas, BIOS ni contenido." % vers[c["id"]], {"tab": "Library", "view": "rec"}, key="emu:%s:%s" % (c["id"], new))
 
 
 def _emu_cat(cid):
@@ -8808,7 +9065,7 @@ def emu_info(cid):
                games_dir=em.get("games") or "", games_label=em.get("games_label") or "", exp=bool(c.get("exp")),
                needs=c.get("needs") or "", installed=bool(out["dirs"].get("app")), tid=c["tid"],
                saves=any(e["id"] == c["tid"] or c["tid"] in (e.get("also") or []) for e in EMU_SAVES),
-               guide=em.get("guide") or [], ver=_emu_vers().get(cid) or "", latest=rec_latest(c["repo"]))
+               guide=em.get("guide") or [], ver=_emu_vers().get(cid) or "", latest=rec_latest(rec_repo(c)))
     return out
 
 
@@ -8977,8 +9234,9 @@ LAN_DEVICES = {}     # ip -> {name, first, last, n}: moviles que han entrado con
 LAN_DENY = {"/api/archive/list", "/api/archived/reveal", "/api/emu/put", "/api/shots/send", "/api/cloud/install", "/api/cloud/add", "/api/cloud/manual", "/api/cloud/remove", "/api/trash/delete", "/api/col/reveal", "/api/forge/update", "/api/job/reveal", "/api/bk/restore", "/api/bk/open", "/api/report/open", "/api/col/set", "/api/col/libdir",
             "/api/col/openlibdir", "/api/lan/firewall", "/api/lan/hits", "/api/update/zip", "/api/update/github", "/api/quit", "/api/pick", "/api/open_ext_folder",
             "/api/fm/open_local", "/api/lan", "/api/forge/download", "/api/payload/file", "/api/fixperms",
-            "/api/ext/openpage", "/api/ext/setup", "/api/ui/focus", "/api/youtube", "/api/bug/list"}
-LAN_LOCKED = {"sevenzip_path", "forge_path", "pc_temp_dir", "pc_library_dir", "update_repo", "lan_access", "lan_port", "lan_token",
+            "/api/ext/openpage", "/api/ext/setup", "/api/ui/focus", "/api/youtube", "/api/bug/list",
+            "/api/rp/play", "/api/rp/path"}
+LAN_LOCKED = {"sevenzip_path", "forge_path", "chiaki_path", "pc_temp_dir", "pc_library_dir", "update_repo", "lan_access", "lan_port", "lan_token",
               "shots_tg_token", "shots_tg_chat", "shots_dc_hook"}
 
 
@@ -9971,7 +10229,7 @@ def github_latest(repo):
     repo = (repo or "").strip().strip("/")
     if not re.match(r"^[\w.-]+/[\w.-]+$", repo):
         raise E.PipeError("Pon el repositorio como usuario/nombre en Ajustes")
-    req = urllib.request.Request("https://api.github.com/repos/%s/releases/latest" % repo,
+    req = urllib.request.Request(F.GH_API + "/repos/%s/releases/latest" % repo,
                                  headers={"User-Agent": "PS5Directo/" + VERSION,
                                           "Accept": "application/vnd.github+json"})
     try:
@@ -9991,6 +10249,45 @@ def github_latest(repo):
         url = zips[0].get("browser_download_url")
     url = url or j.get("zipball_url")
     return (j.get("tag_name") or "").lstrip("vV"), url, (j.get("body") or "")[:12000]
+
+
+UPD_DL = {"got": 0, "size": 0}
+
+
+def _download_update(url, limit=60 * 1024 * 1024):
+    """Baja el zip de la versión nueva sin límite de tiempo total: si la conexión se corta, sigue donde iba
+    (hasta 5 veces). UPD_DL lleva lo bajado, para la barra."""
+    buf = bytearray()
+    UPD_DL.update(got=0, size=0)
+    for attempt in range(6):
+        hd = {"User-Agent": "PS5Directo/" + VERSION}
+        if buf:
+            hd["Range"] = "bytes=%d-" % len(buf)
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=hd), timeout=60) as r:
+                if buf and r.status != 206:
+                    buf = bytearray()          # el servidor no sabe seguir: de cero
+                tot = r.headers.get("Content-Length")
+                if tot and tot.isdigit():
+                    UPD_DL["size"] = len(buf) + int(tot)
+                while True:
+                    ch = r.read(256 * 1024)
+                    if not ch:
+                        break
+                    buf += ch
+                    UPD_DL["got"] = len(buf)
+                    if len(buf) > limit:
+                        raise E.PipeError("El zip de la actualización es demasiado grande")
+            if not UPD_DL["size"] or len(buf) >= UPD_DL["size"]:
+                return bytes(buf)
+        except E.PipeError:
+            raise
+        except Exception as e:
+            if attempt == 5:
+                raise E.PipeError("La descarga de la actualización se cortó (%s). Prueba otra vez: sigue donde iba"
+                                  % E.net_reason(e))
+            time.sleep(2 + attempt * 2)
+    return bytes(buf)
 
 
 def _github_latest_web(repo):
@@ -10432,26 +10729,32 @@ class Handler(BaseHTTPRequestHandler):
         if p == "/api/update/check":
             try:
                 ver, url, notes = github_latest(update_repo())
-            except Exception as e:
+            except E.PipeError as e:
                 return self._send(200, {"ok": False, "error": str(e)})
+            except Exception as e:
+                return self._send(200, {"ok": False, "error": "No he podido consultar GitHub (%s)" % E.net_reason(e)})
             if _ver_tuple(ver) > _ver_tuple(VERSION):
                 notify("info", "Hay una versión nueva: %s" % ver, "Pulsa Actualizar arriba para instalarla.",
                        {"action": "update"}, key="update:" + ver)
-            return self._send(200, {"ok": True, "current": VERSION, "latest": ver, "notes": notes,
-                                    "newer": _ver_tuple(ver) > _ver_tuple(VERSION)})
+            newer = _ver_tuple(ver) > _ver_tuple(VERSION)
+            try:      # todas las versiones que te faltan, no solo la última
+                nl = gh_notes(update_repo(), VERSION if newer else "")["items"]
+            except Exception:
+                nl = []
+            return self._send(200, {"ok": True, "current": VERSION, "latest": ver, "notes": notes, "notes_list": nl,
+                                    "newer": newer})
         if p == "/api/update/github":
             try:
                 ver, url, _ = github_latest(update_repo())
                 if not url:
                     raise E.PipeError("Esa release no tiene un .zip")
-                req = urllib.request.Request(url, headers={"User-Agent": "PS5Directo/" + VERSION})
-                with urllib.request.urlopen(req, timeout=120) as r:
-                    data = r.read(50 * 1024 * 1024)
-                ver = install_zip(data)
+                ver = install_zip(_download_update(url))
             except Exception as e:
                 return self._send(400, {"ok": False, "error": str(e)})
             restart_soon()
             return self._send(200, {"ok": True, "version": ver})
+        if p == "/api/update/progress":
+            return self._send(200, {"ok": True, **UPD_DL})
         if p == "/api/whatsnew":
             return self._send(200, dict(ok=True, **whats_new("en" if b.get("lang") == "en" else "es", bool(b.get("all")))))
         if p == "/api/whatsnew/seen":
@@ -11496,10 +11799,10 @@ def recomp_fetch(force=False):
         except Exception:
             pass
         known = set(prev.get("known") or [])
-        seen_at = dict(prev.get("seen_at") or {})      # cuándo vio PS5 Directo cada cosa por primera vez
+        seen_at = dict(prev.get("seen_at2") or {})     # cuándo vio PS5 Directo cada cosa por primera vez
         now = int(time.time())
-        for it in items:
-            seen_at.setdefault(it["id"], 0 if not known else now)
+        for it in items:                              # lo que ya conocía antes de guardar fechas cuenta como «de siempre»
+            seen_at.setdefault(it["id"], 0 if (not known or it["id"] in known or not prev.get("seen_at2")) else now)
             it["seen"] = seen_at[it["id"]]
         first = not known
         for it in items:
@@ -11508,7 +11811,7 @@ def recomp_fetch(force=False):
         unseen = [it["id"] for it in items if it["new"]]
         try:
             with open(RECOMP_FILE, "w", encoding="utf-8") as fh:
-                json.dump({"known": [it["id"] for it in items], "unseen": unseen, "seen_at": seen_at}, fh)
+                json.dump({"known": [it["id"] for it in items], "unseen": unseen, "seen_at2": seen_at}, fh)
         except OSError:
             pass
         with LOCK:
@@ -11921,6 +12224,28 @@ def extra_api(h, p, b):
             return {"ok": True, "ip": ip, "mac": mac, "bcast": ip.rsplit(".", 1)[0] + ".255" if ip else ""}
         if p == "/api/rec/list":
             return dict(ok=True, **rec_list())
+        if p == "/api/gh/notes":
+            return dict(ok=True, **gh_notes(str(b.get("repo") or ""), str(b.get("have") or ""),
+                                            str(b.get("to") or "") if b.get("to") in ("es", "en") else ""))
+        if p == "/api/rp/state":
+            return dict(ok=True, **rp_state())
+        if p == "/api/rp/play":
+            if b.get("nick") is not None:
+                with LOCK:
+                    SETTINGS["rp_nick"] = str(b.get("nick") or "").strip()[:80]
+                save_settings()
+            return dict(ok=True, **rp_play(bool(b.get("open")), bool(b.get("full")), bool(b.get("ds"))))
+        if p == "/api/rp/path":
+            pth = pick_paths("files", "Dónde está chiaki-ng (chiaki.exe, la .app o la AppImage)")
+            if pth:
+                f = pth[0]
+                if f.endswith(".app") and os.path.isdir(f):
+                    import glob
+                    f = (glob.glob(os.path.join(f, "Contents", "MacOS", "*")) or [f])[0]
+                with LOCK:
+                    SETTINGS["chiaki_path"] = f
+                save_settings()
+            return dict(ok=True, **rp_state())
         if p == "/api/tr":
             return {"ok": True, "out": tr_texts([str(x) for x in (b.get("texts") or [])][:80], str(b.get("to") or "es"))}
         if p == "/api/recomp/install":
@@ -11933,6 +12258,8 @@ def extra_api(h, p, b):
             return dict(ok=True, **os_check())
         if p == "/api/os/image":
             return dict(ok=True, **os_image(str(b.get("id") or "")))
+        if p == "/api/rec/source":
+            return dict(ok=True, **rec_source(str(b.get("id") or ""), str(b.get("repo") or "")))
         if p == "/api/rec/kinds":
             # Title ID -> categoria de «Descubrir», sin red: para el filtro de tipo de la biblioteca
             kinds, art = {}, {}
