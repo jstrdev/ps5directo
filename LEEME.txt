@@ -393,6 +393,9 @@ NOVEDADES 2.0.3
   la consola, con acceso directo a su ficha.
 - Una vez, al abrir esta versión: un aviso que recuerda que puedes
   convertir tus títulos a LZ4 o zstd para que ocupen mucho menos.
+- Móvil: la barra de pestañas vuelve a estar fija abajo (la 2.0.2 la
+  había movido arriba sin querer) y la cabecera ya no se queda pegada
+  ocupando media pantalla.
 - Biblioteca: los títulos empaquetados en zstd salen como «zstd» (antes
   ponía LZ4).
 - Diagnóstico de velocidad: cada 15 s el registro del envío dice (📊) la
