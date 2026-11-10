@@ -362,12 +362,16 @@ def main(out, props_out=""):
         have.add(x["repo"].lower())
     # propuestas de tarjeta: proyectos nuevos que se pueden instalar y tienen nota
     props = []
+    have_tid = {(c.get("tid") or "").upper() for c in F.CATALOG} - {""}
     for x in items:
         if x["kind"] != "new":
             continue
         pr = None
         if x.get("installable") and x["score"] >= PROPOSE_MIN:
             pr = proposal(x, x["_rel"], x["installable"], x["_asset"] or {})
+            if pr and (pr["card"].get("tid") or "").upper() in have_tid:
+                print("ya está en Descubrir con otro nombre (misma carpeta):", x["repo"])
+                continue
         if not pr and x["score"] >= PROPOSE_LINK_MIN:
             pr = proposal_link(x)
         if pr:

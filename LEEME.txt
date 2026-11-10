@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.0
+PS5 DIRECTO 2.1.1
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,14 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.1.1
+- «Añadidos por ti» compartidos: la lista se guarda también en la consola
+  (/data/ps5directo/anadidos.json), así que lo que añades, cambias de
+  sección o quitas en el PC sale igual en el móvil sin PC (y al revés) o en
+  otro PC. Gana siempre el último cambio.
+- Porpoise (GameCube y Wii) cambió el nombre de su proyecto en GitHub:
+  PS5 Directo ya usa el nuevo.
 
 NOVEDADES 2.1.0
 - «Añadidos por ti» con buscador: escribe un nombre (por ejemplo «rpcs3» o

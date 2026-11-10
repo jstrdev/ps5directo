@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.0 — USER GUIDE (English)
+PS5 DIRECTO 2.1.1 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,13 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.1.1 - "Added by you" is shared: the list is also kept on the console
+    (/data/ps5directo/anadidos.json), so what you add, move to another
+    section or remove on the PC shows the same on the phone without a PC
+    (and the other way round) or on another PC. The latest change wins.
+  - Porpoise (GameCube and Wii) renamed its GitHub project: PS5 Directo now
+    uses the new one.
+
 2.1.0 - "Added by you" has a search box: type a name (for example "rpcs3"
     or "jellyfin") and PS5 Directo searches GitHub for matching PS5
     projects, with their stars and last update, and you add them with one

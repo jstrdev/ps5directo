@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.1.0"
+VERSION = "2.1.1"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -105,7 +105,7 @@ DEFAULTS = {
     "pc_mode_fmt": "",         # en Modo PC con convert: formato
     "forge_auto_update": False,  # bajar solo las versiones nuevas de PS5 Dump Forge (si no, avisa y pregunta)
     "tour_done": False,       # la guia de bienvenida ya se vio
-    "tour20_done": False, "spot_packs": False, "spot_ver": "", "spot_done": "", "spot_hint_x": "", "emu_vers_t": {}, "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
+    "tour20_done": False, "spot_packs": False, "spot_ver": "", "spot_done": "", "spot_hint_x": "", "emu_vers_t": {}, "mine_del": {}, "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
     "seen_version": "",       # ultima version cuyas novedades ya se ensenaron
     "shortcut_done": False,   # ya se creo el acceso directo del escritorio una vez
     "icon_ver": "",           # version cuyo icono ya se dejo en la cache de la ventana
@@ -8706,7 +8706,7 @@ def rec_list():
         inst = {c["id"] for c in F.CATALOG if c.get("kind") == "app"
                 and any(t in have for t in [c.get("tid")] + list(c.get("also") or []))}
         try:
-            E.Ftp(cfg).call(lambda f: console_vers_sync(f, inst))
+            E.Ftp(cfg).call(lambda f: (console_vers_sync(f, inst), mine_sync(f)))
         except Exception as e:
             print("No pude leer las versiones de la consola: %s" % e)
     out = []
@@ -9157,9 +9157,11 @@ def mine_show(cid, show):
     for x in lst:
         if x["id"] == cid:
             x["show"] = show if show in MINE_SHOW else ""
+            x["t"] = time.time()
     with LOCK:
         _save_json(MINE_FILE, lst)
         _mine_apply(lst)
+    mine_push()
     return {}
 
 
@@ -9270,11 +9272,13 @@ def mine_add(text, show=None):
                    guide=["Ábrelo en GitHub y sigue su guía (el README).",
                           "Te aviso en la campana cuando saque una versión nueva."])
     ent["seen"] = tag or ""
+    ent["t"] = time.time()
     ent["show"] = show if show in MINE_SHOW else "" if show == "" else _mine_guess(" ".join([real, what, " ".join(names)]))
     lst = [x for x in lst if x["id"] != ent["id"]] + [ent]
     with LOCK:
         _save_json(MINE_FILE, lst)
         _mine_apply(lst)
+    mine_push()
     return {"id": ent["id"], "name": ent["name"], "kind": ent["kind"], "tag": tag, "learn": ent["kind"] == "app" and not ent.get("tid")}
 
 
@@ -9293,9 +9297,11 @@ def mine_learn(lt):
         if x["id"] == lt.get("id") and not x.get("tid"):
             x["tid"] = new[0]
             x["sys"] = "Aplicación · " + new[0]
+            x["t"] = time.time()
     with LOCK:
         _save_json(MINE_FILE, lst)
         _mine_apply(lst)
+    mine_push()
 
 
 def mine_follow():
@@ -9322,7 +9328,74 @@ def mine_del(cid):
     with LOCK:
         _save_json(MINE_FILE, lst)
         _mine_apply(lst)
+        dl = dict(SETTINGS.get("mine_del") or {})
+        dl[cid] = time.time()
+        SETTINGS["mine_del"] = dl
+    save_settings()
+    mine_push()
     return {}
+
+
+# «Añadidos por ti» compartidos: la lista también se guarda EN LA CONSOLA, así el PC, el móvil sin PC u otro PC
+# tienen la misma. Gana el último cambio (al añadir, al cambiar de sección o al quitar).
+PS5_MINE_PATH = "/data/ps5directo/anadidos.json"
+
+
+def _mine_t(x):
+    return float(x.get("t") or x.get("added") or 0)
+
+
+def mine_sync(f):
+    buf = bytearray()
+    try:
+        f.retrbinary("RETR " + PS5_MINE_PATH, buf.extend, 65536)
+        con = json.loads(bytes(buf).decode("utf-8", "replace") or "{}")
+    except Exception:
+        con = {}
+    citems = {x["id"]: x for x in con.get("items") or [] if isinstance(x, dict) and x.get("id") and x.get("repo")}
+    cdel = {k: float(v) for k, v in (con.get("deleted") or {}).items() if isinstance(v, (int, float))}
+    loc = {x["id"]: x for x in _mine_read()}
+    ldel = {k: float(v) for k, v in (SETTINGS.get("mine_del") or {}).items()}
+    dele = dict(cdel)
+    for k, v in ldel.items():
+        dele[k] = max(v, dele.get(k, 0))
+    merged = {}
+    for cid in set(citems) | set(loc):
+        a, b = loc.get(cid), citems.get(cid)
+        x = a if not b else b if not a else (a if _mine_t(a) >= _mine_t(b) else b)
+        if dele.get(cid, 0) >= _mine_t(x):
+            continue                                  # se quitó después de añadirlo (aquí o en otro sitio)
+        merged[cid] = x
+    lst = sorted(merged.values(), key=_mine_t)[:MINE_MAX]
+    cutoff = time.time() - 180 * 86400            # lo quitado hace más de medio año ya no hace falta recordarlo
+    dele = {k: v for k, v in dele.items() if v > cutoff}
+    if [x["id"] for x in lst] != [x["id"] for x in _mine_read()] or any(
+            json.dumps(x, sort_keys=True) != json.dumps(loc.get(x["id"]), sort_keys=True) for x in lst):
+        with LOCK:
+            _save_json(MINE_FILE, lst)
+            _mine_apply(lst)
+    if dele != ldel:
+        with LOCK:
+            SETTINGS["mine_del"] = dele
+        save_settings()
+    new_con = {"_como": "Lo escribe PS5 Directo: tus «Añadidos por ti», para que el PC y el móvil tengan los mismos.",
+               "items": lst, "deleted": dele}
+    if json.dumps(new_con.get("items"), sort_keys=True) != json.dumps(list(citems.values()), sort_keys=True) or dele != cdel:
+        try:
+            f.mkd(PS5_VER_DIR)
+        except ftplib.all_errors:
+            pass
+        f.storbinary("STOR " + PS5_MINE_PATH, io.BytesIO(json.dumps(new_con, ensure_ascii=False, indent=1).encode("utf-8")))
+
+
+def mine_push():
+    """Tras añadir, cambiar o quitar: se apunta en la consola en segundo plano (si no está, ya se hará luego)."""
+    def run():
+        try:
+            E.Ftp(cfg_snapshot()).call(mine_sync)
+        except Exception as e:
+            print("No pude guardar tus añadidos en la consola: %s" % e)
+    threading.Thread(target=run, daemon=True).start()
 
 
 try:
