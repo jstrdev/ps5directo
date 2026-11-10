@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.9 — USER GUIDE (English)
+PS5 DIRECTO 2.1.0 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,19 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.1.0 - "Added by you" has a search box: type a name (for example "rpcs3"
+    or "jellyfin") and PS5 Directo searches GitHub for matching PS5
+    projects, with their stars and last update, and you add them with one
+    click. Pasting the link still works.
+  - What you add can also show in its Discover section (Emulators, Apps and
+    media, Tools…): PS5 Directo picks the right one or you choose it, and
+    you can change it any time from its card.
+  - On the phone, tapping a button no longer shows the browser's blue box:
+    it sinks slightly, like on the PC. And cards no longer stay "lifted"
+    after you tap them.
+  - "⋯ › Check for updates" always stands out in the menu, and glows when
+    there's a new version.
+
 2.0.9 - Fixed: the animated line under the selected tab (and other button
     decorations) got cut off when switching tabs. The 2.0.8 "working" spinner
     no longer shows on tabs or selectors.

@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.9"
+VERSION = "2.1.0"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -8711,7 +8711,7 @@ def rec_list():
             print("No pude leer las versiones de la consola: %s" % e)
     out = []
     for c in F.CATALOG:
-        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam", "mine", "auto_tr") if k in c}
+        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam", "mine", "auto_tr", "show") if k in c}
         it["exp"] = bool(c.get("exp"))
         it["sys"] = c.get("sys", "")
         it["update"] = c.get("update", "")
@@ -9106,6 +9106,7 @@ def _mine_apply(lst):
     F.EXTRA_PAYLOADS[:] = [p for p in F.EXTRA_PAYLOADS if not p.get("mine")]
     for x in lst:
         c = {"id": x["id"], "kind": x["kind"], "group": "mine", "name": x["name"], "repo": x["repo"], "mine": True,
+             "show": x.get("show") if x.get("show") in MINE_SHOW else "",
              "what": x.get("what") or "Añadido por ti desde GitHub.", "sys": x.get("sys") or ""}
         if x["kind"] == "app":
             c["tid"] = x.get("tid") or ""
@@ -9132,7 +9133,77 @@ def _asset_rx(name, ext):
     return out
 
 
-def mine_add(text):
+MINE_SHOW = ("emu", "media", "rp", "tool", "patch", "os")
+
+
+def _mine_guess(text):
+    """En qué sección de Descubrir sale también (según lo que dice de sí mismo)."""
+    t = (text or "").lower()
+    if re.search(r"emulat|rpcs|pcsx|ppsspp|dolphin|retroarch|mame|\bnes\b|snes|n64|gamecube|switch|dreamcast|saturn|xbox|psp\b|ps1\b|ps2\b|ps3\b", t):
+        return "emu"
+    if re.search(r"media|video|vídeo|player|kodi|jellyfin|plex|emby|music|youtube|stream", t):
+        return "media"
+    if re.search(r"remote ?play|chiaki", t):
+        return "rp"
+    if re.search(r"patch|parche|60 ?fps|cheat|mod\b|trainer", t):
+        return "patch"
+    if re.search(r"linux|ubuntu|steam|windows|proton|bazzite", t):
+        return "os"
+    return "tool"
+
+
+def mine_show(cid, show):
+    lst = _mine_read()
+    for x in lst:
+        if x["id"] == cid:
+            x["show"] = show if show in MINE_SHOW else ""
+    with LOCK:
+        _save_json(MINE_FILE, lst)
+        _mine_apply(lst)
+    return {}
+
+
+def mine_search(q):
+    """Busca proyectos de PS5 en GitHub por nombre (para «Añadidos por ti»)."""
+    q = re.sub(r"[^\w .+-]", " ", q or "").strip()[:60]
+    if len(q) < 2:
+        raise E.PipeError("Escribe al menos 2 letras")
+    have = {(c.get("repo") or "").lower(): c for c in F.CATALOG}
+    for c in F.CATALOG:
+        for a in c.get("alts") or []:
+            have.setdefault(a.lower(), c)
+    out, seen = [], set()
+    for qq in ("%s ps5 in:name,description,topics" % q, "%s in:name,description,topics" % q):
+        try:
+            req = urllib.request.Request(F.GH_API + "/search/repositories?" + urllib.parse.urlencode(
+                {"q": qq, "sort": "stars", "per_page": 15}), headers=F._ua())
+            with urllib.request.urlopen(req, timeout=20) as r:
+                items = json.load(r).get("items") or []
+        except urllib.error.HTTPError as e:
+            if e.code in (403, 429):
+                raise E.PipeError("GitHub ha limitado las búsquedas desde tu conexión: prueba en un minuto")
+            raise E.PipeError("No he podido buscar en GitHub (HTTP %d)" % e.code)
+        except Exception as e:
+            raise E.PipeError("No he podido buscar en GitHub (%s)" % E.net_reason(e))
+        for r in items:
+            full = r.get("full_name") or ""
+            text = " ".join([full, r.get("description") or ""] + list(r.get("topics") or []))
+            if not full or full.lower() in seen or r.get("fork") or SCENE_SKIP_RX.search(text):
+                continue
+            if qq.endswith("topics") and " ps5 " not in qq and not re.search(r"(?i)ps5|playstation ?5|prospero", text):
+                continue                          # la segunda búsqueda, solo lo que es de PS5
+            seen.add(full.lower())
+            c = have.get(full.lower())
+            out.append({"repo": full, "name": r.get("name") or full, "desc": (r.get("description") or "")[:200],
+                        "stars": int(r.get("stargazers_count") or 0), "updated": (r.get("pushed_at") or "")[:10],
+                        "in": c["name"] if c and not c.get("mine") else "", "mine": bool(c and c.get("mine")),
+                        "owner_img": "https://github.com/%s.png" % full.split("/")[0]})
+        if len(out) >= 8:
+            break
+    return {"items": out[:15]}
+
+
+def mine_add(text, show=None):
     m = re.match(r"^\s*(?:https?://)?(?:www\.)?(?:github\.com/)?([\w.-]+)/([\w.-]+?)(?:\.git)?(?:[/#?].*)?\s*$", text or "")
     if not m:
         raise E.PipeError("Pega el enlace de GitHub del proyecto (github.com/autor/proyecto)")
@@ -9199,6 +9270,7 @@ def mine_add(text):
                    guide=["Ábrelo en GitHub y sigue su guía (el README).",
                           "Te aviso en la campana cuando saque una versión nueva."])
     ent["seen"] = tag or ""
+    ent["show"] = show if show in MINE_SHOW else "" if show == "" else _mine_guess(" ".join([real, what, " ".join(names)]))
     lst = [x for x in lst if x["id"] != ent["id"]] + [ent]
     with LOCK:
         _save_json(MINE_FILE, lst)
@@ -13177,7 +13249,11 @@ def extra_api(h, p, b):
                             art[t.upper()] = ic
             return {"ok": True, "kinds": kinds, "art": art}
         if p == "/api/rec/mine/add":
-            return dict(ok=True, **mine_add(str(b.get("repo") or "")))
+            return dict(ok=True, **mine_add(str(b.get("repo") or ""), b.get("show") if "show" in b else None))
+        if p == "/api/rec/mine/show":
+            return dict(ok=True, **mine_show(str(b.get("id") or ""), str(b.get("show") or "")))
+        if p == "/api/rec/mine/search":
+            return dict(ok=True, **mine_search(str(b.get("q") or "")))
         if p == "/api/rec/mine/del":
             return dict(ok=True, **mine_del(str(b.get("id") or "")))
         if p == "/api/rec/install":

@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.9
+PS5 DIRECTO 2.1.0
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,20 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.1.0
+- «Añadidos por ti» con buscador: escribe un nombre (por ejemplo «rpcs3» o
+  «jellyfin») y PS5 Directo busca en GitHub los proyectos de PS5 que
+  encajan, con sus estrellas y cuándo se actualizaron, y los añades con un
+  botón. También se puede seguir pegando el enlace.
+- Lo que añades puede salir también en su sección de Descubrir
+  (Emuladores, Apps y multimedia, Herramientas…): PS5 Directo elige la que
+  le toca o la eliges tú, y se cambia cuando quieras desde su tarjeta.
+- En el móvil, al tocar un botón ya no sale el recuadro azul del
+  navegador: se hunde un poco, como en el PC. Y las tarjetas ya no se
+  quedan «levantadas» después de tocarlas.
+- «⋯ › Buscar actualizaciones» se distingue siempre en el menú, y brilla
+  cuando hay versión nueva.
 
 NOVEDADES 2.0.9
 - Arreglado: la raya animada de debajo de la pestaña elegida (y otros
