@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.8 — USER GUIDE (English)
+PS5 DIRECTO 2.0.9 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,10 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.0.9 - Fixed: the animated line under the selected tab (and other button
+    decorations) got cut off when switching tabs. The 2.0.8 "working" spinner
+    no longer shows on tabs or selectors.
+
 2.0.8 - PS3 in Discover › Emulators: RPCS3 for PS5 (PPSA99300), the PS3
     emulator as a native PS5 title. Its licenses don't allow sharing it built,
     so the card explains how to build it on a Linux PC, where your PS3

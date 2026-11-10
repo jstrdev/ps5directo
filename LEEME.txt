@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.8
+PS5 DIRECTO 2.0.9
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,11 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.0.9
+- Arreglado: la raya animada de debajo de la pestaña elegida (y otros
+  adornos de botones) se cortaba al cambiar de pestaña. El aviso de
+  «trabajando» de la 2.0.8 ya no se pone en pestañas ni selectores.
 
 NOVEDADES 2.0.8
 - PS3 en Descubrir › Emuladores: RPCS3 para PS5 (PPSA99300), el emulador

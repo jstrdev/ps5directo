@@ -59,11 +59,11 @@ button:hover{border-color:#3b4553}
 /* que se note al pulsar, y mientras una acción trabaja */
 button,.btn-a,.totile,.reccard,.chip{transition:transform .08s ease,filter .08s ease,box-shadow .15s ease}
 button:not(:disabled):active,.btn-a:active,.totile:active{transform:translateY(1px) scale(.97);filter:brightness(.9)}
-button.busy,.btn-a.busy{position:relative;cursor:progress;pointer-events:none;opacity:.85}
-button.busy::after,.btn-a.busy::after{content:"";display:inline-block;width:.85em;height:.85em;margin-left:.5em;vertical-align:-.1em;
+button.busy,.btn-a.busy{cursor:progress;pointer-events:none;opacity:.85}
+.bspin{display:inline-block;width:.85em;height:.85em;margin-left:.5em;vertical-align:-.1em;flex:none;
   border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:bspin .7s linear infinite}
 @keyframes bspin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){button:not(:disabled):active{transform:none}button.busy::after{animation-duration:2s}}
+@media (prefers-reduced-motion:reduce){button:not(:disabled):active{transform:none}button.busy .bspin{animation-duration:2s}}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 button.primary:hover{background:var(--accent2)}
 button.small{padding:5px 10px;font-size:13px}
@@ -2376,13 +2376,17 @@ function busyMark(path,d){ if(QUIET_API.test(path)) return; BUSY.n=Math.max(0,BU
 // el botón que se acaba de pulsar: si lanza una acción que tarda, sale «trabajando» y no se puede pulsar dos veces.
 // Siempre se suelta al terminar (también si falla).
 const LASTBTN={b:null,t:0};
-document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('button,.btn-a'); if(b){ LASTBTN.b=b; LASTBTN.t=Date.now() } },true);
+// (no en pestañas, menús de secciones ni selectores: esos no «trabajan», y usan su propio adorno)
+const NOBUSY='#tabs button,nav button,.seg button,[role=tab],.totile,.fcard,.dsc-nav button,.bn-nav,.bn-dots button,.nb-x,.ico,dialog .x,[data-k]';
+document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('button,.btn-a'); if(b&&!b.matches(NOBUSY)){ LASTBTN.b=b; LASTBTN.t=Date.now() } else if(b){ LASTBTN.b=null } },true);
 async function api(path, body){
   busyMark(path,1);
   const b=(!QUIET_API.test(path)&&body!==undefined&&Date.now()-LASTBTN.t<350)?LASTBTN.b:null; let tm=null, on=false, was=false;
-  if(b){ LASTBTN.b=null; tm=setTimeout(()=>{ if(!b.isConnected) return; on=true; was=b.disabled; b.classList.add('busy'); b.setAttribute('aria-busy','true') },220) }
+  let sp=null;
+  if(b){ LASTBTN.b=null; tm=setTimeout(()=>{ if(!b.isConnected) return; on=true; was=b.disabled; b.classList.add('busy'); b.setAttribute('aria-busy','true');
+      sp=document.createElement('span'); sp.className='bspin'; sp.setAttribute('aria-hidden','true'); b.appendChild(sp) },220) }
   try{ return await apiR(path, body) }
-  finally{ busyMark(path,-1); clearTimeout(tm); if(b&&on){ b.classList.remove('busy'); b.removeAttribute('aria-busy'); b.disabled=was } }
+  finally{ busyMark(path,-1); clearTimeout(tm); if(b&&on){ b.classList.remove('busy'); b.removeAttribute('aria-busy'); b.disabled=was; if(sp) sp.remove() } }
 }
 async function apiR(path, body){
   for(let i=0;;i++){

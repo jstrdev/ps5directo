@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.8"
+VERSION = "2.0.9"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
