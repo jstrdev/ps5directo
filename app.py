@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.7"
+VERSION = "2.0.8"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -10698,9 +10698,12 @@ def _changelog(lang):
                 continue
             if not in_en:
                 continue
-            if ln.strip() == "" and cur:
-                break
+            if ln.strip() == "" or set(ln.strip()) == {"-"}:
+                cur = None                       # entre versiones (o la raya del título)
+                continue
             m = re.match(r"^(\d+\.\d+(?:\.\d+)?)\s+(.*)$", ln)
+            if not m and not ln.startswith(" ") and out:
+                break                            # se acabó «WHAT'S NEW»
             if m:
                 cur = m.group(1)
                 out[cur] = []

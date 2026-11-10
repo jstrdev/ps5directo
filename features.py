@@ -1086,6 +1086,23 @@ CATALOG = [
              "una en su web. PS5 Directo lo carga y te pone los parches en la consola con un botón.",
      "needs": "Firmware de PS5 3.00 a 12.70 (según su autor). Se vuelve a cargar tras cada reinicio. Los parches solo cambian "
               "el ejecutable al arrancar: el título no se toca."},
+    {"id": "rpcs3ps5", "kind": "link", "group": "emu", "fam": "ps", "name": "RPCS3 para PS5", "sys": "PS3",
+     "repo": "lavavex/rpcs3-PS5", "alts": ["kamb205/KB-RPCS3"], "exp": True,
+     "what": "El emulador de PS3 RPCS3 como título nativo de PS5 (PPSA99300), con la interfaz Big Picture de RPCS3 y los "
+             "mandos DualSense. Muy temprano: Need for Speed Carbon va a 60 fps y casi todo lo demás está sin probar. "
+             "Por las licencias no se puede repartir hecho: se construye en tu PC.",
+     "needs": "Un PC con Linux (Arch o CachyOS; otros instalando lo equivalente), unos 20 GB libres, el firmware de tu "
+              "PS3 (PS3UPDAT.PUP, de la web de PlayStation) y tus copias. Probado en PS5 Pro con firmware 13.60, etaHEN, "
+              "ftpsrv y ShadowMountPlus.",
+     "guide": ["En Linux: git clone https://github.com/lavavex/rpcs3-PS5.git, entra en la carpeta y ejecuta "
+               "tools/bootstrap.sh (la primera vez tarda; si se corta, vuelve a lanzarlo).",
+               "Al terminar tienes la carpeta dist/PPSA99300. En PS5 Directo › Enviar, pega su ruta y mándala «A la PS5» "
+               "(va a /data/homebrew). Cierra antes RPCS3 en la consola si estaba abierto.",
+               "Manda tu PS3UPDAT.PUP a /data/rpcs3/ en la consola: se instala solo al abrir RPCS3 y luego puedes borrarlo.",
+               "Tus copias (carpetas con PS3_GAME dentro) van a /data/rpcs3/games/ o a una carpeta games de un USB en exFAT.",
+               "Ábrelo desde el menú de la PS5. La primera vez que abres cada título va lento mientras prepara su caché.",
+               "Si se cierra solo, el motivo está en /data/rpcs3/cache/RPCS3.log (míralo en Archivos de la consola).",
+               "Hay otra versión, KB-RPCS3 (github.com/kamb205/KB-RPCS3, carpeta PPSA99303), también para construir en el PC."]},
     {"id": "hookshot", "kind": "link", "group": "emu", "fam": "nin", "name": "PS5 Hookshot (Ocarina of Time)",
      "sys": "Switch 2 · nativo", "repo": "mihawk-99/PS5_Hookshot", "exp": True,
      "what": "El remake de Zelda: Ocarina of Time de Switch 2 como título nativo de PS5 (PPSA99024): no es un emulador, "
@@ -2690,6 +2707,7 @@ def open_terminal(cmd):
 # Arte oficial de cada proyecto (icono y portada de su propio GitHub; Bazzite, de su «press kit»). Si falta, se usa el
 # del catálogo de RecompStore para ese repositorio o el icono de la consola si ya está instalado.
 CATALOG_ART = {
+    'rpcs3ps5': {"icon": 'https://raw.githubusercontent.com/lavavex/rpcs3-PS5/main/title/sce_sys/icon0.png', "hero": ''},
     'hookshot': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Hookshot/main/ps5/sce_sys/icon0.png', "hero": ''},
     'crux2': {"icon": 'https://raw.githubusercontent.com/Press5elect/Crux2/main/ps5/sce_sys/icon0.png', "hero": ''},
     'lichii': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Lichii/main/sce_sys/icon0.png', "hero": ''},

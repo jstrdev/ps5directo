@@ -77,6 +77,11 @@ HOT_MIN = 6.0           # nota mínima para salir sola en portada
 HOT_MAX = 2             # como mucho, a la vez
 HOT_DAYS = 7            # días que se queda en portada
 PROPOSE_MIN = 5.0       # nota mínima para proponer una tarjeta de Descubrir
+PROPOSE_LINK_MIN = 7.0  # y para proponer una de solo guía (lo que se construye en el PC o no trae nada instalable)
+TEXT_MIN_STARS = 15     # búsqueda por nombre o descripción: más exigente que por temas
+NOREL_MIN_STARS = 30    # proyectos sin versión publicada (solo código): solo si ya son conocidos
+SCENE_WORDS = re.compile(r"(?i)jailbr|homebrew|payload|etahen|kstuff|elfldr|emulat|\bport\b|recomp|native ps5|"
+                         r"ps5.?(title|app)|ppsa\d|shadowmount|bfpilot|ftpsrv|byepervisor|umtx|y2jb")
 
 
 def _ver(tag):
@@ -103,7 +108,7 @@ def score(x, known_owners, delta, big):
     sc = 0.0
     own = x["repo"].split("/")[0].lower()
     if x["kind"] == "new":
-        sc += 2 + min(x.get("stars", 0) / 20.0, 4)
+        sc += 2 + min(x.get("stars", 0) / 25.0, 6)
         if x.get("installable"):
             sc += 2
     else:
@@ -212,6 +217,23 @@ def proposal(x, rel, kind, asset):
             "file": asset.get("name"), "desc": desc}
 
 
+def proposal_link(x):
+    """Tarjeta de solo guía (enlace, qué es y pasos de su GitHub) para lo que no trae nada que se instale solo."""
+    repo = x["repo"]
+    cid = re.sub(r"[^a-z0-9]+", "-", repo.split("/")[1].lower()).strip("-")[:30] or "nuevo"
+    desc = x.get("desc") or x.get("notes") or ""
+    text = " ".join([repo, desc]).lower()
+    group = "emu" if re.search(r"emulat|rpcs|pcsx|dolphin|ppsspp|mame|retro", text) else "tool"
+    card = {"id": cid, "kind": "link", "group": group, "name": x["name"], "repo": repo, "exp": True, "what": desc,
+            "needs": "No viene hecho para instalar: sigue la guía de su GitHub.", "auto_tr": True,
+            "en": {"what": desc, "needs": "It doesn't come ready to install: follow its GitHub guide."},
+            "guide": ["Ábrelo en GitHub y sigue su guía (el README)."],
+            "icon": "https://github.com/%s.png" % repo.split("/")[0]}
+    card["en"]["guide"] = ["Open it on GitHub and follow its guide (the README)."]
+    return {"card": card, "score": x["score"], "stars": x.get("stars", 0), "url": x.get("url") or "https://github.com/" + repo,
+            "tag": x.get("tag"), "file": "", "desc": desc}
+
+
 def newest(repo):
     rels = gh("/repos/%s/releases" % repo, {"per_page": 5}) or []
     rels = [r for r in rels if isinstance(r, dict) and not r.get("draft") and r.get("published_at")]
@@ -268,12 +290,16 @@ def main(out, props_out=""):
     # proyectos nuevos de PS5 que aún no están en Descubrir
     seen = set(repos)
     created = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=DAYS)).strftime("%Y-%m-%d")
-    for t in TOPICS:
+    # por temas y, como muchos proyectos no los ponen, también por nombre o descripción (más estrellas y con palabras de
+    # la scene, para no colar programas de PC que solo mencionan la PS5)
+    queries = ["topic:%s created:>%s stars:>=%d" % (t, created, NEW_MIN_STARS) for t in TOPICS]
+    queries += ["ps5 in:name,description created:>%s stars:>=%d" % (created, TEXT_MIN_STARS),
+                "playstation 5 in:name,description created:>%s stars:>=%d" % (created, TEXT_MIN_STARS)]
+    for q in queries:
         try:
-            res = gh("/search/repositories", {"q": "topic:%s created:>%s stars:>=%d" % (t, created, NEW_MIN_STARS),
-                                              "sort": "stars", "per_page": 30}) or {}
+            res = gh("/search/repositories", {"q": q, "sort": "stars", "per_page": 30}) or {}
         except Exception as e:
-            print("!", t, e)
+            print("!", q, e)
             continue
         for r in res.get("items") or []:
             full = r.get("full_name") or ""
@@ -283,12 +309,20 @@ def main(out, props_out=""):
             text = " ".join([full, r.get("description") or ""] + list(r.get("topics") or []))
             if SKIP.search(text):
                 continue
+            if q.startswith(("ps5 in:", "playstation 5 in:")) and not SCENE_WORDS.search(text):
+                continue
             try:
                 rel = newest(full)
             except Exception:
                 rel = None
+            stars = int(r.get("stargazers_count") or 0)
             if not rel:
-                continue                                          # sin versión publicada: aún no es para el usuario
+                if stars < NOREL_MIN_STARS:
+                    continue                                      # sin versión publicada y poco conocido: aún no
+                rel = {"tag_name": "", "published_at": r.get("created_at") or r.get("pushed_at") or "", "body": "",
+                       "html_url": r.get("html_url") or "", "assets": []}
+                if not rel["published_at"]:
+                    continue
             kind, asset = installable(rel)
             items.append({"id": "%s@%s" % (full, rel.get("tag_name")), "kind": "new", "repo": full, "cid": "",
                           "name": r.get("name") or full, "tag": rel.get("tag_name") or "", "pre": bool(rel.get("prerelease")),
@@ -329,10 +363,15 @@ def main(out, props_out=""):
     # propuestas de tarjeta: proyectos nuevos que se pueden instalar y tienen nota
     props = []
     for x in items:
-        if x["kind"] == "new" and x.get("installable") and x["score"] >= PROPOSE_MIN:
+        if x["kind"] != "new":
+            continue
+        pr = None
+        if x.get("installable") and x["score"] >= PROPOSE_MIN:
             pr = proposal(x, x["_rel"], x["installable"], x["_asset"] or {})
-            if pr:
-                props.append(pr)
+        if not pr and x["score"] >= PROPOSE_LINK_MIN:
+            pr = proposal_link(x)
+        if pr:
+            props.append(pr)
     for x in items:
         for k in [k for k in x if k.startswith("_")]:
             del x[k]

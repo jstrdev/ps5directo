@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.7
+PS5 DIRECTO 2.0.8
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,25 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.0.8
+- PS3 en Descubrir › Emuladores: RPCS3 para PS5 (PPSA99300), el emulador
+  de PS3 como título nativo de PS5. Por sus licencias no se puede repartir
+  hecho, así que la tarjeta explica cómo construirlo en un PC con Linux,
+  dónde van el firmware de tu PS3 y tus copias, y menciona la otra versión,
+  KB-RPCS3.
+- Todo en inglés: un centenar de mensajes que aún salían en español
+  (errores, avisos, consejos) ya están traducidos.
+- Los botones responden al pulsarlos: se hunden un poco y, si la acción
+  tarda, el botón enseña que está trabajando y no se puede pulsar dos veces
+  sin querer.
+- Aviso de versión nueva sin reiniciar: PS5 Directo lo mira cada hora, así
+  que el aviso de «Actualizar» sale aunque lo tengas abierto.
+- Las novedades tras actualizar se leen mejor: cada cambio con su título en
+  negrita, la versión más nueva abierta y las anteriores plegadas, y si hay
+  muchas se ven las 5 primeras con «Ver más».
+- Las novedades de la scene encuentran más proyectos: también los que no
+  ponen temas en GitHub y los de solo código que ya son conocidos.
 
 NOVEDADES 2.0.7
 - Actualizaciones de emuladores y apps: el PC y el móvil sin PC ya ven lo

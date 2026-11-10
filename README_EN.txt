@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.7 — USER GUIDE (English)
+PS5 DIRECTO 2.0.8 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,79 +342,132 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
-2.0.7 - Emulator and app updates: the PC and the phone without a PC now see
-  the same. Which version you installed is also written on the console
-  (/data/ps5directo/versiones.json), so the one that didn't install it no
-  longer thinks everything needs updating. "You have updates" only lists
-  what is known to be old.
-  Discover › Emulators: PS5 Hookshot, the Switch 2 remake of Zelda: Ocarina
-  of Time as a native PS5 title. It's built on your PC from your own copy;
-  the card explains the steps. "Added by you" no longer fails: it
-  installs apps as .zip, .7z or .rar (with their PPSA…/CUSA… folder) and
-  .elf or .bin payloads; anything else is saved to follow, with its guide
-  and a bell notice for each new version. The Discover banner refreshes itself: featured items move behind the
-  latest scene news after a week and leave after two, and what's trending in the scene shows up there by
-  itself for a week ("🔥 Trending"). Discover can get new cards
-  without updating PS5 Directo. Android app connected to the PC:
-  ⋯ › "📱 Use without a PC (on this phone)".
-  Discover: the scene news text in the big banner no longer shows
-  leftovers like "&nbsp;" or "---" (and it's translated for Spanish users).
-  Android without a PC: if the PS5 is connected to the phone's own hotspot,
-  "Find my PS5" finds it there too, so it downloads over mobile data and
-  sends to the PS5 through the hotspot.
+2.0.8 - PS3 in Discover › Emulators: RPCS3 for PS5 (PPSA99300), the PS3
+    emulator as a native PS5 title. Its licenses don't allow sharing it built,
+    so the card explains how to build it on a Linux PC, where your PS3
+    firmware and your copies go, and mentions the other port, KB-RPCS3.
+  - Everything in English: about a hundred messages that still showed up in
+    Spanish (errors, notices, tips) are now translated.
+  - Buttons respond when pressed: they sink slightly, and when an action takes
+    a moment the button shows it's working and can't be pressed twice by
+    mistake.
+  - New version notice without restarting: PS5 Directo checks every hour, so
+    the "Update" notice shows up even if you leave it open.
+  - What's new after updating is easier to read: each change with its title in
+    bold, the latest version open and older ones folded, and long lists show
+    the first 5 with "See more".
+  - Scene news finds more projects: also those without GitHub topics and
+    source-only ones that are already well known.
+
+2.0.7 - The PC and the phone see the same updates: which version of each
+    emulator or app you installed is also written on the console
+    (/data/ps5directo/versiones.json), and "You have updates" only lists what
+    is known to be old.
+  - New in Discover › Emulators: PS5 Hookshot, the Switch 2 remake of Zelda:
+    Ocarina of Time as a native PS5 title. It's built on your PC from your own
+    copy; the card explains the steps.
+  - "Added by you" no longer fails: it installs apps as .zip, .7z or .rar
+    (with their PPSA… or CUSA… folder) and .elf or .bin payloads; anything
+    else is saved to follow, with its guide and a bell notice for each new
+    version.
+  - The Discover banner refreshes itself: featured items move behind the
+    latest scene news after a week and leave after two, and what's trending in
+    the scene shows up there for a week ("🔥 Trending").
+  - Discover can get new cards without updating PS5 Directo.
+  - Android app connected to the PC: ⋯ › "📱 Use without a PC (on this phone)"
+    to switch without reinstalling.
+  - Scene news in the big banner no longer shows leftovers like "&nbsp;" or
+    "---", and it's translated for Spanish users.
+  - Android without a PC: if the PS5 is connected to the phone's own hotspot,
+    "Find my PS5" finds it there too, so it downloads over mobile data and
+    sends through the hotspot.
 
 2.0.6 - Android without a PC: "Find my PS5" could miss the console; it now
-  searches the phone's Wi-Fi network, where the PS5 is, and the
-  first time it says clearly that it doesn't know your PS5 yet. The links
-  box no longer mentions PC paths or torrents (without a PC only download
-  links work). When a new version comes out, the app without a PC says so at the top,
-  with "What's new" and "Download the app"; it installs over the old one
-  and keeps your settings and queue (no uninstall needed from now on).
-  On the PC, a one-time notice that the Android app now works
-  without a PC, with the link to get it.
+    searches the phone's Wi-Fi network, and the first time it says clearly
+    that it doesn't know your PS5 yet.
+  - Android without a PC: the links box no longer mentions PC paths or
+    torrents (without a PC only download links work).
+  - Android without a PC: when a new version comes out, the app says so at the
+    top with "What's new" and "Download the app"; it installs over the old one
+    and keeps your settings and queue.
+  - On the PC: a one-time notice that the Android app now works without a PC,
+    with the link to get it.
 
-2.0.5 - Android without a PC (beta): the Android app no longer needs the PC.
-  The first time you choose "With PS5 Directo on my PC" (the QR, as
-  before) or "Without a PC": the phone itself downloads and sends to the
-  PS5, and the console extracts with BFpilot and converts with Alembic
-  (LZ4, zstd, .exfat, .ffpkg or .ffpfsc). Library, console files,
-  Discover, payloads, the firmware guard and the rest work the same. A
-  fixed notification with "Close" stays while it works; for big transfers,
-  keep the phone charging. What you download from the console (files,
-  captures) goes to the phone's Downloads › PS5 Directo and backups to
-  Documents › PS5 Directo. To switch: ⋯ › "Use with PS5 Directo on the PC".
-  Android app: if you already had it, uninstall it once before installing
-  this one. It's now signed with a key that isn't in the code, so nobody can
-  make a fake app that installs over the real one. On the phone you just
-  scan the QR again.
-  New in Discover › "📌 Added by you": paste the GitHub link of any app
-  (.zip with its PPSA… or CUSA… folder) or payload (.elf) that isn't in
-  Discover and it's treated like the rest: it installs, opens and tells you
-  about new versions. It belongs to its author and you add it at your own
-  responsibility.
-  Use away from home: "Use on your phone" has a new "🌍 Use away from home"
-  section that explains how with Tailscale (free): install it on the PC
-  and the phone with the same account and PS5 Directo gives you a second
-  QR that works from anywhere, without opening router ports.
-  Phone: if the phone link no longer works (a new code was generated on
-  the PC or "Use on your phone" was turned off), it no longer repeats the
-  welcome, setup and guides with empty menus and a red "token": a notice
-  explains how to link it again, with "Scan again" in the Android app.
-  The "What does PS5 Directo do?" tour no longer overflows the screen with
-  large fonts. New in Discover › Improve your titles: CheatRunner,
-  performance patches while you play (60 fps with fixed timing, higher
-  resolution, 120 Hz); installed by hand following its guide, and it also
-  includes cheats, which shouldn't be used online.
+2.0.5 - Android without a PC (beta): the first time you choose "With PS5
+    Directo on my PC" (the QR, as before) or "Without a PC": the phone itself
+    downloads and sends to the PS5, and the console extracts with BFpilot and
+    converts with Alembic. Library, console files, Discover, payloads and the
+    firmware guard work the same.
+  - Android without a PC: a fixed notification with "Close" stays while it
+    works; what you download from the console goes to the phone's Downloads ›
+    PS5 Directo and backups to Documents › PS5 Directo.
+  - Android app: if you already had it, uninstall it once before installing
+    this one. It's now signed with a key that isn't in the code, so nobody can
+    make a fake app that installs over the real one.
+  - New in Discover › "📌 Added by you": paste the GitHub link of any app or
+    payload that isn't in Discover and it installs, opens and tells you about
+    new versions like the rest.
+  - Use away from home: "Use on your phone" has a "🌍 Use away from home"
+    section that explains how with Tailscale (free), with a second QR that
+    works from anywhere without opening router ports.
+  - Phone: if the phone link no longer works, a clear notice explains how to
+    link it again ("Scan again" in the Android app) instead of repeating the
+    welcome with empty menus.
+  - The "What does PS5 Directo do?" tour no longer overflows the screen with
+    large fonts.
+  - New in Discover › Improve your titles: CheatRunner, performance patches
+    while you play (60 fps with fixed timing, higher resolution, 120 Hz);
+    installed by hand following its guide.
 
-2.0.4 - Updating big emulators (RetroArch) no longer gets stuck on "Putting it in
-  place", and fixing permissions on thousands of files is several times faster.
-  Discover's Home shows the scene news in a big auto-rotating banner, with featured picks editable on GitHub. The banner fills itself with the latest from the scene: new versions of everything in Discover and new PS5 projects on GitHub, newest first, generated every 3 hours by an automatic task in the PS5 Directo repo (escena.json). From the RecompStore catalog the banner only shows just-arrived items and updates from the last 3 days; the full news list can be sorted (recently updated, newest arrivals, most popular, A to Z). New banner look: thumbnails on the right with a progress bar, arrows together at the bottom and a small line with titles seen running. New: PS5 Lichii (Switch 2, PS5 and PS5 Pro; best on Pro). Convert on the PS5 (experimental): in "Format on the PS5" choose where it's converted: "On your PC" (latest PS5 Dump Forge) or "On the PS5" (Alembic), which downloads and sends at the same time and the console converts it at the end. Network shares (SMB: Windows, Samba and most NAS): paste \\NAS\Folder\title or smb://NAS/Folder/title and it goes straight to the PS5. New in Discover: Prospero Manager (all-in-one manager running on the console, port 7070). When a new PS5 Directo version is out, "⋯" shows a blue dot and "Update to vX" glows. New users see the feature cards right after connecting the PS5, with the step-by-step guide at the end; if you skip them, a "See what PS5 Directo can do" bubble next to PC mode reminds you until you watch them or close it. Payloads: "Install on the console" fetches the new version from GitHub into Payload Manager. A 12-step tour of what PS5 Directo does (formats, PC or PS5 conversion, your way / PC mode, file manager, Discover with recomps and more), available any time from ⋯ › "What does PS5 Directo do?". Discover clears the update notice after updating, and has a ✕ to skip a
-  version. Payload updates are also checked on GitHub, with a small notice and
-  "What's new". Dump Forge notes are translated. Convert what's already on your PC
-  without sending it ("Only to my PC" + "Convert"). Extraction goes straight to the
-  USB/external drive when that's the destination. M.2 / extended storage titles show
-  their real path. A warning when ShadowMountPlus isn't on the console. Mac: the app
-  no longer modifies itself and the guide explains the "is damaged" message.
+2.0.4 - Updating big emulators (RetroArch) no longer gets stuck on "Putting it
+    in place", and fixing permissions on thousands of files is several times
+    faster.
+  - Discover's Home shows the scene news in a big auto-rotating banner, with
+    featured picks editable on GitHub.
+  - The banner fills itself with the latest from the scene: new versions of
+    everything in Discover and new PS5 projects on GitHub, newest first,
+    generated every 3 hours by an automatic task in the PS5 Directo repo
+    (escena.json).
+  - From the RecompStore catalog the banner only shows just-arrived items and
+    updates from the last 3 days; the full news list can be sorted (recently
+    updated, newest arrivals, most popular, A to Z).
+  - New banner look: thumbnails on the right with a progress bar, arrows
+    together at the bottom and a small line with titles seen running.
+  - New: PS5 Lichii (Switch 2, PS5 and PS5 Pro; best on Pro).
+  - Convert on the PS5 (experimental): in "Format on the PS5" choose where
+    it's converted: "On your PC" (latest PS5 Dump Forge) or "On the PS5"
+    (Alembic), which downloads and sends at the same time and the console
+    converts it at the end.
+  - Network shares (SMB: Windows, Samba and most NAS): paste
+    \\NAS\Folder\title or smb://NAS/Folder/title and it goes straight to the
+    PS5.
+  - New in Discover: Prospero Manager (all-in-one manager running on the
+    console, port 7070).
+  - When a new PS5 Directo version is out, "⋯" shows a blue dot and "Update to
+    vX" glows.
+  - New users see the feature cards right after connecting the PS5, with the
+    step-by-step guide at the end; if you skip them, a "See what PS5 Directo
+    can do" bubble next to PC mode reminds you until you watch them or close
+    it.
+  - Payloads: "Install on the console" fetches the new version from GitHub
+    into Payload Manager.
+  - A 12-step tour of what PS5 Directo does (formats, PC or PS5 conversion,
+    your way / PC mode, file manager, Discover with recomps and more),
+    available any time from ⋯ › "What does PS5 Directo do?".
+  - Discover clears the update notice after updating, and has a ✕ to skip a
+    version.
+  - Payload updates are also checked on GitHub, with a small notice and
+    "What's new".
+  - Dump Forge notes are translated.
+  - Convert what's already on your PC without sending it ("Only to my PC" +
+    "Convert").
+  - Extraction goes straight to the USB/external drive when that's the
+    destination.
+  - M.2 / extended storage titles show their real path.
+  - A warning when ShadowMountPlus isn't on the console.
+  - Mac: the app no longer modifies itself and the guide explains the "is
+    damaged" message.
+
 
 2.0.3 - Titles installed on the M.2 SSD / extended storage now show their real
   path. "Reinstall from GitHub" in Update. Emulators with several builds (e.g.
