@@ -1,18 +1,121 @@
 {
  "_como": "Lo genera solo tools/escena.py (GitHub Action cada 3 horas). No lo edites a mano: para destacar algo usa destacados.json.",
- "updated": "2026-11-10T11:09:20Z",
+ "updated": "2026-11-10T19:44:15Z",
  "items": [
   {
-   "id": "VivaLaVent/ps5-bazzite-deck@v2.9",
+   "id": "bornaradusin/PC5@v2.3.8",
+   "kind": "new",
+   "repo": "bornaradusin/PC5",
+   "cid": "",
+   "name": "PC5",
+   "tag": "v2.3.8",
+   "pre": false,
+   "date": "2026-11-10T19:37:56Z",
+   "desc": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
+   "notes": "PC5 2.3.8 gets more Steam copies going, keeps the DLC a copy lists, opens a game's menu faster on a USB hard drive, and fixes a crash as some games' movies start. Install - ProsperoStore : update PC5 from its page in the store. - PC5's own updater : Settings › System › Update now , or Update now when PC5 asks as it opens. It downloads only what changed when you have the…",
+   "stars": 141,
+   "url": "https://github.com/bornaradusin/PC5",
+   "score": 12.64
+  },
+  {
+   "id": "jstrdev/ps5directo@v2.0.9",
+   "kind": "new",
+   "repo": "jstrdev/ps5directo",
+   "cid": "",
+   "name": "ps5directo",
+   "tag": "v2.0.9",
+   "pre": false,
+   "date": "2026-11-10T18:48:52Z",
+   "desc": "Gestor de archivos para PS5 con jailbreak: descarga, convierte y envía en un solo paso. Biblioteca, copias de seguridad y diagnóstico. / File manager for jailbroken PS5: download, convert and send in one step.",
+   "notes": "PS5 Directo 2.0.9 - Arreglado: la raya animada de debajo de la pestaña elegida se cortaba al cambiar de pestaña (y algún otro adorno de botones). El aviso de «trabajando» de la 2.0.8 ya no se pone en pestañas ni selectores. PS5 Directo 2.0.9 (English) - Fixed: the animated line under the selected tab got cut off when switching tabs (and some other button decorations). The…",
+   "stars": 75,
+   "url": "https://github.com/jstrdev/ps5directo",
+   "score": 5.0
+  },
+  {
+   "id": "fthdgn-gh/Alembic@v0.6.3",
+   "kind": "update",
+   "repo": "fthdgn-gh/Alembic",
+   "cid": "alembic",
+   "name": "Alembic",
+   "tag": "v0.6.3",
+   "pre": false,
+   "date": "2026-11-10T18:22:40Z",
+   "notes": "Images: your game library, first and the PS5's home tab. This release is 0.6.0 with a new, step-by-step Convert and fixes for the AMPR emulator. New in 0.6.3: Convert, step by step - Convert now goes step by step: Format, Options, Where, Afterwards, then Review. Steps with nothing to choose are skipped, and Install… opens straight on Review. - ✕ on a format picks it and moves…",
+   "url": "https://github.com/fthdgn-gh/Alembic/releases/tag/v0.6.3",
+   "stars": 66,
+   "score": 1.0
+  },
+  {
+   "id": "mihawk-99/PS5_Hookshot@linux-parts",
+   "kind": "update",
+   "repo": "mihawk-99/PS5_Hookshot",
+   "cid": "hookshot",
+   "name": "PS5 Hookshot (Ocarina of Time)",
+   "tag": "linux-parts",
+   "pre": true,
+   "date": "2026-11-10T16:46:52Z",
+   "notes": "Parts Hookshot's Linux builder downloads. A file's name is its checksum; a part that did not change is not uploaded again. This release is not a version of the game.",
+   "url": "https://github.com/mihawk-99/PS5_Hookshot/releases/tag/linux-parts",
+   "stars": 37,
+   "score": 0.0
+  },
+  {
+   "id": "bps2414/lineup@v2.0.0",
+   "kind": "new",
+   "repo": "bps2414/lineup",
+   "cid": "",
+   "name": "lineup",
+   "tag": "v2.0.0",
+   "pre": false,
+   "date": "2026-11-10T16:45:50Z",
+   "desc": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React.",
+   "notes": "2.0.0 - Saving no longer fails with \"The row changed since it was read\" once apps are pinned. The console renumbers the pinned apps every half minute while Lineup is open; a save now checks the order, not the exact numbers ( 19). - All Apps, the App Library tile on the Media tab, can be hidden and shown again from Hidden apps, like the PS Store and the Media Gallery ( 14). -…",
+   "stars": 19,
+   "url": "https://github.com/bps2414/lineup",
+   "score": 4.76
+  },
+  {
+   "id": "mihawk-99/PS5_Lichii@v1.20.00",
+   "kind": "update",
+   "repo": "mihawk-99/PS5_Lichii",
+   "cid": "lichii",
+   "name": "PS5 Lichii",
+   "tag": "v1.20.00",
+   "pre": true,
+   "date": "2026-11-10T16:20:55Z",
+   "notes": "PS5 Lichii becomes its own title on the console, with its own data folder, and takes in a round of Ocarina of Time picture, memory and start-up fixes, a frame rate limit, and nine ports from the projects around it. Thank you to the people whose tests, logs and fixes are in this release (their reports are in issue 1): - Vampinity : Ocarina of Time on a base PS5, and the causes…",
+   "url": "https://github.com/mihawk-99/PS5_Lichii/releases/tag/v1.20.00",
+   "stars": 79,
+   "score": 1.5
+  },
+  {
+   "id": "VivaLaVent/ps5-bazzite-deck@v2.10",
    "kind": "update",
    "repo": "VivaLaVent/ps5-bazzite-deck",
    "cid": "bazzite",
    "name": "Bazzite Deck (Steam como en la Steam Deck)",
-   "tag": "v2.9",
-   "pre": true,
-   "date": "2026-11-10T08:05:45Z",
-   "notes": "What's new A pre-release on top of v2.8.1. Please report what you see, with the SUMMARY line of ps5-report . - Controllers paired in the PS5 OS connect in Linux, without pairing again. The loader hands the PS5's Bluetooth pairings to Linux at every start, so a DualSense you use on the PS5 works in Linux right away and keeps working on the PS5. It needs bazzite-bootc-loader…",
-   "url": "https://github.com/VivaLaVent/ps5-bazzite-deck/releases/tag/v2.9"
+   "tag": "v2.10",
+   "pre": false,
+   "date": "2026-11-10T15:59:24Z",
+   "notes": "What's new The new stable version. Everything since v2.7.3, the previous one: Slim owners: pair your controller once more after updating. On the Slim, Linux and the PS5 OS now share one Bluetooth pairing: hold PS + Create until the light blinks fast, then pair it in Linux. With bazzite-bootc-loader v2.10 from this release, a controller paired in the PS5 OS then connects in…",
+   "url": "https://github.com/VivaLaVent/ps5-bazzite-deck/releases/tag/v2.10",
+   "stars": 534,
+   "score": 2.5
+  },
+  {
+   "id": "MisterTemaki/fbneo-ps5@v2.4",
+   "kind": "update",
+   "repo": "MisterTemaki/fbneo-ps5",
+   "cid": "fbneo",
+   "name": "FBNeo PS5",
+   "tag": "v2.4",
+   "pre": false,
+   "date": "2026-11-10T12:44:22Z",
+   "notes": "New: GPU presentation and CRT filters FBNeo PS5 2.4 adds Vulkan/RADV output. The CPU core generates the original game frame; the GPU handles texture scaling, CRT filtering, interface composition and final presentation. - Eleven CRT filters now run on the GPU, including the default CRT Easymode style . - Aspect ratio, smoothing, scanlines, vertical games, HUD transparency and…",
+   "url": "https://github.com/MisterTemaki/fbneo-ps5/releases/tag/v2.4",
+   "stars": 16,
+   "score": 2.5
   },
   {
    "id": "ZiZc3/VLC@v0.6.1",
@@ -23,22 +126,10 @@
    "tag": "v0.6.1",
    "pre": false,
    "date": "2026-11-10T02:59:27Z",
-   "notes": "VLC for PS5 v0.6.1 Share files and folders in playlists, Playlists on Home. --- What's new &nbsp; SMB files and folders in playlists - In Browse, highlight a video or song on a share, press Options and pick Add to playlist . - Highlight a folder, on the console or on a share, and pick Add this folder to playlist or Add this folder + subfolders to playlist . - Share files show…",
-   "url": "https://github.com/ZiZc3/VLC/releases/tag/v0.6.1"
-  },
-  {
-   "id": "jstrdev/ps5directo@v2.0.4",
-   "kind": "new",
-   "repo": "jstrdev/ps5directo",
-   "cid": "",
-   "name": "ps5directo",
-   "tag": "v2.0.4",
-   "pre": false,
-   "date": "2026-11-10T00:49:18Z",
-   "desc": "Gestor de archivos para PS5 con jailbreak: descarga, convierte y envía en un solo paso. Biblioteca, copias de seguridad y diagnóstico. / File manager for jailbroken PS5: download, convert and send in one step.",
-   "notes": "PS5 Directo 2.0.4 🔧 Arreglos - Actualizar emuladores grandes como RetroArch se quedaba para siempre en «Colocando»: copiar lo nuevo encima iba archivo a archivo, con una tarea de BFpilot por cada uno. Ahora va de golpe y enseña cuántos archivos lleva. Además, arreglar los permisos de miles de archivos (RetroArch tiene 20.000) va varias veces más rápido y enseña cuántos lleva.…",
-   "stars": 65,
-   "url": "https://github.com/jstrdev/ps5directo"
+   "notes": "VLC for PS5 v0.6.1 Share files and folders in playlists, Playlists on Home. What's new SMB files and folders in playlists - In Browse, highlight a video or song on a share, press Options and pick Add to playlist . - Highlight a folder, on the console or on a share, and pick Add this folder to playlist or Add this folder + subfolders to playlist . - Share files show their name,…",
+   "url": "https://github.com/ZiZc3/VLC/releases/tag/v0.6.1",
+   "stars": 75,
+   "score": 1.0
   },
   {
    "id": "ZiZc3/XPSemu@v3.4",
@@ -49,8 +140,10 @@
    "tag": "v3.4",
    "pre": false,
    "date": "2026-11-10T00:28:10Z",
-   "notes": "XPSemu Alpha 3.4 MSAA, turbo buttons, box art for each region, more game fixes. --- What's new &nbsp; MSAA anti-aliasing - MSAA 2x / 4x / 8x , per game, its very heavy on big games. - Off by default. &nbsp; Turbo buttons - Hold a button instead of tapping it. With turbo on, holding a button works like tapping it very fast. For example, in a shooter, hold the fire button and…",
-   "url": "https://github.com/ZiZc3/XPSemu/releases/tag/v3.4"
+   "notes": "XPSemu Alpha 3.4 MSAA, turbo buttons, box art for each region, more game fixes. What's new MSAA anti-aliasing - MSAA 2x / 4x / 8x , per game, its very heavy on big games. - Off by default. Turbo buttons - Hold a button instead of tapping it. With turbo on, holding a button works like tapping it very fast. For example, in a shooter, hold the fire button and the gun keeps…",
+   "url": "https://github.com/ZiZc3/XPSemu/releases/tag/v3.4",
+   "stars": 210,
+   "score": 2.5
   },
   {
    "id": "xXBneutzerNameXx/PS5-Cleanup@v1.0.9",
@@ -62,9 +155,10 @@
    "pre": false,
    "date": "2026-11-09T20:46:10Z",
    "desc": "Räumt eine PS5 mit Jailbreak auf wie frisch eingerichtet – ohne Neuinstallation. Laufwerks-Kopplung, Konto und Lizenzen bleiben erhalten. Clean up a jailbroken PS5 like new, no reinstall.",
-   "notes": "Deutsch ⚠️ Welche Datei ist was? Bitte zuerst lesen! Datei Wofür Löscht? --- --- --- ps5cleanup v1.0.9.elf PS5-App – läuft direkt auf der PS5, Bedienung mit dem Controller oder im Browser. Startet im Testmodus (oben steht „TESTMODUS“) Erst, wenn du den Testmodus ausschaltest und das Löschen ausdrücklich bestätigst PS5-Cleanup-1.0.9.zip die ELF-Datei + Anleitungen (LIESMICH,…",
+   "notes": "Deutsch ⚠️ Welche Datei ist was? Bitte zuerst lesen! Datei Wofür Löscht? --- ps5cleanup v1.0.9.elf PS5-App – läuft direkt auf der PS5, Bedienung mit dem Controller oder im Browser. Startet im Testmodus (oben steht „TESTMODUS“) Erst, wenn du den Testmodus ausschaltest und das Löschen ausdrücklich bestätigst PS5-Cleanup-1.0.9.zip die ELF-Datei + Anleitungen (LIESMICH, README EN,…",
    "stars": 52,
-   "url": "https://github.com/xXBneutzerNameXx/PS5-Cleanup"
+   "url": "https://github.com/xXBneutzerNameXx/PS5-Cleanup",
+   "score": 6.08
   },
   {
    "id": "quer3q/ps5-dump-forge@v0.5.5",
@@ -76,19 +170,9 @@
    "pre": false,
    "date": "2026-11-09T20:19:00Z",
    "notes": "New - Custom output names. The About tab has a new Output names card for how generated names look. Type any text and insert the parts you want: Title, Title ID, Version, Pack kind, Region and Firmware, each at most once. - English titles in names. Generated names use the game's English title when it has one, so a game whose default language is Japanese is named [Astro…",
-   "url": "https://github.com/quer3q/ps5-dump-forge/releases/tag/v0.5.5"
-  },
-  {
-   "id": "mihawk-99/PS5_Lichii@v1.10.00",
-   "kind": "update",
-   "repo": "mihawk-99/PS5_Lichii",
-   "cid": "lichii",
-   "name": "PS5 Lichii",
-   "tag": "v1.10.00",
-   "pre": true,
-   "date": "2026-11-09T19:23:24Z",
-   "notes": "Fritchii v5.5, our PS5 renderer work back in place, and Switch 2 games started from their own files, with no .eden file to write. Mario Kart World race Average Median 10% low 1% low Worst frame --- ---: ---: ---: ---: ---: Fritchii v5.5 alone 35.4 fps 37.7 fps 22.8 fps 9.7 fps 1,157 ms v1.10.00 34.7 fps 36.4 fps 24.5 fps 15.3 fps 290 ms Pre-release. It installs as ProsperoEden…",
-   "url": "https://github.com/mihawk-99/PS5_Lichii/releases/tag/v1.10.00"
+   "url": "https://github.com/quer3q/ps5-dump-forge/releases/tag/v0.5.5",
+   "stars": 334,
+   "score": 1.0
   },
   {
    "id": "elripalda/gta4-ps5@v1.5",
@@ -102,7 +186,8 @@
    "desc": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI.",
    "notes": "Fixes - Endless loading screens are fixed. The rooftop in Lure, and other spots where the game got stuck loading, now go through. This was the game running out of room for something it needed to load, not the frame rate, so it's fixed at every resolution. - The final mission can be finished. Climbing into the chopper works again. That button mash was made for 30 FPS and didn't…",
    "stars": 93,
-   "url": "https://github.com/elripalda/gta4-ps5"
+   "url": "https://github.com/elripalda/gta4-ps5",
+   "score": 10.72
   },
   {
    "id": "blue0x1/EmuFive@1.0.0",
@@ -115,8 +200,9 @@
    "date": "2026-11-09T10:24:38Z",
    "desc": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
    "notes": "EmuFive 1.0.0 The first release of EmuFive: PS5 games on a jailbroken PS4, based on the KytyPS5 PS5 emulator, built for the PS4's CPU, with Linux and the PS4's own GPU through Vulkan. Experimental. On a PS4 Pro, \"Sons of Sparta\" runs at about 40 FPS and more. Other games are still being tested, and many are slow for now. What's in it - A home screen made for the controller, no…",
-   "stars": 58,
-   "url": "https://github.com/blue0x1/EmuFive"
+   "stars": 91,
+   "url": "https://github.com/blue0x1/EmuFive",
+   "score": 5.64
   },
   {
    "id": "streetpea/chiaki-ng@weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
@@ -128,7 +214,9 @@
    "pre": true,
    "date": "2026-11-09T08:20:23Z",
    "notes": "Weekly Test Build",
-   "url": "https://github.com/chiaki-ng/chiaki-ng/releases/tag/weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973"
+   "url": "https://github.com/chiaki-ng/chiaki-ng/releases/tag/weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
+   "stars": 2993,
+   "score": 5.0
   },
   {
    "id": "aarvsn/PS5Droid@v1.0.5",
@@ -142,7 +230,23 @@
    "desc": "Android games on your PS5",
    "notes": "What's Changed Build v1.0.5 release by @aarvsn in https://github.com/aarvsn/PS5Droid/pull/6 Full Changelog : https://github.com/aarvsn/PS5Droid/compare/v1.0.4...v1.0.5",
    "stars": 72,
-   "url": "https://github.com/aarvsn/PS5Droid"
+   "url": "https://github.com/aarvsn/PS5Droid",
+   "score": 6.88
+  },
+  {
+   "id": "JVK3R/JobeesLair@v0.5.7",
+   "kind": "new",
+   "repo": "JVK3R/JobeesLair",
+   "cid": "",
+   "name": "JobeesLair",
+   "tag": "v0.5.7",
+   "pre": false,
+   "date": "2026-11-09T04:21:27Z",
+   "desc": "Standalone, content-neutral PS5 homebrew indexer and media framework. Proudly built alongside AI by JVK3R.",
+   "notes": "New games keep reaching the store between releases, in a new catalog format. Changed - The store's catalog comes in a new format. New games keep arriving between releases. 0.5.6 and earlier stop receiving them and keep the games they already have, so update to keep the store current. Installing On 0.5.2 to 0.5.6: open Jobee'sLair and it offers 0.5.7. Download it, then Restart…",
+   "stars": 291,
+   "url": "https://github.com/JVK3R/JobeesLair",
+   "score": 10.0
   },
   {
    "id": "notmaj0r/ProsperoMgr@v1.2",
@@ -153,8 +257,10 @@
    "tag": "v1.2",
    "pre": false,
    "date": "2026-11-09T00:31:51Z",
-   "notes": "Prospero Manager v1.2 The biggest update so far: a new Media page, a Games / Apps library, right-click menus, Back/Forward navigation, safe USB removal, a much faster PKG install, and a lot of polish for phones and the PS5 browser. See the full changelog here: Changelog If you encounter any issues, please report them through GitHub or in our Discord server! --- ✨ Highlights 🖼️…",
-   "url": "https://github.com/notmaj0r/ProsperoMgr/releases/tag/v1.2"
+   "notes": "Prospero Manager v1.2 The biggest update so far: a new Media page, a Games / Apps library, right-click menus, Back/Forward navigation, safe USB removal, a much faster PKG install, and a lot of polish for phones and the PS5 browser. See the full changelog here: Changelog If you encounter any issues, please report them through GitHub or in our Discord server! ✨ Highlights 🖼️…",
+   "url": "https://github.com/notmaj0r/ProsperoMgr/releases/tag/v1.2",
+   "stars": 328,
+   "score": 2.5
   },
   {
    "id": "ps5-payload-dev/ftpsrv@v0.22",
@@ -166,19 +272,9 @@
    "pre": false,
    "date": "2026-11-08T21:40:53Z",
    "notes": "cmd: initialize addr len before accept() in ftp data open",
-   "url": "https://github.com/ps5-payload-dev/ftpsrv/releases/tag/v0.22"
-  },
-  {
-   "id": "fthdgn-gh/Alembic@v0.6.2",
-   "kind": "update",
-   "repo": "fthdgn-gh/Alembic",
-   "cid": "alembic",
-   "name": "Alembic",
-   "tag": "v0.6.2",
-   "pre": false,
-   "date": "2026-11-08T20:56:06Z",
-   "notes": "Images: your game library, first and the PS5's home tab. This release is 0.6.0 with fixes: the AMPR emulator now goes only to games that use the console's APR. Fixes in 0.6.2 - The AMPR emulator is never added to a title that does not use the console's APR: Files and Images no longer offer it there, and selecting several skips those games and says how many. Switching the…",
-   "url": "https://github.com/fthdgn-gh/Alembic/releases/tag/v0.6.2"
+   "url": "https://github.com/ps5-payload-dev/ftpsrv/releases/tag/v0.22",
+   "stars": 213,
+   "score": 1.5
   },
   {
    "id": "drakmor/ShadowMountPlus@1.7beta12",
@@ -190,7 +286,9 @@
    "pre": true,
    "date": "2026-11-08T20:02:14Z",
    "notes": "- Introduced configuration format v2, with separate config.ini and profiles.ini, automatic migration, and runtime reloads. - Improved mount and launch recovery, including safer cleanup of sandbox layers and handling for M.2 storage. - Made library scans more resilient to inaccessible folders and source changes. - Improved metadata and filename handling for PS4 trophies, sce…",
-   "url": "https://github.com/drakmor/ShadowMountPlus/releases/tag/1.7beta12"
+   "url": "https://github.com/drakmor/ShadowMountPlus/releases/tag/1.7beta12",
+   "stars": 1336,
+   "score": -1.0
   },
   {
    "id": "X1NONs/PrefBar@v0.2.1",
@@ -204,7 +302,8 @@
    "desc": "PrefBar - Standalone On-Screen Performance Overlay for Jailbroken PS5",
    "notes": "What's new Added cool horizontal overlay layout with automatic font-size adjustment. Added SoC APU power consumption monitoring (PWR), displaying power usage in watts. Improved overlay row handling, automatically compacting enabled metrics without leaving empty gaps. Added automatic configuration reloading when a new game session starts so no need to restart. Improved game…",
    "stars": 32,
-   "url": "https://github.com/X1NONs/PrefBar"
+   "url": "https://github.com/X1NONs/PrefBar",
+   "score": 5.28
   },
   {
    "id": "mihawk-99/PS5_MihawkOS@v8.2.0-alpha-8",
@@ -216,7 +315,9 @@
    "pre": true,
    "date": "2026-11-08T13:11:54Z",
    "notes": "PS5 MihawkOS-v8.2.0-alpha-8 MihawkOS is a passion project, not a piracy project. It exists so you can play the games you own on the console you own. - Piracy is not condoned. - No games, saves, keys, firmware or exploits are included, and they never will be. - Use only games and programs you have the right to run : your own copies, bought or installed by you. - Requests for,…",
-   "url": "https://github.com/mihawk-99/PS5_MihawkOS/releases/tag/v8.2.0-alpha-8"
+   "url": "https://github.com/mihawk-99/PS5_MihawkOS/releases/tag/v8.2.0-alpha-8",
+   "stars": 388,
+   "score": 1.5
   },
   {
    "id": "percdotdev/ps5-webkit-autoloader-esp32@0.7.1",
@@ -230,7 +331,8 @@
    "desc": "ESP32 firmware: An automated payload loader for exploited PS5 consoles",
    "notes": "ESP32 firmware that serves itsPLK's WebKit Autoloader 0.7.1 to the PS5 over its own Wi-Fi, ESP32 PORTAL . Flash it Easiest: open the web flasher in Chrome or Edge. Choose your board, plug it in holding BOOT , press Install. It writes this release, checks it and restarts the board into the portal. By hand with esptool: put the board in download mode, then write the file for…",
    "stars": 11,
-   "url": "https://github.com/percdotdev/ps5-webkit-autoloader-esp32"
+   "url": "https://github.com/percdotdev/ps5-webkit-autoloader-esp32",
+   "score": 4.44
   },
   {
    "id": "NotHavocc/ps5-hwcon-plugin@v1.6.0",
@@ -244,7 +346,8 @@
    "desc": "Decky Loader plugin for PS5 Linux hardware control.",
    "notes": "changelog: - new \"Memory\" tab - put GPU memory settings in said tab, alongide new zswap and zram options - other minor changes and bug fixes",
    "stars": 15,
-   "url": "https://github.com/NotHavocc/ps5-hwcon-plugin"
+   "url": "https://github.com/NotHavocc/ps5-hwcon-plugin",
+   "score": 4.6
   },
   {
    "id": "NotHavocc/ps5-hwcon-gui@v1.4.0",
@@ -258,7 +361,8 @@
    "desc": "Hardware control GUI (Fan,GPU,CPU,LED) for PS5 Linux",
    "notes": "changelog: - new \"Memory\" tab - put GPU memory settings in said tab, alongide new zswap and zram options - other minor changes and bug fixes GUI changelog: - removed the service, as noone used it and it just caused extra confusion and problems - optimized tray functionality, allowing the program to properly run in the background - fixed a bug where the hyperlinks (website and…",
    "stars": 9,
-   "url": "https://github.com/NotHavocc/ps5-hwcon-gui"
+   "url": "https://github.com/NotHavocc/ps5-hwcon-gui",
+   "score": 2.36
   },
   {
    "id": "Portablelle/Botty-Plus@v2.0.4",
@@ -272,19 +376,8 @@
    "desc": "Botty+ PS5 native app, download manager, torrent engine and compression services",
    "notes": "Botty+ 2.0.4 — Clearer BOTW profiles Changes - Rename the game's UltraCam settings page to BOTW profile , with one Enable profile switch. The selected game update still chooses UltraCam for 1.6.0 or the experimental FPS profile for 1.9.0. - Remove the two Botty-managed profile folders from the ordinary Mods list so their activation is controlled in one place. - Label the older…",
    "stars": 36,
-   "url": "https://github.com/Portablelle/Botty-Plus"
-  },
-  {
-   "id": "MisterTemaki/fbneo-ps5@v2.3",
-   "kind": "update",
-   "repo": "MisterTemaki/fbneo-ps5",
-   "cid": "fbneo",
-   "name": "FBNeo PS5",
-   "tag": "v2.3",
-   "pre": false,
-   "date": "2026-11-05T18:42:06Z",
-   "notes": "FBNeo PS5 2.3 New: Daytona USA (Sega Model 2) - Four sets: daytona (Revision A), daytonase (Special Edition), daytona93 and daytonas (with Saturn advertisements). This is FBNeo PS5's first Sega Model 2 game, ported from MAME (commit b7f483f ), including: - the main board's i960 and its TGP geometry coprocessor; - the Model 2 3D renderer; - the System 24 tilemaps; - the Model 1…",
-   "url": "https://github.com/MisterTemaki/fbneo-ps5/releases/tag/v2.3"
+   "url": "https://github.com/Portablelle/Botty-Plus",
+   "score": 5.44
   },
   {
    "id": "Swordpdf/PS5SX2@vk-285-190",
@@ -296,7 +389,24 @@
    "pre": false,
    "date": "2026-11-05T17:22:22Z",
    "notes": "PS5SX2 2.40 (build vk-285-190) The in-game menu. No console restart needed this time: the disc helper is still 171p. The in-game menu - In a game, hold L2 + D-pad Down for a second (a small Menu ring fills in the corner). The game pauses and its picture moves into a card next to a menu in the shelf's style. - Game: resume, save and load states (ten slots, each with its…",
-   "url": "https://github.com/Swordpdf/PS5SX2/releases/tag/vk-285-190"
+   "url": "https://github.com/Swordpdf/PS5SX2/releases/tag/vk-285-190",
+   "stars": 1657,
+   "score": 1.0
+  },
+  {
+   "id": "gasb07/ps4mount@v0.7.3",
+   "kind": "new",
+   "repo": "gasb07/ps4mount",
+   "cid": "",
+   "name": "ps4mount",
+   "tag": "v0.7.3",
+   "pre": false,
+   "date": "2026-11-05T17:13:28Z",
+   "desc": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage",
+   "notes": "Changes - Raise the game limit per drive to 768 and say when games are past it - List every add-on of a game: keep a small record per add-on instead of the parsed pkg, and accept long add-on choices - Count only add-ons with content for the add-on limit: unlock-only add-ons are never mounted - Search up to 64 folders for pkgs, keep long folder lists whole and say when folders…",
+   "stars": 200,
+   "url": "https://github.com/gasb07/ps4mount",
+   "score": 13.0
   },
   {
    "id": "MasterShivnath007/ytps5-sponsorblock@v1.2.0",
@@ -309,8 +419,24 @@
    "date": "2026-11-05T07:29:27Z",
    "desc": "YouTube ad blocker + SponsorBlock for the official PS5 video app (jailbroken FW 8.20). One ELF via Payload Manager, native settings, no app packages, keys, or DRM tools. Research/educational. Tested with PPSA01652.",
    "notes": "Firmware-agnostic release — 8.20 and 11.40 verified. Kernel addresses are now resolved at runtime from the PS5 payload SDK, so the same ELF follows firmware 1.00 through 13.60 instead of a hard-coded table. The kernel layer is firmware-agnostic; the app-side hook still matches the HTMLScriptExecute signature of the YouTube build. Verified on real hardware - PS5 8.20 , YouTube…",
-   "stars": 8,
-   "url": "https://github.com/MasterShivnath007/ytps5-sponsorblock"
+   "stars": 9,
+   "url": "https://github.com/MasterShivnath007/ytps5-sponsorblock",
+   "score": 4.36
+  },
+  {
+   "id": "saawant12/orbit-store-ps5@v1.8.5",
+   "kind": "new",
+   "repo": "saawant12/orbit-store-ps5",
+   "cid": "",
+   "name": "orbit-store-ps5",
+   "tag": "v1.8.5",
+   "pre": false,
+   "date": "2026-11-04T17:35:29Z",
+   "desc": "A modern PS5 download manager with a native TV app, phone controls and Orbit Zero for Mac, Windows and Linux.",
+   "notes": "We’re shipping improvements and bug fixes across our apps: - The catalogue now has 2,368 games and 5,306 download options , plus 631 add-ons with 633 options across 197 base games . - 1,064 existing download options now identify the format inside their archive and the space needed after extraction. Orbit Store · Native PS5 app (FFPKG) and browser (ELF) - Fixed the Downloads…",
+   "stars": 1374,
+   "url": "https://github.com/saawant12/orbit-store-ps5",
+   "score": 10.0
   },
   {
    "id": "holdmysocks/ps5-tailscale@v0.7.3",
@@ -322,21 +448,23 @@
    "pre": false,
    "date": "2026-11-04T16:05:32Z",
    "notes": "After updating, check your autoload settings. If a payload manager or autoloader starts Tailscale with the console, make sure it starts the new version, or the old one comes back after a restart. The easy way: keep that copy under a fixed name such as tailscale.elf and save the new release over it, or name its path under Payload file to keep up to date in the settings so the…",
-   "url": "https://github.com/holdmysocks/ps5-tailscale/releases/tag/v0.7.3"
+   "url": "https://github.com/holdmysocks/ps5-tailscale/releases/tag/v0.7.3",
+   "stars": 65,
+   "score": 1.0
   },
   {
-   "id": "bps2414/lineup@v1.8.0",
-   "kind": "new",
-   "repo": "bps2414/lineup",
-   "cid": "",
-   "name": "lineup",
-   "tag": "v1.8.0",
+   "id": "notmaj0r/CheatRunner@v0.18.1",
+   "kind": "update",
+   "repo": "notmaj0r/CheatRunner",
+   "cid": "cheatrunner",
+   "name": "CheatRunner",
+   "tag": "v0.18.1",
    "pre": false,
-   "date": "2026-11-03T23:55:30Z",
-   "desc": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React.",
-   "notes": "1.8.0 - A moved app stays on its new tab when it is installed again. Game Compressor's payload installs its shortcut again each time it starts, which put it back under Games ( 11). - Lineup itself can move to the Media tab ( 12). - Hidden apps has a switch for the Media Gallery, like the one for the PS Store ( 12). - The bug report adds where each app is installed. - More…",
-   "stars": 19,
-   "url": "https://github.com/bps2414/lineup"
+   "date": "2026-11-03T20:12:18Z",
+   "notes": "CheatRunner v0.18.1 See the full changelog here: Changelog ⚠️ Before updating to a new CheatRunner version, please follow these steps: Updating CheatRunner Special Thanks: 💖 Supporters — those who supported the project through Ko-Fi, Buy Me a Coffee, or PIX. • Vinas • Someone • Bruno Sanglard • AirKingBR • Marcus • Jeffs • cavalcanti27 • Maffioh • PCYGOR • Lucas Clinio Maraia…",
+   "url": "https://github.com/notmaj0r/CheatRunner/releases/tag/v0.18.1",
+   "stars": 296,
+   "score": 1.0
   },
   {
    "id": "elripalda/Porpoise@v4.5",
@@ -348,7 +476,9 @@
    "pre": false,
    "date": "2026-11-03T19:07:50Z",
    "notes": "Porpoise 4.5 A new look, PlayStation Move motion controls, up to four players in Wii games, Triforce arcade games, and VRR. The new look - A new Porpoise look built around your collection: real disc cases you move through with the stick, in Light , Dark or OLED - The side menu: press Triangle , or swipe in from the right edge of the touch pad, to reach Settings and everything…",
-   "url": "https://github.com/elripalda/Porpoise-Dolphin-Emulator-for-PS5/releases/tag/v4.5"
+   "url": "https://github.com/elripalda/Porpoise-Dolphin-Emulator-for-PS5/releases/tag/v4.5",
+   "stars": 233,
+   "score": 2.5
   },
   {
    "id": "elripalda/Porpoise-Dolphin-Emulator-for-PS5@v4.5",
@@ -361,8 +491,24 @@
    "date": "2026-11-03T19:07:50Z",
    "desc": "A native GameCube and Wii emulator for jailbroken PS5, powered by Dolphin. Cover-flow library, box art, memory cards, original music.",
    "notes": "Porpoise 4.5 A new look, PlayStation Move motion controls, up to four players in Wii games, Triforce arcade games, and VRR. The new look - A new Porpoise look built around your collection: real disc cases you move through with the stick, in Light , Dark or OLED - The side menu: press Triangle , or swipe in from the right edge of the touch pad, to reach Settings and everything…",
-   "stars": 232,
-   "url": "https://github.com/elripalda/Porpoise-Dolphin-Emulator-for-PS5"
+   "stars": 233,
+   "url": "https://github.com/elripalda/Porpoise-Dolphin-Emulator-for-PS5",
+   "score": 13.0
+  },
+  {
+   "id": "disco-trooper/hush@v1.1.1",
+   "kind": "new",
+   "repo": "disco-trooper/hush",
+   "cid": "",
+   "name": "hush",
+   "tag": "v1.1.1",
+   "pre": false,
+   "date": "2026-11-03T16:28:41Z",
+   "desc": "Turns off the PlayStation 5's continuous recent-gameplay recording. With nothing encoded, there is nothing for the console to save.",
+   "notes": "A leftover state.txt no longer looks like a live patch /data/hush/state.txt exists while the patch is in place and is deleted once every slot is restored. Tools read it that way: PS5Upload's upcoming hold-mode support (phantomptr/ps5upload 651) waits for the file to go before starting a stream. A reboot drops the patch but not the file. After a boot with hold s=0 , a console…",
+   "stars": 15,
+   "url": "https://github.com/disco-trooper/hush",
+   "score": 4.6
   },
   {
    "id": "Herbrax/Chiral-FTP@v1.2",
@@ -374,7 +520,9 @@
    "pre": false,
    "date": "2026-11-03T16:08:39Z",
    "notes": "chiral-ftp 1.2 [](https://github.com/Herbrax/chiral-ftp/releases/tag/v1.2) [](https://github.com/Herbrax/chiral-ftp/stargazers) chiral-ftp now runs on Android : phones, tablets, foldables and Android TV , from one APK. That makes six platforms: Windows, Mac, Linux, Android, Nintendo Switch and PS5. All of them find each other with Quick connect, and from this version on, all…",
-   "url": "https://github.com/Herbrax/Chiral-FTP/releases/tag/v1.2"
+   "url": "https://github.com/Herbrax/Chiral-FTP/releases/tag/v1.2",
+   "stars": 10,
+   "score": 2.5
   },
   {
    "id": "gasb07/NeoEnabler@v0.6.2",
@@ -386,7 +534,9 @@
    "pre": false,
    "date": "2026-11-03T15:17:11Z",
    "notes": "- 8GB Mode on firmware 10.01 (PS5 Pro), experimental. (Contributed by squallsama, who tested it with Bloodborne and other games.) - 8GB Mode now works on firmware 10.01 and 12.70 together with ShadowMount+ and kstuff (12.70 confirmed with Bloodborne by jinxcase000). Before, it refused to start when another payload already used part of the memory area it needs; it now takes a…",
-   "url": "https://github.com/gasb07/NeoEnabler/releases/tag/v0.6.2"
+   "url": "https://github.com/gasb07/NeoEnabler/releases/tag/v0.6.2",
+   "stars": 213,
+   "score": 1.0
   },
   {
    "id": "knutwurst/ps5-patchdl@v0.3.12",
@@ -398,7 +548,24 @@
    "pre": false,
    "date": "2026-11-02T20:40:16Z",
    "notes": "- Updates now install right after the download by default. This applies to new setups; if you saved your settings before, PatchDL keeps your choice, and you can turn on \"Install after download\" in the settings. - Astro's Playroom is no longer marked experimental. On a freshly reset console PatchDL downloaded and installed it without problems. - Donations now go through Ko-fi:…",
-   "url": "https://github.com/knutwurst/ps5-patchdl/releases/tag/v0.3.12"
+   "url": "https://github.com/knutwurst/ps5-patchdl/releases/tag/v0.3.12",
+   "stars": 242,
+   "score": 1.0
+  },
+  {
+   "id": "cobanov/PS5LM@v0.11.0",
+   "kind": "new",
+   "repo": "cobanov/PS5LM",
+   "cid": "",
+   "name": "PS5LM",
+   "tag": "v0.11.0",
+   "pre": false,
+   "date": "2026-11-02T15:40:14Z",
+   "desc": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8",
+   "notes": "One zip again: every PS5LM can be a fleet worker, and a PC's GPU can join a fleet too. Models get more memory and, with sliding-window attention, far longer contexts; codex works with Qwen models; a console serving a model no longer falls into rest mode; and a debug report, the app's own storage and an OnionHEN fix for consoles where the app could not start. Install: unzip…",
+   "stars": 830,
+   "url": "https://github.com/cobanov/PS5LM",
+   "score": 10.0
   },
   {
    "id": "saawant12/orbit-play-ps5@v0.7.0",
@@ -412,7 +579,23 @@
    "desc": "Remote Play for jailbroken PS5s on Mac, Windows and Linux. Play at home without PSN sign-in, or away from home over a direct, encrypted connection. Supports local PS5 accounts and sets up Remote Play for you.",
    "notes": "Orbit Play 0.7.0 (Beta) Orbit Play is a free, open-source Remote Play app for jailbroken PS5s on Mac, Windows and Linux. Stream without a PSN sign-in, including from offline PS5 accounts that have never been linked to PSN. Account setup, the account ID, the Remote Play PIN, pairing and streaming all happen in one desktop app, so there's no base64 account-ID conversion, PIN…",
    "stars": 21,
-   "url": "https://github.com/saawant12/orbit-play-ps5"
+   "url": "https://github.com/saawant12/orbit-play-ps5",
+   "score": 4.84
+  },
+  {
+   "id": "kvaps/ProsperoWeb@v0.2.1",
+   "kind": "new",
+   "repo": "kvaps/ProsperoWeb",
+   "cid": "",
+   "name": "ProsperoWeb",
+   "tag": "v0.2.1",
+   "pre": false,
+   "date": "2026-11-02T14:41:29Z",
+   "desc": "ProsperoWeb: homebrew web browser for PlayStation 5, upstream WebKit (PlayStation port) built with the open ps5-payload-sdk",
+   "notes": "Fixed - Startup on consoles whose ELF loader keeps the launch connection open until the payload exits (etaHEN's bundled elfldr, and some jailbreak hosts). The loader request is now sent asynchronously and the UI connects to the spawn broker as soon as it is listening, instead of blocking on the loader's response while the broker timed out with no client. The browser now starts…",
+   "stars": 48,
+   "url": "https://github.com/kvaps/ProsperoWeb",
+   "score": 5.92
   },
   {
    "id": "bornaradusin/Emby5@1.3.1",
@@ -424,7 +607,9 @@
    "pre": false,
    "date": "2026-11-02T08:49:05Z",
    "notes": "What's new 4K playback - 4K videos, including 4K (UHD) Blu-ray disc images, now get the PS5's hardware video decoder when it couldn't find enough memory before. Emby5 frees the decoders it isn't using for as long as the 4K video plays, and brings them back afterwards. Installation and updating 1. Close Emby5 completely. 2. Download Emby5-1.3.1.zip from the assets below, not a…",
-   "url": "https://github.com/bornaradusin/Emby5/releases/tag/1.3.1"
+   "url": "https://github.com/bornaradusin/Emby5/releases/tag/1.3.1",
+   "stars": 12,
+   "score": 1.0
   },
   {
    "id": "keklick1337/rps5e@v0.1.4-alpha",
@@ -438,7 +623,8 @@
    "desc": "A PlayStation 5 emulator written in Rust, for Linux and Windows.",
    "notes": "Added - On-screen keyboard for games' text input dialogs (sceImeDialog), drawn over the game: type on the keyboard (Enter accepts, Esc cancels) or use the controller (D-pad and Cross on the keys, Circle cancels, Triangle space, Square delete, L1 / R1 move the caret, L2 shift, R2 or Options accept), or click the keys. The game's pads read released while it is shown, and buttons…",
    "stars": 48,
-   "url": "https://github.com/keklick1337/rps5e"
+   "url": "https://github.com/keklick1337/rps5e",
+   "score": 2.92
   },
   {
    "id": "mucahidkambur/EglantinePS5@v1.000.000",
@@ -450,7 +636,24 @@
    "pre": false,
    "date": "2026-11-01T12:05:14Z",
    "notes": "",
-   "url": "https://github.com/mucahidkambur/EglantinePS5/releases/tag/v1.000.000"
+   "url": "https://github.com/mucahidkambur/EglantinePS5/releases/tag/v1.000.000",
+   "stars": 219,
+   "score": 1.0
+  },
+  {
+   "id": "sharpemu/sharpemu-mac@v0.0.7-pulse",
+   "kind": "new",
+   "repo": "sharpemu/sharpemu-mac",
+   "cid": "",
+   "name": "sharpemu-mac",
+   "tag": "v0.0.7-pulse",
+   "pre": false,
+   "date": "2026-11-01T11:06:07Z",
+   "desc": "An experimental PlayStation 5 emulator for Mac devices.",
+   "notes": "SharpEmu for macOS v0.0.7-pulse Upstream SharpEmu dropped macOS (sharpemu 1123), and this repository is now the macOS build of the PS5 emulator. Since v0.0.6 the whole emulator has been ported to macOS on Apple silicon. That covers host memory, CPU execution, the kernel and HLE libraries, the shader compiler and the GPU backend. The fork adds 237k lines of source and 168k…",
+   "stars": 22,
+   "url": "https://github.com/sharpemu/sharpemu-mac",
+   "score": 4.88
   },
   {
    "id": "Press5elect/Crux2@v1.0.18",
@@ -462,7 +665,9 @@
    "pre": false,
    "date": "2026-11-01T07:06:54Z",
    "notes": "Crux2 v1.0.18 [!IMPORTANT] No games, BIOS files, firmware or keys are included, and none ever will be. Use only legally obtained backups of games you own and a BIOS dumped from your own PlayStation 2. Added - Settings Folders : add game folders from USB drives, network shares or the console's storage, and choose where the BIOS, memory cards, save states, screenshots, cheats,…",
-   "url": "https://github.com/Press5elect/Crux2/releases/tag/v1.0.18"
+   "url": "https://github.com/Press5elect/Crux2/releases/tag/v1.0.18",
+   "stars": 26,
+   "score": 1.0
   },
   {
    "id": "Press5elect/PSSwanStation@build26",
@@ -474,7 +679,9 @@
    "pre": false,
    "date": "2026-11-01T05:17:37Z",
    "notes": "PSSwanStation build 26 Added - The renderer changes while a game runs. Software and Vulkan, both ways: the game goes on where it was, with no restart. The picture presets that change the renderer apply at once too. - Multi-disc games as one (Settings, Interface, View; on): the discs of a game are one entry, sharing one memory card. Discs are now also found when each is in a…",
-   "url": "https://github.com/Press5elect/PSSwanStation/releases/tag/build26"
+   "url": "https://github.com/Press5elect/PSSwanStation/releases/tag/build26",
+   "stars": 39,
+   "score": 6.0
   },
   {
    "id": "Press5elect/PSFlycast@v1.3.5",
@@ -485,8 +692,10 @@
    "tag": "v1.3.5",
    "pre": false,
    "date": "2026-11-01T05:12:07Z",
-   "notes": "New in v1.3.5 Added Threads on cores of their own (Settings &gt; System, on), as Crux2 has them: the emulator on a processor of its own with its core's second thread left empty, the renderer and the interface on another core, and everything else on the cores left over. With the graphics driver on its own thread, Graphics driver on a core of its own (on) gives that thread a…",
-   "url": "https://github.com/Press5elect/PSFlycast/releases/tag/v1.3.5"
+   "notes": "New in v1.3.5 Added Threads on cores of their own (Settings > System, on), as Crux2 has them: the emulator on a processor of its own with its core's second thread left empty, the renderer and the interface on another core, and everything else on the cores left over. With the graphics driver on its own thread, Graphics driver on a core of its own (on) gives that thread a third.…",
+   "url": "https://github.com/Press5elect/PSFlycast/releases/tag/v1.3.5",
+   "stars": 39,
+   "score": 1.0
   },
   {
    "id": "MisterTemaki/snes9xPS5@v2.11",
@@ -498,7 +707,9 @@
    "pre": false,
    "date": "2026-10-31T13:38:26Z",
    "notes": "Snes9x PS5 2.11 New: RetroAchievements Achievements for SNES games from retroachievements.org, with RetroAchievements' own client library (rcheevos 12.5.0). - Logging in. Settings RetroAchievements Log in, with your retroachievements.org user name and password. - The password is hidden as you type and sent once. Only the token the server sends back is kept, in…",
-   "url": "https://github.com/MisterTemaki/snes9xPS5/releases/tag/v2.11"
+   "url": "https://github.com/MisterTemaki/snes9xPS5/releases/tag/v2.11",
+   "stars": 66,
+   "score": 2.5
   },
   {
    "id": "freefelt/Transmission-PS5@0.3",
@@ -512,7 +723,8 @@
    "desc": "The Transmission BitTorrent client as a homebrew payload for the PlayStation 5",
    "notes": "Changes - Transmission no longer runs while the console is in rest mode. The console does not freeze the payload in rest mode (it kept running, and the daemon used a whole CPU core for ten minutes), so the manager now watches the power state of the console (the system's event flags, the same way as ShadowMountPlus): when the console goes to sleep or shuts down, Transmission is…",
    "stars": 7,
-   "url": "https://github.com/freefelt/Transmission-PS5"
+   "url": "https://github.com/freefelt/Transmission-PS5",
+   "score": 4.28
   },
   {
    "id": "freefelt/StoreTileHider-PS5@0.1",
@@ -526,7 +738,38 @@
    "desc": "Hide the \"PlayStation Store\" and \"All Apps\" tiles from the home screen of PS5",
    "notes": "The first public release. Features - One file, StoreTileHider- .elf : each run toggles the \"PlayStation Store\" tile (Games tab) and the \"All Apps\" tile (Media tab) by changing the visible flag in the home screen database. If any of the tiles is shown they are hidden; if all of them are hidden they are shown again. - A short notification on the console, in English and Russian:…",
    "stars": 6,
-   "url": "https://github.com/freefelt/StoreTileHider-PS5"
+   "url": "https://github.com/freefelt/StoreTileHider-PS5",
+   "score": 4.24
+  },
+  {
+   "id": "rodri0x/ps5-hackintosh@",
+   "kind": "new",
+   "repo": "rodri0x/ps5-hackintosh",
+   "cid": "",
+   "name": "ps5-hackintosh",
+   "tag": "",
+   "pre": false,
+   "date": "2026-10-31T08:47:17Z",
+   "desc": "XNU booting bare-metal on a PS5's Zen 2 SoC. UEFI, OpenCore, a crash-kexec hop, and a TV as the only logic analyzer.",
+   "notes": "",
+   "stars": 129,
+   "url": "https://github.com/rodri0x/ps5-hackintosh",
+   "score": 7.16
+  },
+  {
+   "id": "darkxex/SwanStationPS5@1.6.2",
+   "kind": "new",
+   "repo": "darkxex/SwanStationPS5",
+   "cid": "",
+   "name": "SwanStationPS5",
+   "tag": "1.6.2",
+   "pre": false,
+   "date": "2026-10-31T06:24:24Z",
+   "desc": "SwanStationPS5: a PlayStation 1 emulator running natively on jailbroken PS5, based on SwanStation. https://discord.gg/Drx8tsqq3B",
+   "notes": "- New setting, Settings System \"Restart after a game\" (off by default). Closing a game now takes you straight back to the library in the same session, with no restart and no loading screen. A game played from a disc gives back the memory it used and the disc stays on the shelf. Turn the setting on to get the old behaviour, where the app starts again after every game to hand…",
+   "stars": 96,
+   "url": "https://github.com/darkxex/SwanStationPS5",
+   "score": 7.84
   },
   {
    "id": "MiladRTX/Glint@v1.3",
@@ -540,7 +783,23 @@
    "desc": "Watch, hear and record a jailbroken PS5 on your Windows PC with low latency.",
    "notes": "[!IMPORTANT] Glint only works in 60 Hz mode. If a game switches the PS5 to 120 Hz, capture stops until you restart the console. - Glint turns 120 Hz Output off while it runs and puts your setting back when you stop it. - Load Glint from the home screen, before you start a game. - A fix for 120 Hz mode is in the works. Lower latency - Sound much closer to the picture: about…",
    "stars": 20,
-   "url": "https://github.com/MiladRTX/Glint"
+   "url": "https://github.com/MiladRTX/Glint",
+   "score": 4.8
+  },
+  {
+   "id": "heydemoura/EglantinePS5@",
+   "kind": "new",
+   "repo": "heydemoura/EglantinePS5",
+   "cid": "",
+   "name": "EglantinePS5",
+   "tag": "",
+   "pre": false,
+   "date": "2026-10-30T21:11:08Z",
+   "desc": "VERY experimental Nintendo Switch 2 emulator port for PS5",
+   "notes": "",
+   "stars": 318,
+   "url": "https://github.com/heydemoura/EglantinePS5",
+   "score": 11.0
   },
   {
    "id": "elripalda/RecompStore@v2.7.4",
@@ -553,8 +812,9 @@
    "date": "2026-10-30T04:00:44Z",
    "desc": "RecompStore: the free homebrew app store for jailbroken PS5. Installs and updates recompiled game ports, emulators, apps and tools from the console. Bring your own disc.",
    "notes": "RecompStore 2.7.4 - Setting up a game is faster: disc images on the same drive as the game are moved into place instead of copied, so it takes a second and doesn't need room for a second copy. Files from another drive, like a USB stick, are still copied. - Game pages with lots of files to set up now fit their panel. It scrolls to whatever you're on, with a scroll bar on its…",
-   "stars": 368,
-   "url": "https://github.com/elripalda/RecompStore"
+   "stars": 376,
+   "url": "https://github.com/elripalda/RecompStore",
+   "score": 13.0
   },
   {
    "id": "niakw/ProsperoEden-Encore@encore-test-56293953",
@@ -568,7 +828,8 @@
    "desc": "ProsperoEden Encore — experimental Nintendo Switch 1 + 2 (NS1/NS2) emulator PS5 FW 13.60. Audited Eden Vulkan/OpenGL, per-core JIT, FSR, DualSense TV-first UI, 31 languages, multiplayer lobby, per-game profiles, hardened releases. NSP/XCI/NSZ/XCZ/ExeFS/NRO/NSO/NCA/NAX/KIP;…",
    "notes": "Eden Encore — validated native PS5 test package Source SHA: 5629395324ff65c98b50c44f35f2142a4a92654a Successful native CI: https://github.com/niakw/Prospero.Eden-Encore/actions/runs/38752177232 This ZIP is repackaged from the existing successful CI artifact , without recompiling or changing PPSA99008/ . It is a test pre-release , not a stable R1. The selected All-On test build…",
    "stars": 101,
-   "url": "https://github.com/niakw/ProsperoEden-Encore"
+   "url": "https://github.com/niakw/ProsperoEden-Encore",
+   "score": 7.04
   },
   {
    "id": "heydemoura/ProsperoEden@v1.000.111",
@@ -580,7 +841,39 @@
    "pre": true,
    "date": "2026-10-29T21:36:41Z",
    "notes": "This is a mirror of the last version of ProsperoEden by BlackBearReloaded. Until the upstream ProsperoEden repository is made public again this will serve as ProsperoEden distribution - A new title ID: PPSA99016. ProsperoEden used to be PPSA99008, the ID of the earlier ProsperoEden listed in the homebrew catalog, whose repository is not public currently. This version installs…",
-   "url": "https://github.com/heydemoura/ProsperoEden/releases/tag/v1.000.111"
+   "url": "https://github.com/heydemoura/ProsperoEden/releases/tag/v1.000.111",
+   "stars": 26,
+   "score": 0.0
+  },
+  {
+   "id": "holdmysocks/mcla-recomp@v1.0.14",
+   "kind": "new",
+   "repo": "holdmysocks/mcla-recomp",
+   "cid": "",
+   "name": "mcla-recomp",
+   "tag": "v1.0.14",
+   "pre": false,
+   "date": "2026-10-29T15:55:01Z",
+   "desc": "Static recompilation of Midnight Club: Los Angeles (Xbox 360) for PC and PS5. No game data included.",
+   "notes": "The zip below is everything needed to build the game from your own disc: the build scripts, the SDK patches, the function hints and the host application. As always, it holds no game code, assets or keys ; the build takes those from your own copy of Midnight Club: Los Angeles Complete Edition (USA/Europe, Xbox 360) on your machine. Both changes are by ZaidNx ( 29, 30). Thanks!…",
+   "stars": 238,
+   "url": "https://github.com/holdmysocks/mcla-recomp",
+   "score": 13.0
+  },
+  {
+   "id": "darkxex/ProsperoStore@v1.000.116",
+   "kind": "new",
+   "repo": "darkxex/ProsperoStore",
+   "cid": "",
+   "name": "ProsperoStore",
+   "tag": "v1.000.116",
+   "pre": false,
+   "date": "2026-10-29T12:30:23Z",
+   "desc": "Native PS5 app store for the homebrew catalog at ProsperoStore.net (title PPSA99000) https://discord.gg/Drx8tsqq3B",
+   "notes": "Improvements since v1.000.115 - Lapy elevation is back to how it worked in v1.000.112: a resident Lapy service gets the first chance to claim the request, and the helper is sent to the ELF loader only after that. - The HEN request files are tried first again, and etaHEN's command server is asked after them. - The Lapy helper is built with PS5 Payload SDK v0.42 again. - This…",
+   "stars": 523,
+   "url": "https://github.com/darkxex/ProsperoStore",
+   "score": 10.0
   },
   {
    "id": "griches/JamesPond2RobocodRecomp@v1.0.4",
@@ -594,7 +887,8 @@
    "desc": "Static recompilation of James Pond 2: Codename RoboCod (Amiga) to C++ with SDL3: widescreen, smooth motion, Amiga 500 sound, pause menu. Bring your own disk image.",
    "notes": "A fix for saving on Windows: only the very first save ever worked, and every save after it said SAVE FAILED . Changes to the settings weren't kept either. Saves you already have load as before. The other systems didn't have this problem: macOS and Linux stay on 1.0.0, the PlayStation 5 on 1.0.2 and Android on 1.0.3. You need your own Amiga disk image of the game (the Kixx…",
    "stars": 24,
-   "url": "https://github.com/griches/JamesPond2RobocodRecomp"
+   "url": "https://github.com/griches/JamesPond2RobocodRecomp",
+   "score": 2.96
   },
   {
    "id": "seregonwar/zftpd@v1.7.0",
@@ -606,7 +900,9 @@
    "pre": false,
    "date": "2026-10-28T09:20:28Z",
    "notes": "What's Changed Add native PKG uninstall through the installer helper (zhttp) by @NotSoTypicalGamer in https://github.com/seregonwar/zftpd/pull/15 fix: preserve native install/uninstall error codes by @NotSoTypicalGamer in https://github.com/seregonwar/zftpd/pull/16 Fix FEAT reply formatting and reject non-regular SIZE targets by @gmelikov in…",
-   "url": "https://github.com/seregonwar/zftpd/releases/tag/v1.7.0"
+   "url": "https://github.com/seregonwar/zftpd/releases/tag/v1.7.0",
+   "stars": 136,
+   "score": 2.5
   },
   {
    "id": "premohq/PS5-ECAM@v5.1.0",
@@ -618,7 +914,39 @@
    "pre": false,
    "date": "2026-10-28T06:08:12Z",
    "notes": "Download PS5-ECAM-v5.1.0.zip (75.0 MB), on the releases branch. SHA-256: c6a0c0b50617d923a5e7a5cb37d799c746118342cd850d5bca634c3670a6562f From 3.0.0 or later, the app offers this update itself as it starts ( Settings Online PS5-ECAM updates checks again). Otherwise extract the ZIP and copy the PPSA99360 folder to /data/homebrew/PPSA99360 , replacing the old one. Your settings,…",
-   "url": "https://github.com/premohq/PlayTendoh/releases/tag/v5.1.0"
+   "url": "https://github.com/premohq/PlayTendoh/releases/tag/v5.1.0",
+   "stars": 485,
+   "score": 2.5
+  },
+  {
+   "id": "XavyProd-Git/pkg-mutant-shop@v3.99.5",
+   "kind": "new",
+   "repo": "XavyProd-Git/pkg-mutant-shop",
+   "cid": "",
+   "name": "pkg-mutant-shop",
+   "tag": "v3.99.5",
+   "pre": false,
+   "date": "2026-10-26T01:22:00Z",
+   "desc": "A homebrew package manager and store front-end for a jailbroken PlayStation 5 and PlayStation 4 - from the console, a PC, or your phone.",
+   "notes": "This release is about Payloads & Homebrews. Every window - the PC, the PS5's own page, the PS4's own page and a phone - now shows the same thing: what each console really holds and runs, not what the PC happens to have downloaded. An Update now does the whole job on the console, the Queue shows each step, and a console that is switched off and on again keeps what it was given.…",
+   "stars": 18,
+   "url": "https://github.com/XavyProd-Git/pkg-mutant-shop",
+   "score": 4.72
+  },
+  {
+   "id": "deox1111/ps5-library@v0.7.39",
+   "kind": "new",
+   "repo": "deox1111/ps5-library",
+   "cid": "",
+   "name": "ps5-library",
+   "tag": "v0.7.39",
+   "pre": false,
+   "date": "2026-10-25T17:57:46Z",
+   "desc": "Game library for jailbroken PS5: pick a game, it downloads, installs and appears on your home screen.",
+   "notes": "[!NOTE] REST MODE CURRENTLY WORKS ONLY ON INTERNAL STORAGE, NOT USB. USB SUPPORT IS IN PROGRESS. Keep the console awake for USB downloads and unpacking. Changes - Upload a catalog file. Have a catalog as a .json file instead of an address? Open the library on your phone or computer, go to Settings → Catalogs and press Upload a catalog file . The file (up to 30 MB) is kept on…",
+   "stars": 325,
+   "url": "https://github.com/deox1111/ps5-library",
+   "score": 10.0
   },
   {
    "id": "BallerIsLeet/AnyController@v0.1.0",
@@ -632,7 +960,8 @@
    "desc": "Use Switch Pro and Xbox/XInput controllers on a jailbroken PS5 as a virtual DualSense",
    "notes": "Install Direct: send anycontroller.elf to your ELF loader on port 9021, e.g. python3 send payload.py anycontroller.elf Payload Manager: copy anycontroller.elf and anycontroller.elf.json into /data/pldmgr/payloads/anycontroller/ over FTP, then launch it. Use Plug in a Switch Pro Controller (USB) or an Xbox 360 / XInput controller (USB or 2.4GHz dongle). It appears as a…",
    "stars": 17,
-   "url": "https://github.com/BallerIsLeet/AnyController"
+   "url": "https://github.com/BallerIsLeet/AnyController",
+   "score": 4.68
   },
   {
    "id": "Wigglez-sudo/12.xx-linux-loader@12.xx",
@@ -646,7 +975,8 @@
    "desc": "Working Linux Loader For PS5 Firmware 12.00/12.02/12.20/12.40/12.60/12.70 — Phat and Slim",
    "notes": "Linux Loader AIO Boot Linux on a PS5 (Phat or Slim) that's on firmware 12.xx. One file. What this is Our own build, from our own 12.xx offset tables, with extra sanity checks. It writes ps5lin probe.log to the USB drive's boot partition — adding to it each run, so the whole history is kept — which is what a failure gets diagnosed from instead of guessed at. It's built for…",
    "stars": 53,
-   "url": "https://github.com/Wigglez-sudo/12.xx-linux-loader"
+   "url": "https://github.com/Wigglez-sudo/12.xx-linux-loader",
+   "score": 6.12
   },
   {
    "id": "MisterTemaki/genplusgxPS5@v2.2.1",
@@ -658,7 +988,9 @@
    "pre": false,
    "date": "2026-10-24T12:47:11Z",
    "notes": "Genesis Plus GX PS5 2.2.1 Fixed - A card for a game without a cover shows its own system's controller ( 4). The card's corner had the four coloured buttons of a Super Nintendo pad, left over from Snes9x PS5. It now shows three buttons in a row for a Mega Drive or Sega CD game, and two for a Master System, Game Gear or SG-1000 game. Thanks to CroCop86 for the report. - Network…",
-   "url": "https://github.com/MisterTemaki/genplusgxPS5/releases/tag/v2.2.1"
+   "url": "https://github.com/MisterTemaki/genplusgxPS5/releases/tag/v2.2.1",
+   "stars": 14,
+   "score": 1.0
   },
   {
    "id": "MisterTemaki/beetlepcePS5@v1.1.1",
@@ -670,7 +1002,9 @@
    "pre": false,
    "date": "2026-10-24T12:44:35Z",
    "notes": "Beetle PCE PS5 1.1.1 Fixed - A card for a game without a cover shows a PC Engine pad with its two round buttons (II, I). Before, it showed the four coloured buttons of a Super Nintendo pad, left over from Snes9x PS5. Thanks to CroCop86 for the report (genplusgxPS5 4). - CD games on network shares: - On a slow link, the running game's own read-ahead now goes before the CD's…",
-   "url": "https://github.com/MisterTemaki/beetlepcePS5/releases/tag/v1.1.1"
+   "url": "https://github.com/MisterTemaki/beetlepcePS5/releases/tag/v1.1.1",
+   "stars": 2,
+   "score": 1.0
   },
   {
    "id": "ItsBlurf/BFpilot@v0.4.9",
@@ -682,7 +1016,9 @@
    "pre": true,
    "date": "2026-10-24T04:48:24Z",
    "notes": "BFpilot 0.4.9 Added - SMB2/3 connections, share browsing, file operations, transfers and text editing. - SMB-hosted PKG details, icons and installation sources; payload loading from SMB. - Built-in archive service with AES ZIP and additional formats. - Multiple-archive extraction with destination and merge/replace options. - Individual selected-item downloads alongside…",
-   "url": "https://github.com/ItsBlurf/BFpilot/releases/tag/v0.4.9"
+   "url": "https://github.com/ItsBlurf/BFpilot/releases/tag/v0.4.9",
+   "stars": 65,
+   "score": -1.0
   },
   {
    "id": "sub0x00001/padbridge@v1.3.1",
@@ -696,7 +1032,8 @@
    "desc": "Use controllers the PS5 does not accept as extra DualSense pads on a jailbroken PS5 (tested on 13.60): 8BitDo Ultimate 2C, 8BitDo USB Wireless Adapter 2 (DualSense, Switch Pro, GameSir G8...), wired XInput. Rumble in PS4 games, up to 4 pads, settings page.",
    "notes": "A fix for rest mode. Tested on a PS5 Slim (CFI-2114), firmware 13.60. See the README for compatibility and the settings page. Files - padbridge-1.3.1.elf : the payload. Send it to your payload loader or add it to Payload Manager's autoload. - padbridge-probe.elf : an optional read-only diagnostic that dumps the descriptors and reports of USB devices plugged into the console.…",
    "stars": 20,
-   "url": "https://github.com/sub0x00001/padbridge"
+   "url": "https://github.com/sub0x00001/padbridge",
+   "score": 4.8
   },
   {
    "id": "viviandsx/regie5@v0.8.0",
@@ -710,7 +1047,8 @@
    "desc": "Native PS5 homebrew to control Sonarr, Radarr, Seerr, Jellyfin, Plex and Emby from the couch",
    "notes": "Régie5 0.8.0: your disks' health and your viewing statistics, both optional. Two optional services, read-only like everything Régie5 reads: if you do not use them, nothing changes on screen. Disk health, with Scrutiny - If you run Scrutiny, give its address on the phone page (no key needed): a failing disk, a disk too hot, or one whose last reading is more than 48 hours old…",
    "stars": 8,
-   "url": "https://github.com/viviandsx/regie5"
+   "url": "https://github.com/viviandsx/regie5",
+   "score": 4.32
   },
   {
    "id": "BrinooTk/PS5X360@v1.0.2",
@@ -722,7 +1060,9 @@
    "pre": false,
    "date": "2026-10-22T23:27:57Z",
    "notes": "PS5X360 v1.0.2 Online play now gets past the start on the PS5, the emulator speaks every language it lists, a dark theme, a Windows app that installs DLC and title updates over the network, and the Helper 1.3.0. Compatibility keeps improving, but results depend on the game, firmware and homebrew setup. Online play (experimental) Turn it on in the home screen's Online channel…",
-   "url": "https://github.com/BrinooTk/PS5X360/releases/tag/v1.0.2"
+   "url": "https://github.com/BrinooTk/PS5X360/releases/tag/v1.0.2",
+   "stars": 409,
+   "score": 1.0
   },
   {
    "id": "ps5-payload-dev/elfldr@v0.27",
@@ -734,7 +1074,9 @@
    "pre": false,
    "date": "2026-10-21T17:42:19Z",
    "notes": "",
-   "url": "https://github.com/ps5-payload-dev/elfldr/releases/tag/v0.27"
+   "url": "https://github.com/ps5-payload-dev/elfldr/releases/tag/v0.27",
+   "stars": 159,
+   "score": 1.5
   },
   {
    "id": "heni0xyz/PS5Save@v2",
@@ -748,7 +1090,8 @@
    "desc": "USB save backup utility for jailbroken PS5’s",
    "notes": "- Changed the default backup interval to 60 seconds - Added per-title protection: other saves can back up while you play - Added automatic retries after closing a protected game - Improved unchanged-file detection - Fixed closed games staying postponed due to leftover sandbox mounts - Added the version to notification titles",
    "stars": 58,
-   "url": "https://github.com/heni0xyz/PS5Save"
+   "url": "https://github.com/heni0xyz/PS5Save",
+   "score": 6.32
   },
   {
    "id": "griches/PS5_MarioGalaxy@v1.1.0",
@@ -762,7 +1105,8 @@
    "desc": "Super Mario Galaxy on the PlayStation 5: Nebula's static recompilation on a Win32 compatibility layer, Direct3D 12 on vkd3d and RADV",
    "notes": "Motion controls: point the DualSense at the screen like a Wii Remote, tilt it for the Star Ball and the ray, and shake it to spin if you like. Motion controls They're on from the first start, and the right stick still points as well. - Pointing : turn the DualSense left, right, up and down and the pointer follows, like a Wii Remote aimed at the screen. It works the same with…",
    "stars": 29,
-   "url": "https://github.com/griches/PS5_MarioGalaxy"
+   "url": "https://github.com/griches/PS5_MarioGalaxy",
+   "score": 5.16
   },
   {
    "id": "ZiZc3/Ruffle-Flash-PS5@v1.3.0",
@@ -774,7 +1118,9 @@
    "pre": false,
    "date": "2026-10-21T02:37:53Z",
    "notes": "v1.3.0 Saves - Fixed: game saves were lost when the console was turned off, put in rest mode or the app was closed while still in a game ( 1). Saves are now kept every 3 seconds and whenever the quick menu opens - Saves are written in the background, so games never stutter while saving Fixes - The Recent tab now highlights the game you just played - Games with the same file…",
-   "url": "https://github.com/ZiZc3/Ruffle-Flash-PS5/releases/tag/v1.3.0"
+   "url": "https://github.com/ZiZc3/Ruffle-Flash-PS5/releases/tag/v1.3.0",
+   "stars": 20,
+   "score": 2.5
   },
   {
    "id": "mihawk-99/PS5_RetroArch@v4.0.0-beta-4",
@@ -786,7 +1132,9 @@
    "pre": false,
    "date": "2026-10-19T20:58:35Z",
    "notes": "PS5 RetroArch-v4.0.0-beta-4 PS5 RetroArch is a passion project, not a piracy project. It exists so you can play the games you own on the console you own. - Piracy is not condoned. - No games, BIOS files, console firmware or decryption keys are included, and they never will be. - Use only legally obtained backups of games you own , made yourself from your own discs, cartridges…",
-   "url": "https://github.com/mihawk-99/PS5_RetroArch/releases/tag/v4.0.0-beta-4"
+   "url": "https://github.com/mihawk-99/PS5_RetroArch/releases/tag/v4.0.0-beta-4",
+   "stars": 431,
+   "score": 6.0
   },
   {
    "id": "Marice/ps5-exporter@v0.3.1",
@@ -798,241 +1146,680 @@
    "pre": false,
    "date": "2026-10-19T17:10:18Z",
    "notes": "Changed - The process is named ps5-exporter.elf . Started through an ELF loader's port it showed as payload.elf in process lists such as pldmgr's and PayLoader's.",
-   "url": "https://github.com/Marice/ps5-exporter/releases/tag/v0.3.1"
+   "url": "https://github.com/Marice/ps5-exporter/releases/tag/v0.3.1",
+   "stars": 12,
+   "score": 1.0
   },
   {
-   "id": "smoxa/ps5-new-overlay@v1.0.19",
-   "kind": "update",
-   "repo": "smoxa/ps5-new-overlay",
-   "cid": "overlay",
-   "name": "PS5 Hardware Overlay",
-   "tag": "v1.0.19",
-   "pre": false,
-   "date": "2026-10-18T10:19:27Z",
-   "notes": "🎮 PS5 In-Game Overlay v1.0.19 Standalone in-game hardware telemetry overlay for jailbroken PlayStation 5 with real-time hardware monitoring and built-in Web configuration panel. ✨ Features - 12 Live Hardware Metrics : - FPS : Hardware Display Controller Engine scanout flip counter ( /dev/dce ) - CPU : Zen 2 Tctl core temperature (°C) - LOAD : CPU utilization (%) - CCLK : Zen 2…",
-   "url": "https://github.com/smoxa/ps5-new-overlay/releases/tag/v1.0.19"
-  },
-  {
-   "id": "TheRealRetro/mupen64plus-ps5@0.7.5",
-   "kind": "update",
-   "repo": "TheRealRetro/mupen64plus-ps5",
-   "cid": "mupen64",
-   "name": "Mupen64Plus PS5",
-   "tag": "0.7.5",
-   "pre": false,
-   "date": "2026-10-18T01:32:23Z",
-   "notes": "New - Cheat search: find where a game keeps a number (lives, health, money) and make your own cheat from it. In the pause menu, Cheats → Search for a Cheat: search for the value the game shows, or without a value for things like a health bar. Then play, pause, and pick what happened to it (changed, went up, went down by the value...) until only a few addresses are left. In…",
-   "url": "https://github.com/TheRealRetro/mupen64plus-ps5/releases/tag/0.7.5"
-  },
-  {
-   "id": "02dnot/Jelly5@v0.7.0",
-   "kind": "update",
-   "repo": "02dnot/Jelly5",
-   "cid": "jelly5",
-   "name": "Jelly5",
-   "tag": "v0.7.0",
-   "pre": false,
-   "date": "2026-10-17T07:17:18Z",
-   "notes": "Jelly5 0.7.0 brings the changes currently on main since 0.6.1. - HDR video reaches an HDR10 TV as HDR10, with clean glass overlays. ( 49) - Set the playback read-ahead buffer from 30 seconds to 5 minutes. ( 54) - Show library rows on Home as portrait posters if you prefer. ( 48) - Choose a title's media version in Options or when you press Play. ( 55) - Navigate and use media…",
-   "url": "https://github.com/02dnot/Jelly5/releases/tag/v0.7.0"
-  },
-  {
-   "id": "pinkythegawd/ps5-webkit-autoloader@v0.7.1",
+   "id": "Epinorr/y2jb-update-blocker@v1.0.2",
    "kind": "new",
-   "repo": "pinkythegawd/ps5-webkit-autoloader",
+   "repo": "Epinorr/y2jb-update-blocker",
    "cid": "",
-   "name": "ps5-webkit-autoloader",
-   "tag": "v0.7.1",
+   "name": "y2jb-update-blocker",
+   "tag": "v1.0.2",
    "pre": false,
-   "date": "2026-10-15T18:12:35Z",
-   "desc": "Offline PS5 WebKit Autoloader for firmware 1.00-5.50 and 7.00-13.60 (umtx2 + Poops + Relapse) - by MikePinku",
-   "notes": "Full Changelog : https://github.com/pinkythegawd/ps5-webkit-autoloader/compare/v0.7.0...v0.7.1",
-   "stars": 5,
-   "url": "https://github.com/pinkythegawd/ps5-webkit-autoloader"
-  },
-  {
-   "id": "fstat13/PSCapture@v0.1.0",
-   "kind": "new",
-   "repo": "fstat13/PSCapture",
-   "cid": "",
-   "name": "PSCapture",
-   "tag": "v0.1.0",
-   "pre": true,
-   "date": "2026-10-15T12:50:41Z",
-   "desc": "Turn a jailbroken PS5 into a real capture card on your PC: screen over LAN as a 'PS5 Capture' camera in Discord/OBS. No capture card, no Remote Play. by fstat13",
-   "notes": "PSCapture v0.1 - PS5 screen to PC as a real capture card. No capture card, no Remote Play. The single file pscapture.exe contains everything: the console payload (pscapture.elf) and the Windows capture driver (pscapture.dll) travel inside it. First launch: self-elevation, driver install, payload deploy to the console, then streaming - one window, one click. The PS5 shows a…",
-   "stars": 9,
-   "url": "https://github.com/fstat13/PSCapture"
-  },
-  {
-   "id": "LaRazaDelSol/wings-app@v0.1.3",
-   "kind": "new",
-   "repo": "LaRazaDelSol/wings-app",
-   "cid": "",
-   "name": "wings-app",
-   "tag": "v0.1.3",
-   "pre": false,
-   "date": "2026-10-15T03:49:15Z",
-   "desc": "A PS5 Frontend Solution for a Seamless & Frustration Free On-Device Experiences",
-   "notes": "Wings 0.1.3 Wings updates itself From now on you never copy files to update Wings. When a new version is out, Wings tells you when it starts and opens an update page with four steps: 1. Check - finds the new version. 2. Download - downloads it and checks it against the published SHA-256, with progress and Cancel. 3. Install - puts it in place in a few seconds. Your current…",
-   "stars": 9,
-   "url": "https://github.com/LaRazaDelSol/wings-app"
-  },
-  {
-   "id": "griches/PS5_Dusklight@v1.0.0",
-   "kind": "new",
-   "repo": "griches/PS5_Dusklight",
-   "cid": "",
-   "name": "PS5_Dusklight",
-   "tag": "v1.0.0",
-   "pre": false,
-   "date": "2026-10-14T22:02:56Z",
-   "desc": "Dusklight for PlayStation 5: a homebrew port on RADV (Aurora, Dawn WebGPU, SDL3). Bring your own disc image.",
-   "notes": "Version 1.0, with new home-screen art. Built from upstream Dusklight revision 34a144a493 , the latest on its main , as v0.3.0 was. Changed - New home-screen art. The icon, the background behind the title and the splash while it starts are a new picture in the spirit of the game's own cover: a young swordsman and a black wolf, split by a seam of twilight, over carved stone in…",
-   "stars": 16,
-   "url": "https://github.com/griches/PS5_Dusklight"
-  },
-  {
-   "id": "griches/PS5_DevTools@v0.1.0",
-   "kind": "new",
-   "repo": "griches/PS5_DevTools",
-   "cid": "",
-   "name": "PS5_DevTools",
-   "tag": "v0.1.0",
-   "pre": false,
-   "date": "2026-10-14T14:51:14Z",
-   "desc": "Crash reports and memory graphs for homebrew on a jailbroken PS5: a resident payload that records every crash with backtraces and graphs each title's memory, with a dashboard on your network.",
-   "notes": "The first release: crash reports and memory graphs for homebrew on a jailbroken PS5. To use it: send ps5devtools.elf to your ELF loader (port 9021), then open http:// :9113/ in a browser on the same network. Or clone the repo and run tools/ps5devtools.py load , then tools/ps5devtools.py serve for the dashboard with function names. - Attaches to every homebrew title (folders in…",
-   "stars": 6,
-   "url": "https://github.com/griches/PS5_DevTools"
-  },
-  {
-   "id": "rodri0x/ps5-airplay@v0.1.2",
-   "kind": "new",
-   "repo": "rodri0x/ps5-airplay",
-   "cid": "",
-   "name": "ps5-airplay",
-   "tag": "v0.1.2",
-   "pre": false,
-   "date": "2026-10-13T19:03:26Z",
-   "desc": "AirPlay screen-mirroring receiver for jailbroken PS5: mirror an iPhone, iPad or Mac to your TV with sound, as a payload (not official)",
-   "notes": "Full Changelog : https://github.com/rodri0x/ps5-airplay/compare/v0.1.1...v0.1.2",
-   "stars": 39,
-   "url": "https://github.com/rodri0x/ps5-airplay"
-  },
-  {
-   "id": "griches/PS5_SwitchWaker@v1.0.3",
-   "kind": "new",
-   "repo": "griches/PS5_SwitchWaker",
-   "cid": "",
-   "name": "PS5_SwitchWaker",
-   "tag": "v1.0.3",
-   "pre": false,
-   "date": "2026-10-13T14:40:18Z",
-   "desc": "The Wind Waker (GameCube) for PlayStation 5 homebrew: SwitchWaker on the PS5 Vulkan stack. No game data included.",
-   "notes": "Fixed - A crash in Dragon Roost Cavern, in the rooms with the hanging platforms. It showed as the game closing, or as an error message naming SIGSEGV , and was most likely to happen on coming back to a room after cutting a platform's ropes, including after loading a save. Thanks to the player who photographed the error message: the addresses in it were enough to find the…",
-   "stars": 19,
-   "url": "https://github.com/griches/PS5_SwitchWaker"
-  },
-  {
-   "id": "tsuramatsu1/PSP5@v1.000.100",
-   "kind": "update",
-   "repo": "tsuramatsu1/PSP5",
-   "cid": "psp5",
-   "name": "PSP5",
-   "tag": "v1.000.100",
-   "pre": false,
-   "date": "2026-10-12T15:26:25Z",
-   "notes": "PSP5 01.000.100 PSP5 now follows the console's language, reads games and texture packs from USB drives, and lets you remap the PSP's buttons. Interface language Choose a language under Settings → System → Language and the home screen follows it, not just the emulator. 45 languages are available, including Japanese, Korean, Chinese, Arabic, Hebrew, Thai and Lao. The font…",
-   "url": "https://github.com/tsuramatsu1/psp5/releases/tag/v1.000.100"
-  },
-  {
-   "id": "illusionyy/ps-patch-system@38108724867",
-   "kind": "update",
-   "repo": "illusionyy/ps-patch-system",
-   "cid": "patchsys",
-   "name": "Parches de juegos (ps-patch-system)",
-   "tag": "38108724867",
-   "pre": false,
-   "date": "2026-10-11T03:33:58Z",
-   "notes": "What's Changed patchGetAppInfoSfo: fix pattern for new firmware ps4 by @illusionyy in https://github.com/illusionyy/ps-patch-system/pull/32 shellcore: patch preLaunchUpdateCheck flags by @illusionyy in https://github.com/illusionyy/ps-patch-system/pull/33 Full Changelog : https://github.com/illusionyy/ps-patch-system/compare/37549880588...38108724867",
-   "url": "https://github.com/illusionyy/ps-patch-system/releases/tag/38108724867"
-  },
-  {
-   "id": "StonedModder/PShare@1.0",
-   "kind": "update",
-   "repo": "StonedModder/PShare",
-   "cid": "pshare",
-   "name": "PShare",
-   "tag": "1.0",
-   "pre": false,
-   "date": "2026-10-10T15:51:36Z",
-   "notes": "PShare sends your PS5 captures where you want them, the moment you take them. Take a screenshot or save a clip with the Create button and PShare sends it to Discord, Telegram, catbox.moe, a USB drive, a shared folder on your PC or a dozen other places, automatically and in the background, even after you close the app. It doubles as a media gallery: browse every capture by…",
-   "url": "https://github.com/StonedModder/PShare/releases/tag/1.0"
-  },
-  {
-   "id": "itsPLK/ps5-pkg-manager@v1.5.1",
-   "kind": "update",
-   "repo": "itsPLK/ps5-pkg-manager",
-   "cid": "pkgmanager",
-   "name": "PKG Manager",
-   "tag": "v1.5.1",
-   "pre": false,
-   "date": "2026-10-10T15:38:10Z",
-   "notes": "- Added support for PS5 backport patches that previously appeared as unknown packages - Show an \"SDK target\" badge for PS5 packages when the executable's SDK version can be read reliably - Improved installed-version detection so newer PS5 patches can be installed and already installed updates are correctly recognized Full Changelog:…",
-   "url": "https://github.com/itsPLK/ps5-pkg-manager/releases/tag/v1.5.1"
-  },
-  {
-   "id": "mortyzip/KeepAwake@v1.5.0",
-   "kind": "new",
-   "repo": "mortyzip/KeepAwake",
-   "cid": "",
-   "name": "KeepAwake",
-   "tag": "v1.5.0",
-   "pre": false,
-   "date": "2026-10-09T21:28:26Z",
-   "desc": "",
-   "notes": "What's new - Dark mode. Choose Light, Dark or Auto on the control page. Auto is light from 7 am to 7 pm and dark at night. The choice is saved per browser. - The control page now adapts to the screen: one column on a phone, two on a tablet, three on a computer or TV, so it fits without scrolling. - Websites open elsewhere on your network can no longer control it. Requests from…",
-   "stars": 8,
-   "url": "https://github.com/mortyzip/KeepAwake"
-  },
-  {
-   "id": "kamb205/KB-RPCS3@v0.1.0-alpha",
-   "kind": "new",
-   "repo": "kamb205/KB-RPCS3",
-   "cid": "",
-   "name": "KB-RPCS3",
-   "tag": "v0.1.0-alpha",
-   "pre": true,
-   "date": "2026-10-09T12:36:41Z",
-   "desc": "Unofficial RPCS3 port for PlayStation 5 — run PS3 games as a native PS5 homebrew title. Alpha 0.1.0 source release.",
-   "notes": "KB-RPCS3 Alpha 0.1.0 [](https://github.com/kamb205/KB-RPCS3/releases/tag/v0.1.0-alpha) [](https://github.com/kamb205/KB-RPCS3) [](https://github.com/kamb205/KB-RPCS3) KB-RPCS3 runs RPCS3, the open-source PlayStation 3 emulator, as a native PS5 homebrew title. This is its first public release : the complete source of the port, the RPCS3 patch series, the PS5 title shell and the…",
-   "stars": 106,
-   "url": "https://github.com/kamb205/KB-RPCS3"
-  },
-  {
-   "id": "SynoPiia/PSXS5@v2.2.0",
-   "kind": "update",
-   "repo": "SynoPiia/PSXS5",
-   "cid": "psxs5",
-   "name": "PSXS5",
-   "tag": "v2.2.0",
-   "pre": false,
-   "date": "2026-10-09T00:32:18Z",
-   "notes": "PSXS5 2.2.0 : SwanStation as a third emulator, games from USB drives, a smooth boot intro, and a long list of fixes from testers. SwanStation - A third emulator (Settings → System → Emulator): SwanStation, libretro's fork of DuckStation, drawing with Vulkan and running its fast CPU recompiler. Your settings (internal resolution, PGXP, true colour, anti-aliasing, texture…",
-   "url": "https://github.com/SynoPiia/PSXS5/releases/tag/v2.2.0"
-  },
-  {
-   "id": "lowbit/ps5-doom@v1.1.1",
-   "kind": "update",
-   "repo": "lowbit/ps5-doom",
-   "cid": "doom",
-   "name": "DOOM (port nativo)",
-   "tag": "v1.1.1",
-   "pre": false,
-   "date": "2026-10-06T08:10:33Z",
-   "notes": "Sending games from a PC or phone now keeps full speed with large archives, and going back during a transfer no longer freezes the screen. What's new - Large files at full speed. A big archive used to slow down the longer it ran: the 643 MB DOOM + DOOM II collection 7Z fell to 0.4 MB/s past 400 MB and took over ten minutes. It now arrives at the network's speed the whole way,…",
-   "url": "https://github.com/lowbit/ps5-doom/releases/tag/v1.1.1"
+   "date": "2026-10-18T15:39:55Z",
+   "desc": "A PlayStation 5 payload for blocking YouTube update metadata",
+   "notes": "What's Changed - Simplified payload notifications. - Minor code cleanup. Full Changelog : https://github.com/Epinorr/y2jb-update-blocker/compare/v1.0.1...v1.0.2",
+   "stars": 64,
+   "url": "https://github.com/Epinorr/y2jb-update-blocker",
+   "score": 6.56
   }
- ]
+ ],
+ "hot": [
+  {
+   "id": "gasb07/ps4mount@v0.7.3",
+   "repo": "gasb07/ps4mount",
+   "cid": "",
+   "kind": "new",
+   "name": "ps4mount",
+   "tag": "v0.7.3",
+   "text": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage",
+   "url": "https://github.com/gasb07/ps4mount",
+   "stars": 200,
+   "score": 13.0,
+   "big": "",
+   "from": "2026-11-10"
+  },
+  {
+   "id": "bornaradusin/PC5@v2.3.8",
+   "repo": "bornaradusin/PC5",
+   "cid": "",
+   "kind": "new",
+   "name": "PC5",
+   "tag": "v2.3.8",
+   "text": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
+   "url": "https://github.com/bornaradusin/PC5",
+   "stars": 141,
+   "score": 12.64,
+   "big": "",
+   "from": "2026-11-10"
+  }
+ ],
+ "hist": {
+  "bornaradusin/pc5": [
+   [
+    "2026-11-10",
+    141
+   ]
+  ],
+  "jstrdev/ps5directo": [
+   [
+    "2026-11-10",
+    75
+   ]
+  ],
+  "fthdgn-gh/alembic": [
+   [
+    "2026-11-10",
+    66
+   ]
+  ],
+  "mihawk-99/ps5_hookshot": [
+   [
+    "2026-11-10",
+    37
+   ]
+  ],
+  "bps2414/lineup": [
+   [
+    "2026-11-10",
+    19
+   ]
+  ],
+  "mihawk-99/ps5_lichii": [
+   [
+    "2026-11-10",
+    79
+   ]
+  ],
+  "vivalavent/ps5-bazzite-deck": [
+   [
+    "2026-11-10",
+    534
+   ]
+  ],
+  "mistertemaki/fbneo-ps5": [
+   [
+    "2026-11-10",
+    16
+   ]
+  ],
+  "zizc3/vlc": [
+   [
+    "2026-11-10",
+    75
+   ]
+  ],
+  "zizc3/xpsemu": [
+   [
+    "2026-11-10",
+    210
+   ]
+  ],
+  "xxbneutzernamexx/ps5-cleanup": [
+   [
+    "2026-11-10",
+    52
+   ]
+  ],
+  "quer3q/ps5-dump-forge": [
+   [
+    "2026-11-10",
+    334
+   ]
+  ],
+  "elripalda/gta4-ps5": [
+   [
+    "2026-11-10",
+    93
+   ]
+  ],
+  "blue0x1/emufive": [
+   [
+    "2026-11-10",
+    91
+   ]
+  ],
+  "streetpea/chiaki-ng": [
+   [
+    "2026-11-10",
+    2993
+   ]
+  ],
+  "aarvsn/ps5droid": [
+   [
+    "2026-11-10",
+    72
+   ]
+  ],
+  "jvk3r/jobeeslair": [
+   [
+    "2026-11-10",
+    291
+   ]
+  ],
+  "notmaj0r/prosperomgr": [
+   [
+    "2026-11-10",
+    328
+   ]
+  ],
+  "ps5-payload-dev/ftpsrv": [
+   [
+    "2026-11-10",
+    213
+   ]
+  ],
+  "drakmor/shadowmountplus": [
+   [
+    "2026-11-10",
+    1336
+   ]
+  ],
+  "x1nons/prefbar": [
+   [
+    "2026-11-10",
+    32
+   ]
+  ],
+  "mihawk-99/ps5_mihawkos": [
+   [
+    "2026-11-10",
+    388
+   ]
+  ],
+  "percdotdev/ps5-webkit-autoloader-esp32": [
+   [
+    "2026-11-10",
+    11
+   ]
+  ],
+  "nothavocc/ps5-hwcon-plugin": [
+   [
+    "2026-11-10",
+    15
+   ]
+  ],
+  "nothavocc/ps5-hwcon-gui": [
+   [
+    "2026-11-10",
+    9
+   ]
+  ],
+  "portablelle/botty-plus": [
+   [
+    "2026-11-10",
+    36
+   ]
+  ],
+  "swordpdf/ps5sx2": [
+   [
+    "2026-11-10",
+    1657
+   ]
+  ],
+  "gasb07/ps4mount": [
+   [
+    "2026-11-10",
+    200
+   ]
+  ],
+  "mastershivnath007/ytps5-sponsorblock": [
+   [
+    "2026-11-10",
+    9
+   ]
+  ],
+  "saawant12/orbit-store-ps5": [
+   [
+    "2026-11-10",
+    1374
+   ]
+  ],
+  "holdmysocks/ps5-tailscale": [
+   [
+    "2026-11-10",
+    65
+   ]
+  ],
+  "notmaj0r/cheatrunner": [
+   [
+    "2026-11-10",
+    296
+   ]
+  ],
+  "elripalda/porpoise": [
+   [
+    "2026-11-10",
+    233
+   ]
+  ],
+  "elripalda/porpoise-dolphin-emulator-for-ps5": [
+   [
+    "2026-11-10",
+    233
+   ]
+  ],
+  "disco-trooper/hush": [
+   [
+    "2026-11-10",
+    15
+   ]
+  ],
+  "herbrax/chiral-ftp": [
+   [
+    "2026-11-10",
+    10
+   ]
+  ],
+  "gasb07/neoenabler": [
+   [
+    "2026-11-10",
+    213
+   ]
+  ],
+  "knutwurst/ps5-patchdl": [
+   [
+    "2026-11-10",
+    242
+   ]
+  ],
+  "cobanov/ps5lm": [
+   [
+    "2026-11-10",
+    830
+   ]
+  ],
+  "saawant12/orbit-play-ps5": [
+   [
+    "2026-11-10",
+    21
+   ]
+  ],
+  "kvaps/prosperoweb": [
+   [
+    "2026-11-10",
+    48
+   ]
+  ],
+  "bornaradusin/emby5": [
+   [
+    "2026-11-10",
+    12
+   ]
+  ],
+  "keklick1337/rps5e": [
+   [
+    "2026-11-10",
+    48
+   ]
+  ],
+  "mucahidkambur/eglantineps5": [
+   [
+    "2026-11-10",
+    219
+   ]
+  ],
+  "sharpemu/sharpemu-mac": [
+   [
+    "2026-11-10",
+    22
+   ]
+  ],
+  "press5elect/crux2": [
+   [
+    "2026-11-10",
+    26
+   ]
+  ],
+  "press5elect/psswanstation": [
+   [
+    "2026-11-10",
+    39
+   ]
+  ],
+  "press5elect/psflycast": [
+   [
+    "2026-11-10",
+    39
+   ]
+  ],
+  "mistertemaki/snes9xps5": [
+   [
+    "2026-11-10",
+    66
+   ]
+  ],
+  "freefelt/transmission-ps5": [
+   [
+    "2026-11-10",
+    7
+   ]
+  ],
+  "freefelt/storetilehider-ps5": [
+   [
+    "2026-11-10",
+    6
+   ]
+  ],
+  "rodri0x/ps5-hackintosh": [
+   [
+    "2026-11-10",
+    129
+   ]
+  ],
+  "darkxex/swanstationps5": [
+   [
+    "2026-11-10",
+    96
+   ]
+  ],
+  "miladrtx/glint": [
+   [
+    "2026-11-10",
+    20
+   ]
+  ],
+  "heydemoura/eglantineps5": [
+   [
+    "2026-11-10",
+    318
+   ]
+  ],
+  "elripalda/recompstore": [
+   [
+    "2026-11-10",
+    376
+   ]
+  ],
+  "niakw/prosperoeden-encore": [
+   [
+    "2026-11-10",
+    101
+   ]
+  ],
+  "heydemoura/prosperoeden": [
+   [
+    "2026-11-10",
+    26
+   ]
+  ],
+  "holdmysocks/mcla-recomp": [
+   [
+    "2026-11-10",
+    238
+   ]
+  ],
+  "darkxex/prosperostore": [
+   [
+    "2026-11-10",
+    523
+   ]
+  ],
+  "griches/jamespond2robocodrecomp": [
+   [
+    "2026-11-10",
+    24
+   ]
+  ],
+  "seregonwar/zftpd": [
+   [
+    "2026-11-10",
+    136
+   ]
+  ],
+  "premohq/ps5-ecam": [
+   [
+    "2026-11-10",
+    485
+   ]
+  ],
+  "xavyprod-git/pkg-mutant-shop": [
+   [
+    "2026-11-10",
+    18
+   ]
+  ],
+  "deox1111/ps5-library": [
+   [
+    "2026-11-10",
+    325
+   ]
+  ],
+  "ballerisleet/anycontroller": [
+   [
+    "2026-11-10",
+    17
+   ]
+  ],
+  "wigglez-sudo/12.xx-linux-loader": [
+   [
+    "2026-11-10",
+    53
+   ]
+  ],
+  "mistertemaki/genplusgxps5": [
+   [
+    "2026-11-10",
+    14
+   ]
+  ],
+  "mistertemaki/beetlepceps5": [
+   [
+    "2026-11-10",
+    2
+   ]
+  ],
+  "itsblurf/bfpilot": [
+   [
+    "2026-11-10",
+    65
+   ]
+  ],
+  "sub0x00001/padbridge": [
+   [
+    "2026-11-10",
+    20
+   ]
+  ],
+  "viviandsx/regie5": [
+   [
+    "2026-11-10",
+    8
+   ]
+  ],
+  "brinootk/ps5x360": [
+   [
+    "2026-11-10",
+    409
+   ]
+  ],
+  "ps5-payload-dev/elfldr": [
+   [
+    "2026-11-10",
+    159
+   ]
+  ],
+  "heni0xyz/ps5save": [
+   [
+    "2026-11-10",
+    58
+   ]
+  ],
+  "griches/ps5_mariogalaxy": [
+   [
+    "2026-11-10",
+    29
+   ]
+  ],
+  "zizc3/ruffle-flash-ps5": [
+   [
+    "2026-11-10",
+    20
+   ]
+  ],
+  "mihawk-99/ps5_retroarch": [
+   [
+    "2026-11-10",
+    431
+   ]
+  ],
+  "marice/ps5-exporter": [
+   [
+    "2026-11-10",
+    12
+   ]
+  ],
+  "epinorr/y2jb-update-blocker": [
+   [
+    "2026-11-10",
+    64
+   ]
+  ],
+  "smoxa/ps5-new-overlay": [
+   [
+    "2026-11-10",
+    20
+   ]
+  ],
+  "swordpdf/prosperoeden": [
+   [
+    "2026-11-10",
+    263
+   ]
+  ],
+  "therealretro/mupen64plus-ps5": [
+   [
+    "2026-11-10",
+    36
+   ]
+  ],
+  "02dnot/jelly5": [
+   [
+    "2026-11-10",
+    45
+   ]
+  ],
+  "abhi245y/ps5lm-plus": [
+   [
+    "2026-11-10",
+    515
+   ]
+  ],
+  "zigzagboi1/ps5-14.10-research": [
+   [
+    "2026-11-10",
+    481
+   ]
+  ],
+  "pinkythegawd/ps5-webkit-autoloader": [
+   [
+    "2026-11-10",
+    6
+   ]
+  ],
+  "fstat13/pscapture": [
+   [
+    "2026-11-10",
+    9
+   ]
+  ],
+  "lvndry/ps5-firmware-pin": [
+   [
+    "2026-11-10",
+    85
+   ]
+  ],
+  "larazadelsol/wings-app": [
+   [
+    "2026-11-10",
+    9
+   ]
+  ],
+  "griches/ps5_dusklight": [
+   [
+    "2026-11-10",
+    17
+   ]
+  ],
+  "griches/ps5_devtools": [
+   [
+    "2026-11-10",
+    6
+   ]
+  ],
+  "rodri0x/ps5-airplay": [
+   [
+    "2026-11-10",
+    39
+   ]
+  ],
+  "griches/ps5_switchwaker": [
+   [
+    "2026-11-10",
+    19
+   ]
+  ],
+  "overdriveps5/overdrive-releases": [
+   [
+    "2026-11-10",
+    776
+   ]
+  ],
+  "tsuramatsu1/psp5": [
+   [
+    "2026-11-10",
+    52
+   ]
+  ],
+  "illusionyy/ps-patch-system": [
+   [
+    "2026-11-10",
+    204
+   ]
+  ],
+  "stonedmodder/pshare": [
+   [
+    "2026-11-10",
+    29
+   ]
+  ],
+  "itsplk/ps5-pkg-manager": [
+   [
+    "2026-11-10",
+    252
+   ]
+  ],
+  "mortyzip/keepawake": [
+   [
+    "2026-11-10",
+    8
+   ]
+  ],
+  "kamb205/kb-rpcs3": [
+   [
+    "2026-11-10",
+    106
+   ]
+  ],
+  "synopiia/psxs5": [
+   [
+    "2026-11-10",
+    98
+   ]
+  ],
+  "lowbit/ps5-doom": [
+   [
+    "2026-11-10",
+    10
+   ]
+  ],
+  "erickdavestech/ps5-dualsense-overlay": [
+   [
+    "2026-11-10",
+    5
+   ]
+  ]
+ }
 }
