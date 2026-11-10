@@ -222,7 +222,7 @@ jobs:
           set -e
           D=android/app/src/main/python/ps5d
           rm -rf "$D" && mkdir -p "$D"
-          cp app.py engine.py features.py destacados.json escena.json portadas.json LEEME.txt README_EN.txt "$D"/
+          cp app.py engine.py features.py destacados.json escena.json portadas.json catalogo.json LEEME.txt README_EN.txt "$D"/
           cp -r web "$D"/web
           : > "$D/__init__.py"
           find "$D" -name '__pycache__' -prune -exec rm -rf {} +

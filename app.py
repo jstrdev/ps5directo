@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.6"
+VERSION = "2.0.7"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -105,7 +105,7 @@ DEFAULTS = {
     "pc_mode_fmt": "",         # en Modo PC con convert: formato
     "forge_auto_update": False,  # bajar solo las versiones nuevas de PS5 Dump Forge (si no, avisa y pregunta)
     "tour_done": False,       # la guia de bienvenida ya se vio
-    "tour20_done": False, "spot_packs": False, "spot_ver": "", "spot_done": "", "spot_hint_x": "", "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
+    "tour20_done": False, "spot_packs": False, "spot_ver": "", "spot_done": "", "spot_hint_x": "", "emu_vers_t": {}, "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
     "seen_version": "",       # ultima version cuyas novedades ya se ensenaron
     "shortcut_done": False,   # ya se creo el acceso directo del escritorio una vez
     "icon_ver": "",           # version cuyo icono ya se dejo en la cache de la ventana
@@ -853,11 +853,15 @@ def record_history(job):
             _save_json(HISTORY_FILE, hist[-500:])
         if job.get("status") == "hecho":
             torrent_cleanup(job)
+            lt_ = job.get("learn_tid")
+            if lt_:
+                threading.Thread(target=mine_learn, args=(lt_,), daemon=True).start()
             rv = job.get("rec_ver")
             if rv:
                 vers = _emu_vers()
                 vers[rv["id"]] = rv["tag"]
                 _save_json(EMU_VER_FILE, vers)
+                console_vers_mark(rv["id"], rv["tag"])
         title = job.get("title") or "Transferencia"
         link = {"tab": "Transfers", "job": job["id"]}
         if job.get("status") == "hecho":
@@ -8386,7 +8390,7 @@ DISCOVER_PORTS = ((2121, "FTP"), (8084, "Payload Manager"), (5905, "BFpilot"), (
 def _local_ipv4s():
     ips = set()
     # la IP con la que se sale hacia cada sitio (en Android getaddrinfo solo da «localhost», asi que esto es lo que vale)
-    for t in ("10.255.255.255", "192.168.1.1", "192.168.0.1", "172.16.0.1", "8.8.8.8"):
+    for t in ("10.255.255.255", "192.168.1.1", "192.168.0.1", "192.168.43.1", "172.16.0.1", "8.8.8.8"):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
@@ -8686,6 +8690,10 @@ def rec_art(c):
 def rec_list():
     cfg = cfg_snapshot()
     try:
+        catalog_remote()
+    except Exception as e:
+        print("No pude leer catalogo.json: %s" % e)
+    try:
         recomp_fetch()                               # para el arte de los que no traen el suyo
     except Exception:
         pass
@@ -8694,9 +8702,16 @@ def rec_list():
         ok = True
     except Exception:
         have, ok = set(), False
+    if ok and time.time() - _CVERS["t"] > 120:
+        inst = {c["id"] for c in F.CATALOG if c.get("kind") == "app"
+                and any(t in have for t in [c.get("tid")] + list(c.get("also") or []))}
+        try:
+            E.Ftp(cfg).call(lambda f: console_vers_sync(f, inst))
+        except Exception as e:
+            print("No pude leer las versiones de la consola: %s" % e)
     out = []
     for c in F.CATALOG:
-        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam", "mine") if k in c}
+        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam", "mine", "auto_tr") if k in c}
         it["exp"] = bool(c.get("exp"))
         it["sys"] = c.get("sys", "")
         it["update"] = c.get("update", "")
@@ -8733,7 +8748,7 @@ def rec_list():
             it["url"] = "https://github.com/%s/releases/latest" % c["repo"]
             it["ip"] = E.clean_host(cfg.get("ps5_ip") or "")[0]
         out.append(it)
-    return {"items": out, "console": ok}
+    return {"items": out, "console": ok, "tr": CAT["tr"]}
 
 
 
@@ -9093,8 +9108,13 @@ def _mine_apply(lst):
         c = {"id": x["id"], "kind": x["kind"], "group": "mine", "name": x["name"], "repo": x["repo"], "mine": True,
              "what": x.get("what") or "Añadido por ti desde GitHub.", "sys": x.get("sys") or ""}
         if x["kind"] == "app":
-            c["tid"] = x["tid"]
+            c["tid"] = x.get("tid") or ""
             c["asset"] = x["asset"]
+            if not c["tid"]:
+                c["learn"] = True
+        elif x["kind"] == "link":
+            c["needs"] = x.get("needs") or ""
+            c["guide"] = x.get("guide") or []
         else:
             F.EXTRA_PAYLOADS.append({"id": x["id"], "name": x["name"], "repo": x["repo"], "port": None,
                                      "pick": x["asset"], "what": c["what"], "mine": True})
@@ -9104,7 +9124,7 @@ def _mine_apply(lst):
 
 def _asset_rx(name, ext):
     """Patrón que reconoce el mismo archivo en versiones futuras (sin los números de versión)."""
-    stem = re.split(r"[-_ .]?v?\d", name, 1)[0]
+    stem = re.split(r"[-_ .]?v?\d", name.rsplit(".", 1)[0], 1)[0]
     out = []
     if len(stem) >= 3:
         out.append(r"(?i)^" + re.escape(stem) + r".*\." + ext + r"$")
@@ -9143,7 +9163,9 @@ def mine_add(text):
     ent = {"id": "gh-" + re.sub(r"[^a-z0-9]+", "-", real.lower()).strip("-"), "repo": real,
            "name": real.split("/")[1], "what": what, "added": int(time.time())}
     zips = [a for a in assets if (a.get("name") or "").lower().endswith(".zip")]
-    elfs = [a for a in assets if (a.get("name") or "").lower().endswith(".elf")]
+    elfs = [a for a in assets if re.search(r"(?i)\.(elf|bin)$", a.get("name") or "")
+            and not re.search(r"(?i)(eboot|param|firmware|bios|update)", a.get("name") or "")]
+    arcs = [a for a in assets if re.search(r"(?i)\.(7z|rar)$", a.get("name") or "")]
     if zips:
         zips.sort(key=lambda a: (not re.search(r"(?i)(PPSA|CUSA)\d{5}", a["name"]), -int(a.get("size") or 0)))
         a = zips[0]
@@ -9154,23 +9176,73 @@ def mine_add(text):
             print("No pude mirar dentro de %s: %s" % (a["name"], e))
             mt = re.search(r"(?i)(PPSA|CUSA)\d{5}", a["name"])
             tid = mt.group(0).upper() if mt else ""
-        if not tid:
-            if not elfs:
-                raise E.PipeError("El .zip de %s (%s) no trae la carpeta de una aplicación (PPSA… o CUSA…): "
-                                  "instálalo a mano siguiendo su guía" % (real, a["name"]))
-        else:
+        if tid:
             ent.update(kind="app", tid=tid, asset=_asset_rx(a["name"], "zip"), sys="Aplicación · " + tid)
+    if "kind" not in ent and arcs and not elfs:
+        # .7z o .rar: no se puede mirar dentro sin bajarlo; la PS5 lo descomprime y se ve qué carpeta (PPSA…) aparece
+        arcs.sort(key=lambda a: -int(a.get("size") or 0))
+        a = arcs[0]
+        mt = re.search(r"(?i)(PPSA|CUSA)\d{5}", a["name"])
+        ext = a["name"].rsplit(".", 1)[1].lower()
+        ent.update(kind="app", tid=mt.group(0).upper() if mt else "", asset=_asset_rx(a["name"], ext),
+                   sys="Aplicación" + (" · " + mt.group(0).upper() if mt else ""))
     if "kind" not in ent and elfs:
-        elfs.sort(key=lambda a: len(a["name"]))
-        ent.update(kind="payload", asset=_asset_rx(elfs[0]["name"], "elf"), sys="Payload")
+        elfs.sort(key=lambda a: (not a["name"].lower().endswith(".elf"), len(a["name"])))
+        ent.update(kind="payload", asset=_asset_rx(elfs[0]["name"], elfs[0]["name"].rsplit(".", 1)[1].lower()), sys="Payload")
     if "kind" not in ent:
-        raise E.PipeError("La última versión de %s (%s) no trae nada que sepa instalar (un .zip con la aplicación o un "
-                          ".elf). Archivos: %s" % (real, tag or "?", ", ".join(names[:6]) or "ninguno"))
+        # nada que se instale solo: se guarda para seguirlo (enlace, su guía y aviso de versiones nuevas)
+        build = any(re.search(r"(?i)\.(sh|bat|cmd|ps1|appimage|py)$|build", n) for n in names)
+        ent.update(kind="link", sys="Seguimiento", follow=True,
+                   needs=("No viene hecho: se construye en tu PC siguiendo la guía de su GitHub. Cuando tengas su carpeta "
+                          "(PPSA… o CUSA…), mándala desde «Enviar» pegando su ruta." if build else
+                          "No trae nada que PS5 Directo sepa instalar solo: sigue la guía de su GitHub."),
+                   guide=["Ábrelo en GitHub y sigue su guía (el README).",
+                          "Te aviso en la campana cuando saque una versión nueva."])
+    ent["seen"] = tag or ""
     lst = [x for x in lst if x["id"] != ent["id"]] + [ent]
     with LOCK:
         _save_json(MINE_FILE, lst)
         _mine_apply(lst)
-    return {"id": ent["id"], "name": ent["name"], "kind": ent["kind"], "tag": tag}
+    return {"id": ent["id"], "name": ent["name"], "kind": ent["kind"], "tag": tag, "learn": ent["kind"] == "app" and not ent.get("tid")}
+
+
+def mine_learn(lt):
+    """Tras instalar un añadido en .7z/.rar: la carpeta (PPSA…) nueva que ha aparecido es la suya."""
+    try:
+        after = E.Ftp(cfg_snapshot()).call(rec_installed)
+    except Exception:
+        return
+    new = sorted(set(after) - set(lt.get("before") or []))
+    if len(new) != 1:
+        print("No sé qué carpeta es la de %s: %s" % (lt.get("id"), new or "ninguna nueva"))
+        return
+    lst = _mine_read()
+    for x in lst:
+        if x["id"] == lt.get("id") and not x.get("tid"):
+            x["tid"] = new[0]
+            x["sys"] = "Aplicación · " + new[0]
+    with LOCK:
+        _save_json(MINE_FILE, lst)
+        _mine_apply(lst)
+
+
+def mine_follow():
+    """Los añadidos que solo se siguen: aviso en la campana cuando sacan versión nueva."""
+    lst, changed = _mine_read(), False
+    for x in lst:
+        if x.get("kind") != "link":
+            continue
+        new = rec_latest(x["repo"])
+        if new and x.get("seen") and new != x["seen"]:
+            notify("info", "Versión nueva de %s: %s" % (x["name"], new),
+                   "Lo sigues en Descubrir › Añadidos por ti. Mira su GitHub para ver qué cambia.",
+                   {"tab": "Library", "view": "rec"}, key="mine:%s:%s" % (x["id"], new))
+        if new and new != x.get("seen"):
+            x["seen"] = new
+            changed = True
+    if changed:
+        with LOCK:
+            _save_json(MINE_FILE, lst)
 
 
 def mine_del(cid):
@@ -9204,6 +9276,11 @@ def rec_install(cid, update=False):
     job["exact_name"] = True
     job["fmt_set"] = True
     job["rec_ver"] = {"id": cid, "tag": tag}
+    if c.get("learn"):
+        try:
+            job["learn_tid"] = {"id": cid, "before": sorted(E.Ftp(cfg_snapshot()).call(rec_installed))}
+        except Exception:
+            pass
     if update:
         job["merge_into"] = True
         job["title"] = "%s: actualizar a %s" % (c["name"], tag)
@@ -9231,6 +9308,81 @@ def _emu_vers():
             return json.load(fh)
     except Exception:
         return {}
+
+
+# Qué versión de cada app se instaló, guardado también EN LA CONSOLA: así el PC, el móvil sin PC u otro PC saben lo
+# mismo (si no, el que no la instaló cree que todo está por actualizar).
+PS5_VER_DIR = "/data/ps5directo"
+PS5_VER_PATH = PS5_VER_DIR + "/versiones.json"
+_CVERS = {"t": 0.0, "d": {}}
+
+
+def _console_vers_read(f):
+    buf = bytearray()
+    try:
+        f.retrbinary("RETR " + PS5_VER_PATH, buf.extend, 65536)
+        d = json.loads(bytes(buf).decode("utf-8", "replace") or "{}")
+        return {k: v for k, v in d.items() if isinstance(k, str) and isinstance(v, dict) and v.get("tag")}
+    except Exception:
+        return {}
+
+
+def _console_vers_write(f, d):
+    try:
+        f.mkd(PS5_VER_DIR)
+    except ftplib.all_errors:
+        pass
+    f.storbinary("STOR " + PS5_VER_PATH, io.BytesIO(json.dumps(d, indent=1).encode("utf-8")))
+
+
+def console_vers_sync(f, installed_ids):
+    """Junta lo que sabe este equipo con lo que hay en la consola. Gana la instalación más reciente."""
+    con = _console_vers_read(f)
+    loc = _emu_vers()
+    lt = SETTINGS.get("emu_vers_t") or {}
+    changed_c = changed_l = False
+    for cid, tag in loc.items():
+        c = con.get(cid)
+        t = float(lt.get(cid) or 0)
+        if cid in installed_ids and (not c or (c.get("tag") != tag and t > float(c.get("t") or 0))):
+            con[cid] = {"tag": tag, "t": t or time.time()}
+            changed_c = True
+    for cid, c in con.items():
+        if loc.get(cid) != c["tag"] and float(c.get("t") or 0) >= float(lt.get(cid) or 0):
+            loc[cid] = c["tag"]
+            lt[cid] = float(c.get("t") or 0)
+            changed_l = True
+    if changed_l:
+        _save_json(EMU_VER_FILE, loc)
+        with LOCK:
+            SETTINGS["emu_vers_t"] = lt
+        save_settings()
+    if changed_c:
+        try:
+            _console_vers_write(f, con)
+        except ftplib.all_errors as e:
+            print("No pude guardar las versiones en la consola: %s" % e)
+    _CVERS.update(t=time.time(), d=con)
+
+
+def console_vers_mark(cid, tag):
+    """Tras instalar o actualizar: lo apunta en la consola (en segundo plano, sin parar nada)."""
+    with LOCK:
+        lt = dict(SETTINGS.get("emu_vers_t") or {})
+        lt[cid] = time.time()
+        SETTINGS["emu_vers_t"] = lt
+    save_settings()
+
+    def run():
+        try:
+            def go(f):
+                con = _console_vers_read(f)
+                con[cid] = {"tag": tag, "t": lt[cid]}
+                _console_vers_write(f, con)
+            E.Ftp(cfg_snapshot()).call(go)
+        except Exception as e:
+            print("No pude apuntar la versión en la consola: %s" % e)
+    threading.Thread(target=run, daemon=True).start()
 
 
 def rec_latest(repo, max_age=6 * 3600):
@@ -9423,6 +9575,10 @@ def rp_play(open_only=False, full=False, ds=False, nick=""):
 
 def emu_news():
     """Cada 6 h: si hay version nueva de un emulador que tienes, avisa en la campana (una vez por version)."""
+    try:
+        mine_follow()
+    except Exception as e:
+        print("Añadidos: %s" % e)
     vers = _emu_vers()
     for c in F.CATALOG:
         if c.get("kind") != "app" or c["id"] not in vers:
@@ -12380,16 +12536,63 @@ def featured():
     for x in ((j or {}).get("items") if isinstance(j, dict) else j) or []:
         if not isinstance(x, dict) or not x.get("title"):
             continue
-        if x.get("until") and str(x["until"]) < today:
+        until = str(x.get("until") or "")
+        if not until and x.get("from"):          # sin fecha de fin: dos semanas desde que se puso
+            try:
+                until = time.strftime("%Y-%m-%d", time.localtime(time.mktime(time.strptime(str(x["from"]), "%Y-%m-%d"))
+                                                                 + 14 * 86400))
+            except ValueError:
+                until = ""
+        if until and until < today:
             continue                      # caducado
         items.append({k: x.get(k) for k in ("id", "title", "title_en", "text", "text_en", "img", "badge", "badge_en",
-                                            "cat", "cat_en", "install", "url", "pro", "until", "note", "note_en")})
+                                            "cat", "cat_en", "install", "url", "pro", "until", "note", "note_en", "from")})
     FEAT.update(t=time.time(), d=items[:10] if j is not None else FEAT["d"])
     return FEAT["d"]
 
 
+SCENE_SKIP_RX = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|"
+                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control")
+CAT_URL = os.environ.get("PS5D_CATALOGO") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/catalogo.json"
+CAT = {"t": 0.0, "tr": {}}
+
+
+def _catalog_use(j):
+    with LOCK:
+        CAT["tr"] = F.remote_apply(j)
+        _mine_apply(_mine_read())              # los añadidos van detrás (y no se pisan con los remotos)
+
+
+def _catalog_fetch():
+    try:
+        req = urllib.request.Request(CAT_URL, headers={"User-Agent": "PS5Directo/" + VERSION})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            _catalog_use(json.loads(r.read(500000).decode("utf-8", "replace")))
+    except Exception as e:
+        print("catalogo.json de GitHub: %s" % e)
+    finally:
+        CAT["busy"] = False
+
+
+def catalog_remote():
+    """Tarjetas extra de Descubrir desde catalogo.json en GitHub (cada 3 horas): se añaden sin sacar versión.
+    Sin esperar: la primera vez se usa el que viene con la app y el de GitHub se lee por detrás.
+    Devuelve las traducciones al inglés de sus textos."""
+    if not CAT["t"]:
+        try:
+            with open(os.path.join(HERE, "catalogo.json"), encoding="utf-8") as fh:
+                _catalog_use(json.load(fh))
+        except Exception:
+            pass
+    if time.time() - CAT["t"] >= 3 * 3600 and not CAT.get("busy"):
+        CAT["t"] = time.time()
+        CAT["busy"] = True
+        threading.Thread(target=_catalog_fetch, daemon=True).start()
+    return CAT["tr"]
+
+
 ESC_URL = os.environ.get("PS5D_ESCENA") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/escena.json"
-ESC = {"t": 0.0, "d": [], "upd": ""}
+ESC = {"t": 0.0, "d": [], "upd": "", "hot": []}
 
 
 def escena():
@@ -12420,8 +12623,18 @@ def escena():
                     "notes": str(x.get("notes") or "")[:400], "desc": str(x.get("desc") or "")[:300],
                     "stars": int(x.get("stars") or 0) if str(x.get("stars") or "0").isdigit() else 0,
                     "url": u if u.startswith("https://github.com/") else "https://github.com/" + x["repo"]})
+    hot = []
+    for h in ((j or {}).get("hot") or []) if isinstance(j, dict) else []:
+        if isinstance(h, dict) and re.match(r"^[\w.-]+/[\w.-]+$", str(h.get("repo") or "")) and not SCENE_SKIP_RX.search(
+                str(h.get("repo")) + " " + str(h.get("name") or "")):
+            u = str(h.get("url") or "")
+            hot.append({"repo": h["repo"], "cid": str(h.get("cid") or "")[:40], "kind": "new" if h.get("kind") == "new" else "update",
+                        "name": str(h.get("name") or h["repo"])[:80], "tag": str(h.get("tag") or "")[:40],
+                        "text": str(h.get("text") or "")[:400], "from": str(h.get("from") or "")[:10],
+                        "big": str(h.get("big") or "")[:8], "stars": int(h.get("stars") or 0) if str(h.get("stars") or "0").isdigit() else 0,
+                        "url": u if u.startswith("https://github.com/") else "https://github.com/" + h["repo"]})
     if j is not None:
-        ESC.update(t=time.time(), d=out[:80], upd=str((j or {}).get("updated") or "")[:30])
+        ESC.update(t=time.time(), d=out[:80], upd=str((j or {}).get("updated") or "")[:30], hot=hot[:3])
     else:
         ESC["t"] = time.time() - 3000           # sin red: se reintenta en 10 minutos
     return ESC["d"]
@@ -12645,7 +12858,7 @@ def extra_api(h, p, b):
             with LOCK:
                 its, err, upd = RECOMP["items"], RECOMP["error"], RECOMP["updated"]
             return {"ok": True, "items": its, "covers": fix, "error": err, "updated": upd,
-                    "source": "recompstore.com", "feat": featured(), "scene": escena()}
+                    "source": "recompstore.com", "feat": featured(), "scene": escena(), "hot": ESC["hot"]}
         if p == "/api/wiki":
             return dict(ok=True, **wiki_summary(b.get("title"), b.get("lang")))
         if p == "/api/pld/updates":

@@ -322,7 +322,8 @@ public class MainActivity extends Activity {
                         if (!(a instanceof java.net.Inet4Address) || !a.isSiteLocalAddress()) continue;
                         String ip = a.getHostAddress();
                         String n = ni.getName().toLowerCase();
-                        if (n.startsWith("wlan") || n.startsWith("eth") || n.startsWith("ap")) return ip;
+                        // wlan0 = la Wi-Fi; swlan0/ap0/softap = el punto de acceso del propio movil (PS5 conectada a el)
+                        if (n.contains("wlan") || n.startsWith("eth") || n.startsWith("ap") || n.startsWith("softap")) return ip;
                         if (other.isEmpty() && !n.startsWith("rmnet") && !n.startsWith("ccmni") && !n.startsWith("tun")) other = ip;
                     }
                 }

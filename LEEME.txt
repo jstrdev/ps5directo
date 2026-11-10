@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.6
+PS5 DIRECTO 2.0.7
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,37 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.0.7
+- Actualizaciones de emuladores y apps: el PC y el móvil sin PC ya ven lo
+  mismo. Qué versión instalaste se apunta también en la consola
+  (/data/ps5directo/versiones.json), así que el que no la instaló ya no
+  cree que todo está por actualizar. «Tienes actualizaciones» solo enseña
+  lo que se sabe que está viejo.
+- Descubrir › Emuladores: PS5 Hookshot, el remake de Zelda: Ocarina of
+  Time de Switch 2 como título nativo de PS5. No viene hecho: se construye
+  en tu PC a partir de tu copia, y la tarjeta explica los pasos.
+- «Añadidos por ti» ya no falla: instala aplicaciones en .zip, .7z o .rar
+  (con su carpeta PPSA… o CUSA…; en .7z y .rar la reconoce al instalarla
+  la primera vez) y payloads .elf o .bin. Si un proyecto no trae nada que
+  se instale solo (se construye en el PC, es una herramienta…), se guarda
+  para seguirlo: con su enlace, su guía y aviso en la campana de cada
+  versión nueva.
+- El cartel de Descubrir se renueva solo: lo destacado pasa detrás de las
+  novedades de la scene a la semana y deja de salir a las dos. Y lo que
+  más está sonando en la scene (lo que gana estrellas muy rápido, lo nuevo
+  de autores conocidos, las versiones grandes) sale solo en portada una
+  semana con «🔥 Lo más sonado».
+- Descubrir puede recibir tarjetas nuevas sin actualizar PS5 Directo: se
+  leen del GitHub del proyecto cada pocas horas.
+- App de Android conectada al PC: ⋯ › «📱 Usar sin PC (en este móvil)»
+  para pasarte al modo sin PC sin reinstalar nada.
+- Descubrir: el texto de las novedades de la scene (el cartel grande) sale
+  traducido al español, como las descripciones del resto, y sin restos
+  raros como «&nbsp;» o «---».
+- Android sin PC: si conectas la PS5 al punto de acceso (hotspot) del
+  propio móvil, «Buscar mi PS5» también la encuentra ahí. Así se descarga
+  con los datos móviles y se manda a la PS5 por ese punto de acceso.
 
 NOVEDADES 2.0.6
 - Android sin PC: «Buscar mi PS5» podía no encontrar la consola: ahora

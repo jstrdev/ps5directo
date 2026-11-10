@@ -1,6 +1,23 @@
 {
-  "_como": "Cartel de Descubrir › Inicio. Se lee de GitHub cada 3 horas: cámbialo aquí y les llega a todos sin sacar versión. Campos: title, text, badge, cat (y title_en, text_en, badge_en, cat_en para inglés), img (URL de una imagen), install (id del emulador o app de Descubrir: eglantine, lichii, ps5sx2...), url (enlace de más información), note (línea pequeña, por ejemplo títulos que ya se ven funcionar; y note_en), pro (true si es solo para PS5 Pro), until (AAAA-MM-DD: deja de salir ese día). Salen primero estos y luego lo último de RecompStore.",
+  "_como": "Cartel de Descubrir › Inicio. Se lee de GitHub cada 3 horas: cámbialo aquí y les llega a todos sin sacar versión. Campos: title, text, badge, cat (y title_en, text_en, badge_en, cat_en para inglés), img (URL de una imagen), install (id del emulador o app de Descubrir: eglantine, lichii, ps5sx2...), url (enlace de más información), note (línea pequeña, por ejemplo títulos que ya se ven funcionar; y note_en), pro (true si es solo para PS5 Pro), from (AAAA-MM-DD: el día que lo pones; a la semana pasa detrás de las novedades de la scene y a las dos semanas deja de salir solo, salvo que pongas until), until (AAAA-MM-DD: deja de salir ese día). Salen primero estos y luego lo último de RecompStore.",
   "items": [
+    {
+      "id": "hookshot-oot",
+      "cat": "Ports nativos",
+      "cat_en": "Native ports",
+      "badge": "Nuevo",
+      "badge_en": "New",
+      "title": "Zelda: Ocarina of Time, nativo en PS5",
+      "title_en": "Zelda: Ocarina of Time, native on PS5",
+      "text": "PS5 Hookshot, de mihawk, convierte el remake de Switch 2 en un título nativo de PS5, sin emulador. Se construye en tu PC a partir de tu propia copia: la tarjeta te explica los pasos.",
+      "text_en": "PS5 Hookshot, by mihawk, turns the Switch 2 remake into a native PS5 title, no emulator. It's built on your PC from your own copy: the card walks you through the steps.",
+      "install": "hookshot",
+      "url": "https://github.com/mihawk-99/PS5_Hookshot",
+      "from": "2026-11-10",
+      "until": "2026-11-30",
+      "note": "Primera beta (v0.1.0): en pruebas",
+      "note_en": "First beta (v0.1.0): experimental"
+    },
     {
       "id": "lichii-oot",
       "cat": "Emulación",
@@ -14,9 +31,10 @@
       "install": "lichii",
       "pro": true,
       "url": "https://github.com/mihawk-99/PS5_Lichii",
-      "until": "2026-12-31",
+      "until": "2026-11-24",
       "note": "Se ha visto: The Legend of Zelda: Ocarina of Time (remake) a unos 30 fps en PS5 Pro",
-      "note_en": "Seen running: The Legend of Zelda: Ocarina of Time (remake) at about 30 fps on PS5 Pro"
+      "note_en": "Seen running: The Legend of Zelda: Ocarina of Time (remake) at about 30 fps on PS5 Pro",
+      "from": "2026-11-08"
     },
     {
       "id": "eglantine-sw2",
@@ -29,9 +47,10 @@
       "text": "EglantinePS5 es el emulador de Switch 2 más avanzado para PS5 y cada versión hace arrancar más títulos. Instálalo en un clic y PS5 Directo te avisa de cada versión nueva.",
       "text_en": "EglantinePS5 is the most advanced Switch 2 emulator for the PS5, and every release boots more titles. Install it in one click and PS5 Directo tells you about each new version.",
       "install": "eglantine",
-      "until": "2027-03-31",
+      "until": "2026-11-17",
       "note": "Pokopia a 60 fps en PS5 · Mario Kart World y Donkey Kong Bananza ya arrancan en el núcleo Eglantine",
-      "note_en": "Pokopia at 60 fps on PS5 · Mario Kart World and Donkey Kong Bananza already boot on the Eglantine core"
+      "note_en": "Pokopia at 60 fps on PS5 · Mario Kart World and Donkey Kong Bananza already boot on the Eglantine core",
+      "from": "2026-11-03"
     }
   ]
 }

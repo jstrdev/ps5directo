@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.6 — USER GUIDE (English)
+PS5 DIRECTO 2.0.7 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,27 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.0.7 - Emulator and app updates: the PC and the phone without a PC now see
+  the same. Which version you installed is also written on the console
+  (/data/ps5directo/versiones.json), so the one that didn't install it no
+  longer thinks everything needs updating. "You have updates" only lists
+  what is known to be old.
+  Discover › Emulators: PS5 Hookshot, the Switch 2 remake of Zelda: Ocarina
+  of Time as a native PS5 title. It's built on your PC from your own copy;
+  the card explains the steps. "Added by you" no longer fails: it
+  installs apps as .zip, .7z or .rar (with their PPSA…/CUSA… folder) and
+  .elf or .bin payloads; anything else is saved to follow, with its guide
+  and a bell notice for each new version. The Discover banner refreshes itself: featured items move behind the
+  latest scene news after a week and leave after two, and what's trending in the scene shows up there by
+  itself for a week ("🔥 Trending"). Discover can get new cards
+  without updating PS5 Directo. Android app connected to the PC:
+  ⋯ › "📱 Use without a PC (on this phone)".
+  Discover: the scene news text in the big banner no longer shows
+  leftovers like "&nbsp;" or "---" (and it's translated for Spanish users).
+  Android without a PC: if the PS5 is connected to the phone's own hotspot,
+  "Find my PS5" finds it there too, so it downloads over mobile data and
+  sends to the PS5 through the hotspot.
+
 2.0.6 - Android without a PC: "Find my PS5" could miss the console; it now
   searches the phone's Wi-Fi network, where the PS5 is, and the
   first time it says clearly that it doesn't know your PS5 yet. The links

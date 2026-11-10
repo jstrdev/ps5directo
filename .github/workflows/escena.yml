@@ -1,5 +1,8 @@
 # Novedades de la scene para el cartel de Descubrir: cada 3 horas mira GitHub y actualiza escena.json.
-# Necesita: Settings › Actions › General › Workflow permissions › «Read and write permissions».
+# Lo gordo sale solo en la portada de Descubrir, y los proyectos nuevos que se pueden instalar llegan como pull request
+# (propuesta de tarjeta para catalogo.json): Merge para añadirlo, Close para descartarlo.
+# Necesita: Settings › Actions › General › Workflow permissions › «Read and write permissions» y
+# «Allow GitHub Actions to create and approve pull requests».
 name: Novedades de la scene
 on:
   schedule:
@@ -7,6 +10,7 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
+  pull-requests: write
 concurrency: escena
 jobs:
   escena:
@@ -20,7 +24,7 @@ jobs:
       - name: Generar escena.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 tools/escena.py escena.json
+        run: python3 tools/escena.py escena.json "$RUNNER_TEMP/propuestas.json"
       - name: Subir si ha cambiado
         run: |
           git config user.name "escena-bot"
@@ -29,3 +33,11 @@ jobs:
           if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
           git commit -m "Novedades de la scene"
           git push
+      - name: Proponer tarjetas nuevas para Descubrir
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin
+          python3 tools/proponer.py "$RUNNER_TEMP/propuestas.json"

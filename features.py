@@ -1086,6 +1086,22 @@ CATALOG = [
              "una en su web. PS5 Directo lo carga y te pone los parches en la consola con un botón.",
      "needs": "Firmware de PS5 3.00 a 12.70 (según su autor). Se vuelve a cargar tras cada reinicio. Los parches solo cambian "
               "el ejecutable al arrancar: el título no se toca."},
+    {"id": "hookshot", "kind": "link", "group": "emu", "fam": "nin", "name": "PS5 Hookshot (Ocarina of Time)",
+     "sys": "Switch 2 · nativo", "repo": "mihawk-99/PS5_Hookshot", "exp": True,
+     "what": "El remake de Zelda: Ocarina of Time de Switch 2 como título nativo de PS5 (PPSA99024): no es un emulador, "
+             "el código del juego se recompila. Es de mihawk, el autor de PS5 Lichii. Se construye en tu PC a partir de tu "
+             "propia copia, así que no viene hecho para descargar.",
+     "needs": "Un PC con Linux o con Windows 10/11 y Ubuntu 24.04 en WSL 2, tu copia del juego en .nup (la versión que pide "
+              "su guía), unos 60 GB libres y una hora o más de compilación la primera vez.",
+     "guide": ["En su GitHub, baja build-windows.bat y build-title.sh de la última versión y ponlos juntos en una carpeta.",
+               "En Windows, si no tienes Ubuntu en WSL: abre una terminal como administrador, ejecuta "
+               "wsl --install -d Ubuntu-24.04 y abre «Ubuntu 24.04» una vez para crear tu usuario.",
+               "Arrastra el .nup de tu copia encima de build-windows.bat (en Linux: ./build-title.sh tu-copia.nup). "
+               "La primera vez tarda una hora o más; si se corta, vuelve a lanzarlo y sigue donde iba.",
+               "Al terminar sale la carpeta PPSA99024 al lado. En PS5 Directo › Enviar, pega la ruta de esa carpeta y "
+               "mándala «A la PS5» (va a /data/homebrew).",
+               "Manda también tu .nup a la consola, a /data/lichii/roms/oot/ con el nombre oot.nup: el título lee sus datos de ahí.",
+               "Ábrelo desde el menú de la PS5."]},
     {"id": "cheatrunner", "kind": "link", "group": "patch", "name": "CheatRunner", "repo": "notmaj0r/CheatRunner",
      "exp": True,
      "what": "Parches de rendimiento que se aplican mientras juegas: títulos de PS4 a 60 fps con el ritmo corregido (que no "
@@ -2674,6 +2690,7 @@ def open_terminal(cmd):
 # Arte oficial de cada proyecto (icono y portada de su propio GitHub; Bazzite, de su «press kit»). Si falta, se usa el
 # del catálogo de RecompStore para ese repositorio o el icono de la consola si ya está instalado.
 CATALOG_ART = {
+    'hookshot': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Hookshot/main/ps5/sce_sys/icon0.png', "hero": ''},
     'crux2': {"icon": 'https://raw.githubusercontent.com/Press5elect/Crux2/main/ps5/sce_sys/icon0.png', "hero": ''},
     'lichii': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Lichii/main/sce_sys/icon0.png', "hero": ''},
     'prosperoeden': {"icon": 'https://raw.githubusercontent.com/heydemoura/ProsperoEden/main/sce_sys/icon0.png', "hero": ''},
@@ -2713,3 +2730,81 @@ CATALOG_ART = {
     'doom': {"icon": '', "hero": '', "bg": ["#7a1e12", "#1c0805"]},
     'zftpd': {"icon": 'https://raw.githubusercontent.com/seregonwar/zftpd/main/assets/zftpd-logo.png', "hero": ''},
 }
+
+
+# ---------------------------------------------------------------------------
+# Tarjetas extra de Descubrir que llegan de catalogo.json (en el GitHub de PS5 Directo): se añaden sin sacar versión.
+# Mismos campos que CATALOG; los textos en inglés van en "en". Lo que no cuadre se ignora.
+# ---------------------------------------------------------------------------
+REMOTE_KINDS = ("app", "payload", "link")
+REMOTE_GROUPS = ("emu", "media", "rp", "tool", "patch", "os")
+
+
+def remote_entries(j):
+    """(tarjetas, payloads, arte, traducciones) válidas de un catalogo.json ya leído."""
+    import re as _re
+    import time as _t
+    cards, plds, art, trs = [], [], {}, {}
+    builtin = {c["id"] for c in CATALOG if not c.get("remote")}
+    today = _t.strftime("%Y-%m-%d")
+    for x in ((j or {}).get("items") if isinstance(j, dict) else None) or []:
+        try:
+            if not isinstance(x, dict):
+                continue
+            cid, kind, repo = str(x.get("id") or ""), x.get("kind"), str(x.get("repo") or "")
+            if not _re.fullmatch(r"[a-z0-9][a-z0-9_-]{1,39}", cid) or cid in builtin or kind not in REMOTE_KINDS:
+                continue
+            if not _re.fullmatch(r"[\w.-]+/[\w.-]+", repo) or (x.get("until") and str(x["until"]) < today):
+                continue
+            txt = lambda k, n=400: str(x.get(k) or "")[:n]
+            c = {"id": cid, "kind": kind, "group": x.get("group") if x.get("group") in REMOTE_GROUPS else "tool",
+                 "name": txt("name", 60) or repo.split("/")[1], "repo": repo, "what": txt("what", 500),
+                 "needs": txt("needs", 400), "sys": txt("sys", 40), "exp": bool(x.get("exp")), "remote": True,
+                 "auto_tr": bool(x.get("auto_tr"))}
+            if x.get("fam"):
+                c["fam"] = txt("fam", 12)
+            guide = [str(g)[:300] for g in (x.get("guide") or [])[:10] if g]
+            if guide:
+                c["guide"] = guide
+            if kind == "app":
+                tid = str(x.get("tid") or "").upper()
+                if not _re.fullmatch(r"(PPSA|CUSA)\d{5}", tid):
+                    continue
+                c["tid"] = tid
+            if kind in ("app", "payload"):
+                rx = [str(a) for a in (x.get("asset") or [])[:4]]
+                for a in rx:
+                    _re.compile(a)
+                if not rx:
+                    rx = [r"(?i)\.zip$"] if kind == "app" else [r"(?i)\.elf$"]
+                c["asset"] = rx
+            if kind == "payload":
+                port = x.get("port")
+                plds.append({"id": cid, "name": c["name"], "repo": repo, "port": int(port) if port else None,
+                             "pick": c["asset"], "what": c["what"], "remote": True})
+            if x.get("icon") or x.get("hero"):
+                art[cid] = {"icon": txt("icon", 300), "hero": txt("hero", 300)}
+            en = x.get("en") if isinstance(x.get("en"), dict) else {}
+            for k in ("name", "what", "needs", "sys"):
+                if en.get(k) and c.get(k):
+                    trs[c[k]] = str(en[k])[:500]
+            for a, b in zip(c.get("guide") or [], en.get("guide") or []):
+                trs[a] = str(b)[:300]
+            cards.append(c)
+        except Exception:
+            continue
+    return cards[:60], plds, art, trs
+
+
+def remote_apply(j):
+    """Mete en CATALOG / EXTRA_PAYLOADS / CATALOG_ART las tarjetas remotas (quitando las de antes)."""
+    cards, plds, art, trs = remote_entries(j)
+    CATALOG[:] = [c for c in CATALOG if not c.get("remote")]
+    EXTRA_PAYLOADS[:] = [p for p in EXTRA_PAYLOADS if not p.get("remote")]
+    for k in [k for k, v in CATALOG_ART.items() if isinstance(v, dict) and v.get("_remote")]:
+        del CATALOG_ART[k]
+    CATALOG.extend(cards)
+    EXTRA_PAYLOADS.extend(plds)
+    for k, v in art.items():
+        CATALOG_ART[k] = dict(v, _remote=True)
+    return trs
