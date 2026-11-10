@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.5 — USER GUIDE (English)
+PS5 DIRECTO 2.0.6 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,16 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.0.6 - Android without a PC: "Find my PS5" could miss the console; it now
+  searches the phone's Wi-Fi network, where the PS5 is, and the
+  first time it says clearly that it doesn't know your PS5 yet. The links
+  box no longer mentions PC paths or torrents (without a PC only download
+  links work). When a new version comes out, the app without a PC says so at the top,
+  with "What's new" and "Download the app"; it installs over the old one
+  and keeps your settings and queue (no uninstall needed from now on).
+  On the PC, a one-time notice that the Android app now works
+  without a PC, with the link to get it.
+
 2.0.5 - Android without a PC (beta): the Android app no longer needs the PC.
   The first time you choose "With PS5 Directo on my PC" (the QR, as
   before) or "Without a PC": the phone itself downloads and sends to the

@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.5"
+VERSION = "2.0.6"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -2185,7 +2185,7 @@ def fm_api(p, b):
         with LOCK:
             return {"grab": json.loads(json.dumps(GRAB))}
     if p == "/api/discover":
-        return discover_ps5()
+        return discover_ps5(hint=str(b.get("hint") or "")[:80])
     if p == "/api/played":
         with PLAYED_LOCK:
             return {"titles": played_load().get("titles") or {}}
@@ -8385,13 +8385,17 @@ DISCOVER_PORTS = ((2121, "FTP"), (8084, "Payload Manager"), (5905, "BFpilot"), (
 
 def _local_ipv4s():
     ips = set()
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("10.255.255.255", 1))
-        ips.add(s.getsockname()[0])
-        s.close()
-    except Exception:
-        pass
+    # la IP con la que se sale hacia cada sitio (en Android getaddrinfo solo da «localhost», asi que esto es lo que vale)
+    for t in ("10.255.255.255", "192.168.1.1", "192.168.0.1", "172.16.0.1", "8.8.8.8"):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                s.connect((t, 1))
+                ips.add(s.getsockname()[0])
+            finally:
+                s.close()
+        except Exception:
+            pass
     try:
         for ai in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
             ips.add(ai[4][0])
@@ -8400,11 +8404,16 @@ def _local_ipv4s():
     return [ip for ip in ips if not ip.startswith(("127.", "169.254."))]
 
 
-def discover_ps5(timeout=0.35):
-    """Busca la consola en la red de casa: equipos que contesten en los puertos de los payloads o de la PS5."""
+def discover_ps5(timeout=0.35, hint=""):
+    """Busca la consola en la red de casa: equipos que contesten en los puertos de los payloads o de la PS5.
+    hint: la IP de la Wi-Fi que da la app de Android (la red de casa va primero)."""
     from concurrent.futures import ThreadPoolExecutor
     mine = _local_ipv4s()
-    nets = sorted({ip.rsplit(".", 1)[0] for ip in mine})[:3]
+    hint = [h for h in re.split(r"[,\s]+", hint or "") if re.fullmatch(r"\d{1,3}(\.\d{1,3}){3}", h)]
+    mine = list(dict.fromkeys(hint + mine))
+    # primero la Wi-Fi de la app y las redes de casa típicas (192.168…), luego el resto (los datos móviles suelen ser 10.x)
+    order = lambda n: (0 if any(h.startswith(n + ".") for h in hint) else 1 if n.startswith("192.168.") else 2 if n.startswith("172.") else 3, n)
+    nets = sorted({ip.rsplit(".", 1)[0] for ip in mine}, key=order)[:3]
     hosts = [n + "." + str(k) for n in nets for k in range(1, 255) if n + "." + str(k) not in mine]
 
     def probe(h):
@@ -11216,7 +11225,8 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:
                 return self._send(200, {"ok": False, "error": "No he podido consultar GitHub (%s)" % E.net_reason(e)})
             if _ver_tuple(ver) > _ver_tuple(VERSION):
-                notify("info", "Hay una versión nueva: %s" % ver, "Pulsa Actualizar arriba para instalarla.",
+                notify("info", "Hay una versión nueva: %s" % ver,
+                       "Baja la app nueva desde el aviso de arriba e instálala encima." if PHONE else "Pulsa Actualizar arriba para instalarla.",
                        {"action": "update"}, key="update:" + ver)
             newer = _ver_tuple(ver) > _ver_tuple(VERSION)
             try:      # todas las versiones que te faltan, no solo la última

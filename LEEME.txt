@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.5
+PS5 DIRECTO 2.0.6
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,19 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.0.6
+- Android sin PC: «Buscar mi PS5» podía no encontrar la consola: ahora
+  busca en la Wi-Fi del móvil, que es donde está la PS5. La primera vez,
+  si aún no sabe cuál es tu PS5, lo dice claro en vez de «No encuentro la
+  PS5 en ?».
+- Android sin PC: la caja de enlaces ya no habla de rutas del PC ni de
+  torrents (sin PC solo van enlaces de descarga).
+- Android sin PC: cuando sale una versión nueva, la app lo avisa arriba
+  con «Qué trae» y «Descargar la app». Se instala encima y se conservan
+  tus ajustes y tu cola (desde esta versión no hace falta desinstalar).
+- En el PC: un aviso, una sola vez, de que la app de Android ya funciona
+  sin PC, con el enlace para bajarla.
 
 NOVEDADES 2.0.5
 - Android sin PC (en pruebas): la app de Android ya no necesita el PC. Al

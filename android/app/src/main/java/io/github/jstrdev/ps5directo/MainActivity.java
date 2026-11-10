@@ -311,9 +311,39 @@ public class MainActivity extends Activity {
             return local();
         }
 
+        /** La IP de este movil en la Wi-Fi (para buscar la PS5 en esa red y no en la de los datos moviles). */
+        @JavascriptInterface
+        public String wifiIp() {
+            String other = "";
+            try {
+                for (java.net.NetworkInterface ni : java.util.Collections.list(java.net.NetworkInterface.getNetworkInterfaces())) {
+                    if (!ni.isUp() || ni.isLoopback()) continue;
+                    for (java.net.InetAddress a : java.util.Collections.list(ni.getInetAddresses())) {
+                        if (!(a instanceof java.net.Inet4Address) || !a.isSiteLocalAddress()) continue;
+                        String ip = a.getHostAddress();
+                        String n = ni.getName().toLowerCase();
+                        if (n.startsWith("wlan") || n.startsWith("eth") || n.startsWith("ap")) return ip;
+                        if (other.isEmpty() && !n.startsWith("rmnet") && !n.startsWith("ccmni") && !n.startsWith("tun")) other = ip;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            return other;
+        }
+
         @JavascriptInterface
         public boolean isApp() {
             return true;
+        }
+
+        /** La version de esta app (para avisar cuando hay una mas nueva). */
+        @JavascriptInterface
+        public String appVersion() {
+            try {
+                return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            } catch (Exception e) {
+                return "";
+            }
         }
 
         /** La pagina de PS5 Directo nos dice como despertar ese PC (su MAC y la red). */
