@@ -5,7 +5,7 @@
 #                                   «Actualizar» dentro del programa, que solo copia los archivos.
 #  - PS5Directo-X.Y.Z-Linux.tar.gz  Linux x86-64, con Python y 7-Zip incluidos (se abre con ps5directo.sh).
 #  - PS5Directo-X.Y.Z-macOS.dmg     Mac (Apple Silicon e Intel), en pruebas: la app con Python y 7-Zip.
-#  - PS5Directo-X.Y.Z-Android.apk   app del movil (abre PS5 Directo del PC en su propia ventana).
+#  - PS5Directo-X.Y.Z-Android.apk   app del movil: con PS5 Directo del PC o sin PC (lleva el motor dentro).
 name: Publicar version
 
 on:
@@ -22,7 +22,7 @@ jobs:
     outputs:
       ver: ${{ steps.v.outputs.ver }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Version de app.py
         id: v
@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p dist/PS5Directo
           git archive HEAD | tar -x -C dist/PS5Directo
-          rm -rf dist/PS5Directo/.github dist/PS5Directo/installer dist/PS5Directo/android dist/PS5Directo/tools
+          rm -rf dist/PS5Directo/.github dist/PS5Directo/installer dist/PS5Directo/android dist/PS5Directo/tools dist/PS5Directo/docs
 
       - name: Python incluido
         run: |
@@ -60,7 +60,7 @@ jobs:
           L=build/linux/PS5Directo
           mkdir -p "$L"
           git archive HEAD | tar -x -C "$L"
-          rm -rf "$L/.github" "$L/installer" "$L/android" "$L/tools" "$L"/*.bat "$L"/*.vbs
+          rm -rf "$L/.github" "$L/installer" "$L/android" "$L/tools" "$L/docs" "$L"/*.bat "$L"/*.vbs
           chmod +x "$L/ps5directo.sh"
           PBS=20250604; PYV=3.12.11
           curl -fsSL -o pyl.tgz "https://github.com/astral-sh/python-build-standalone/releases/download/$PBS/cpython-$PYV+$PBS-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
@@ -79,7 +79,7 @@ jobs:
           (cd build/linux && tar -czf "../../dist/PS5Directo-${{ steps.v.outputs.ver }}-Linux.tar.gz" PS5Directo)
           ls -la dist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: dist
           path: dist/
@@ -89,9 +89,9 @@ jobs:
     needs: build
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: dist
           path: dist
@@ -105,7 +105,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           Get-ChildItem dist\*.exe, dist\*.zip | Format-Table Name, Length
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: setup
           path: dist/PS5Directo-*-Setup.exe
@@ -121,7 +121,7 @@ jobs:
       VER: ${{ needs.build.outputs.ver }}
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Montar la app
         run: |
@@ -129,7 +129,7 @@ jobs:
           A="build/PS5 Directo.app"; C="$A/Contents"; R="$C/Resources"
           mkdir -p "$C/MacOS" "$R/app" "$R/bin"
           git archive HEAD | tar -x -C "$R/app"
-          rm -rf "$R/app/.github" "$R/app/installer" "$R/app/android" "$R/app/tools" "$R/app"/*.bat "$R/app"/*.vbs "$R/app/ps5directo.sh"
+          rm -rf "$R/app/.github" "$R/app/installer" "$R/app/android" "$R/app/tools" "$R/app/docs" "$R/app"/*.bat "$R/app"/*.vbs "$R/app/ps5directo.sh"
           # ejecutable nativo para Apple Silicon e Intel (con un script como ejecutable, macOS pide Rosetta)
           clang -O2 -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -o "$C/MacOS/PS5 Directo" installer/macos/launcher.c
           lipo -archs "$C/MacOS/PS5 Directo" | grep -q arm64
@@ -192,7 +192,7 @@ jobs:
           hdiutil create -volname "PS5 Directo" -srcfolder dmg -ov -format UDZO "dist/PS5Directo-$VER-macOS.dmg"
           ls -la dist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: mac
           path: dist/PS5Directo-*-macOS.dmg
@@ -206,14 +206,27 @@ jobs:
     env:
       VER: ${{ needs.build.outputs.ver }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: "8.10.2"
+      - name: Meter PS5 Directo dentro de la app (modo «Usar sin PC»)
+        run: |
+          set -e
+          D=android/app/src/main/python/ps5d
+          rm -rf "$D" && mkdir -p "$D"
+          cp app.py engine.py features.py destacados.json escena.json portadas.json LEEME.txt README_EN.txt "$D"/
+          cp -r web "$D"/web
+          : > "$D/__init__.py"
+          find "$D" -name '__pycache__' -prune -exec rm -rf {} +
+          ls -la "$D"
       - name: Compilar la .apk
         working-directory: android
         env:
@@ -222,15 +235,17 @@ jobs:
           KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           set -e
-          if [ -n "$KS_B64" ]; then
-            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/ps5d.jks"
-            export PS5D_KS="$RUNNER_TEMP/ps5d.jks" PS5D_KS_PASS="$KS_PASS" PS5D_KS_ALIAS="${KS_ALIAS:-ps5directo}"
+          if [ -z "$KS_B64" ] || [ -z "$KS_PASS" ]; then
+            echo "::error::Faltan los secretos ANDROID_KEYSTORE_B64 y ANDROID_KEYSTORE_PASS (Settings › Secrets and variables › Actions). Sin ellos no se firma la .apk."
+            exit 1
           fi
+          echo "$KS_B64" | tr -d ' \r\n' | base64 -d > "$RUNNER_TEMP/ps5d.jks"
+          export PS5D_KS="$RUNNER_TEMP/ps5d.jks" PS5D_KS_PASS="$KS_PASS" PS5D_KS_ALIAS="${KS_ALIAS:-ps5directo}"
           gradle --no-daemon assembleRelease -Pps5dVersion="$VER"
           mkdir -p ../dist
           cp app/build/outputs/apk/release/app-release.apk "../dist/PS5Directo-$VER-Android.apk"
           ls -la ../dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: android
           path: dist/PS5Directo-*-Android.apk
@@ -241,7 +256,7 @@ jobs:
     if: ${{ !cancelled() && needs.build.result == 'success' && needs.setup.result == 'success' && needs.mac.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: dist
           merge-multiple: true

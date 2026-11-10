@@ -2,73 +2,62 @@
 
 **English** · [Español](#español)
 
-An all-in-one Windows tool for jailbroken PS5 consoles: it **downloads, converts and sends** in a single step. Sent as is, files go to the console over FTP **while they download**, without storing them on your PC; or it **converts them on the fly** (LZ4, `.exfat`, folder, `.ffpfsc`…) as part of the same job, no second program needed. It extracts on the console (BFpilot) or on the PC (7-Zip), places apps in `/data/homebrew` so ShadowMountPlus shows them in the menu, and lets you browse your console's library with covers and control everything from your phone.
+![PS5 Directo: the all-in-one manager for your jailbroken PS5](docs/portada_en.jpg)
 
-![PS5 Directo: paste a link, send it as is or convert it, and it shows up in the library](docs/demo_en.gif)
+**The all-in-one manager for your jailbroken PS5**, free and open source, for Windows, Mac and Linux (plus a phone app). It's not just an uploader that sends files you already have: you paste a link and PS5 Directo downloads it, sends it to the console *at the same time*, extracts it, makes it smaller if you want, and leaves it ready in the PS5 menu.
 
-<sub>Demo with a sample homebrew app served from a NAS on the local network.</sub>
+**[⬇ Download the latest version](../../releases/latest)**
 
-### ⚡ One step instead of three tools
-- ✅ **Download and send at once:** files go straight to the console while they download, nothing stored on your PC
-- ✅ **Or convert on the fly** with [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge) (downloaded and updated automatically): folder, `.exfat`, LZ4, `.ffpfsc`, `.ffpkg`, `.ffpfs` or `.fpkg`, with a "Which one?" guide by need
-- ✅ **Any source:** download links, `ftp://` (e.g. a NAS), torrents (magnet or `.torrent`) or files and folders on your PC (drag and drop or "Send to")
-- ✅ **Extracts and places:** joins split parts, extracts RAR, 7z, ZIP and tar on the console (BFpilot) or on the PC (7-Zip, CRC-checked), splits archives with a backport and places apps in `/data/homebrew` for ShadowMountPlus
-- ✅ **Reliable:** pause, resume and retry where it left off, several connections per file, `.sfv`/`.md5` checks, free-space watch and permission fixes (CE-107750-0)
+## Why it's different
 
-### 📚 Your console from your PC and phone
-- ✅ **Library:** covers, versions and required firmware for everything on the console, including images and installed PS4/PS5 content; flags what won't launch on your firmware, duplicates and broken folders, and links to each title's public update list
-- ✅ **On your PC:** point it at your PC/NAS folders, see what's missing on the console and send it with one click
-- ✅ **Backup:** saved data, ShadowMountPlus/payload settings and the app database copied to the PC, manually or daily; restore saved data to the same console
-- ✅ **Console files, Space and Captures:** file browser (copy, move, rename, upload, download), storage chart with "Make room", and the console's screenshots and videos
-- ✅ **Phone and browser:** use it from your phone with a QR code, and send links from your browser with the optional extension
+| | |
+|---|---|
+| ![Paste a link and it's ready on the PS5](docs/cards/en-03-pegar-y-listo.gif) | ![Titles that take far less space](docs/cards/en-01-formatos.gif) |
+| **Paste a link, done.** Download links, torrents, PC folders or your NAS. It downloads and sends at the same time, extracts on the console or the PC, fixes permissions and leaves it ready for ShadowMountPlus. | **Titles that take far less space.** It converts to LZ4 or zstd on the way (26 GB → 11 GB in our test). The console reads them on the fly. Images (`.exfat`, `.ffpkg`, `.ffpfsc`…) and `.fpkg` too. |
+| ![Convert on your PC or on the PS5](docs/cards/en-02-pc-o-ps5.gif) | ![Emulators, apps and recomps in one click](docs/cards/en-07-descubrir.gif) |
+| **Converted wherever you want.** On your PC with the latest [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge) (it arrives already smaller), or on the PS5 itself with [Alembic](https://github.com/fthdgn-gh/Alembic) (downloads and sends at once, the console converts it at the end). | **Emulators, apps and recomps in one click.** Switch 2, PS2, GameCube, Xbox 360, retro, media players, Linux and the whole RecompStore catalog. It tells you about every new version, with its notes translated. |
+| ![Your jailbreak, safe](docs/cards/en-08-jailbreak.gif) | ![Everything your PS5 needs, in one app](docs/cards/en-12-todo-en-una.gif) |
+| **Your jailbreak, safe.** If the console downloads a system update, it warns you so you can remove it before it installs. It can also stop YouTube from updating for Y2JB. | **Everything else in one app.** Library with covers, file manager, space cleanup, payloads kept up to date, backups and captures, Remote Play, Linux on the PS5, and control from your phone or browser. |
 
-### 🩺 When something goes wrong
-- ✅ **Diagnosis** on failed transfers: cause, error codes and how to fix it
-- ✅ **Launch check:** if an app closes on launch, it checks the folder (executable, permissions, firmware, backports, LZ4 packing) and shows recent logs and captures
-- ✅ **Problem report** in one click (.zip, no passwords) to share when asking for help
-- ✅ **Warnings:** your PS5 firmware always visible, speed-drop alerts, "Why is it slow?" network check, and it loads ftpsrv/BFpilot from the app
-- ✅ **Payloads on autopilot:** with Payload Manager open on the console, it starts ftpsrv and BFpilot when they're missing, restarts them if they hang, installs them if needed and can add them to Payload Manager's autoload
-- ✅ **Self-updating**, with a welcome window and a user guide, in English and Spanish
+## Download and install
 
-## Requirements
+| System | File | How |
+|---|---|---|
+| **Windows 10/11** | `PS5Directo-X.Y.Z-Setup.exe` | Open it and click **Install**. No admin rights, nothing else to install. |
+| **Mac** (beta) | `PS5Directo-X.Y.Z-macOS.dmg` | Drag **PS5 Directo** into Applications. See the note below. |
+| **Linux** (x86-64) | `PS5Directo-X.Y.Z-Linux.tar.gz` | Extract it and open `./ps5directo.sh` once; it adds itself to the apps menu. |
+| **Android** | `PS5Directo-X.Y.Z-Android.apk` | Two ways: with your PC (scan the QR in **Phone**) or **without a PC** (beta): the phone does it all by itself. |
 
-- **PC:** Windows 10/11. Nothing else to install: the download includes everything it needs. Optional: [7-Zip](https://www.7-zip.org/), only if you want to extract on the PC instead of on the console.
-- **Mac (new, in testing — not tested on a real Mac yet, [feedback welcome](../../issues/new?template=mac.md)):** macOS 11 or later, Apple Silicon or Intel. Python and 7-Zip are included. Torrents need `aria2` (`brew install aria2`).
-- **Linux (new, x86-64):** any recent distro (glibc 2.35+, e.g. Ubuntu 22.04+). Python and 7-Zip are included. For the app window without tabs, Chrome, Chromium, Edge or Brave (otherwise it opens in your default browser). Torrents need `aria2` (`sudo apt install aria2`).
-- **Jailbroken PS5:**
-  - An FTP server, for example [ftpsrv](https://github.com/ps5-payload-dev/ftpsrv) on port 2121.
-  - [BFpilot](https://github.com/ItsBlurf/BFpilot) on port 5905.
-  - [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus).
-  - Payloads can be loaded with [ps5-payload-manager](https://github.com/itsPLK/ps5-payload-manager).
+All of them are in the [latest release](../../releases/latest). PS5 Directo updates itself from inside the app.
+
+- **Windows:** if it says "Windows protected your PC", click **More info → Run anyway** (the installer isn't signed, which costs money). Rather not install? Use `PS5Directo-X.Y.Z-Windows.zip` and run `Crear accesos directos.bat` (create shortcuts).
+- **Mac:** the app isn't signed by Apple. The first time, go to *System Settings → Privacy & Security → Open Anyway* (on older macOS: right-click the app → *Open*). If macOS says it **"is damaged"**, run this once in Terminal: `xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"`.
+- **Linux:** torrents need `aria2` (`sudo apt install aria2`). For the app window, Chrome, Chromium, Edge or Brave; otherwise it opens in your browser.
+
+## What you need on the PS5
+
+A jailbroken PS5 on the same network as your PC, with:
+
+- an FTP server, for example [ftpsrv](https://github.com/ps5-payload-dev/ftpsrv) (port 2121);
+- [BFpilot](https://github.com/ItsBlurf/BFpilot) (port 5905), to extract on the console;
+- [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus), so what you send shows up in the menu.
+
+PS5 Directo checks them, tells you what's missing and can load them for you with [Payload Manager](https://github.com/itsPLK/ps5-payload-manager).
 
 ## Getting started
 
-1. Download **`PS5Directo-X.Y.Z-Setup.exe`** from the latest [release](../../releases), open it and click **Install**. No admin rights needed, nothing else to install.
-2. Open **PS5 Directo** from the desktop or the Start menu. The language follows Windows; switch it with the **English / Español** button at the top.
-3. Follow the welcome guide, enter your PS5's IP in Settings, then paste links or drop files.
+1. Open PS5 Directo. The language follows your system; switch it with **English / Español** at the top.
+2. Follow the welcome window: enter your PS5's IP and it checks the connection and your firmware.
+3. Paste a link or drop a file, choose the format if you want, and **Add to queue**.
 
-> If Windows shows "Windows protected your PC", click **More info → Run anyway**. The installer isn't signed (signing costs money); it's the usual warning for small free programs.
->
-> Rather not install? Download `PS5Directo-X.Y.Z-Windows.zip` instead, extract it anywhere and run `Crear accesos directos.bat`. Both update themselves the same way.
-
-**Mac (in testing):** download `PS5Directo-X.Y.Z-macOS.dmg`, open it and drag **PS5 Directo** into Applications. The app isn't signed by Apple, so the first time macOS blocks it: on macOS 15+ go to *System Settings → Privacy & Security → Open Anyway*; on older versions right-click the app → *Open*. If macOS says the app **"is damaged and can't be opened"**, it isn't: open Terminal and run `xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"`, then open it normally (only once). **It hasn't been tested on a real Mac yet:** if something fails, click *Create problem report* in the program and attach it to an [issue](../../issues/new?template=mac.md). Thanks!
-
-**Linux:** download `PS5Directo-X.Y.Z-Linux.tar.gz`, extract it anywhere (for example in your home folder) and open it once with `./ps5directo.sh` in a terminal (or right-click → *Run as a Program*). That first time it adds **PS5 Directo** to your applications menu, so from then on you open it from there. It updates itself like on Windows.
-
-> **About BFpilot and permissions:** up to at least v0.4.4, BFpilot's archive extractor leaves files without the execute bit, so the PS5 refuses to launch them (CE-107750-0). This also happens when you extract from BFpilot's own web UI. PS5 Directo fixes it automatically after every extraction. For content you already have, use **Settings → Fix permissions**.
-
-The full guide is in [README_EN.txt](README_EN.txt) (Spanish: [LEEME.txt](LEEME.txt)).
-
-## Publishing a release
-
-Bump `VERSION` in `app.py`, add the notes to `LEEME.txt` / `README_EN.txt`, then push a tag (`git tag v1.20.3 && git push --tags`). The GitHub Action builds the installer `PS5Directo-X.Y.Z-Setup.exe`, `PS5Directo-X.Y.Z-Windows.zip`, `PS5Directo-X.Y.Z-Linux.tar.gz` and `PS5Directo-X.Y.Z-macOS.dmg` (all with Python included; the Mac app is built and smoke-tested on a GitHub macOS runner) and creates the release. The installer script is `installer/PS5Directo.iss` (Inno Setup).
+The first time you'll see a short tour of everything it does. You can watch it again from **⋯ › What does PS5 Directo do?**. The full guide is in [README_EN.txt](README_EN.txt).
 
 ## Disclaimer
 
-Independent project, not affiliated with Sony or with the authors of the tools mentioned. It's a file-transfer tool: it includes no third-party content, no Sony keys or files, and no links to download sites. Use it only with content you have the right to use (your own backups and homebrew).
+Independent project, not affiliated with Sony or with the authors of the tools it uses. It's a file manager: it includes no third-party content, no Sony keys or files, and no links to download sites. Use it only with content you have the right to use (your own backups and homebrew).
 
-- It does not jailbreak the console or bypass any protection: it only copies files to a console you have already modified yourself.
-- No piracy: don't use it to copy or run software you don't own or aren't licensed to use. Requests for help getting such content are not answered.
+- It does not jailbreak the console or bypass any protection: it only works with a console you have already modified yourself.
+- Requests for help getting unlicensed content are not answered.
 - You are responsible for how you use it. Modifying a console can void its warranty, break its terms of service or lose data: back up what matters.
 - Provided "as is", without warranty of any kind. "PlayStation" and "PS5" are trademarks of Sony Interactive Entertainment, used only to describe compatibility.
 
@@ -76,27 +65,61 @@ Independent project, not affiliated with Sony or with the authors of the tools m
 
 ## Español
 
-![PS5 Directo: pegas un enlace, lo envías tal cual o lo conviertes, y aparece en la biblioteca](docs/demo_es.gif)
+![PS5 Directo: el gestor todo en uno de tu PS5 con jailbreak](docs/portada_es.jpg)
 
-Herramienta todo en uno para Windows y PS5 con jailbreak: **descarga, convierte y envía** en un solo paso. Tal cual, los archivos van a la consola por FTP **mientras se descargan**, sin pasar por el disco del PC; o los **convierte sobre la marcha** (LZ4, `.exfat`, carpeta, `.ffpfsc`…) dentro del mismo trabajo, sin usar otro programa. Descomprime en la consola (BFpilot) o en el PC (7-Zip), coloca las aplicaciones en `/data/homebrew` para que ShadowMountPlus las muestre en el menú, y te deja ver la biblioteca de la consola con portadas y controlarlo todo desde el móvil.
+**El gestor todo en uno de tu PS5 con jailbreak**, gratuito y de código abierto, para Windows, Mac y Linux (con app para el móvil). No es solo un programa para subir archivos que ya tienes: pegas un enlace y PS5 Directo lo descarga, lo manda a la consola *a la vez*, lo descomprime, lo hace ocupar menos si quieres y lo deja listo en el menú de la PS5.
 
-**Un programa en vez de tres:** descarga y envío a la vez sin ocupar el PC, o conversión sobre la marcha (carpeta, `.exfat`, LZ4, `.ffpfsc`, `.ffpkg`, `.ffpfs`, `.fpkg`) con [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge). Vale con enlaces, `ftp://`, torrents o archivos del PC; une partes, descomprime y lo deja colocado.
+**[⬇ Descargar la última versión](../../releases/latest)**
 
-**Tu consola desde el PC y el móvil:** Biblioteca con portadas, versión y firmware (también lo instalado de PS4 y PS5), vista «En tu PC» para enviar lo que falta, copias de seguridad de partidas y ajustes, explorador de archivos, espacio, capturas y modo móvil con QR.
+## Lo que lo hace distinto
 
-**Cuando algo falla:** diagnóstico de errores con causa y solución, «Comprobar» si algo se cierra al abrirlo, informe de fallo en un clic y avisos automáticos de versiones y de bajadas de velocidad.
+| | |
+|---|---|
+| ![Pegas el enlace y en la PS5 sale listo](docs/cards/es-03-pegar-y-listo.gif) | ![Títulos que ocupan mucho menos](docs/cards/es-01-formatos.gif) |
+| **Pegas el enlace y listo.** Enlaces de descarga, torrents, carpetas del PC o de tu NAS. Descarga y envía a la vez, descomprime en la consola o en el PC, arregla los permisos y lo deja listo para ShadowMountPlus. | **Títulos que ocupan mucho menos.** Los convierte a LZ4 o zstd por el camino (26 GB → 11 GB en nuestra prueba). La consola los lee al vuelo. También imágenes (`.exfat`, `.ffpkg`, `.ffpfsc`…) y `.fpkg`. |
+| ![Conviértelo en tu PC o en la propia PS5](docs/cards/es-02-pc-o-ps5.gif) | ![Emuladores, apps y recomps en un clic](docs/cards/es-07-descubrir.gif) |
+| **Convertido donde tú quieras.** En tu PC con la última versión de [PS5 Dump Forge](https://github.com/quer3q/ps5-dump-forge) (llega ya convertido) o en la propia PS5 con [Alembic](https://github.com/fthdgn-gh/Alembic) (descarga y envía a la vez, y la consola lo convierte al terminar). | **Emuladores, apps y recomps en un clic.** Switch 2, PS2, GameCube, Xbox 360, retro, reproductores, Linux y todo el catálogo de RecompStore. Te avisa de cada versión nueva, con sus notas traducidas. |
+| ![Tu jailbreak, a salvo](docs/cards/es-08-jailbreak.gif) | ![Todo en una sola app](docs/cards/es-12-todo-en-una.gif) |
+| **Tu jailbreak, a salvo.** Si la consola descarga una actualización del sistema, te avisa para quitarla antes de que se instale. Y si usas Y2JB, puede impedir que YouTube se actualice. | **Todo lo demás, en una sola app.** Biblioteca con portadas, gestor de archivos, limpieza de espacio, payloads al día, copias y capturas, Remote Play, Linux en la PS5 y control desde el móvil o el navegador. |
 
-**Requisitos:** Windows 10/11, sin instalar nada más: la descarga lo trae todo. Opcional: [7-Zip](https://www.7-zip.org/), solo si quieres descomprimir en el PC en vez de en la consola. En la PS5: servidor FTP ([ftpsrv](https://github.com/ps5-payload-dev/ftpsrv)), [BFpilot](https://github.com/ItsBlurf/BFpilot) y [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus).
+## Descarga e instalación
 
-**Cómo instalarlo:**
-1. Descarga **`PS5Directo-X.Y.Z-Setup.exe`** de la última [release](../../releases), ábrelo y pulsa **Instalar**. No pide permisos de administrador ni hay que instalar nada más.
-2. Abre **PS5 Directo** desde el escritorio o el menú Inicio.
-3. Sigue la ventana de bienvenida y pon la IP de tu PS5 en Ajustes.
+| Sistema | Archivo | Cómo |
+|---|---|---|
+| **Windows 10/11** | `PS5Directo-X.Y.Z-Setup.exe` | Ábrelo y pulsa **Instalar**. Sin permisos de administrador ni nada más que instalar. |
+| **Mac** (beta) | `PS5Directo-X.Y.Z-macOS.dmg` | Arrastra **PS5 Directo** a Aplicaciones. Mira la nota de abajo. |
+| **Linux** (x86-64) | `PS5Directo-X.Y.Z-Linux.tar.gz` | Descomprímelo y abre `./ps5directo.sh` una vez; se añade solo al menú de aplicaciones. |
+| **Android** | `PS5Directo-X.Y.Z-Android.apk` | Dos formas: con tu PC (escanea el QR de **Móvil**) o **sin PC** (en pruebas): el móvil lo hace todo solo. |
 
-Si Windows dice «Windows protegió su PC», pulsa **Más información → Ejecutar de todos modos** (el instalador no está firmado, que cuesta dinero; es el aviso normal en programas pequeños y gratuitos). ¿Prefieres no instalar? Descarga el `.zip`, descomprímelo y ejecuta `Crear accesos directos.bat`. La guía completa está en [LEEME.txt](LEEME.txt).
+Todos están en la [última release](../../releases/latest). PS5 Directo se actualiza solo desde la propia app.
 
-**Mac (nuevo, en pruebas):** descarga `PS5Directo-X.Y.Z-macOS.dmg`, ábrelo y arrastra **PS5 Directo** a Aplicaciones. No está firmada por Apple, así que la primera vez macOS la bloquea: en macOS 15 o posterior ve a *Ajustes del Sistema → Privacidad y seguridad → Abrir igualmente*; en versiones anteriores, clic derecho en la app → *Abrir*. Si macOS dice que la app **«está dañada»**, no lo está: abre Terminal y ejecuta `xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"`; luego ábrela normal (solo una vez). **Todavía no se ha podido probar en un Mac de verdad:** si algo falla, pulsa *Crear informe de fallo* en el programa y adjúntalo en un [aviso](../../issues/new?template=mac.md). ¡Gracias!
+- **Windows:** si dice «Windows protegió su PC», pulsa **Más información → Ejecutar de todos modos** (el instalador no está firmado, que cuesta dinero). ¿Prefieres no instalar? Usa `PS5Directo-X.Y.Z-Windows.zip` y ejecuta `Crear accesos directos.bat`.
+- **Mac:** la app no está firmada por Apple. La primera vez ve a *Ajustes del Sistema → Privacidad y seguridad → Abrir igualmente* (en macOS antiguos: clic derecho en la app → *Abrir*). Si macOS dice que **«está dañada»**, ejecuta esto una vez en Terminal: `xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"`.
+- **Linux:** los torrents necesitan `aria2` (`sudo apt install aria2`). Para la ventana de la app, Chrome, Chromium, Edge o Brave; si no, se abre en tu navegador.
 
-**Linux (nuevo):** descarga `PS5Directo-X.Y.Z-Linux.tar.gz`, descomprímelo donde quieras y ábrelo una vez con `./ps5directo.sh` en una terminal (o clic derecho → *Ejecutar como programa*). Esa primera vez se añade solo al menú de aplicaciones, y desde entonces lo abres desde ahí. Trae Python y 7-Zip; para los torrents hace falta `aria2` (`sudo apt install aria2`).
+## Qué necesitas en la PS5
 
-**Aviso:** proyecto independiente, sin relación con Sony ni con los autores de las herramientas citadas. No incluye contenido de terceros, claves ni archivos de Sony, ni enlaces a sitios de descargas. Úsalo solo con contenido que tengas derecho a usar (copias de seguridad propias y homebrew). No hace el jailbreak ni salta ninguna protección: solo copia archivos a una consola que ya has modificado tú. No se da ayuda para conseguir contenido sin licencia. Se ofrece tal cual, sin garantías, y lo que hagas con él es responsabilidad tuya.
+Una PS5 con jailbreak en la misma red que tu PC, con:
+
+- un servidor FTP, por ejemplo [ftpsrv](https://github.com/ps5-payload-dev/ftpsrv) (puerto 2121);
+- [BFpilot](https://github.com/ItsBlurf/BFpilot) (puerto 5905), para descomprimir en la consola;
+- [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus), para que lo que envíes salga en el menú.
+
+PS5 Directo los comprueba, te dice si falta alguno y puede cargarlos por ti con [Payload Manager](https://github.com/itsPLK/ps5-payload-manager).
+
+## Primeros pasos
+
+1. Abre PS5 Directo. El idioma sigue al de tu sistema; se cambia con **English / Español** arriba.
+2. Sigue la ventana de bienvenida: pon la IP de tu PS5 y comprueba la conexión y tu firmware.
+3. Pega un enlace o arrastra un archivo, elige el formato si quieres y pulsa **Añadir a la cola**.
+
+La primera vez verás un recorrido corto por todo lo que hace. Se puede volver a ver en **⋯ › ¿Qué hace PS5 Directo?**. La guía completa está en [LEEME.txt](LEEME.txt).
+
+## Aviso
+
+Proyecto independiente, sin relación con Sony ni con los autores de las herramientas que usa. Es un gestor de archivos: no incluye contenido de terceros, ni claves o archivos de Sony, ni enlaces a sitios de descargas. Úsalo solo con contenido que tengas derecho a usar (tus copias de seguridad y homebrew).
+
+- No hace el jailbreak ni salta ninguna protección: solo trabaja con una consola que ya has modificado tú.
+- No se da ayuda para conseguir contenido sin licencia.
+- Lo que hagas con él es responsabilidad tuya. Modificar una consola puede anular su garantía, incumplir sus condiciones o hacerte perder datos: haz copia de lo importante.
+- Se ofrece tal cual, sin garantías de ningún tipo. «PlayStation» y «PS5» son marcas de Sony Interactive Entertainment y se usan solo para indicar compatibilidad.

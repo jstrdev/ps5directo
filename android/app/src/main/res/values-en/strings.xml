@@ -2,4 +2,9 @@
 <resources>
     <string name="downloading">Saving %1$s to Downloads › PS5 Directo…</string>
     <string name="connect_first">First connect the app to your PC (scan the QR) and share the link again.</string>
+    <string name="engine_channel">PS5 Directo without a PC</string>
+    <string name="engine_title">PS5 Directo running</string>
+    <string name="engine_text">Without a PC: ready to send to your PS5</string>
+    <string name="engine_stop">Close</string>
+    <string name="engine_starting">Starting PS5 Directo…</string>
 </resources>

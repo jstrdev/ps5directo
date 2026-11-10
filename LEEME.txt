@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.4
+PS5 DIRECTO 2.0.5
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,45 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.0.5
+- Android sin PC (en pruebas): la app de Android ya no necesita el PC. Al
+  abrirla la primera vez eliges «Con PS5 Directo en mi PC» (como hasta
+  ahora, con el QR) o «Sin PC»: el propio móvil descarga, lo manda a la
+  PS5 y la consola lo descomprime con BFpilot y lo convierte con Alembic
+  (LZ4, zstd, .exfat, .ffpkg o .ffpfsc). Biblioteca, archivos de la
+  consola, Descubrir, payloads, guardián del firmware y demás funcionan
+  igual. Mientras trabaja sale una notificación fija con «Cerrar»; para
+  envíos grandes, mejor con el móvil cargando. Lo que bajas de la consola
+  (archivos, capturas) va a Descargas › PS5 Directo del móvil y las copias
+  de seguridad a Documentos › PS5 Directo. Para cambiar de modo:
+  ⋯ › «Usar con PS5 Directo del PC».
+- App de Android: si ya la tenías, desinstálala una vez antes de instalar
+  esta. Ahora se firma con una clave que no está en el código, para que
+  nadie pueda hacer una app falsa que se instale encima de la buena. Tus
+  ajustes del PC no se pierden; en el móvil solo hay que volver a escanear
+  el QR.
+- Nuevo en Descubrir › «📌 Añadidos por ti»: pega el enlace de GitHub de
+  cualquier aplicación (.zip con su carpeta PPSA… o CUSA…) o payload (.elf)
+  que no esté en Descubrir y se trata como uno más: se instala, se abre y
+  te avisa de sus versiones nuevas. Es de su autor y lo añades bajo tu
+  responsabilidad.
+- Usar fuera de casa: en «Usar en el móvil» hay un apartado nuevo «🌍 Usar
+  fuera de casa» que explica cómo hacerlo con Tailscale (gratis): lo
+  instalas en el PC y en el móvil con la misma cuenta y PS5 Directo te
+  da un segundo QR que funciona desde cualquier sitio, sin abrir puertos
+  del router.
+- Móvil: si el enlace del móvil ya no vale (se generó un código nuevo en el
+  PC o se apagó «Usar en el móvil»), ya no sale la bienvenida, el asistente
+  y las guías una y otra vez con los menús vacíos y «token» en rojo: sale un
+  aviso que explica cómo volver a vincularlo, con «Escanear de nuevo» en la
+  app de Android.
+- Móvil: el recorrido «¿Qué hace PS5 Directo?» ya no se sale de la pantalla
+  con la letra grande; los botones bajan a otra fila.
+- Nuevo en Descubrir › Mejorar tus títulos: CheatRunner, parches de
+  rendimiento mientras juegas (60 fps con el ritmo corregido, más
+  resolución, 120 Hz). Se instala a mano siguiendo su guía; trae también
+  trucos, que no hay que usar online.
 
 NOVEDADES 2.0.4
 - Actualizar emuladores grandes (RetroArch) se quedaba para siempre en

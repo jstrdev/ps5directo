@@ -2,4 +2,9 @@
 <resources>
     <string name="downloading">Guardando %1$s en Descargas › PS5 Directo…</string>
     <string name="connect_first">Primero conecta la app con tu PC (escanea el QR) y vuelve a compartir el enlace.</string>
+    <string name="engine_channel">PS5 Directo sin PC</string>
+    <string name="engine_title">PS5 Directo funcionando</string>
+    <string name="engine_text">Sin PC: listo para enviar a tu PS5</string>
+    <string name="engine_stop">Cerrar</string>
+    <string name="engine_starting">Arrancando PS5 Directo…</string>
 </resources>

@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 .backup/
 *.nuevo
+android/app/src/main/python/ps5d/
+*.jks

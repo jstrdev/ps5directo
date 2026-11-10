@@ -24,6 +24,9 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+# Dentro de la app de Android, modo «Usar sin PC»: el movil hace de PC (sin 7-Zip ni Dump Forge: descomprime
+# BFpilot y convierte Alembic, en la consola)
+PHONE = os.environ.get("PS5D_PHONE") == "1"
 
 # Mac: abierto desde el Finder, el PATH no incluye Homebrew ni MacPorts, y no se encontrarian
 # aria2, ffmpeg o rclone instalados con ellos (en Linux se anade ~/.local/bin, de pip y similares)
@@ -44,13 +47,16 @@ if sys.platform == "darwin" or sys.platform.startswith("linux"):
                 if os.path.isfile(_c):
                     os.environ["SSL_CERT_FILE"] = _c
                     break
+            else:
+                if os.path.isdir("/system/etc/security/cacerts"):        # Android
+                    os.environ["SSL_CERT_DIR"] = "/system/etc/security/cacerts"
     except Exception:
         pass
 sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.0.4"
+VERSION = "2.0.5"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -2367,11 +2373,31 @@ def fm_api(p, b):
 _DL_DIR = []
 
 
+def phone_shared(sub):
+    """Android «sin PC»: la carpeta compartida del movil (Download, Documents) si se puede escribir en ella,
+    para que lo bajado salga en «Archivos» y en la galeria y no se quede escondido dentro de la app."""
+    for root in ("/storage/emulated/0", "/sdcard"):
+        d = os.path.join(root, sub)
+        try:
+            if os.path.isdir(d):
+                t = os.path.join(d, ".ps5d_test")
+                with open(t, "w") as fh:
+                    fh.write("1")
+                os.remove(t)
+                return d
+        except OSError:
+            pass
+    return None
+
+
 def downloads_dir():
     """Carpeta de Descargas del usuario. En Linux puede llamarse "Descargas" (xdg-user-dir)."""
     if _DL_DIR:
         return _DL_DIR[0]
     d = os.path.join(os.path.expanduser("~"), "Downloads")
+    if PHONE:
+        _DL_DIR.append(phone_shared("Download") or d)
+        return _DL_DIR[0]
     if sys.platform.startswith("linux"):
         try:
             import subprocess
@@ -7345,6 +7371,10 @@ BK_MAX_FILE = 200 * 1024 * 1024       # en la configuracion no se copian archivo
 
 def backup_dir(cfg=None):
     d = ((cfg or cfg_snapshot()).get("backup_dir") or "").strip().strip('"')
+    if not d and PHONE:
+        docs = phone_shared("Documents")
+        if docs:
+            return os.path.join(docs, "PS5 Directo", "Copias")
     return d or os.path.join(os.path.expanduser("~"), "Documents", "PS5 Directo", "Copias")
 
 
@@ -8657,7 +8687,7 @@ def rec_list():
         have, ok = set(), False
     out = []
     for c in F.CATALOG:
-        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam") if k in c}
+        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam", "mine") if k in c}
         it["exp"] = bool(c.get("exp"))
         it["sys"] = c.get("sys", "")
         it["update"] = c.get("update", "")
@@ -8683,6 +8713,9 @@ def rec_list():
             it["once"] = bool(p and not p.get("port"))
             it["running"] = _port_open(cfg["ps5_ip"], p["port"], 1.2) if p and p.get("port") else False
             it["url"] = "http://%s:%d" % (E.clean_host(cfg.get("ps5_ip") or "")[0], p["port"]) if p and p.get("port") else ""
+        elif c["kind"] == "link":
+            it["url"] = "https://github.com/%s" % c["repo"]
+            it["guide"] = c.get("guide") or []
         elif c["kind"] == "guide":
             it["guide"] = c.get("guide") or []
             it["doc"] = c.get("doc") or ""
@@ -8957,6 +8990,193 @@ def rec_source(cid, repo):
     save_settings()
     REC_LATEST.pop(rec_repo(c), None)
     return {"repo": rec_repo(c)}
+
+# ---------------------------------------------------------------------------
+# «Añadidos por ti»: cualquier aplicación (homebrew en .zip) o payload (.elf) de GitHub que no esté en Descubrir.
+# Se tratan como uno más: se instalan desde su GitHub, se abren y avisan de las versiones nuevas.
+# ---------------------------------------------------------------------------
+MINE_FILE = os.path.join(DATA_DIR, "mis_apps.json")
+MINE_MAX = 40
+
+
+class _RangeFile(io.RawIOBase):
+    """Un archivo de internet que se lee a trozos (Range): para mirar dentro de un .zip sin bajarlo entero."""
+
+    def __init__(self, url):
+        super().__init__()
+        self.url, self.pos, self.n = url, 0, 0
+        req = urllib.request.Request(url, headers=dict(F._ua(), Range="bytes=0-0"))
+        with urllib.request.urlopen(req, timeout=25) as r:
+            cr = r.headers.get("Content-Range") or ""
+            if r.status != 206 or "/" not in cr:
+                raise E.PipeError("El servidor no deja leer el archivo a trozos")
+            self.size = int(cr.rsplit("/", 1)[1])
+            self.url = r.geturl()
+
+    def readable(self):
+        return True
+
+    def seekable(self):
+        return True
+
+    def tell(self):
+        return self.pos
+
+    def seek(self, off, whence=0):
+        self.pos = off if whence == 0 else self.pos + off if whence == 1 else self.size + off
+        return self.pos
+
+    def read(self, n=-1):
+        if n is None or n < 0:
+            n = self.size - self.pos
+        n = min(n, self.size - self.pos)
+        if n <= 0:
+            return b""
+        self.n += 1
+        if self.n > 40:
+            raise E.PipeError("Demasiadas lecturas")
+        req = urllib.request.Request(self.url, headers=dict(F._ua(), Range="bytes=%d-%d" % (self.pos, self.pos + n - 1)))
+        with urllib.request.urlopen(req, timeout=40) as r:
+            data = r.read(n)
+        self.pos += len(data)
+        return data
+
+    def readinto(self, b):
+        d = self.read(len(b))
+        b[:len(d)] = d
+        return len(d)
+
+
+def _zip_tid(url):
+    """Title ID de la app que trae un .zip (su carpeta PPSA/CUSA de arriba, o el titleId de su param.json)."""
+    import zipfile
+    with zipfile.ZipFile(_RangeFile(url)) as z:
+        names = z.namelist()
+        tops = {n.split("/")[0] for n in names if n.strip("/")}
+        for t in tops:
+            if re.fullmatch(r"(?i)(PPSA|CUSA)\d{5}", t):
+                return t.upper()
+        pj = [n for n in names if n.lower().endswith("sce_sys/param.json") and n.count("/") == 2]
+        if pj and len(tops) == 1:
+            try:
+                tid = json.loads(z.read(pj[0]).decode("utf-8", "replace")).get("titleId") or ""
+            except Exception:
+                tid = ""
+            if re.fullmatch(r"(?i)(PPSA|CUSA)\d{5}", tid) and tid.upper() == list(tops)[0].upper():
+                return tid.upper()
+    return ""
+
+
+def _mine_read():
+    try:
+        with open(MINE_FILE, encoding="utf-8") as fh:
+            return [x for x in json.load(fh) if isinstance(x, dict) and x.get("id") and x.get("repo")][:MINE_MAX]
+    except Exception:
+        return []
+
+
+def _mine_apply(lst):
+    """Mete los añadidos en el catálogo (y los .elf en la lista de payloads), quitando los que ya no estén."""
+    ids = {x["id"] for x in lst}
+    F.CATALOG[:] = [c for c in F.CATALOG if not c.get("mine")]
+    F.EXTRA_PAYLOADS[:] = [p for p in F.EXTRA_PAYLOADS if not p.get("mine")]
+    for x in lst:
+        c = {"id": x["id"], "kind": x["kind"], "group": "mine", "name": x["name"], "repo": x["repo"], "mine": True,
+             "what": x.get("what") or "Añadido por ti desde GitHub.", "sys": x.get("sys") or ""}
+        if x["kind"] == "app":
+            c["tid"] = x["tid"]
+            c["asset"] = x["asset"]
+        else:
+            F.EXTRA_PAYLOADS.append({"id": x["id"], "name": x["name"], "repo": x["repo"], "port": None,
+                                     "pick": x["asset"], "what": c["what"], "mine": True})
+        F.CATALOG.append(c)
+    return ids
+
+
+def _asset_rx(name, ext):
+    """Patrón que reconoce el mismo archivo en versiones futuras (sin los números de versión)."""
+    stem = re.split(r"[-_ .]?v?\d", name, 1)[0]
+    out = []
+    if len(stem) >= 3:
+        out.append(r"(?i)^" + re.escape(stem) + r".*\." + ext + r"$")
+    out.append(r"(?i)\." + ext + r"$")
+    return out
+
+
+def mine_add(text):
+    m = re.match(r"^\s*(?:https?://)?(?:www\.)?(?:github\.com/)?([\w.-]+)/([\w.-]+?)(?:\.git)?(?:[/#?].*)?\s*$", text or "")
+    if not m:
+        raise E.PipeError("Pega el enlace de GitHub del proyecto (github.com/autor/proyecto)")
+    repo = "%s/%s" % (m.group(1), m.group(2))
+    for c in F.CATALOG:
+        if c.get("mine"):
+            continue
+        if (c.get("repo") or "").lower() == repo.lower() or any(a.lower() == repo.lower() for a in c.get("alts") or []):
+            raise E.PipeError("%s ya está en Descubrir: búscalo como «%s»" % (repo, c["name"]))
+    lst = _mine_read()
+    if len(lst) >= MINE_MAX:
+        raise E.PipeError("Ya tienes %d añadidos: quita alguno antes" % MINE_MAX)
+    try:
+        tag, assets = F.github_release(repo)
+    except E.PipeError as e:
+        if "404" in str(e):
+            raise E.PipeError("No encuentro %s en GitHub, o no tiene ninguna versión publicada (Releases)" % repo)
+        raise
+    names = [a.get("name") or "" for a in assets]
+    what, real = "", repo
+    try:
+        req = urllib.request.Request(F.GH_API + "/repos/%s" % repo, headers=F._ua())
+        with urllib.request.urlopen(req, timeout=20) as r:
+            j = json.load(r)
+        what, real = (j.get("description") or "").strip()[:300], j.get("full_name") or repo
+    except Exception:
+        pass
+    ent = {"id": "gh-" + re.sub(r"[^a-z0-9]+", "-", real.lower()).strip("-"), "repo": real,
+           "name": real.split("/")[1], "what": what, "added": int(time.time())}
+    zips = [a for a in assets if (a.get("name") or "").lower().endswith(".zip")]
+    elfs = [a for a in assets if (a.get("name") or "").lower().endswith(".elf")]
+    if zips:
+        zips.sort(key=lambda a: (not re.search(r"(?i)(PPSA|CUSA)\d{5}", a["name"]), -int(a.get("size") or 0)))
+        a = zips[0]
+        tid = ""
+        try:
+            tid = _zip_tid(a["browser_download_url"])
+        except Exception as e:
+            print("No pude mirar dentro de %s: %s" % (a["name"], e))
+            mt = re.search(r"(?i)(PPSA|CUSA)\d{5}", a["name"])
+            tid = mt.group(0).upper() if mt else ""
+        if not tid:
+            if not elfs:
+                raise E.PipeError("El .zip de %s (%s) no trae la carpeta de una aplicación (PPSA… o CUSA…): "
+                                  "instálalo a mano siguiendo su guía" % (real, a["name"]))
+        else:
+            ent.update(kind="app", tid=tid, asset=_asset_rx(a["name"], "zip"), sys="Aplicación · " + tid)
+    if "kind" not in ent and elfs:
+        elfs.sort(key=lambda a: len(a["name"]))
+        ent.update(kind="payload", asset=_asset_rx(elfs[0]["name"], "elf"), sys="Payload")
+    if "kind" not in ent:
+        raise E.PipeError("La última versión de %s (%s) no trae nada que sepa instalar (un .zip con la aplicación o un "
+                          ".elf). Archivos: %s" % (real, tag or "?", ", ".join(names[:6]) or "ninguno"))
+    lst = [x for x in lst if x["id"] != ent["id"]] + [ent]
+    with LOCK:
+        _save_json(MINE_FILE, lst)
+        _mine_apply(lst)
+    return {"id": ent["id"], "name": ent["name"], "kind": ent["kind"], "tag": tag}
+
+
+def mine_del(cid):
+    lst = [x for x in _mine_read() if x["id"] != cid]
+    with LOCK:
+        _save_json(MINE_FILE, lst)
+        _mine_apply(lst)
+    return {}
+
+
+try:
+    _mine_apply(_mine_read())
+except Exception as _e:
+    print("No pude leer tus añadidos de GitHub: %s" % _e)
+
 
 def rec_install(cid, update=False):
     """Pone en la cola la ultima version oficial (su GitHub) de un programa de «Recomendados». Con update, lo nuevo
@@ -9534,6 +9754,10 @@ def lan_info():
             out["test_svg"] = F.qr_svg(out["test_url"], scale=3)
         else:
             out["error"] = "No sé la IP de este PC en la red local"
+        ts = F.tailscale_ip()                 # fuera de casa: el mismo PS5 Directo por la red privada de Tailscale
+        if ts:
+            out["ts_url"] = "http://%s:%d/#t=%s" % (ts, LAN["port"], tok)
+            out["ts_svg"] = F.qr_svg(out["ts_url"])
     return out
 
 
@@ -10788,7 +11012,7 @@ class Handler(BaseHTTPRequestHandler):
                       "unread": sum(1 for n in NOTIFS if not n.get("read")), "settings": dict(SETTINGS), "jobs": jobs,
                       "inbox": len(INBOX), "repo": SETTINGS.get("update_repo") or DEFAULT_REPO,
                       "sched": {"start": SCHED["start"], "after": SCHED["after"], "countdown": SCHED["countdown"]},
-                      "lan": bool(LAN["srv"]), "remote": self.lan, "os": os.name,
+                      "lan": bool(LAN["srv"]), "remote": self.lan, "phone": PHONE, "os": os.name,
                       "platform": sys.platform,
                       "bugs": bug_state() if not self.lan else None,
                       "now": dict(NOWPLAY) if NOWPLAY.get("tid") and time.time() - NOWPLAY.get("t", 0) < 180 else None}
@@ -11128,6 +11352,16 @@ class Handler(BaseHTTPRequestHandler):
                 job["title"] = str(b["title"])[:200]
             if "fmt" in b:
                 job["fmt_set"] = True
+            if PHONE:
+                # en el movil no hay 7-Zip ni Dump Forge: descomprime BFpilot y convierte Alembic, en la consola
+                if job.get("where") == "keep":
+                    return self._send(400, {"ok": False, "error": "En el móvil no se puede guardar en el propio móvil: elige «A la PS5»."})
+                if job.get("where") == "pc":
+                    job["where"] = "ps5"
+                if job["fmt"] and job["fmt"] != "plain" and job["fmt"] not in ALEMBIC_TO:
+                    return self._send(400, {"ok": False, "error": "Sin PC solo se convierte en la PS5 (Alembic): elige LZ4, zstd, .exfat, .ffpkg o .ffpfsc."})
+                if job["fmt"] in ALEMBIC_TO:
+                    b["conv_at"] = "ps5"
             if b.get("conv_at") == "ps5" and job["fmt"] in ALEMBIC_TO and job["where"] in ("ps5", "pc", ""):
                 # se manda tal cual (descarga y envío a la vez) y luego lo convierte Alembic en la propia consola
                 job["alembic"], job["fmt"] = job["fmt"], ""
@@ -12716,6 +12950,10 @@ def extra_api(h, p, b):
                         if ic:
                             art[t.upper()] = ic
             return {"ok": True, "kinds": kinds, "art": art}
+        if p == "/api/rec/mine/add":
+            return dict(ok=True, **mine_add(str(b.get("repo") or "")))
+        if p == "/api/rec/mine/del":
+            return dict(ok=True, **mine_del(str(b.get("id") or "")))
         if p == "/api/rec/install":
             return dict(ok=True, **rec_install(str(b.get("id") or ""), bool(b.get("update"))))
         if p == "/api/col/reveal":
@@ -13443,6 +13681,18 @@ def main():
         srv.serve_forever()
     except KeyboardInterrupt:
         pass
+
+
+def phone_start():
+    """Arranque dentro de la app de Android (modo «Usar sin PC»): el mismo PS5 Directo, sin ventana ni accesos
+    directos ni nada del escritorio. Devuelve la direccion (con su codigo) que abre la app."""
+    load_state()
+    for target in (transfer_worker, extract_worker, monitor, speed_watch, console_auto, console_watch):
+        threading.Thread(target=target, daemon=True).start()
+    srv = Server(("127.0.0.1", pick_port()), Handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    print("PS5 Directo %s (Android, sin PC)" % VERSION)
+    return "http://127.0.0.1:%d/#t=%s" % (srv.server_address[1], TOKEN)
 
 
 if __name__ == "__main__":

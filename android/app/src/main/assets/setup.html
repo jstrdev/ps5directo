@@ -17,6 +17,8 @@ video{width:100%;border-radius:12px;margin-top:12px;background:#000;display:none
 <div class="logo"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10M7.5 9.5 12 14l4.5-4.5"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg></div>
 <h1>PS5 Directo</h1>
 <p id="intro"></p>
+<div class="card" id="modes" hidden><p id="mdQ"></p><button id="mdPc"></button><button class="sec" id="mdLocal"></button><p><small id="mdNote"></small></p></div>
+<div class="card" id="local" hidden><p id="lcT"></p><p class="err" id="lcE"></p><button id="lcRetry" hidden></button><button class="sec" id="lcPc" hidden></button></div>
 <div class="card" id="noconn" hidden><p class="err" id="ncT"></p><button id="retry"></button><button id="wake" hidden></button><p id="wakeMsg"></p><button class="sec" id="other"></button></div>
 <div class="card" id="setup">
   <ol id="steps"></ol>
@@ -10131,19 +10133,33 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 /******/ ])["default"];
 });</script>
 <script>
-const MODE="{{MODE}}", SAVED="{{URL}}";
+const MODE="{{MODE}}", SAVED="{{URL}}", ERR="{{ERR}}";
 const EN=!(navigator.language||"es").toLowerCase().startsWith("es");
 const T=EN?{intro:"Connect this phone to PS5 Directo on your PC (same Wi-Fi).",steps:["On the PC, open PS5 Directo and click <b>Use on phone</b>.","Tap <b>Scan the QR</b> and point at the code on the PC screen."],
  scan:"📷 Scan the QR",use:"Use this link",wake:"⏰ Wake up my PC",waking:"Sent. If your PC allows it (Wake-on-LAN, usually only by cable), it wakes up in a few seconds; then I try again.",nc:"Can't reach PS5 Directo at ",retry:"Try again",other:"Scan another QR",bad:"That QR isn't PS5 Directo's. Use the one from «Use on phone».",nocam:"Can't open the camera: ",paste:"or paste the link",foot:"Use at your own responsibility. Nothing is sent outside your home network.",
- hint:"Is PS5 Directo open on the PC and the phone on the same Wi-Fi?"}
+ hint:"Is PS5 Directo open on the PC and the phone on the same Wi-Fi? Away from home, use Tailscale (PS5 Directo on the PC › Phone › Use away from home).",
+ mdQ:"How do you want to use it?",mdPc:"💻 With PS5 Directo on my PC",mdLocal:"📱 Without a PC (beta)",mdNote:"Without a PC, this phone does everything itself: downloads, sends to the PS5 and the console extracts and converts (Alembic). Keep the phone charging for big transfers.",
+ starting:"Starting PS5 Directo on this phone…",lcErr:"PS5 Directo couldn't start on this phone.",lcRetry:"Try again",lcPc:"Use it with my PC instead"}
 :{intro:"Conecta este móvil con PS5 Directo del PC (en la misma Wi-Fi).",steps:["En el PC, abre PS5 Directo y pulsa <b>Usar en el móvil</b>.","Pulsa <b>Escanear el QR</b> y apunta al código de la pantalla del PC."],
  scan:"📷 Escanear el QR",use:"Usar este enlace",wake:"⏰ Despertar mi PC",waking:"Enviado. Si tu PC lo permite (Wake-on-LAN, normalmente solo por cable), se despierta en unos segundos; luego vuelvo a probar.",nc:"No conecto con PS5 Directo en ",retry:"Volver a probar",other:"Escanear otro QR",bad:"Ese QR no es el de PS5 Directo. Usa el de «Usar en el móvil».",nocam:"No puedo abrir la cámara: ",paste:"o pega el enlace",foot:"Cada uno lo usa bajo su responsabilidad. No sale nada de la red de tu casa.",
- hint:"¿Está PS5 Directo abierto en el PC y el móvil en la misma Wi-Fi?"};
+ hint:"¿Está PS5 Directo abierto en el PC y el móvil en la misma Wi-Fi? Fuera de casa, usa Tailscale (PS5 Directo del PC › Móvil › Usar fuera de casa).",
+ mdQ:"¿Cómo lo quieres usar?",mdPc:"💻 Con PS5 Directo en mi PC",mdLocal:"📱 Sin PC (en pruebas)",mdNote:"Sin PC, este móvil lo hace todo: descarga, lo manda a la PS5 y la consola lo descomprime y convierte (Alembic). Para envíos grandes, mejor con el móvil cargando.",
+ starting:"Arrancando PS5 Directo en este móvil…",lcErr:"PS5 Directo no ha podido arrancar en este móvil.",lcRetry:"Volver a probar",lcPc:"Mejor usarlo con mi PC"};
 const $=id=>document.getElementById(id);
 $("intro").textContent=T.intro; $("steps").innerHTML=T.steps.map(s=>"<li>"+s+"</li>").join("");
 $("scan").textContent=T.scan; $("use").textContent=T.use; $("link").placeholder=T.paste+": http://192.168.1.20:8780/#t=…"; $("foot").textContent=T.foot;
 if(MODE==="noconn"){ $("noconn").hidden=false; $("ncT").textContent=T.nc+(SAVED.split("#")[0]||"?")+". "+T.hint; $("retry").textContent=T.retry; $("other").textContent=T.other; }
 $("retry").onclick=()=>PS5D.retry();
+// Primera vez: elegir con PC o sin PC. Las demas veces se va directo a lo que eligio.
+const local=()=>{ try{ return PS5D.useLocal&&true }catch(e){ return false } };
+if(MODE==="first"&&local()){ $("setup").hidden=true; $("modes").hidden=false; $("intro").textContent="";
+  $("mdQ").textContent=T.mdQ; $("mdPc").textContent=T.mdPc; $("mdLocal").textContent=T.mdLocal; $("mdNote").textContent=T.mdNote;
+  $("mdPc").onclick=()=>{ $("modes").hidden=true; $("setup").hidden=false; $("intro").textContent=T.intro };
+  $("mdLocal").onclick=()=>PS5D.useLocal(); }
+if(MODE==="starting"||MODE==="localerr"){ $("setup").hidden=true; $("local").hidden=false; $("intro").textContent="";
+  $("lcT").textContent=MODE==="starting"?T.starting:T.lcErr;
+  if(MODE==="localerr"){ $("lcE").textContent=ERR; $("lcRetry").hidden=$("lcPc").hidden=false; $("lcRetry").textContent=T.lcRetry; $("lcPc").textContent=T.lcPc;
+    $("lcRetry").onclick=()=>PS5D.retry(); $("lcPc").onclick=()=>PS5D.reset(); } }
 try{ if(MODE==="noconn"&&PS5D.canWake&&PS5D.canWake()){ $("wake").hidden=false; $("wake").textContent=T.wake;
   $("wake").onclick=()=>{ PS5D.wake(); $("wakeMsg").className="ok"; $("wakeMsg").textContent=T.waking; setTimeout(()=>PS5D.retry(),15000) } } }catch(e){} $("other").onclick=()=>{ $("noconn").hidden=true; startScan() };
 function ok(u){ return /^https?:\/\/[^/\s]+\/?.*#t=[\w-]+/i.test(u) }

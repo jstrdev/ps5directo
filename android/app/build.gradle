@@ -1,6 +1,9 @@
 // App de Android de PS5 Directo: una ventana propia (WebView) que abre PS5 Directo del PC por la red de casa.
 // La version la pasa el flujo de GitHub (-Pps5dVersion=X.Y.Z, la misma que app.py).
-plugins { id 'com.android.application' }
+plugins {
+    id 'com.android.application'
+    id 'com.chaquo.python'
+}
 
 def ver = (project.findProperty('ps5dVersion') ?: '1.0.0').toString()
 def nums = ver.tokenize('.').collect { it.replaceAll('\\D', '') ?: '0' }.collect { it.toInteger() }
@@ -15,15 +18,20 @@ android {
         targetSdk 34
         versionCode nums[0] * 10000 + nums[1] * 100 + nums[2]
         versionName ver
+        ndk { abiFilters 'arm64-v8a', 'x86_64' }   // moviles de hoy (y el emulador)
     }
     signingConfigs {
-        // Clave fija para que cada version nueva se instale encima de la anterior
+        // La clave de firma NO esta en el repo: la pone el flujo de GitHub desde sus secretos
+        // (ANDROID_KEYSTORE_B64, ANDROID_KEYSTORE_PASS, ANDROID_KEY_ALIAS). Asi nadie puede firmar
+        // una app falsa que se instale encima de la buena.
         release {
-            // Si en GitHub hay secretos con una clave propia (ANDROID_KEYSTORE_B64...), se usa esa; si no, la de siempre
-            storeFile file(System.getenv('PS5D_KS') ?: '../ps5directo.jks')
-            storePassword System.getenv('PS5D_KS_PASS') ?: 'ps5directo'
-            keyAlias System.getenv('PS5D_KS_ALIAS') ?: 'ps5directo'
-            keyPassword System.getenv('PS5D_KS_PASS') ?: 'ps5directo'
+            def ks = System.getenv('PS5D_KS')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('PS5D_KS_PASS')
+                keyAlias System.getenv('PS5D_KS_ALIAS') ?: 'ps5directo'
+                keyPassword System.getenv('PS5D_KS_PASS')
+            }
         }
     }
     buildTypes {
@@ -35,5 +43,14 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+// Modo «Usar sin PC»: el flujo de GitHub copia el codigo de PS5 Directo a src/main/python/ps5d antes de compilar
+chaquopy {
+    defaultConfig {
+        version '3.11'
+        pyc { src false }
+        extractPackages 'ps5d'
     }
 }

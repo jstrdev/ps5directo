@@ -332,6 +332,24 @@ def lan_ip(target=None):
     return None
 
 
+def tailscale_ip():
+    """IP de este PC en Tailscale (100.64.0.0/10) si Tailscale esta encendido; si no, None.
+    Con ella el movil llega a PS5 Directo desde fuera de casa, sin abrir puertos del router."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("100.100.100.100", 53))      # el DNS de Tailscale: solo sale por su red
+            ip = s.getsockname()[0]
+        finally:
+            s.close()
+        a = [int(x) for x in ip.split(".")]
+        if a[0] == 100 and 64 <= a[1] <= 127:
+            return ip
+    except Exception:
+        pass
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Sumas de comprobacion (.sfv / .md5 / .sha1 / .sha256)
 # ---------------------------------------------------------------------------
@@ -1068,6 +1086,16 @@ CATALOG = [
              "una en su web. PS5 Directo lo carga y te pone los parches en la consola con un botón.",
      "needs": "Firmware de PS5 3.00 a 12.70 (según su autor). Se vuelve a cargar tras cada reinicio. Los parches solo cambian "
               "el ejecutable al arrancar: el título no se toca."},
+    {"id": "cheatrunner", "kind": "link", "group": "patch", "name": "CheatRunner", "repo": "notmaj0r/CheatRunner",
+     "exp": True,
+     "what": "Parches de rendimiento que se aplican mientras juegas: títulos de PS4 a 60 fps con el ritmo corregido (que no "
+             "se aceleren), más resolución o 120 Hz. Con él se ha visto Bloodborne a 60 fps estables. Usa parte de "
+             "ps-patch-system y es del autor de Prospero Manager.",
+     "needs": "Se instala a mano: baja CheatRunner.zip de su GitHub y sigue su guía (se abre con Homebrew Launcher). "
+              "También trae trucos: no los uses online.",
+     "guide": ["En su GitHub, baja CheatRunner.zip de la última versión.",
+               "Sigue los pasos de su GUIDE para ponerlo en la consola y abrirlo con Homebrew Launcher.",
+               "Para actualizar, sigue antes sus pasos de «Updating CheatRunner»."]},
     {"id": "neoenabler", "kind": "payload", "group": "patch", "name": "NeoEnabler (PS4 en modo Pro)",
      "repo": "gasb07/NeoEnabler", "exp": True,
      "what": "Hace que los títulos de PS4 de su lista arranquen como en una PS4 Pro y suban de resolución (hasta 4K) con "

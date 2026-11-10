@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.4 — USER GUIDE (English)
+PS5 DIRECTO 2.0.5 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,39 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.0.5 - Android without a PC (beta): the Android app no longer needs the PC.
+  The first time you choose "With PS5 Directo on my PC" (the QR, as
+  before) or "Without a PC": the phone itself downloads and sends to the
+  PS5, and the console extracts with BFpilot and converts with Alembic
+  (LZ4, zstd, .exfat, .ffpkg or .ffpfsc). Library, console files,
+  Discover, payloads, the firmware guard and the rest work the same. A
+  fixed notification with "Close" stays while it works; for big transfers,
+  keep the phone charging. What you download from the console (files,
+  captures) goes to the phone's Downloads › PS5 Directo and backups to
+  Documents › PS5 Directo. To switch: ⋯ › "Use with PS5 Directo on the PC".
+  Android app: if you already had it, uninstall it once before installing
+  this one. It's now signed with a key that isn't in the code, so nobody can
+  make a fake app that installs over the real one. On the phone you just
+  scan the QR again.
+  New in Discover › "📌 Added by you": paste the GitHub link of any app
+  (.zip with its PPSA… or CUSA… folder) or payload (.elf) that isn't in
+  Discover and it's treated like the rest: it installs, opens and tells you
+  about new versions. It belongs to its author and you add it at your own
+  responsibility.
+  Use away from home: "Use on your phone" has a new "🌍 Use away from home"
+  section that explains how with Tailscale (free): install it on the PC
+  and the phone with the same account and PS5 Directo gives you a second
+  QR that works from anywhere, without opening router ports.
+  Phone: if the phone link no longer works (a new code was generated on
+  the PC or "Use on your phone" was turned off), it no longer repeats the
+  welcome, setup and guides with empty menus and a red "token": a notice
+  explains how to link it again, with "Scan again" in the Android app.
+  The "What does PS5 Directo do?" tour no longer overflows the screen with
+  large fonts. New in Discover › Improve your titles: CheatRunner,
+  performance patches while you play (60 fps with fixed timing, higher
+  resolution, 120 Hz); installed by hand following its guide, and it also
+  includes cheats, which shouldn't be used online.
+
 2.0.4 - Updating big emulators (RetroArch) no longer gets stuck on "Putting it in
   place", and fixing permissions on thousands of files is several times faster.
   Discover's Home shows the scene news in a big auto-rotating banner, with featured picks editable on GitHub. The banner fills itself with the latest from the scene: new versions of everything in Discover and new PS5 projects on GitHub, newest first, generated every 3 hours by an automatic task in the PS5 Directo repo (escena.json). From the RecompStore catalog the banner only shows just-arrived items and updates from the last 3 days; the full news list can be sorted (recently updated, newest arrivals, most popular, A to Z). New banner look: thumbnails on the right with a progress bar, arrows together at the bottom and a small line with titles seen running. New: PS5 Lichii (Switch 2, PS5 and PS5 Pro; best on Pro). Convert on the PS5 (experimental): in "Format on the PS5" choose where it's converted: "On your PC" (latest PS5 Dump Forge) or "On the PS5" (Alembic), which downloads and sends at the same time and the console converts it at the end. Network shares (SMB: Windows, Samba and most NAS): paste \\NAS\Folder\title or smb://NAS/Folder/title and it goes straight to the PS5. New in Discover: Prospero Manager (all-in-one manager running on the console, port 7070). When a new PS5 Directo version is out, "⋯" shows a blue dot and "Update to vX" glows. New users see the feature cards right after connecting the PS5, with the step-by-step guide at the end; if you skip them, a "See what PS5 Directo can do" bubble next to PC mode reminds you until you watch them or close it. Payloads: "Install on the console" fetches the new version from GitHub into Payload Manager. A 12-step tour of what PS5 Directo does (formats, PC or PS5 conversion, your way / PC mode, file manager, Discover with recomps and more), available any time from ⋯ › "What does PS5 Directo do?". Discover clears the update notice after updating, and has a ✕ to skip a
