@@ -1,4 +1,24 @@
 {
   "_como": "Tarjetas extra de Descubrir. Se leen de GitHub cada 3 horas: añade una aquí y les llega a todos sin sacar versión. Campos: id (minúsculas, único), kind (app = se instala en /data/homebrew; payload = se carga en la PS5; link = solo guía y enlace), group (emu, media, rp, tool, patch, os), fam (para emuladores: nin, sony, sega, ms, retro, multi), name, sys (línea pequeña, p. ej. «Switch 2»), repo (autor/proyecto de GitHub), what (qué es), needs (qué hace falta), guide (lista de pasos), exp (true = en pruebas), tid (solo app: PPSA12345), asset (opcional: patrones del archivo de la release, p. ej. [\"(?i)\\\\.zip$\"]), port (solo payload, si escucha en un puerto), icon y hero (URL de imágenes), until (AAAA-MM-DD: deja de salir ese día) y en: {sys, what, needs, guide} con los textos en inglés (el nombre no se traduce). Si un id ya existe dentro de la app, esta tarjeta se ignora.",
-  "items": []
+  "items": [
+    {
+      "id": "ps4mount",
+      "kind": "payload",
+      "group": "tool",
+      "name": "ps4mount",
+      "repo": "gasb07/ps4mount",
+      "exp": true,
+      "what": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage"
+      },
+      "icon": "https://github.com/gasb07.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)\\.elf$"
+      ]
+    }
+  ]
 }
