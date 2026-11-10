@@ -19,10 +19,11 @@ android {
     signingConfigs {
         // Clave fija para que cada version nueva se instale encima de la anterior
         release {
-            storeFile file('../ps5directo.jks')
-            storePassword 'ps5directo'
-            keyAlias 'ps5directo'
-            keyPassword 'ps5directo'
+            // Si en GitHub hay secretos con una clave propia (ANDROID_KEYSTORE_B64...), se usa esa; si no, la de siempre
+            storeFile file(System.getenv('PS5D_KS') ?: '../ps5directo.jks')
+            storePassword System.getenv('PS5D_KS_PASS') ?: 'ps5directo'
+            keyAlias System.getenv('PS5D_KS_ALIAS') ?: 'ps5directo'
+            keyPassword System.getenv('PS5D_KS_PASS') ?: 'ps5directo'
         }
     }
     buildTypes {

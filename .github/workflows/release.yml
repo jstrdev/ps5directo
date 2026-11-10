@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p dist/PS5Directo
           git archive HEAD | tar -x -C dist/PS5Directo
-          rm -rf dist/PS5Directo/.github dist/PS5Directo/installer dist/PS5Directo/android
+          rm -rf dist/PS5Directo/.github dist/PS5Directo/installer dist/PS5Directo/android dist/PS5Directo/tools
 
       - name: Python incluido
         run: |
@@ -60,7 +60,7 @@ jobs:
           L=build/linux/PS5Directo
           mkdir -p "$L"
           git archive HEAD | tar -x -C "$L"
-          rm -rf "$L/.github" "$L/installer" "$L/android" "$L"/*.bat "$L"/*.vbs
+          rm -rf "$L/.github" "$L/installer" "$L/android" "$L/tools" "$L"/*.bat "$L"/*.vbs
           chmod +x "$L/ps5directo.sh"
           PBS=20250604; PYV=3.12.11
           curl -fsSL -o pyl.tgz "https://github.com/astral-sh/python-build-standalone/releases/download/$PBS/cpython-$PYV+$PBS-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
@@ -129,7 +129,7 @@ jobs:
           A="build/PS5 Directo.app"; C="$A/Contents"; R="$C/Resources"
           mkdir -p "$C/MacOS" "$R/app" "$R/bin"
           git archive HEAD | tar -x -C "$R/app"
-          rm -rf "$R/app/.github" "$R/app/installer" "$R/app/android" "$R/app"/*.bat "$R/app"/*.vbs "$R/app/ps5directo.sh"
+          rm -rf "$R/app/.github" "$R/app/installer" "$R/app/android" "$R/app/tools" "$R/app"/*.bat "$R/app"/*.vbs "$R/app/ps5directo.sh"
           # ejecutable nativo para Apple Silicon e Intel (con un script como ejecutable, macOS pide Rosetta)
           clang -O2 -arch arm64 -arch x86_64 -mmacosx-version-min=11.0 -o "$C/MacOS/PS5 Directo" installer/macos/launcher.c
           lipo -archs "$C/MacOS/PS5 Directo" | grep -q arm64
@@ -216,8 +216,16 @@ jobs:
           gradle-version: "8.10.2"
       - name: Compilar la .apk
         working-directory: android
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           set -e
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/ps5d.jks"
+            export PS5D_KS="$RUNNER_TEMP/ps5d.jks" PS5D_KS_PASS="$KS_PASS" PS5D_KS_ALIAS="${KS_ALIAS:-ps5directo}"
+          fi
           gradle --no-daemon assembleRelease -Pps5dVersion="$VER"
           mkdir -p ../dist
           cp app/build/outputs/apk/release/app-release.apk "../dist/PS5Directo-$VER-Android.apk"

@@ -10,6 +10,12 @@ INSTALAR
 1. Arrastra "PS5 Directo" a la carpeta Aplicaciones (Applications).
 2. Ábrelo desde Aplicaciones.
 
+SI DICE QUE ESTÁ «DAÑADA» (is damaged and can't be opened)
+No está dañada: es como avisa macOS de las apps descargadas que no ha
+firmado Apple. Abre la app Terminal, pega esto y pulsa Intro:
+    xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"
+Luego ábrela normal. Solo hace falta una vez.
+
 SI MACOS NO TE DEJA ABRIRLO
 La app no está firmada por Apple (eso cuesta 99 $ al año), así que la
 primera vez macOS la bloquea. Es normal en programas gratuitos.
@@ -46,6 +52,12 @@ That makes it quick to fix. Thanks for trying it!
 INSTALL
 1. Drag "PS5 Directo" into the Applications folder.
 2. Open it from Applications.
+
+IF IT SAYS IT "IS DAMAGED AND CAN'T BE OPENED"
+It isn't damaged: that's how macOS warns about downloaded apps that Apple
+hasn't signed. Open the Terminal app, paste this and press Enter:
+    xattr -dr com.apple.quarantine "/Applications/PS5 Directo.app"
+Then open it normally. You only need to do this once.
 
 IF MACOS WON'T OPEN IT
 The app isn't signed by Apple (that costs $99 a year), so macOS blocks it

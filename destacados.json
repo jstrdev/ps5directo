@@ -1,0 +1,37 @@
+{
+  "_como": "Cartel de Descubrir › Inicio. Se lee de GitHub cada 3 horas: cámbialo aquí y les llega a todos sin sacar versión. Campos: title, text, badge, cat (y title_en, text_en, badge_en, cat_en para inglés), img (URL de una imagen), install (id del emulador o app de Descubrir: eglantine, lichii, ps5sx2...), url (enlace de más información), note (línea pequeña, por ejemplo títulos que ya se ven funcionar; y note_en), pro (true si es solo para PS5 Pro), until (AAAA-MM-DD: deja de salir ese día). Salen primero estos y luego lo último de RecompStore.",
+  "items": [
+    {
+      "id": "lichii-oot",
+      "cat": "Emulación",
+      "cat_en": "Emulation",
+      "badge": "Nuevo",
+      "badge_en": "New",
+      "title": "El remake de Zelda: Ocarina of Time ya se juega en PS5",
+      "title_en": "The Zelda: Ocarina of Time remake is now playable on PS5",
+      "text": "PS5 Lichii, el nuevo emulador de Switch 2 de mihawk, lo mueve a unos 30 fps en una PS5 Pro y puede llegar a 60 con su generación de fotogramas. En la PS5 normal aún está por medir. Con tus propias claves, firmware y copia.",
+      "text_en": "PS5 Lichii, mihawk's new Switch 2 emulator, runs it at about 30 fps on a PS5 Pro and can reach 60 with its frame generation. On the standard PS5 it hasn't been measured yet. With your own keys, firmware and copy.",
+      "install": "lichii",
+      "pro": true,
+      "url": "https://github.com/mihawk-99/PS5_Lichii",
+      "until": "2026-12-31",
+      "note": "Se ha visto: The Legend of Zelda: Ocarina of Time (remake) a unos 30 fps en PS5 Pro",
+      "note_en": "Seen running: The Legend of Zelda: Ocarina of Time (remake) at about 30 fps on PS5 Pro"
+    },
+    {
+      "id": "eglantine-sw2",
+      "cat": "Emulación",
+      "cat_en": "Emulation",
+      "badge": "Cada vez más títulos",
+      "badge_en": "More titles every release",
+      "title": "Switch 2 en tu PS5",
+      "title_en": "Switch 2 on your PS5",
+      "text": "EglantinePS5 es el emulador de Switch 2 más avanzado para PS5 y cada versión hace arrancar más títulos. Instálalo en un clic y PS5 Directo te avisa de cada versión nueva.",
+      "text_en": "EglantinePS5 is the most advanced Switch 2 emulator for the PS5, and every release boots more titles. Install it in one click and PS5 Directo tells you about each new version.",
+      "install": "eglantine",
+      "until": "2027-03-31",
+      "note": "Pokopia a 60 fps en PS5 · Mario Kart World y Donkey Kong Bananza ya arrancan en el núcleo Eglantine",
+      "note_en": "Pokopia at 60 fps on PS5 · Mario Kart World and Donkey Kong Bananza already boot on the Eglantine core"
+    }
+  ]
+}

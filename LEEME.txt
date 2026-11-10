@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.0.3
+PS5 DIRECTO 2.0.4
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,79 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.0.4
+- Actualizar emuladores grandes (RetroArch) se quedaba para siempre en
+  «Colocando»: copiar lo nuevo encima iba archivo a archivo con una tarea
+  de BFpilot por cada uno. Ahora va de una vez y enseña cuántos archivos
+  lleva. Y arreglar los permisos de miles de archivos (RetroArch: 20.000)
+  va varias veces más rápido y enseña cuántos lleva.
+- Descubrir › Inicio: las novedades de la scene salen en un cartel grande
+  que pasa solo (con flechas, puntos y deslizar en el móvil), con
+  «Instalar en la PS5» y «Más información».
+- El cartel puede llevar destacados (lo que más se juega o lo nuevo de la
+  emulación) que se cambian en GitHub sin sacar versión, con un botón para
+  instalar el emulador que lo mueve.
+- El cartel se llena solo con lo más reciente de la scene: versiones
+  nuevas de todo lo de Descubrir (emuladores, apps, payloads) y proyectos
+  nuevos de PS5 en GitHub, de los últimos días y lo más nuevo primero. Lo
+  genera cada 3 horas una tarea automática del repositorio de PS5 Directo
+  (escena.json), sin sacar versión nueva. Si tienes algo instalado con
+  versión nueva, sale una tarjeta «Nueva versión» con «Actualizar».
+- Del catálogo de RecompStore, el cartel ya no enseña actualizaciones de
+  hace semanas: solo lo recién llegado y lo actualizado en los últimos 3
+  días. La lista completa de novedades se puede ordenar (actualizado hace
+  poco, recién llegados, más populares, de la A a la Z) y lo que no
+  recomendamos ya no sale.
+- Cartel nuevo: miniaturas a la derecha con barra de progreso, flechas
+  juntas abajo y una línea pequeña con los títulos que ya se ven funcionar.
+- Nuevo en Descubrir: PS5 Lichii, emulador de Switch 2 para PS5 y PS5 Pro
+  (en la Pro rinde mejor).
+- Convertir en la PS5 (en pruebas): en «Formato en la PS5» › «Dónde se
+  convierte» eliges «En tu PC» (PS5 Dump Forge, la última versión) o «En la
+  PS5» (Alembic). Con «En la PS5» se descarga y envía a la vez, sin pasar
+  por el disco del PC, y al terminar la consola lo convierte a LZ4, zstd,
+  .exfat, .ffpkg o .ffpfsc. Si Alembic no está cargado, se carga solo
+  (por Payload Manager o el cargador de ELF) y se queda en Payload Manager
+  para la próxima vez. Debajo de la opción ves si está cargado.
+- Carpetas compartidas de la red (SMB: Windows, Samba y casi todos los NAS):
+  pega \\NAS\Carpeta\titulo o smb://NAS/Carpeta/titulo y se manda directo a
+  la PS5. En Windows usa el usuario que guardaste en el Explorador; en Mac y
+  Linux, si la carpeta no está montada, el sistema te pide la contraseña.
+- Nuevo en Descubrir: Prospero Manager, un gestor todo en uno que vive en la
+  consola y se usa desde el navegador (puerto 7070).
+- Si hay versión nueva de PS5 Directo, «⋯» lleva un punto azul y la opción
+  «Actualizar a la vX» brilla para que se vea.
+- Usuarios nuevos: al terminar de conectar la PS5 salen las tarjetas de lo que
+  puede hacer, y al final se puede seguir con la guía de uso paso a paso.
+  Si las cierras antes de acabar, un bocadillo junto a «Modo PC» («Descubre
+  qué hace PS5 Directo») te las recuerda hasta que las veas o lo cierres.
+- Payloads: «Instalar en la consola» baja la versión nueva de GitHub y la
+  instala en Payload Manager (y en el autoarranque si estaba ahí).
+- Recorrido de 12 pasos por lo que hace PS5 Directo: formatos (LZ4, zstd,
+  imágenes, .fpkg), convertir en el PC o en la PS5, pegar y listo, todo a tu
+  gusto (Modo PC, dónde descomprimir, destino, programar...), Biblioteca,
+  gestor de archivos, Descubrir (emuladores, apps y recomps), jailbreak
+  protegido, espacio, móvil, copias y capturas, y todo lo demás. Se puede ver otra vez cuando quieras
+  desde ⋯ › «¿Qué hace PS5 Directo?».
+- Descubrir: tras actualizar un emulador o una app, el aviso de
+  actualización se quita solo. Botón ✕ para que no te avise de una
+  versión (vuelve a avisar si sale otra).
+- Payloads: también se mira GitHub (ShadowMountPlus, ftpsrv…), que a veces
+  va por delante del catálogo de Payload Manager. Y cuando hay versión
+  nueva sale un aviso pequeño con «Qué cambia» y «Actualizar».
+- Las novedades de PS5 Dump Forge se traducen a tu idioma.
+- Convertir lo que ya tienes en el PC sin mandarlo: en «Solo a mi PC» pon la
+  ruta del .pkg, la carpeta o la imagen, elige «Convertir» y el formato.
+  El resultado queda en tu carpeta y el original no se toca.
+- Si el destino es un USB o un disco externo de la consola, se descomprime
+  directamente en ese disco, no en el interno.
+- Biblioteca: lo instalado en el SSD M.2 o en almacenamiento ampliado sale
+  con su ruta real aunque haya un resto en /user/app.
+- Si mandas un título y no veo ShadowMountPlus en la consola, te aviso: sin
+  él no sale en la pantalla de inicio.
+- Mac: la app ya no se modifica a sí misma al arrancar (la firma seguía
+  valiendo) y la guía explica qué hacer si macOS dice que está «dañada».
 
 NOVEDADES 2.0.3
 - Biblioteca: los títulos instalados en el SSD M.2 o en almacenamiento

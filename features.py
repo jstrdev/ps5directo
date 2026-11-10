@@ -768,6 +768,9 @@ EXTRA_PAYLOADS = [
     {"id": "alembic", "name": "Alembic", "repo": "fthdgn-gh/Alembic", "port": 5940,
      "pick": [r"(?i)^alembic-[\d.]+\.elf$", r"(?i)^alembic.*\.elf$"],
      "what": "Conversor de formatos dentro de la consola (carpeta, exFAT, FFPKG, FFPFS, FFPFSC, paquete), desde su web (puerto 5940)"},
+    {"id": "prosperomgr", "name": "Prospero Manager", "repo": "notmaj0r/ProsperoMgr", "port": 7070,
+     "pick": [r"(?i)^prosperomgr.*\.elf$", r"(?i)prospero.*\.elf$"],
+     "what": "Gestor todo en uno dentro de la consola: archivos, ZIP, payloads, copias de partidas y temperaturas (web, puerto 7070)"},
     {"id": "forge", "name": "PS5 Dump Forge", "repo": "quer3q/ps5-dump-forge", "port": 8095,
      "what": "Conversor e instalador de .pkg dentro de la consola (se usa desde su web, puerto 8095)"},
     {"id": "overlay", "name": "PS5 Hardware Overlay", "repo": "smoxa/ps5-new-overlay", "port": 8585,
@@ -923,6 +926,24 @@ CATALOG = [
                        "Contenido (.nsp o .xci) en roms; actualizaciones y DLC en updates.",
                        "Después de añadir claves o firmware, ciérralo y vuelve a abrirlo.",
                        "Está en pruebas: muchos títulos aún no van o van lentos."]}},
+    {"id": "lichii", "kind": "app", "group": "emu", "fam": "nin", "name": "PS5 Lichii", "sys": "Switch 2",
+     "tid": "PPSA99008", "repo": "mihawk-99/PS5_Lichii", "asset": [r"(?i)PS5_Lichii.*\.zip$", r"(?i)\.zip$"], "exp": True,
+     "what": "Emulador experimental de Switch 2 de mihawk (el de MihawkOS). Frente a EglantinePS5 usa una base más nueva "
+             "(Fritchii 5.3), compacta la memoria para aguantar zonas grandes y trae generación de fotogramas (30 → 60 fps). "
+             "Rinde mejor en PS5 Pro: allí mueve el remake de Ocarina of Time a unos 30 fps.",
+     "needs": "Las claves y el firmware de tu propia consola y tu contenido (.xci, .nsp o .nup). En la PS5 normal aún no "
+              "está medido y algunos títulos pueden quedarse sin memoria. Se instala en lugar de ProsperoEden (mismo "
+              "Title ID) y comparte su carpeta.",
+     "update": "No avisa solo de versiones nuevas: te avisa PS5 Directo.",
+     "emu": {"data": "/data/prosperoeden", "fixed": True, "bios": "keys", "games": "roms",
+             "bios_what": "Claves de tu propia consola (prod.keys)", "bios_ext": [".keys"],
+             "extra_dirs": [{"dir": "firmware", "what": "Firmware de tu consola (los archivos .nca)", "ext": [".nca"]}],
+             "files": ["logs/"],
+             "guide": ["Todo va en /data/prosperoeden (lo comparte con ProsperoEden).",
+                       "Claves en keys y firmware en firmware: tienen que ser de tu propia consola.",
+                       "Cada título en su carpeta dentro de roms, con su archivo .eden; mejor en un solo archivo (.xci o .nup).",
+                       "Touchpad + R1 enseña el rendimiento; Touchpad + L1 cierra el título.",
+                       "Muy experimental: tirones al cambiar de zona y títulos que no arrancan."]}},
     {"id": "ecam", "kind": "app", "group": "emu", "fam": "nin", "name": "PS5-ECAM", "sys": "Wii U / 3DS / DS / Switch",
      "tid": "PPSA99360", "repo": "premohq/PS5-ECAM", "asset": [r"(?i)PPSA99360.*\.zip$", r"(?i)\.zip$"], "exp": True,
      "what": "Cuatro emuladores en uno: Cemu (Wii U), Azahar (3DS), melonDS (DS) y Eden (Switch).",
@@ -1076,6 +1097,14 @@ CATALOG = [
              "emparejarse con su versión de PC para convertir con el procesador del PC y escribir directo en la consola. "
              "Se maneja desde su web en el puerto 5940.",
      "needs": "En desarrollo: guarda copia de lo que conviertas hasta comprobarlo en la consola. Se carga como payload."},
+    {"id": "prosperomgr", "kind": "payload", "group": "tool", "name": "Prospero Manager", "repo": "notmaj0r/ProsperoMgr",
+     "exp": True,
+     "what": "Un gestor todo en uno que vive dentro de la consola y se usa desde el navegador de cualquier aparato "
+             "(PC, tablet o móvil) en el puerto 7070, sin instalar nada más: archivos con ZIP, biblioteca de payloads "
+             "con autoarranque, instalador de .pkg desde la consola o una URL, copias de tus partidas, procesos y "
+             "temperaturas. Útil para cuando no tienes el PC a mano.",
+     "needs": "Se carga como payload. Es reciente: sus funciones de cuentas y ventilador son experimentales, úsalas con "
+              "cuidado. PS5 Directo y Prospero Manager pueden convivir."},
     {"id": "overlay", "kind": "payload", "group": "tool", "name": "PS5 Hardware Overlay", "repo": "smoxa/ps5-new-overlay",
      "what": "Como MangoHud en el PC: pone encima de la imagen (en el menú y dentro de las aplicaciones) los FPS, la "
              "temperatura de la CPU, la GPU y el SSD, las frecuencias, el uso de RAM y VRAM, el ventilador y el consumo. "
@@ -1202,7 +1231,11 @@ def _github_release(repo):
         if not lst:
             raise E.PipeError("%s no tiene versiones publicadas" % repo)
         j = lst[0]
+    GH_DATES[repo.lower()] = (j.get("published_at") or "")[:19]
     return (j.get("tag_name") or "").strip(), j.get("assets") or []
+
+
+GH_DATES = {}      # repo -> fecha de su última versión (para «Nueva versión hace 2 días»)
 
 
 def _pick_elf(names):
@@ -2614,6 +2647,7 @@ def open_terminal(cmd):
 # del catálogo de RecompStore para ese repositorio o el icono de la consola si ya está instalado.
 CATALOG_ART = {
     'crux2': {"icon": 'https://raw.githubusercontent.com/Press5elect/Crux2/main/ps5/sce_sys/icon0.png', "hero": ''},
+    'lichii': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Lichii/main/sce_sys/icon0.png', "hero": ''},
     'prosperoeden': {"icon": 'https://raw.githubusercontent.com/heydemoura/ProsperoEden/main/sce_sys/icon0.png', "hero": ''},
     'ps5sx2': {"icon": 'https://raw.githubusercontent.com/Swordpdf/PS5SX2/main/ps5/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/Swordpdf/PS5SX2/main/ps5/docs/banner.png'},
     'psxs5': {"icon": 'https://raw.githubusercontent.com/SynoPiia/PSXS5/main/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/SynoPiia/PSXS5/main/docs/media/banner.png'},

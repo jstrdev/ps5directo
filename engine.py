@@ -15,9 +15,12 @@ import json
 import math
 import os
 import posixpath
+import shutil
 import re
 import socket
 import ssl
+import subprocess
+import sys
 import threading
 import time
 import urllib.error
@@ -1231,12 +1234,77 @@ class FtpSource:
                         pass
 
 
+def _smb_parts(text):
+    """smb://servidor/carpeta/resto o \\\\servidor\\carpeta\\resto -> (servidor, carpeta, [resto...]) o None."""
+    m = re.match(r"(?i)^smb://(?:[^@/]*@)?([^/]+)/([^/]+)/?(.*)$", text)
+    if not m and not sys.platform.startswith("win"):
+        m = re.match(r"^\\\\([^\\/]+)[\\/]([^\\/]+)[\\/]?(.*)$", text)
+    if not m:
+        return None
+    rest = [urllib.parse.unquote(x) for x in re.split(r"[\\/]+", m.group(3)) if x]
+    return m.group(1), urllib.parse.unquote(m.group(2)), rest
+
+
+def smb_path(text, mount=True):
+    """Una carpeta compartida de la red (SMB: Windows, Samba, casi todos los NAS) como ruta normal del PC.
+    Windows la abre directamente (\\\\servidor\\carpeta, con el usuario guardado en el Explorador); en macOS y Linux se
+    usa donde esté montada y, si no lo está, se pide al sistema que la monte (él pregunta usuario y contraseña).
+    Devuelve la ruta o lanza PipeError con lo que hay que hacer."""
+    parts = _smb_parts(text)
+    if not parts:
+        return text
+    host, share, rest = parts
+    if sys.platform.startswith("win"):
+        return "\\\\" + "\\".join([host, share] + rest)
+    def find():
+        try:                                                       # montada con mount/cifs o por el Finder
+            with open("/proc/mounts") as fh:
+                for ln in fh:
+                    f = ln.split()
+                    if len(f) > 2 and f[2] in ("cifs", "smb3", "smbfs") and \
+                            f[0].replace("\\040", " ").lower().rstrip("/") == ("//%s/%s" % (host, share)).lower():
+                        return f[1].replace("\\040", " ")
+        except OSError:
+            pass
+        if sys.platform == "darwin":
+            try:
+                out = subprocess.run(["mount"], capture_output=True, text=True, timeout=5).stdout
+                for ln in out.splitlines():
+                    mm = re.match(r"^//(?:[^@]*@)?([^/]+)/(.+?) on (.+?) \(smbfs", ln)
+                    if mm and mm.group(1).lower() == host.lower() and urllib.parse.unquote(mm.group(2)).lower() == share.lower():
+                        return mm.group(3)
+            except Exception:
+                pass
+        g = "/run/user/%d/gvfs" % os.getuid() if hasattr(os, "getuid") else ""
+        if g and os.path.isdir(g):                                 # escritorios Linux (Archivos/Nautilus, Dolphin...)
+            for d in os.listdir(g):
+                if d.lower() == ("smb-share:server=%s,share=%s" % (host, share)).lower():
+                    return os.path.join(g, d)
+        return ""
+    base = find()
+    if not base and mount:
+        url = "smb://%s/%s" % (host, urllib.parse.quote(share))
+        try:
+            if sys.platform == "darwin":
+                subprocess.run(["osascript", "-e", 'mount volume "%s"' % url], capture_output=True, timeout=120)
+            elif shutil.which("gio"):
+                subprocess.run(["gio", "mount", url], capture_output=True, timeout=60, stdin=subprocess.DEVNULL)
+        except Exception:
+            pass
+        base = find()
+    if not base:
+        raise PipeError("No puedo abrir la carpeta compartida %s en %s. Ábrela una vez en tu explorador de archivos "
+                        "(con su usuario y contraseña) y vuelve a probar." % (share, host))
+    return os.path.join(base, *rest)
+
+
 def make_source(text):
     text = text.strip().strip('"')
     if re.match(r"^https?://", text, re.I):
         return UrlSource(text)
     if re.match(r"^ftp://", text, re.I):
         return FtpSource(text)
+    text = smb_path(text)
     if os.path.isdir(text):
         return FolderSource(text)
     return FileSource(text)
@@ -1774,61 +1842,82 @@ class BFpilot:
     def chmod(self, path, mode="777"):
         self._req("GET", "/api/fs/chmod", {"path": path, "mode": mode})
 
-    def fix_perms(self, root, cancel=None, log=None):
+    def fix_perms(self, root, cancel=None, log=None, progress=None):
         """Pone permisos 777 a una carpeta y todo lo que hay dentro.
 
         El unrar de BFpilot copia los permisos que trae el RAR (666 o 444 si se hizo en
         Windows): sin permiso de ejecucion la PS5 no la arranca (CE-107750-0).
+        Con miles de archivos (RetroArch: 20.000) se cambian varios a la vez, para no tardar un cuarto de hora.
+        progress(revisados, cambiados) de vez en cuando.
         Devuelve (cambiados, revisados, {nombre: modo_antiguo} de los importantes).
         """
-        changed = seen = 0
+        from concurrent.futures import ThreadPoolExecutor
+        st = {"changed": 0, "seen": 0, "ftp": False, "t": 0.0}
         notable = {}
+        lock = threading.Lock()
         ftp = None
-        use_ftp = False
+        pending = []
 
-        def do(path, mode_now):
-            nonlocal changed, use_ftp, ftp
-            if mode_now == 0o777:
+        def flush(batch):
+            nonlocal ftp
+            if not batch:
                 return
-            if not use_ftp:
-                try:
+            if not st["ftp"]:
+                def one(path):
                     self.chmod(path)
-                    changed += 1
+                    return 1
+                try:
+                    with ThreadPoolExecutor(max_workers=6) as ex:
+                        n = sum(ex.map(one, batch))
+                    with lock:
+                        st["changed"] += n
                     return
                 except PipeError as e:
                     if "endpoint" not in str(e).lower() and "404" not in str(e):
                         raise
-                    use_ftp = True
+                    st["ftp"] = True
                     if log:
                         log("Este BFpilot no sabe cambiar permisos: lo hago por FTP")
             if ftp is None:
                 ftp = Ftp(self.cfg).connect()
-            ftp.sendcmd("SITE CHMOD 777 " + path)
-            changed += 1
+            for path in batch:
+                ftp.sendcmd("SITE CHMOD 777 " + path)
+                st["changed"] += 1
+
+        def tick():
+            if progress and time.time() - st["t"] > 1:
+                st["t"] = time.time()
+                progress(st["seen"], st["changed"])
 
         try:
-            do(root, None)
+            flush([root])
             stack = [root]
             while stack:
                 if cancel is not None and cancel.is_set():
                     raise Cancelled()
                 d = stack.pop()
                 for e in self.listdir(d):
-                    seen += 1
+                    st["seen"] += 1
                     path = d + "/" + e["name"]
                     mode = e.get("mode")
                     if e["name"].lower() == "eboot.bin" and mode is not None:
                         notable[path[len(root):].lstrip("/")] = mode
-                    do(path, mode)
+                    if mode != 0o777:
+                        pending.append(path)
                     if e.get("dir"):
                         stack.append(path)
+                if len(pending) >= 120:
+                    flush(pending)
+                    pending = []
+                    tick()
+            flush(pending)
         finally:
             if ftp is not None:
                 try:
                     ftp.quit()
                 except Exception:
                     pass
-        return changed, seen, notable
+        return st["changed"], st["seen"], notable
 
     def read_text(self, path):
         try:

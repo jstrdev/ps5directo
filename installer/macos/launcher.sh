@@ -40,6 +40,11 @@ if command -v xattr >/dev/null 2>&1; then
   xattr -dr com.apple.quarantine "$BUNDLE" 2>/dev/null || xattr -dr com.apple.quarantine "$RES" 2>/dev/null
 fi
 
+# Python no escribe nada dentro de la app (los .pyc van a Cachés): si la app se modifica a sí misma, su firma deja
+# de valer y macOS dice que está «dañada»
+export PYTHONPYCACHEPREFIX="$HOME/Library/Caches/PS5 Directo/pycache"
+mkdir -p "$PYTHONPYCACHEPREFIX" 2>/dev/null || export PYTHONDONTWRITEBYTECODE=1
+
 case "$(uname -m)" in
   arm64) PY="$RES/python-arm64/bin/python3" ;;
   *)     PY="$RES/python-x86_64/bin/python3" ;;

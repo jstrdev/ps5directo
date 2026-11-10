@@ -459,7 +459,7 @@ a.btn-a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:9p
 .sy-now{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(46,160,67,.45);border-radius:10px;background:rgba(46,160,67,.08);margin:8px 0}.sy-now b{font-size:16px}
 .sy-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:4px}.sy-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .md-send{flex-basis:100%;display:flex;gap:8px;align-items:center;flex-wrap:wrap}#mdSendSt{font-size:12.5px;color:var(--muted)}.sd-box{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}.sd-box legend{padding:0 6px;font-weight:600}
-.rec-sh{font-size:13px;margin:12px 0 6px;color:var(--text);opacity:.85}.rec-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 4px}.rec-tools input{flex:1 1 260px;max-width:420px}
+.rec-sh{font-size:13px;margin:12px 0 6px;color:var(--text);opacity:.85}#nwSort{width:auto;flex:0 0 auto;min-width:190px}.rec-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 4px}.rec-tools input{flex:1 1 260px;max-width:420px}
 .wz-dots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.wz-dot{width:30px;height:30px;border-radius:50%;padding:0;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-weight:600}
 .wz-dot.on{border-color:var(--accent);color:var(--text);box-shadow:0 0 0 2px rgba(61,139,253,.35)}.wz-dot.done{background:rgba(46,160,67,.18);color:var(--ok);border-color:var(--ok)}
 .wz-step h3{margin:4px 0 8px;font-size:17px}.wz-n{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.wz-p{white-space:pre-line;line-height:1.55}.wz-nav{margin-top:16px}
@@ -757,6 +757,89 @@ header h1{white-space:nowrap}
 .sp-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sp-card{border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px;color:var(--muted)}.sp-card b{display:block;color:#7fa8ff;font-size:15px;margin-bottom:3px}.sp-card.z b{color:#4fc9a4}
 .sp-how{margin:12px 0 4px;padding-left:18px;line-height:1.5;font-size:13.5px}.sp-how li{margin:4px 0}
 @media(max-width:560px){.sp-cards{grid-template-columns:1fr}}
+.bn{position:relative;height:350px;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#0b0e14;margin:4px 0 14px;outline:none}
+.bn-s{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;pointer-events:none;background:linear-gradient(120deg,var(--g1),var(--g2))}
+.bn-s.on{opacity:1;pointer-events:auto}
+.bn-bg{position:absolute;inset:-30px;background-size:cover;background-position:center;filter:blur(28px) brightness(.55) saturate(1.2)}
+.bn-img{position:absolute;right:0;top:0;height:100%;width:62%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 35%);mask-image:linear-gradient(90deg,transparent,#000 35%);transform:scale(1.04);transition:transform 7s ease}
+.bn-s.on .bn-img{transform:scale(1.12)}.bn.hold .bn-s.on .bn-img{transform:scale(1.06)}
+.bn-img.ico{width:auto;height:62%;top:19%;right:9%;border-radius:28px;-webkit-mask-image:none;mask-image:none;box-shadow:0 20px 50px rgba(0,0,0,.5);object-fit:contain}
+.bn-t{position:absolute;left:0;top:0;bottom:0;width:min(58%,600px);padding:24px 34px 62px 34px;display:flex;flex-direction:column;justify-content:center;gap:10px;background:linear-gradient(90deg,rgba(8,10,16,.85),rgba(8,10,16,.55) 70%,transparent)}
+.bn-t h3{margin:0;font-size:30px;line-height:1.1;letter-spacing:-.3px;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.bn-t p{margin:0;color:#d6dbe6;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bn-pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.bn-pills .whenpill{position:static}
+.bn-cat{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9fc3ff}
+.bn-act{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}.bn-act .btn-a{background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--text)}
+.bn-s .bn-t{transform:translateY(10px);opacity:0;transition:transform .7s .15s,opacity .7s .15s}.bn-s.on .bn-t{transform:none;opacity:1}
+.bn-ctl{position:absolute;left:34px;bottom:16px;display:flex;align-items:center;gap:8px;z-index:5}
+.bn-nav{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(10,12,18,.55);padding:0;display:grid;place-items:center;backdrop-filter:blur(6px);transition:background .2s,border-color .2s;flex:none}
+.bn-nav svg{width:16px;height:16px;display:block}.bn-nav:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45)}
+.bn-dots{display:flex;gap:6px;margin-left:6px}
+.bn-dots button{width:26px;height:5px;border-radius:4px;border:none;padding:0;background:rgba(255,255,255,.22);overflow:hidden;cursor:pointer}
+.bn-dots button i{display:block;height:100%;width:0;background:#fff}.bn-dots button.on.run i{animation:bnfill 6s linear forwards}.bn.hold .bn-dots button.on i,.bn.hold .bn-rail button.on i{animation-play-state:paused}
+.spot-hint{display:inline-flex;align-items:center;margin-right:6px;border-radius:999px;background:linear-gradient(90deg,rgba(61,125,255,.22),rgba(163,92,240,.22));box-shadow:inset 0 0 0 1px rgba(120,150,255,.55);animation:shin .5s ease both,shglow 2.8s 1s ease-in-out infinite;position:relative}
+.spot-hint:before{content:"";position:absolute;right:-6px;top:50%;margin-top:-5px;border:5px solid transparent;border-left-color:rgba(120,150,255,.7)}
+.spot-hint[hidden]{display:none}.spot-hint button{background:none;border:0;color:#dbe6ff;font:inherit;font-size:13px;cursor:pointer;padding:6px 6px 6px 12px}.spot-hint .sh-x{padding:6px 10px 6px 4px;opacity:.6;font-size:11px}.spot-hint .sh-x:hover{opacity:1}
+.spot-hint .sh-go:hover span{text-decoration:underline}
+@keyframes shin{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}@keyframes shglow{50%{box-shadow:inset 0 0 0 1px rgba(140,170,255,.9),0 0 16px rgba(91,120,255,.45)}}
+@media(max-width:700px){.spot-hint{order:-1;width:100%;justify-content:space-between;margin:0 0 6px}.spot-hint:before{display:none}}
+@media(prefers-reduced-motion:reduce){.spot-hint{animation:none}}
+.alem-st{color:#ffb454}
+#btnUpdMenu.glow{color:#cfe0ff;background:linear-gradient(90deg,rgba(61,125,255,.28),rgba(61,125,255,.08));box-shadow:inset 0 0 0 1px rgba(91,140,255,.55);animation:updg 2.4s ease-in-out infinite}
+@keyframes updg{50%{box-shadow:inset 0 0 0 1px rgba(91,140,255,.9),0 0 14px rgba(61,125,255,.45)}}
+#btnMore.dot{position:relative}#btnMore.dot:after{content:"";position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:#3d7dff;box-shadow:0 0 0 2px var(--bg,#0d1117),0 0 8px #3d7dff}
+@media(prefers-reduced-motion:reduce){#btnUpdMenu.glow{animation:none}}.alem-st.ok{color:#4fc9a4}.alem-st.bad{color:#ff6b6b}.bn-t>*{flex-shrink:0}.bn-t p:has(+.bn-note){-webkit-line-clamp:2}.bn-rail button:not([style]){background:linear-gradient(135deg,#2a3b7a,#141a2a)}.bn-note{font-size:12.5px;color:#aab6cc;display:flex;gap:6px;align-items:baseline}.bn-note:before{content:"🎮";font-size:12px}
+.bn-rail{display:none}
+@media(min-width:1000px){.bn.rail .bn-rail{display:flex;flex-direction:column;gap:8px;position:absolute;right:14px;top:14px;bottom:14px;width:118px;z-index:5;overflow:hidden;scrollbar-width:none}
+  .bn-rail button{flex:0 0 calc((100% - 32px)/5);min-height:0;position:relative;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#1a2030 center/cover no-repeat;padding:0;opacity:.6;transition:opacity .25s,transform .25s,border-color .25s;overflow:hidden;cursor:pointer}
+  .bn-rail button span{position:absolute;inset:auto 0 0;padding:14px 6px 5px;font-size:10.5px;line-height:1.2;color:#fff;text-align:left;background:linear-gradient(0deg,rgba(0,0,0,.85),transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bn-rail button:hover{opacity:.9}.bn-rail button.on{opacity:1;border:2px solid #4fc9a4;box-shadow:0 0 0 3px rgba(79,201,164,.18)}
+  .bn-rail button i{position:absolute;left:0;bottom:0;height:3px;width:0;background:#4fc9a4;z-index:2}.bn-rail button.on.run i{animation:bnfill 6s linear forwards}
+  .bn.rail .bn-img.ico{right:calc(9% + 120px)}.bn.rail .bn-dots{display:none}}
+@keyframes bnfill{to{width:100%}}
+@media(max-width:720px){.bn{height:auto;min-height:360px}.bn-img{width:100%;height:55%;-webkit-mask-image:linear-gradient(180deg,#000 50%,transparent);mask-image:linear-gradient(180deg,#000 50%,transparent)}.bn-img.ico{height:40%;top:6%;right:50%;transform:translateX(50%)!important}
+  .bn-t{width:100%;top:auto;padding:20px 18px 40px;background:linear-gradient(0deg,rgba(8,10,16,.95) 60%,transparent)}.bn-t h3{font-size:22px}.bn-ctl{left:18px;bottom:12px}.bn-t{padding-bottom:60px!important}.bn-dots{overflow:hidden;max-width:calc(100vw - 170px)}.bn-dots button{width:14px;flex:none}}
+@media (prefers-reduced-motion:reduce){.bn-s,.bn-img,.bn-t{transition:none!important}}
+.sp-fmts{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}.sp-fmts span{font:600 11.5px ui-monospace,monospace;border:1px solid var(--line);border-radius:7px;padding:3px 8px;color:var(--muted);opacity:0;animation:slp .4s calc(var(--k,0)*.06s + .9s) ease forwards}.sp-fmts span.hi{color:#7fa8ff;border-color:#5b8cff;background:rgba(91,140,255,.12);animation-delay:.6s}.sp-fmts span.hi.z{color:#4fc9a4;border-color:#4fc9a4;background:rgba(79,201,164,.12)}
+.sp-where{display:flex;align-items:stretch;gap:10px;margin:14px 0 4px}.sw-o{flex:1;border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:center;background:rgba(255,255,255,.03);animation:swo 4s ease-in-out infinite}.sw-o.b{animation-delay:2s}
+.sw-o span{font-size:22px;display:block}.sw-o b{display:block;font-size:14px}.sw-o small{display:block;color:#9fc3ff;font-size:11.5px}.sw-o em{display:block;font-style:normal;color:var(--muted);font-size:11.5px;margin-top:4px}
+@keyframes swo{0%,45%{border-color:#4fc9a4;box-shadow:0 0 0 1px #4fc9a4 inset,0 6px 22px rgba(79,201,164,.18)}50%,100%{border-color:var(--line);box-shadow:none}}
+.sw-k{width:46px;align-self:center;height:24px;border-radius:14px;background:rgba(255,255,255,.12);position:relative;flex:none}.sw-k i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#4fc9a4;animation:swk 4s ease-in-out infinite}@keyframes swk{0%,45%{left:3px}50%,95%{left:25px}100%{left:3px}}
+.sp-opts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0 4px}.sp-opts div{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;opacity:0;animation:slp .4s calc(var(--k)*.08s) ease forwards}
+.sp-opts i{flex:none;width:30px;height:17px;border-radius:10px;background:rgba(255,255,255,.15);position:relative}.sp-opts i:after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:left .3s}.sp-opts i.on{background:#3d7dff}.sp-opts i.on:after{left:15px;animation:sot 3s calc(var(--k)*.3s + 1s) ease-in-out infinite}@keyframes sot{0%,70%{left:15px}80%,90%{left:2px}100%{left:15px}}
+.sp-fm{display:flex;gap:10px;margin:12px 0 4px;align-items:flex-start}.fm-l{flex:1.3;border:1px solid var(--line);border-radius:10px;padding:5px}.fm-l div{font-size:12.5px;padding:5px 8px;border-radius:7px;opacity:0;animation:slp .35s calc(var(--k)*.1s) ease forwards}.fm-l div.sel{background:rgba(61,125,255,.22);outline:1px solid #3d7dff}
+.fm-m{flex:1;border:1px solid var(--line);border-radius:10px;padding:5px;background:#151a24;box-shadow:0 12px 30px rgba(0,0,0,.4);opacity:0;transform:translate(-8px,6px);animation:fmm .35s .7s ease forwards}.fm-m div{font-size:12px;padding:4px 8px;border-radius:6px}.fm-m div:nth-child(4){background:rgba(61,125,255,.25);animation:fmh 2.4s 1.4s infinite}@keyframes fmm{to{opacity:1;transform:none}}@keyframes fmh{50%{background:transparent}}
+#btnPcMode.flash{animation:pcf .6s 4}@keyframes pcf{50%{box-shadow:0 0 0 3px #4fc9a4}}
+@media(max-width:560px){.sp-opts{grid-template-columns:1fr}.sp-where{flex-direction:column}.sw-k{transform:rotate(90deg)}}
+.spot{padding:0;overflow:hidden}.sp-step[hidden]{display:none}.sp-step{animation:spin .45s cubic-bezier(.3,1.2,.4,1)}@keyframes spin{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.sp-nav{display:flex;gap:8px;align-items:center;padding:12px 20px 16px;border-top:1px solid var(--line)}.sp-dots{display:flex;gap:6px;flex:1}.sp-dots button{width:8px;height:8px;border-radius:5px;border:none;padding:0;background:rgba(255,255,255,.2);cursor:pointer;transition:width .3s,background .3s}.sp-dots button.on{width:22px;background:#4fc9a4}
+.sp-flow{display:flex;align-items:center;gap:6px;margin:14px 0 4px}.sf-n{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;background:rgba(255,255,255,.03)}.sf-n span{font-size:22px;display:block}.sf-n b{font-size:13px}.sf-n small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.sf-b{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}.sf-b u{display:block;height:100%;width:0;background:linear-gradient(90deg,#5b8cff,#4fc9a4);animation:sfb 3.2s var(--d) ease-in-out infinite}
+@keyframes sfb{0%{width:0}70%{width:100%}100%{width:100%;opacity:.4}}
+.sf-l{position:relative;width:34px;height:2px;background:var(--line);flex:none}.sf-l em{position:absolute;top:-3px;left:0;width:8px;height:8px;border-radius:50%;background:#4fc9a4;box-shadow:0 0 10px #4fc9a4;animation:sfl 1.2s linear infinite}@keyframes sfl{to{left:calc(100% - 8px)}}
+.sp-lib{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0 4px}.sp-lib div{position:relative;aspect-ratio:3/4;border-radius:10px;background:linear-gradient(160deg,hsl(calc(var(--k)*55),45%,38%),hsl(calc(var(--k)*55 + 40),50%,18%));opacity:0;transform:scale(.8);animation:slp .5s calc(var(--k)*.12s) cubic-bezier(.3,1.4,.4,1) forwards}
+.sp-lib s{position:absolute;left:5px;top:5px;font-size:9.5px;text-decoration:none;font-weight:700;background:rgba(0,0,0,.55);border-radius:5px;padding:1px 5px;color:#ffd666}.sp-lib b{position:absolute;left:6px;right:6px;bottom:8px;height:5px;border-radius:3px;background:rgba(255,255,255,.55)}.sp-lib i{position:absolute;left:6px;right:20px;bottom:17px;height:5px;border-radius:3px;background:rgba(255,255,255,.85)}
+@keyframes slp{to{opacity:1;transform:none}}
+.sp-shield{position:relative;height:96px;margin:14px 0 4px;display:flex;align-items:center;justify-content:center}.sh-s{font-size:54px;animation:shp 2.4s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(79,201,164,.6))}@keyframes shp{50%{transform:scale(1.08)}}
+.sh-up,.sh-yt{position:absolute;font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap}.sh-up{left:6%;background:rgba(255,92,92,.18);color:#ff8a8a;border:1px solid rgba(255,92,92,.4);animation:shu 2.4s ease-in-out infinite}
+@keyframes shu{0%{transform:translateX(0);opacity:0}25%{opacity:1}55%{transform:translateX(90px)}70%{transform:translateX(40px);opacity:1}100%{transform:translateX(40px);opacity:0}}
+.sh-yt{right:4%;background:rgba(79,201,164,.14);color:#7fe0c0;border:1px solid rgba(79,201,164,.4)}
+.sp-dsc{display:flex;gap:8px;margin:14px 0 4px;overflow:hidden}.sp-dsc div{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center;opacity:0;transform:translateY(12px);animation:slp .5s calc(var(--k)*.1s) ease forwards}
+.sp-dsc i{display:block;height:44px;border-radius:9px;margin-bottom:6px;background:linear-gradient(135deg,hsl(var(--h),70%,55%),hsl(calc(var(--h) + 40),70%,30%))}.sp-dsc b{display:block;font-size:12px}.sp-dsc s{display:inline-block;margin-top:5px;text-decoration:none;font-size:10.5px;background:#3d7dff;color:#fff;border-radius:6px;padding:2px 7px;animation:sdp 1.6s calc(var(--k)*.3s + 1s) ease-in-out infinite}
+@keyframes sdp{50%{transform:scale(1.12);box-shadow:0 0 12px #3d7dff}}
+@media (prefers-reduced-motion:reduce){.sp-step,.sf-b u,.sf-l em,.sh-s,.sh-up,.sp-dsc s{animation:none}.sp-lib div,.sp-dsc div{opacity:1;transform:none;animation:none}}
+.sp-pie{display:flex;gap:22px;align-items:center;margin:12px 0 4px}.sp-pie svg{width:120px;height:120px;transform:rotate(-90deg)}.sp-pie circle{fill:none;stroke-width:6.5;stroke-dasharray:0 100;animation:pie 1.2s cubic-bezier(.3,1,.4,1) forwards}
+.sp-pie .pb{stroke:var(--line);stroke-dasharray:100 0;animation:none}.sp-pie .p1{stroke:#5b8cff;--a:68;--o:0}.sp-pie .p2{stroke:#b06cff;--a:16;--o:-68;animation-delay:.25s}.sp-pie .p3{stroke:#ffb454;--a:11;--o:-84;animation-delay:.5s}.sp-pie .p4{stroke:#ff6b6b;--a:5;--o:-95;animation-delay:.75s}
+.sp-pie circle{stroke-dashoffset:var(--o,0)}@keyframes pie{to{stroke-dasharray:var(--a) calc(100 - var(--a))}}
+.sp-pie ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13px}.sp-pie li{display:flex;gap:8px;align-items:center}.sp-pie li i{width:10px;height:10px;border-radius:3px;background:var(--c)}.sp-pie li b{margin-left:auto;padding-left:14px}
+.sp-phone{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 4px}.sp-phone .ph{width:58px;height:96px;border:2px solid rgba(255,255,255,.35);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative}
+.sp-phone .ph i{position:absolute;top:5px;width:16px;height:3px;border-radius:2px;background:rgba(255,255,255,.35)}.sp-phone .ph u{text-decoration:none;font-size:10px;background:#3d7dff;border-radius:5px;padding:2px 6px;animation:sdp 1.6s ease-in-out infinite}
+.sp-phone em{position:relative;width:46px;height:2px;background:var(--line)}.sp-phone em::after{content:'';position:absolute;top:-3px;left:0;width:8px;height:8px;border-radius:50%;background:#4fc9a4;box-shadow:0 0 10px #4fc9a4;animation:sfl 1.2s linear infinite}
+.sp-phone .pc{font-size:30px;text-align:center}.sp-phone .pc small{display:block;font-size:11px;color:var(--muted)}
+.sp-bk{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 4px;font-size:26px}.sp-bk div{opacity:0;transform:translateY(10px);animation:slp .5s calc(var(--k)*.15s) ease forwards}.sp-bk em{width:60px;height:2px;background:var(--line);position:relative}.sp-bk em::after{content:'';position:absolute;top:-3px;left:0;width:8px;height:8px;border-radius:50%;background:#5b8cff;animation:sfl 1.1s linear infinite}.sp-bk b{font-size:34px}
+.sp-all{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0 4px}.sp-all div{font-size:12.5px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;display:flex;gap:7px;align-items:center;opacity:0;animation:slp .4s calc(var(--k)*.07s) ease forwards;transform:scale(.95)}.sp-all s{text-decoration:none;color:#4fc9a4;font-weight:700}
+@media(max-width:560px){.sp-all{grid-template-columns:1fr 1fr}.sp-pie{flex-direction:column}}
+.fmt-where{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 12px}.fmt-where .seg button small{color:var(--muted);font-weight:400}.fmt-where .seg button .bdg{margin-left:4px}
 .upd-foot{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:14px;flex-wrap:wrap}
 .upd-warn{margin:10px 0 0;color:#f2c46d;font-size:13px}
 .upd-prog{margin-top:12px;display:flex;flex-direction:column;gap:5px}.upd-prog .bar{height:8px;border-radius:6px;background:var(--line);overflow:hidden}.upd-prog .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5b8cff,#b06cff);transition:width .4s}
@@ -881,6 +964,7 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
     <div class="sub">Envía archivos a tu consola por la red local, sin pasar por el disco del PC</div>
   </div>
   <div class="spacer"></div>
+  <span class="spot-hint" id="spotHint" hidden><button type="button" class="sh-go" id="spotHintGo">🎬 <span>Descubre qué hace PS5 Directo</span></button><button type="button" class="sh-x" id="spotHintX" aria-label="Cerrar" title="No volver a mostrar">✕</button></span>
   <button class="small pcm" id="btnPcMode" aria-pressed="false" title="Modo PC: todo lo que añadas se baja a tu PC (solo bajar, descomprimir o convertir) y no se manda nada a la consola. Para usarlo como gestor de descargas."><span class="sw"><i></i></span><span>Modo PC</span></button>
   <span class="pill click" id="pFtp" title="Pulsa para ver el estado de la consola y arreglar lo que falte"><span class="dot"></span>FTP</span>
   <span class="pill click" id="pBf" title="Pulsa para ver el estado de la consola y arreglar lo que falte"><span class="dot"></span>BFpilot</span>
@@ -897,6 +981,7 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
       <button id="btnPalette" title="Ctrl+K">🔎 Ir a… <kbd>Ctrl+K</kbd></button>
       <button id="btnUpdMenu">⬆ Buscar actualizaciones</button>
       <button id="btnNews">✨ Novedades</button>
+      <button id="btnWhat">🎬 ¿Qué hace PS5 Directo?</button>
       <button id="btnA2hs" hidden>📲 Instalar como app</button>
       <button id="btnCredits" title="Los proyectos libres de la comunidad que hacen posible PS5 Directo">❤ Créditos</button>
       <hr>
@@ -927,7 +1012,7 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
   <section class="card">
     <h2>Nueva transferencia</h2>
     <label for="lines">Enlaces, rutas de tu PC o torrents <span class="x-info" tabindex="0" title="Pega todas las partes juntas (.part1.rar, .part2.rar… o .001, .002…), una por línea o dentro de cualquier texto: las separo por paquetes y, antes de empezar, te aviso si algún enlace no funciona o falta alguna parte.">i</span></label>
-    <textarea id="lines" placeholder="https://servidor/archivo.part1.rar&#10;https://servidor/archivo.part2.rar&#10;&#10;También vale la ruta de un archivo o carpeta de tu PC (D:\Descargas\archivo.rar), un enlace ftp:// de tu NAS o un torrent (magnet o .torrent)"></textarea>
+    <textarea id="lines" placeholder="https://servidor/archivo.part1.rar&#10;https://servidor/archivo.part2.rar&#10;&#10;También vale la ruta de un archivo o carpeta de tu PC (D:\Descargas\archivo.rar), una carpeta de tu NAS (\\NAS\Juegos, smb:// o ftp://) o un torrent (magnet o .torrent)"></textarea>
     <div class="x-src"><span class="x-l">Añadir desde:</span>
       <button type="button" class="x-pill" id="btnPickFiles">📁 Archivos</button>
       <button type="button" class="x-pill" id="btnPickFolder" title="Una carpeta se manda tal cual (si tiene sce_sys, como aplicación) y salta lo que ya esté igual en la consola.">📂 Carpeta</button>
@@ -996,12 +1081,14 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
       <button type="button" class="fmt-bar" id="fmtBar" aria-expanded="false" aria-controls="fmtBody"><span class="fb-l">Formato en la PS5:</span> <b id="fmtBarName"></b> <span class="fb-d" id="fmtBarDesc"></span><span class="fb-fast" id="fmtBarFast" hidden></span><span class="fb-more"><span id="fmtBarAct"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button>
       <div id="fmtBody" hidden>
       <div class="fmt-head"><span class="fmt-opt">Opcional: convierte el contenido mientras se envía. Si no eliges nada, se envía tal cual.</span><button type="button" class="small cmpbtn" id="btnCmp">¿Cuál elijo? Comparar formatos</button></div>
+      <div class="fmt-where" id="fmtWhere"><span class="hint">Dónde se convierte</span><div class="seg" role="radiogroup">
+        <button type="button" data-cw="pc" class="on">💻 En tu PC <small>· PS5 Dump Forge</small></button><button type="button" data-cw="ps5">🎮 En la PS5 <small>· Alembic</small> <span class="bdg warn">en pruebas</span></button></div>
+        <span class="hint" id="fmtWhereH"></span></div>
       <div class="fmt-cards fmt-groups" id="fmtCards" role="radiogroup"><div class="fgroup" style="--n:3;--g:#7fa3d6"><div class="fglabel" title="Lo que usa casi todo el mundo"><i></i>Lo más usado</div><div class="fgcards"><button type="button" class="fcard" data-f="" role="radio" style="--c:#7fa3d6"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z" stroke-dasharray="2.6 2.2"/><path d="M9.2 12.2l2 2 3.8-4.2"/></svg></span><b>Sin convertir</b><span class="fext">tal cual</span><small class="ftag ">Por defecto</small></button><button type="button" class="fcard" data-f="plain" role="radio" style="--c:#4fc9a4"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.2h7a2 2 0 0 1 2 2v8.3a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg></span><b>Carpeta</b><span class="fext">normal</span><small class="ftag ">La más compatible</small></button><button type="button" class="fcard" data-f="exfat" role="radio" style="--c:#ec6fb4"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="12" rx="2.2"/><path d="M7 14.5h4M16.5 14.5h.01M7 9.5h10"/></svg></span><b>Imagen</b><span class="fext">.exfat</span><small class="ftag ok">La más usada</small></button></div></div><div class="fgroup" style="--n:3;--g:#f29e4c"><div class="fglabel" title="Más pequeño en la consola"><i></i>Para ahorrar espacio</div><div class="fgcards"><button type="button" class="fcard" data-f="zstd" role="radio" style="--c:#b08cf5"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7.5 12 12 4 7.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5 12 21l8-4.5"/></svg></span><b>zstd</b><span class="fext">carpeta o imagen</span><small class="ftag ok">Ocupa aún menos</small></button><button type="button" class="fcard" data-f="lz4" role="radio" style="--c:#eec34a"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 2.5 5 13.5h6l-1 8 8.5-11h-6z"/></svg></span><b>LZ4</b><span class="fext">carpeta o imagen</span><small class="ftag ok">La más probada</small></button><button type="button" class="fcard" data-f="ffpfsc" role="radio" style="--c:#f29e4c"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9z"/><path d="M9 9.5l3 2.5 3-2.5M9 15l3-2.5 3 2.5"/></svg></span><b>Imagen comprimida</b><span class="fext">.ffpfsc</span><small class="ftag exp">Puede ir lento</small></button></div></div><div class="fgroup" style="--n:2;--g:#5b9dff"><div class="fglabel" title="Otras imágenes que ShadowMountPlus monta"><i></i>Otras imágenes</div><div class="fgcards"><button type="button" class="fcard" data-f="ffpkg" role="radio" style="--c:#5b9dff"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9z"/><path d="M3.8 7.6 12 12l8.2-4.4M12 12v9"/></svg></span><b>Imagen</b><span class="fext">.ffpkg</span><small class="ftag ">Oficial de SMP</small></button><button type="button" class="fcard" data-f="ffpfs" role="radio" style="--c:#45c3dc"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3.5 7.5 12 12l8.5-4.5z"/><path d="M3.5 12 12 16.5 20.5 12M3.5 16.5 12 21l8.5-4.5"/></svg></span><b>Imagen PFS</b><span class="fext">.ffpfs</span><small class="ftag ">Formato PS5</small></button></div></div><div class="fgroup" style="--n:1;--g:#7ad37f"><div class="fglabel" title="Como una app de la tienda"><i></i>Para instalar</div><div class="fgcards"><button type="button" class="fcard" data-f="fpkg" id="fpkgCard" role="radio" style="--c:#7ad37f"><span class="fico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="M12 8.5v6.2M9.4 12.3 12 14.9l2.6-2.6"/></svg></span><b>Paquete</b><span class="fext">.fpkg</span><small class="ftag exp fw">FW ≤ 11.60</small></button></div></div></div>
       <div class="fmt-comp" id="fmtComp" hidden><span class="hint">Compresión</span><div class="seg" role="radiogroup">
         <button type="button" data-c="fast">Rápida</button><button type="button" data-c="balanced">Equilibrada</button><button type="button" data-c="smallest">Mínimo tamaño</button><button type="button" data-c="stored">Sin comprimir</button></div><span class="hint" id="fmtCompNote"></span></div>
       <label class="check fmt-img" id="fmtImgRow" hidden><input type="checkbox" id="fmtImg"> En un solo archivo: dentro de una imagen .ffpkg <span class="hint">(si no, queda como carpeta)</span></label>
       <div class="fmt-info" id="fmtNote" hidden></div>
-      <div class="fmt-alt">🧪 <span>¿Algo que ya está en la consola? <b>Alembic</b> (en pruebas) lo convierte dentro de la propia PS5 entre carpeta, exFAT, FFPKG, FFPFS y FFPFSC, sin pasar por el PC.</span> <button type="button" class="linkbtn" id="fmtAlembic">Ver Alembic →</button></div>
       </div>
     </div>
     <div class="actions">
@@ -1104,7 +1191,7 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
   <section class="card" id="newsCard" hidden>
     <div class="fm-head"><h2>📰 Novedades de la scene</h2><div class="spacer"></div><button class="small" id="nwRe">Volver a mirar</button></div>
     <p class="hint">Lo último que se publica para la PS5 en el catálogo de RecompStore: ports nativos, emuladores, aplicaciones y herramientas. PS5 Directo solo te lo enseña para que estés al día: se instala desde la app RecompStore de la consola, y cada port necesita tus propios archivos originales.</p>
-    <div class="rec-tools"><div class="seg" id="nwCat"><button type="button" data-c="" class="on">Todo</button><button type="button" data-c="games">Ports nativos</button><button type="button" data-c="emulators">Emuladores</button><button type="button" data-c="apps">Aplicaciones</button><button type="button" data-c="tools">Herramientas</button><button type="button" data-c="soon">Próximamente</button></div><input id="nwQ" placeholder="Buscar…"></div>
+    <div class="rec-tools"><div class="seg" id="nwCat"><button type="button" data-c="" class="on">Todo</button><button type="button" data-c="games">Ports nativos</button><button type="button" data-c="emulators">Emuladores</button><button type="button" data-c="apps">Aplicaciones</button><button type="button" data-c="tools">Herramientas</button><button type="button" data-c="soon">Próximamente</button></div><select id="nwSort" aria-label="Ordenar"><option value="upd">Actualizado hace poco</option><option value="new">Recién llegados</option><option value="pop">Más populares</option><option value="az">De la A a la Z</option></select><input id="nwQ" placeholder="Buscar…"></div>
     <div id="nwBody"></div>
   </section>
 </main>
@@ -1377,23 +1464,16 @@ body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none
     <div id="cnNotes" class="upd-notes"></div>
     <div class="upd-foot"><label class="check" id="cnOrigL" hidden><input type="checkbox" id="cnOrig"> Ver el texto original</label><div class="spacer"></div><a class="btn-a" id="cnGh" href="#" target="_blank" rel="noopener">GitHub ↗</a><button class="primary" id="cnGo" hidden>Actualizar</button></div></div>
 </dialog>
-<dialog id="dlgSpot" class="spot" style="width:min(640px,95vw)">
-  <div class="sp-hero"><div class="sp-badge">Nuevo en PS5 Directo</div><h2>Títulos que ocupan mucho menos</h2>
-    <p id="spP">PS5 Directo puede convertir tus títulos a <b>LZ4</b> o <b>zstd</b>: empaqueta sus datos para que ocupen bastante menos y la consola los lee al vuelo, casi sin perder velocidad. Menos gigas: envíos más cortos y más sitio en tu SSD.</p>
-    <div class="sp-bar"><span>Original</span><i style="--w:100%"></i><span>LZ4</span><i class="l" style="--w:68%"></i><span>zstd</span><i class="z" style="--w:43%"></i></div>
-    <p class="sp-cap">Ejemplo real: 26 GB de datos quedaron en 17,5 GB con LZ4 y en 11 GB con zstd.</p></div>
-  <div class="body">
-    <div class="sp-cards">
-      <div class="sp-card"><b>LZ4</b><span>La más rápida de crear y la más probada. La lee el emulador AMPR (ampr_emu).</span></div>
-      <div class="sp-card z"><b>zstd</b><span>Ocupa aún menos. La lee ampr-emu-ng; es lo que recomienda ahora PS5 Dump Forge.</span></div>
-    </div>
-    <ul class="sp-how" id="spHow">
-      <li><b>Al mandar a la PS5:</b> en Transferencias, «Formato en la PS5» › «Convertir a otro formato» › LZ4 o zstd. Se convierte en tu PC y se manda ya convertido.</li>
-      <li><b>Si solo lo bajas a tu PC:</b> elige LZ4 o zstd en el formato y se convierte solo al terminar de bajar.</li>
-    </ul>
-    <p class="hint">Solo sirve para títulos AMPR (la mayoría); si no lo es, se manda sin convertir. Comprueba que arranca antes de borrar el original.</p>
-    <div class="upd-foot"><button id="spLater">Ahora no</button><button class="primary" id="spGo">Probarlo ahora</button></div>
-  </div>
+<dialog id="dlgSpot" class="spot" style="width:min(680px,95vw)">
+  <div class="sp-steps"></div>
+  <div class="sp-nav"><div class="sp-dots"></div>
+    <button id="spLater">Ahora no</button><button id="spTry">Probarlo ahora</button><button class="primary" id="spGo" autofocus>Siguiente</button></div>
+</dialog>
+<dialog id="dlgPld" style="width:min(600px,95vw)">
+  <div class="head"><h2>🧩 Versiones nuevas de tus payloads</h2><div class="spacer"></div><button class="small" id="plX">Cerrar</button></div>
+  <div class="body"><p class="hint">Conviene tenerlos al día: suelen traer arreglos y compatibilidad con más títulos. Mira qué cambia antes de actualizar.</p>
+    <div id="plList" class="pdlist"></div>
+    <div class="upd-foot"><button id="plSys">Ver en Sistema</button><button class="primary" id="plOk">Entendido</button></div></div>
 </dialog>
 <dialog id="dlgNews" class="dlg-scroll">
   <div class="head"><h2 id="newsTitle">Novedades</h2><div class="spacer"></div><button class="small" id="btnNewsX">Cerrar</button></div>
@@ -1802,7 +1882,7 @@ Object.assign(I18N_EXACT,{"La velocidad ha bajado de {0} a {1} MB/s. Si la PS5 l
 Object.assign(I18N_EXACT,{"Solo títulos AMPR (la mayoría), y no todos: algunos, como HITMAN 3, leen sus datos sin pasar por el emulador AMPR. La conversión desde el PC todavía falla con algunos títulos: comprueba que arranca antes de borrar el original. Se habla de cargas un 30-40 % más rápidas que con otros comprimidos, pero sin pruebas publicadas.": "AMPR titles only (most), and not all: some, like HITMAN 3, read their data without going through the AMPR emulator. Converting on the PC still fails with some titles: check it starts before deleting the original. People report 30-40% faster loads than other compressed formats, but with no published tests."});
 Object.assign(I18N_EXACT,{"carpeta normal": "plain folder", "imagen .ffpkg": ".ffpkg image", "imagen .exfat": ".exfat image", "imagen .ffpfs": ".ffpfs image", "imagen comprimida .ffpfsc": ".ffpfsc compressed image", "paquete .fpkg": ".fpkg package", "carpeta LZ4": "LZ4 folder", "imagen .ffpkg con LZ4": ".ffpkg image with LZ4", "leyendo el comprimido": "reading the archive", "analizando": "analyzing", "comprobando": "checking", "midiendo (LZ4)": "measuring (LZ4)", "escribiendo": "writing", "empaquetando LZ4": "packing LZ4", "verificando": "verifying", "terminando": "finishing"});
 I18N_RX.push(['^Convirtiendo a ([^:]+): ([\\s\\S]*?) (\\d+)%$','Converting to {0}: {1} {2}%'],['^Convirtiendo a ([\\s\\S]+?) con PS5 Dump Forge \\(([\\s\\S]*?) sin convertir\\)$','Converting to {0} with PS5 Dump Forge ({1} unconverted)'],['^([\\s\\S]+?) · ([\\d.,]+ [KMGT]?B) de ([\\d.,]+ [KMGT]?B|\\?)$','{0} · {1} of {2}']);
-Object.assign(I18N_EXACT,{"También vale la ruta de un archivo o carpeta de tu PC (D:\\Descargas\\archivo.rar), un enlace ftp:// de tu NAS o un torrent (magnet o .torrent)": "A file or folder path on your PC also works (D:\\Downloads\\file.rar), an ftp:// link to your NAS or a torrent (magnet or .torrent)", "Torrent: buscando pares y datos del torrent…": "Torrent: looking for peers and torrent data…", "Descarga del torrent": "Torrent download", "Bajado al PC": "Downloaded to PC", "Torrent": "Torrent", "Un enlace magnet o un archivo .torrent: se baja primero al PC (con aria2, que se descarga solo la primera vez) y luego sigue como un archivo del PC: se envía, se descomprime o se convierte.": "A magnet link or a .torrent file: it's downloaded to the PC first (with aria2, fetched automatically the first time) and then continues like a file on your PC: sent, extracted or converted.", "Torrent bajado al PC": "Torrent downloaded to the PC"});
+Object.assign(I18N_EXACT,{"También vale la ruta de un archivo o carpeta de tu PC (D:\\Descargas\\archivo.rar), una carpeta de tu NAS (\\\\NAS\\Juegos, smb:// o ftp://) o un torrent (magnet o .torrent)": "A file or folder path on your PC also works (D:\\Downloads\\file.rar), a folder on your NAS (\\\\NAS\\Games, smb:// or ftp://) or a torrent (magnet or .torrent)", "Torrent: buscando pares y datos del torrent…": "Torrent: looking for peers and torrent data…", "Descarga del torrent": "Torrent download", "Bajado al PC": "Downloaded to PC", "Torrent": "Torrent", "Un enlace magnet o un archivo .torrent: se baja primero al PC (con aria2, que se descarga solo la primera vez) y luego sigue como un archivo del PC: se envía, se descomprime o se convierte.": "A magnet link or a .torrent file: it's downloaded to the PC first (with aria2, fetched automatically the first time) and then continues like a file on your PC: sent, extracted or converted.", "Torrent bajado al PC": "Torrent downloaded to the PC"});
 I18N_RX.push(['^Bajando el torrent al PC: (\\d+)%(?: · (\\d+) conexiones(?:, (\\d+) compartiendo)?)?$','Downloading the torrent to the PC: {0}% · {1} connections, {2} seeding'],['^Torrent: consiguiendo los datos del torrent \\((\\d+) conexiones\\)$','Torrent: getting the torrent data ({0} connections)'],['^Bajando el torrent al PC con aria2 en ([\\s\\S]*)$','Downloading the torrent to the PC with aria2 into {0}'],['^Del torrent sale: ([\\s\\S]*)$','From the torrent: {0}']);
 Object.assign(I18N_EXACT,{"Torrent: primero se baja entero al PC y luego se envía": "Torrent: downloaded fully to the PC first, then sent", "Un torrent llega en trozos desordenados de mucha gente, así que no se puede ir enviando mientras baja: se descarga al PC (con aria2) y después sigue como un archivo del PC. Al terminar se borra del PC.": "A torrent arrives in out-of-order pieces from many people, so it can't be sent while it downloads: it's downloaded to the PC (with aria2) and then continues like a file on your PC. It's deleted from the PC when done."});
 Object.assign(I18N_EXACT,{"Actualizarlo solo cuando salga una versión nueva (comprueba antes que funciona con PS5 Directo)": "Update it automatically when a new version comes out (checks first that it works with PS5 Directo)"});
@@ -2029,6 +2109,21 @@ Object.assign(I18N_EXACT,{"La conexión con el servidor falla una y otra vez": "
 I18N_RX.push(...[["^El servidor aguanta (\\d+) conexiones$", "The server copes with {0} connections"], ["^El servidor rechaza la descarga \\(HTTP (\\d+)\\)$", "The server refuses the download (HTTP {0})"], ["^No se puede bajar \\(HTTP (\\d+)\\)$", "Can't download (HTTP {0})"]]);
 Object.assign(I18N_EXACT,{"PS5 Directo v{0} lista para instalar": "PS5 Directo v{0} ready to install", "Reiniciar ahora": "Restart now", "Descargando…": "Downloading…", "¿Algo que ya está en la consola? Alembic (en pruebas) lo convierte dentro de la propia PS5 entre carpeta, exFAT, FFPKG, FFPFS y FFPFSC, sin pasar por el PC.": "Something already on the console? Alembic (experimental) converts it on the PS5 itself between folder, exFAT, FFPKG, FFPFS and FFPFSC, without going through the PC.", "¿Algo que ya está en la consola?": "Something already on the console?", "(en pruebas) lo convierte dentro de la propia PS5 entre carpeta, exFAT, FFPKG, FFPFS y FFPFSC, sin pasar por el PC.": "(experimental) converts it on the PS5 itself between folder, exFAT, FFPKG, FFPFS and FFPFSC, without going through the PC.", "Ver Alembic →": "See Alembic →"});
 Object.assign(I18N_EXACT,{"Nuevo en PS5 Directo": "New in PS5 Directo", "Títulos que ocupan mucho menos": "Titles that take up much less space", "Ejemplo real con zstd: 26 GB de datos quedaron en 11 GB.": "Real example with zstd: 26 GB of data became 11 GB.", "La más rápida de crear y la más probada. La lee el emulador AMPR (ampr_emu).": "The fastest to create and the most tested. Read by the AMPR emulator (ampr_emu).", "Ocupa aún menos. La lee ampr-emu-ng; es lo que recomienda ahora PS5 Dump Forge.": "Takes up even less. Read by ampr-emu-ng; it's what PS5 Dump Forge now recommends.", "Solo sirve para títulos AMPR (la mayoría); si no lo es, se manda sin convertir. Comprueba que arranca antes de borrar el original.": "Only for AMPR titles (most of them); otherwise it's sent unconverted. Check it boots before deleting the original.", "Ahora no": "Not now", "Probarlo ahora": "Try it now", "Original": "Original"});
+Object.assign(I18N_EXACT,{"No avisar de esta versión (se puede actualizar igual desde su ficha)": "Don't remind me about this version (you can still update from its card)", "No avisar de esta versión": "Don't remind me about this version", "Ya no te aviso de {0} {1}. Si sale otra versión, volverá a avisar.": "I won't remind you about {0} {1} any more. If another version comes out, I'll let you know."});
+I18N_RX.push(...[["^Colocando en su sitio: (\\d+) archivos$", "Putting it in place: {0} files"]]);
+Object.assign(I18N_EXACT,{"🧩 Versiones nuevas de tus payloads": "🧩 New versions of your payloads", "Versiones nuevas de tus payloads": "New versions of your payloads", "Conviene tenerlos al día: suelen traer arreglos y compatibilidad con más títulos. Mira qué cambia antes de actualizar.": "Worth keeping them up to date: they usually bring fixes and support for more titles. See what's new before updating.", "Ver en Sistema": "See in System", "en GitHub ya hay versión nueva; el catálogo de Payload Manager aún no la tiene": "GitHub already has a new version; Payload Manager's catalog doesn't yet"});
+Object.assign(I18N_EXACT,{"Copiado, pero falta ShadowMountPlus": "Copied, but ShadowMountPlus is missing", "AVISO: no veo ShadowMountPlus en la consola. Sin él, lo que está en /data/homebrew no sale en la pantalla de inicio: cárgalo (Descubrir › Herramientas, o Payload Manager) y en unos segundos aparecerá.": "WARNING: I can't see ShadowMountPlus on the console. Without it, what's in /data/homebrew doesn't show on the home screen: load it (Discover › Tools, or Payload Manager) and it'll appear in a few seconds.", "Eso ya está en tu PC. Para convertirlo a otro formato sin mandarlo, en «Solo a mi PC» elige «Convertir» y el formato (LZ4, zstd, .ffpkg…).": "That's already on your PC. To convert it to another format without sending it, in “Only to my PC” choose “Convert” and the format (LZ4, zstd, .ffpkg…)."});
+I18N_RX.push(...[["^(.*) está en la PS5, pero sin ShadowMountPlus no sale en la pantalla de inicio\\. Cárgalo y aparecerá solo\\.$", "{0} is on the PS5, but without ShadowMountPlus it doesn't show on the home screen. Load it and it'll appear by itself."], ["^Se descomprime directamente en el disco de destino \\((.+)\\)$", "Extracting straight onto the destination drive ({0})"], ["^PS5 Dump Forge no ha podido convertirlo a (.+)\\.$", "PS5 Dump Forge couldn't convert it to {0}."]]);
+Object.assign(I18N_EXACT,{"Más información": "More info", "Anterior": "Previous", "Siguiente": "Next"});
+Object.assign(I18N_EXACT,{"Emulador experimental de Switch 2 de mihawk (el de MihawkOS), basado en Fritchii. Pensado para la PS5 Pro, con generación de fotogramas opcional (30 → 60 fps).": "Experimental Switch 2 emulator by mihawk (of MihawkOS), based on Fritchii. Aimed at the PS5 Pro, with optional frame generation (30 → 60 fps).", "PS5 Pro (en la normal casi seguro que no tiene memoria suficiente). Las claves y el firmware de tu propia consola y tu contenido (.xci, .nsp o .nup). Se instala en lugar de ProsperoEden (mismo Title ID) y comparte su carpeta.": "PS5 Pro (the standard model almost certainly lacks the memory). Your own console's keys and firmware and your content (.xci, .nsp or .nup). It installs in place of ProsperoEden (same Title ID) and shares its folder.", "No avisa solo de versiones nuevas: te avisa PS5 Directo.": "It doesn't check for new versions itself: PS5 Directo tells you.", "Todo va en /data/prosperoeden (lo comparte con ProsperoEden).": "Everything goes in /data/prosperoeden (shared with ProsperoEden).", "Cada título en su carpeta dentro de roms, con su archivo .eden; mejor en un solo archivo (.xci o .nup).": "Each title in its own folder inside roms, with its .eden file; a single file (.xci or .nup) works best.", "Touchpad + R1 enseña el rendimiento; Touchpad + L1 cierra el título.": "Touchpad + R1 shows performance; Touchpad + L1 closes the title.", "Muy experimental: tirones al cambiar de zona y títulos que no arrancan.": "Very experimental: hitches when changing areas and titles that won't start.", "Claves de tu propia consola (prod.keys)": "Your own console's keys (prod.keys)"});
+Object.assign(I18N_EXACT,{"Ya la tienes": "You have it", "Descubre qué hace PS5 Directo": "See what PS5 Directo can do", "No volver a mostrar": "Don't show again", "{0} {1} ya está en Payload Manager, junto al antiguo. No estaba en tu autoarranque: cárgalo desde Payload Manager o añádelo a su lista.": "{0} {1} is now in Payload Manager, next to the old one. It wasn't in your autoload: load it from Payload Manager or add it to its list.", "{0} {1} ya está en Payload Manager y ocupa el sitio del antiguo en tu autoarranque. Reinicia la consola para usarlo.": "{0} {1} is now in Payload Manager and takes the old one's place in your autoload. Restart the console to use it.", "ya tienes la {0} puesta como «{1}»": "you already have {0} installed as “{1}”", "Actualizar a la v{0}": "Update to v{0}", "Guía de uso paso a paso (2 minutos)": "Step-by-step guide (2 minutes)", "Gestor todo en uno dentro de la consola: archivos, ZIP, payloads, copias de partidas y temperaturas (web, puerto 7070)": "All-in-one manager inside the console: files, ZIP, payloads, save backups and temperatures (web, port 7070)", "Un gestor todo en uno que vive dentro de la consola y se usa desde el navegador de cualquier aparato (PC, tablet o móvil) en el puerto 7070, sin instalar nada más: archivos con ZIP, biblioteca de payloads con autoarranque, instalador de .pkg desde la consola o una URL, copias de tus partidas, procesos y temperaturas. Útil para cuando no tienes el PC a mano.": "An all-in-one manager that lives inside the console and is used from the browser of any device (PC, tablet or phone) on port 7070, with nothing else to install: files with ZIP, a payload library with autoload, a .pkg installer from the console or a URL, save backups, processes and temperatures. Handy when your PC isn't around.", "Se carga como payload. Es reciente: sus funciones de cuentas y ventilador son experimentales, úsalas con cuidado. PS5 Directo y Prospero Manager pueden convivir.": "Loaded as a payload. It's new: its account and fan features are experimental, use them with care. PS5 Directo and Prospero Manager can live side by side.", "Recién llegado": "Just arrived", "Actualizado hace poco": "Recently updated", "De la A a la Z": "A to Z", "Ordenar": "Sort", "Alembic está cargado en la consola.": "Alembic is running on the console.", "Alembic no está cargado: lo cargo yo al terminar (lo bajo de GitHub y lo dejo en Payload Manager para la próxima vez).": "Alembic isn't running: I'll load it when the transfer ends (downloaded from GitHub and added to Payload Manager for next time).", "Alembic no está cargado y no veo Payload Manager ni el cargador de ELF (9021): ábrelos en la consola o se quedará sin convertir.": "Alembic isn't running and I can't see Payload Manager or the ELF loader (9021): open one on the console or it will stay unconverted.", "Nuevo en la scene": "New in the scene", "Nueva versión": "New version", "beta": "beta", "Instalar {0}": "Install {0}", "Actualizar {0}": "Update {0}", "Ya tienes {0}": "You have {0}", "Ver {0}": "See {0}", "Destacado": "Featured"});
+Object.assign(I18N_EXACT,{"Lo que no hace ninguna otra": "What no other app does", "Pegas el enlace y en la PS5 sale listo": "Paste the link and it shows up ready on the PS5", "Biblioteca": "Library", "Todo lo que tienes, de un vistazo": "Everything you have, at a glance", "Tu jailbreak, a salvo": "Your jailbreak, kept safe", "Que una actualización no te lo quite": "Don't let an update take it away", "Descubrir": "Discover", "Emuladores y apps, instalados en un clic": "Emulators and apps, installed in one click", "Empezar": "Start", "Siguiente": "Next", "Enlace": "Link", "Tu PC": "Your PC", "baja · convierte": "downloads · converts", "recibe · coloca": "receives · places", "Instalar": "Install", "Vídeo": "Video"});
+Object.assign(I18N_EXACT,{"Instalar en la consola": "Install on the console", "Lo baja de GitHub y lo pone en Payload Manager por ti (el antiguo se queda por si quieres volver)": "Downloads it from GitHub and puts it in Payload Manager for you (the old one stays in case you want to go back)", "Abre Payload Manager en la consola para poder ponerlo": "Open Payload Manager on the console so it can be installed", "Esa versión no trae un .elf para cargar: mira su página de GitHub": "That release has no .elf to load: check its GitHub page", "Lo que se ha bajado no es un payload (.elf)": "What was downloaded isn't a payload (.elf)"});
+Object.assign(I18N_EXACT,{"Emulador experimental de Switch 2 de mihawk (el de MihawkOS). Frente a EglantinePS5 usa una base más nueva (Fritchii 5.3), compacta la memoria para aguantar zonas grandes y trae generación de fotogramas (30 → 60 fps). Rinde mejor en PS5 Pro: allí mueve el remake de Ocarina of Time a unos 30 fps.": "Experimental Switch 2 emulator by mihawk (of MihawkOS). Compared with EglantinePS5 it uses a newer base (Fritchii 5.3), compacts memory to cope with big areas and adds frame generation (30 → 60 fps). It runs best on the PS5 Pro, where it runs the Ocarina of Time remake at about 30 fps.", "Las claves y el firmware de tu propia consola y tu contenido (.xci, .nsp o .nup). En la PS5 normal aún no está medido y algunos títulos pueden quedarse sin memoria. Se instala en lugar de ProsperoEden (mismo Title ID) y comparte su carpeta.": "Your own console's keys and firmware and your content (.xci, .nsp or .nup). On the standard PS5 it hasn't been measured yet and some titles may run out of memory. It installs in place of ProsperoEden (same Title ID) and shares its folder.", "Mejor en PS5 Pro": "Best on PS5 Pro"});
+Object.assign(I18N_EXACT,{"Tienes actualización": "Update available", "Nueva versión de {0}": "New version of {0}", "Tienes la {0}. Mira qué trae y actualízalo en un clic: se conservan tus ajustes, partidas y contenido.": "You have {0}. See what's new and update it in one click: your settings, saves and content are kept.", "versión anterior": "an older version"});
+Object.assign(I18N_EXACT,{"🎬 ¿Qué hace PS5 Directo?": "🎬 What does PS5 Directo do?", "¿Qué hace PS5 Directo?": "What does PS5 Directo do?", "Espacio": "Space", "Qué te ocupa la consola, de verdad": "What's really taking up space on your console", "Títulos": "Titles", "Emuladores": "Emulators", "Repetido": "Duplicates", "Restos": "Leftovers", "Desde donde estés": "From wherever you are", "Mándalo desde el móvil o el navegador": "Send it from your phone or browser", "Añadir": "Add", "Cola": "Queue", "Tranquilidad": "Peace of mind", "Tus partidas y capturas, a salvo en el PC": "Your saves and captures, safe on your PC", "Todo en una": "All in one", "Lo que necesitas para tu PS5, en una sola app": "Everything you need for your PS5, in one app", "Descarga y envío a la vez": "Download and send at once", "LZ4 · zstd · imágenes": "LZ4 · zstd · images", "Biblioteca con portadas": "Library with covers", "Emuladores en un clic": "Emulators in one click", "Avisos de versiones": "Version alerts", "Guardián del firmware": "Firmware guard", "Espacio y limpieza": "Space and cleanup", "Copias y capturas": "Backups and captures", "Móvil y navegador": "Phone and browser", "Sensores y temperatura": "Sensors and temperature", "En español e inglés": "In Spanish and English"});
+Object.assign(I18N_EXACT,{"Dónde se convierte": "Where it's converted", "En tu PC": "On your PC", "En la PS5": "On the PS5", "en pruebas": "experimental", "Elige un formato para convertir en la PS5.": "Pick a format to convert on the PS5.", "Se descarga y envía a la vez (lo más rápido) y al terminar Alembic lo convierte dentro de la consola. Sin pasar por el disco del PC.": "It's downloaded and sent at the same time (fastest) and then Alembic converts it on the console. Nothing goes through your PC's disk.", "Alembic no hace este formato: se convierte en tu PC.": "Alembic doesn't do this format: it's converted on your PC.", "Con la última versión de PS5 Dump Forge, que se actualiza sola.": "With the latest PS5 Dump Forge, which updates itself.", "(se convierte en la PS5)": "(converted on the PS5)", "Descarga y envío a la vez, y la PS5 lo convierte después": "Download and send at once, then the PS5 converts it", "Se manda tal cual mientras se descarga (lo más rápido) y, al terminar, Alembic lo convierte dentro de la consola. Si algo falla, el título se queda como se mandó.": "It's sent as-is while downloading (fastest) and, when done, Alembic converts it on the console. If something fails, the title stays as it was sent.", "Sin convertir en la PS5": "Not converted on the PS5"});
+I18N_RX.push(...[["^Convirtiendo en la PS5 con Alembic a (.+)…$", "Converting on the PS5 with Alembic to {0}…"], ["^Convirtiendo en la PS5 con Alembic: (.*)$", "Converting on the PS5 with Alembic: {0}"], ["^Alembic convierte (.+) a (.+) \\(trabajo (.+)\\)$", "Alembic is converting {0} to {1} (job {2})"], ["^Alembic terminó: (.+)$", "Alembic finished: {0}"], ["^AVISO: (.+)\\. El título se queda como se mandó, sin convertir\\.$", "WARNING: {0}. The title stays as it was sent, unconverted."]]);
 // --- idioma: español (original) o inglés. Traduce el texto de la página y los mensajes del programa.
 const LANG=(()=>{try{const v=localStorage.getItem('ps5d_lang');if(v==='es'||v==='en')return v}catch(e){}
   return (navigator.language||'es').toLowerCase().startsWith('es')?'es':'en'})();
@@ -2222,7 +2317,7 @@ const $ = (id) => document.getElementById(id);
 let state = {jobs:[], settings:{}};
 let openLogs = new Set();
 
-function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),3500)}
+function toast(msg,ms){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),ms||3500)}
 // Consultas que se pueden repetir sin efectos: si falla la conexion un instante, se reintenta
 const SAFE_API=new Set(['/api/state','/api/test','/api/settings','/api/places','/api/whatsnew','/api/space/state']);
 
@@ -2586,7 +2681,7 @@ $('btnAdd').onclick = async ()=>{
   let chk; try{ chk=await precheckLinks(lines) }finally{ btn.disabled=false; btn.textContent=label }
   if(!chk.ok){ const how=await askAddChk(chk); if(!how) return;
     if(how==='good'){ const drop=new Set(chk.bad.flatMap(p=>p.parts.map(x=>x.url))); lines=lines.filter(x=>!drop.has(x)) } }
-  try{await api('/api/add',{lines:lines.join('\n'),password:$('pw').value,dest:$('dest').value,where:$('where').value,fmt:keepFmt($('where').value),comp:FMT_COMP[keepFmt($('where').value)]?fmtComp:'',...keepArgs($('where').value)});$('lines').value='';$('pw').value='';toast('Añadido a la cola');refresh()}
+  try{await api('/api/add',{lines:lines.join('\n'),password:$('pw').value,dest:$('dest').value,where:$('where').value,fmt:keepFmt($('where').value),comp:FMT_COMP[keepFmt($('where').value)]?fmtComp:'',conv_at:convPs5()?'ps5':'',...keepArgs($('where').value)});$('lines').value='';$('pw').value='';toast('Añadido a la cola');refresh()}
   catch(e){toast(e.message)}
 };
 $('btnClear').onclick = async ()=>{await api('/api/clear',{}).catch(()=>{});refresh()};
@@ -2797,7 +2892,7 @@ function palBase(){
     C('btnCloud','Mis almacenamientos','☁️',()=>showTab('Transfers')),C('libUpd','Actualizaciones de la biblioteca','🔔',()=>showTab('Library')),
     C('libCheckAll','Revisar todo','🩺',()=>showTab('Library')),C('colArch','Archivados','🗄',()=>{ showTab('Library'); document.querySelector('#libView button[data-v="pc"]').click() }),
     C('mdSendCfg','Capturas a Telegram o Discord','📤',()=>showTab('Media')),{l:tr('Papelera'),ic:'🗑',go:()=>{ showTab('Space'); setTimeout(()=>$('trCard').scrollIntoView({behavior:'smooth'}),300) }},
-    C('btnPcMode','Modo PC (encender o apagar)','🖥'),C('btnTour','Guía de uso','🧭'),{l:tr('Novedades'),ic:'✨',go:()=>showNews(true)},{l:tr('Jugar en el PC (Remote Play)'),ic:'▶',go:()=>goApps('rp')}];
+    C('btnPcMode','Modo PC (encender o apagar)','🖥'),C('btnTour','Guía de uso','🧭'),{l:tr('Novedades'),ic:'✨',go:()=>showNews(true)},{l:tr('Jugar en el PC (Remote Play)'),ic:'▶',go:()=>goApps('rp')},{l:tr('¿Qué hace PS5 Directo?'),ic:'🎬',go:()=>showSpot()}];
 }
 function palItems(q){
   q=q.trim().toLowerCase(); let out=palBase();
@@ -2841,6 +2936,7 @@ $('btnLang').onclick=()=>setLang(LANG==='en'?'es':'en');
 document.addEventListener('keydown',e=>{ if(!tourEls) return;
   if(e.key==='Escape') tourEnd(); else if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();tourI===TOUR.length-1?tourEnd():tourGo(tourI+1)} else if(e.key==='ArrowLeft') tourGo(tourI-1)});
 refresh().then(()=>{
+  try{spotHintPaint()}catch(_){}
   const goOn=()=>{ if(state.settings && !state.settings.tour_done) openSetup(); else { needIp(); showNews(); setTimeout(maybeTour20,1500) } };
   if(state.settings && !state.settings.welcome_seen && !state.remote) showWelcome(goOn); else goOn();
   checkUpdateQuiet();
@@ -2943,6 +3039,7 @@ function notifyChanges(){
   for(const j of (state.jobs||[])){
     const prev=lastStatus[j.id]; lastStatus[j.id]=j.status;
     if(!prev || prev===j.status) continue;
+    if(j.status==='hecho'&&rec.loaded) setTimeout(recLoad,1500);   // Descubrir al día tras instalar o actualizar (el aviso de actualización se quita solo)
     if(j.status==='hecho'||j.status==='error'){
       const title=j.status==='hecho'?'Listo en la PS5':'Problema en PS5 Directo';
       const body=(j.title||'Transferencia')+(j.status==='error'?': '+(j.error||'').slice(0,120):'');
@@ -3084,6 +3181,7 @@ async function checkUpdateQuiet(){
   if(!state.repo||state.remote) return;
   try{const r=await api('/api/update/check',{}); if(!(r.ok&&r.newer)) return; updR=r;
     latestSeen=r.latest;$('btnUpdHead').textContent=tr('Actualizar · v{0}').replace('{0}',r.latest);$('btnUpdHead').classList.add('primary');$('btnUpdHead').hidden=!!state.remote;
+    { const m=$('btnUpdMenu'); m.textContent='⬆ '+tr('Actualizar a la v{0}').replace('{0}',r.latest); m.classList.add('glow'); $('btnMore').classList.add('dot') }
     updBar(r);
   }catch(e){}
 }
@@ -3573,9 +3671,85 @@ function dscNews(n){ const list=nw.items.filter(x=>!x.soon).slice(0,n);
     return `<div class="nwcard" data-nw="1" data-home="1">${artCover({hero:artURL(x.hero),icon:artURL(x.icon),name:x.name,col:NW_COL[x.cat]||NW_COL.apps,fill:true})}${nwPill(x,true)}
     <div class="nwb"><b class="ttl" data-noi18n>${esc(x.name)}</b>${x.new?`<div class="row"><span class="bdg ok">${esc(tr('Nuevo'))}</span></div>`:''}
     <div class="row hint"><span>${esc(tr(NW_CAT[x.cat]||x.cat))}</span></div>${x.blurb?`<p data-noi18n data-tb="${esc(x.id)}"${x.blurb_t?` title="${esc(tr('Traducido automáticamente del inglés'))}"`:''}>${esc(x.blurb_t||x.blurb)}</p>`:''}</div></div>` }).join('')}</div>` }
+// --- Inicio: lo último de la scene en un cartel grande que pasa solo (como una tienda)
+// destacados (destacados.json en GitHub, lo que más se juega o lo nuevo de la emulación) + lo último de RecompStore
+function featSlide(f,i){ const L=k=>(LANG==='en'&&f[k+'_en'])||f[k]||'', it=f.install?(rec.items||[]).find(x=>x.id===f.install):null;
+  let act='';
+  if(it&&!state.remote){ const newer=it.installed&&it.latest&&it.latest!==it.ver;
+    act=!it.installed?`<button class="primary" data-ri="${esc(it.id)}">${esc(tr('Instalar {0}').replace('{0}',it.name))}</button>`
+      :newer?`<button class="primary" data-ru="${esc(it.id)}">${esc(tr('Actualizar {0}').replace('{0}',it.name))}</button>`
+      :`<button disabled>✓ ${esc(tr('Ya tienes {0}').replace('{0}',it.name))}</button>`;
+    act+=`<button data-fgo="${esc(it.id)}">${esc(tr('Ver {0}').replace('{0}',it.name))}</button>` }
+  if(f.url) act+=`<a class="btn-a" href="${esc(f.url)}" target="_blank" rel="noopener">${esc(tr('Más información'))} ↗</a>`;
+  const img=f.img?artURL(f.img):'', ico=!img&&it?(it.hero||it.icon):'';
+  return `<div class="bn-s${i?'':' on'}" style="--g1:#3b2a7a;--g2:#0e4b6b">${img?`<div class="bn-bg" style="background-image:url('${esc(img)}')"></div><img class="bn-img" src="${esc(img)}" alt="" onerror="this.remove()">`
+      :ico?`<img class="bn-img${it.hero?'':' ico'}" src="${esc(artURL(ico))}" alt="" onerror="this.remove()">`:''}
+    <div class="bn-t"><div class="bn-pills"><span class="bn-cat">${esc(L('cat')||tr('Destacado'))}</span>${L('badge')?`<span class="whenpill new">${esc(L('badge'))}</span>`:''}${f.pro?`<span class="whenpill">${esc(tr('Mejor en PS5 Pro'))}</span>`:''}</div>
+      <h3 data-noi18n>${esc(L('title'))}</h3>${L('text')?`<p data-noi18n>${esc(L('text'))}</p>`:''}${L('note')?`<div class="bn-note" data-noi18n>${esc(L('note'))}</div>`:''}<div class="bn-act">${act}</div></div></div>` }
+function updSlide(it,i){ const d=it.latest_t?new Date(it.latest_t):null, ago=d&&!isNaN(d)?nwWhen(it.latest_t):'';
+  return `<div class="bn-s${i?'':' on'}" style="--g1:#5a3b0e;--g2:#3b1d5a">${(it.hero||it.icon)?`<img class="bn-img${it.hero?'':' ico'}" src="${esc(artURL(it.hero||it.icon))}" alt="" onerror="this.remove()">`:''}
+    <div class="bn-t"><div class="bn-pills"><span class="bn-cat">${esc(tr('Tienes actualización'))}</span><span class="whenpill new">${esc(it.latest)}</span>${ago?`<span class="whenpill">${esc(ago)}</span>`:''}</div>
+      <h3 data-noi18n>${esc(tr('Nueva versión de {0}').replace('{0}',it.name))}</h3><p>${esc(tr('Tienes la {0}. Mira qué trae y actualízalo en un clic: se conservan tus ajustes, partidas y contenido.').replace('{0}',it.ver||tr('versión anterior')))}</p>
+      <div class="bn-act"><button class="primary" data-ru="${esc(it.id)}">${esc(tr('Actualizar'))}</button><button data-cn="${esc(it.id)}">📝 ${esc(tr('Qué cambia'))}</button></div></div></div>` }
+// novedades que se generan solas (escena.json, GitHub Action del repo): versiones nuevas de lo de Descubrir y proyectos nuevos
+function sceneSlide(x,i){ const it=x.cid?(rec.items||[]).find(r=>r.id===x.cid):null, ago=nwWhen(x.date), art=it?(it.hero||it.icon):'';
+  const own=(x.repo||'').split('/')[0], img=art?artURL(art):artURL('https://github.com/'+own+'.png'), newer=it&&it.installed&&x.tag&&x.tag!==it.ver;
+  let act='';
+  if(it&&!state.remote) act=!it.installed?`<button class="primary" data-ri="${esc(it.id)}">${esc(tr('Instalar {0}').replace('{0}',it.name))}</button>`
+      :newer?`<button class="primary" data-ru="${esc(it.id)}">${esc(tr('Actualizar {0}').replace('{0}',it.name))}</button>`:`<button disabled>✓ ${esc(tr('Ya la tienes'))}</button>`;
+  if(it&&it.kind==='app') act+=`<button data-fgo="${esc(it.id)}">${esc(tr('Ver {0}').replace('{0}',it.name))}</button>`;
+  act+=`<a class="btn-a" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(tr(x.kind==='new'?'Ver en GitHub':'Qué cambia'))} ↗</a>`;
+  const txt=x.kind==='new'?(x.desc||x.notes):x.notes;
+  return {th:img, name:x.name, html:`<div class="bn-s${i?'':' on'}" style="--g1:${x.kind==='new'?'#0e5b4b':'#2a3b7a'};--g2:#141a2a"><img class="bn-img${art&&it.hero?'':' ico'}" src="${esc(img)}" alt="" loading="lazy" onerror="this.remove()">
+    <div class="bn-t"><div class="bn-pills"><span class="bn-cat">${esc(tr(x.kind==='new'?'Nuevo en la scene':'Nueva versión'))}</span><span class="whenpill new">${esc(x.tag)}${x.pre?' · '+esc(tr('beta')):''}</span>${ago?`<span class="whenpill">${esc(ago)}</span>`:''}${x.stars?`<span class="whenpill">★ ${x.stars}</span>`:''}</div>
+      <h3 data-noi18n>${esc(x.name)}</h3>${txt?`<p data-noi18n>${esc(txt)}</p>`:''}<div class="bn-act">${act}</div></div></div>`} }
+function dscBanner(n){ const feat=(nw.feat||[]), now=Date.now(), age=w=>{ const d=new Date(w); return isNaN(d)?1e15:now-d };
+  const upd=state.remote?[]:(rec.items||[]).filter(x=>x.kind==='app'&&x.installed&&x.latest&&x.latest!==x.ver).slice(0,3);
+  const busy=new Set([...feat.map(f=>f.install),...upd.map(x=>x.id)].filter(Boolean));
+  // lo más reciente de verdad: versiones y proyectos de los últimos 10 días (lo más nuevo primero)
+  const sc=(nw.scene||[]).filter(x=>age(x.date)<10*864e5&&!(x.cid&&busy.has(x.cid))&&!SCENE_SKIP.test(x.name+' '+x.repo)).slice(0,5);
+  // del catálogo de RecompStore: lo que acaba de llegar (3 semanas) y lo actualizado de verdad hace poco (3 días).
+  // Si con eso hay poco, se completa con los últimos en llegar, nunca con actualizaciones viejas.
+  const live=nw.items.filter(x=>!x.soon&&!busy.has(x.id)), arr=arrivals(live);
+  const isNewA=x=>{ const d=arrivedAt(x); return d&&now-d<21*864e5 };
+  let list=arr.filter(isNewA).slice(0,4).map(x=>Object.assign(x,{_arr:1}));
+  const seen=new Set(list.map(x=>x.id));
+  live.filter(x=>!seen.has(x.id)&&age(x.when)<3*864e5).sort((a,b)=>age(a.when)-age(b.when)).slice(0,2).forEach(x=>{ x._arr=0; list.push(x); seen.add(x.id) });
+  const want=Math.max(4,9-feat.length-upd.length-sc.length);
+  for(const x of arr){ if(list.length>=want) break; if(!seen.has(x.id)){ x._arr=1; list.push(x); seen.add(x.id) } }
+  list=list.slice(0,want);
+  if(!list.length&&!feat.length&&!sc.length) return dscNews(4);
+  const rsSlide=(x,i)=>{ const a=nwArt(x), img=a.hero||a.icon, col=a.col||NW_COL.apps, inst=x.repo&&!state.remote&&!SCENE_SKIP.test(x.name+' '+(x.repo||''));
+    return {th:img, name:x.name, html:`<div class="bn-s${i?'':' on'}" data-i="${i}" style="--g1:${col[0]};--g2:${col[1]}">
+      ${img?`<div class="bn-bg" style="background-image:url('${esc(img)}')"></div><img class="bn-img${a.hero?'':' ico'}" src="${esc(img)}" alt="" loading="${i?'lazy':'eager'}" onerror="this.remove()">`:''}
+      <div class="bn-t"><div class="bn-pills"><span class="bn-cat">${esc(tr(NW_CAT[x.cat]||x.cat))}</span>${x._arr?`<span class="whenpill new">${esc(tr('Recién llegado'))}</span>${arrivedAt(x)?`<span class="whenpill">${esc(nwWhen(arrivedAt(x).toISOString()))}</span>`:''}`:nwPill(x,true)}</div>
+        <h3 data-noi18n>${esc(x.name)}</h3>${x.blurb?`<p data-noi18n data-tb="${esc(x.id)}">${esc(x.blurb_t||x.blurb)}</p>`:''}
+        <div class="bn-act">${inst?`<button class="primary" data-ni="${esc(x.id)}">${esc(tr('Instalar en la PS5'))}</button>`:''}<button data-sq="${esc(x.id)}">${esc(tr('Más información'))}</button></div></div></div>`} };
+  const fit=f=>{ const it=f.install?(rec.items||[]).find(x=>x.id===f.install):null; return f.img?artURL(f.img):it&&(it.hero||it.icon)?artURL(it.hero||it.icon):'' };
+  const S=[...feat.map(f=>({html:'',th:fit(f),name:f.title,f})),...upd.map(x=>({html:'',th:(x.hero||x.icon)?artURL(x.hero||x.icon):'',name:x.name,u:x}))];
+  S.forEach((o,i)=>o.html=o.f?featSlide(o.f,i):updSlide(o.u,i));
+  sc.forEach(x=>S.push(sceneSlide(x,S.length))); list.forEach(x=>S.push(rsSlide(x,S.length)));
+  setTimeout(bnStart,0);
+  const chev=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+  return `<div class="bn${S.length>1?' rail':''}" id="dscBn" tabindex="0" aria-roledescription="carousel">${S.map(o=>o.html).join('')}
+    <div class="bn-ctl"><button type="button" class="bn-nav p" aria-label="${esc(tr('Anterior'))}">${chev('M14.5 6l-6 6 6 6')}</button><button type="button" class="bn-nav n" aria-label="${esc(tr('Siguiente'))}">${chev('M9.5 6l6 6-6 6')}</button>
+    <div class="bn-dots">${S.map((o,i)=>`<button type="button" data-d="${i}" class="${i?'':'on'}" aria-label="${esc(o.name)}"><i></i></button>`).join('')}</div></div>
+    <div class="bn-rail">${S.map((o,i)=>`<button type="button" data-d="${i}" class="${i?'':'on'}" title="${esc(o.name)}" style="${o.th?`background-image:url('${esc(o.th)}')`:''}"><span>${esc(o.name)}</span><i></i></button>`).join('')}</div></div>` }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-fgo]'); if(!b) return; const it=(rec.items||[]).find(x=>x.id===b.dataset.fgo); if(!it) return;
+  const g=it.group||'emu'; appShow(g); setTimeout(()=>{ const q=$('recQ'); if(q){ q.value=it.name; q.dispatchEvent(new Event('input')) } },200) });
+let bnT=null;
+function bnStart(){ const b=$('dscBn'); if(!b||b.dataset.on) return; b.dataset.on=1; let cur=0, hold=false; const ss=[...b.querySelectorAll('.bn-s')], ds=[...b.querySelectorAll('.bn-dots button,.bn-rail button')], rl=b.querySelector('.bn-rail');
+  const go=i=>{ cur=(i+ss.length)%ss.length; ss.forEach((s,k)=>s.classList.toggle('on',k===cur)); ds.forEach(d=>{ d.classList.toggle('on',+d.dataset.d===cur); d.classList.remove('run'); if(+d.dataset.d===cur){ void d.offsetWidth; d.classList.add('run') } }); const on=rl&&rl.querySelector('button.on'); if(on&&rl.offsetParent){ rl.scrollTo({top:on.offsetTop-rl.clientHeight/2+on.offsetHeight/2,behavior:'smooth'}) } };
+  clearInterval(bnT); bnT=setInterval(()=>{ if(!b.isConnected){ clearInterval(bnT); return } if(!hold&&!document.hidden) go(cur+1) },6000);
+  b.querySelector('.bn-nav.p').onclick=()=>go(cur-1); b.querySelector('.bn-nav.n').onclick=()=>go(cur+1);
+  ds.forEach(d=>d.onclick=()=>go(+d.dataset.d));
+  b.addEventListener('mouseenter',()=>{ hold=true; b.classList.add('hold') }); b.addEventListener('mouseleave',()=>{ hold=false; b.classList.remove('hold') });
+  b.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft') go(cur-1); if(e.key==='ArrowRight') go(cur+1) });
+  let x0=null; b.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX },{passive:true}); b.addEventListener('touchend',e=>{ if(x0==null) return; const dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>40) go(cur+(dx<0?1:-1)); x0=null });
+  go(0) }
 // lo del catálogo de RecompStore que no está ya en Descubrir: se suma a su categoría (y a su número)
 const SCENE_CAT={emu:'emulators',media:'apps',tool:'tools'};
-const SCENE_SKIP=/playden|art.?swap|trophy|savegam|save.?manager|cheat/i;    // lo que decidimos no recomendar
+const SCENE_SKIP=/playden|art.?swap|psgfx|steam.?grid|romm\b|nuvio|stremio|smarttube|trophy|savegam|save.?manager|cheat|dumper/i;    // lo que decidimos no recomendar
 function sceneExtra(g){ const mine=new Set((rec.items||[]).map(x=>(x.repo||'').toLowerCase()).filter(Boolean)), names=new Set((rec.items||[]).map(x=>x.name.toLowerCase()));
   return nw.items.filter(x=>x.cat===SCENE_CAT[g]&&!x.soon&&!mine.has((x.repo||'').toLowerCase())&&!names.has((x.name||'').toLowerCase())&&!SCENE_SKIP.test(x.name+' '+(x.repo||''))) }
 function recPaint(){ if(!DSC[appV]) return; const box=$('recBody'), v=appV, q=($('recQ').value||'').trim().toLowerCase(), all=rec.items;
@@ -3590,7 +3764,7 @@ function recPaint(){ if(!DSC[appV]) return; const box=$('recBody'), v=appV, q=($
   if(q){ const l=all.filter(x=>(x.name+' '+(x.sys||'')+' '+tr(x.sys||'')+' '+tr(x.what||'')+' '+(x.what||'')).toLowerCase().includes(q));
     h+=l.length?grid(l):`<p class="hint">${esc(tr('Nada por aquí con ese filtro.'))}</p>` }
   else if(v==='home'){
-    h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>📰 ${esc(tr('Novedades de la scene'))}</h3><span class="hint">${esc(tr('Lo último que se ha publicado o actualizado para la PS5'))}</span><button class="more" data-go="news">${esc(tr('Ver todas'))} →</button></div>${dscNews(4)}${sceneCats()}</section>`;
+    h+=`<section class="dsc-sec"><div class="dsc-sh"><h3>📰 ${esc(tr('Novedades de la scene'))}</h3><span class="hint">${esc(tr('Lo último que se ha publicado o actualizado para la PS5'))}</span><button class="more" data-go="news">${esc(tr('Ver todas'))} →</button></div>${dscBanner(8)}${sceneCats()}</section>`;
     const sc=sceneRows();
     DSC_ORDER.forEach(g=>{ const l=by(g); if(!l.length) return;
       if(g==='emu') h+=sc.pop; if(g==='media') h+=sc.fresh; if(g==='rp') h+=sc.ports;
@@ -3612,8 +3786,13 @@ function recPaint(){ if(!DSC[appV]) return; const box=$('recBody'), v=appV, q=($
     if(more.length) h+=`<section class="dsc-sec" style="margin-top:22px"><div class="dsc-sh"><h3>${esc(tr('Más de la scene'))} <span class="hint">${more.length}</span></h3><span class="hint">${esc(tr('Del catálogo de RecompStore: también se instalan con un clic desde su GitHub.'))}</span></div><div class="nwgrid">${more.map(nwCardHTML).join('')}</div></section>`;
     else if(!nw.items.length) nwGet().then(()=>{ if(appV===v&&nw.items.length) recPaint() }) }
   else { let l=by(v); if(v==='emu'&&recFam) l=l.filter(x=>recFam==='multi'?['multi','other'].includes(x.fam||'other'):x.fam===recFam); h+=grid(l) }
-  { const up=all.filter(x=>x.kind==='app'&&x.installed&&x.latest&&x.latest!==x.ver), u=$('dscUpd');
-    u.hidden=!up.length; u.innerHTML=up.length?`<div class="dsc-upd"><div class="dsc-sh" style="margin:0"><h3>⬆ ${esc(tr('Tienes actualizaciones'))}</h3><span class="hint">${esc(tr('Se copian encima: se conservan tus ajustes, partidas, BIOS y contenido'))}</span></div>${up.map(x=>`<div class="ur"><b data-noi18n>${esc(x.name)}</b><span class="hint" data-noi18n>${esc(x.ver?x.ver+' → '+x.latest:tr('Última versión: {0}').replace('{0}',x.latest))}</span><button class="small" data-cn="${esc(x.id)}">📝 ${esc(tr('Qué cambia'))}</button><button class="small primary" data-ru="${esc(x.id)}">${esc(tr('Actualizar'))}</button></div>`).join('')}</div>`:''; recBind(u) }
+  { let skip={}; try{ skip=JSON.parse(localStorage.getItem('ps5d_rec_skip')||'{}') }catch(e){}
+    const up=all.filter(x=>x.kind==='app'&&x.installed&&x.latest&&x.latest!==x.ver&&skip[x.id]!==x.latest), u=$('dscUpd');
+    u.hidden=!up.length; u.innerHTML=up.length?`<div class="dsc-upd"><div class="dsc-sh" style="margin:0"><h3>⬆ ${esc(tr('Tienes actualizaciones'))}</h3><span class="hint">${esc(tr('Se copian encima: se conservan tus ajustes, partidas, BIOS y contenido'))}</span></div>${up.map(x=>`<div class="ur"><b data-noi18n>${esc(x.name)}</b><span class="hint" data-noi18n>${esc(x.ver?x.ver+' → '+x.latest:tr('Última versión: {0}').replace('{0}',x.latest))}</span><button class="small" data-cn="${esc(x.id)}">📝 ${esc(tr('Qué cambia'))}</button><button class="small primary" data-ru="${esc(x.id)}">${esc(tr('Actualizar'))}</button><button class="small ico" data-rskip="${esc(x.id)}" title="${esc(tr('No avisar de esta versión (se puede actualizar igual desde su ficha)'))}" aria-label="${esc(tr('No avisar de esta versión'))}">✕</button></div>`).join('')}</div>`:''; recBind(u);
+    u.querySelectorAll('[data-rskip]').forEach(b=>b.onclick=()=>{ const it=up.find(x=>x.id===b.dataset.rskip); if(!it) return;
+      skip[it.id]=it.latest; try{ localStorage.setItem('ps5d_rec_skip',JSON.stringify(skip)) }catch(e){}
+      toast(tr('Ya no te aviso de {0} {1}. Si sale otra versión, volverá a avisar.').replace('{0}',it.name).replace('{1}',it.latest));
+      b.closest('.ur').remove(); if(!u.querySelector('.ur')) u.hidden=true }) }
   box.innerHTML=h; recBind(box); if(v==='home') nwTranslate(); if($('rpPlay')) rpPlayLoad() }
 $('recQ').oninput=()=>{ if(rec.loaded) recPaint() };
 $('recFam').addEventListener('click',e=>{ const b=e.target.closest('button[data-f]'); if(!b) return; recFam=b.dataset.f; recPaint() });
@@ -3735,7 +3914,7 @@ const NW_REQ={loader:'cargador de payloads',smp:'ShadowMountPlus',kstuff:'kstuff
 function nwWhen(w){ if(!w) return ''; const d=new Date(w); if(isNaN(d)) return w; const days=Math.floor((Date.now()-d)/864e5);
   return days<1?tr('hoy'):days<2?tr('ayer'):days<31?tr('hace {0} días').replace('{0}',days):d.toLocaleDateString(LANG==='en'?'en-GB':'es-ES',{day:'numeric',month:'short',year:'numeric'}) }
 async function nwGet(force){ try{ const r=await api('/api/recomp',force?{refresh:1}:{}); if(!r.ok) throw new Error(r.error);
-    nw.items=r.items||[]; nw.covers=r.covers||{}; nw.err=(r.error&&!nw.items.length)?r.error:'' }catch(e){ if(!nw.items.length) nw.err=e.message } nwBadge(); return nw }
+    nw.items=(r.items||[]).filter(x=>!SCENE_SKIP.test([x.name,x.repo,x.blurb].join(' '))); nw.covers=r.covers||{}; nw.feat=r.feat||[]; nw.scene=r.scene||[]; nw.err=(r.error&&!nw.items.length)?r.error:'' }catch(e){ if(!nw.items.length) nw.err=e.message } nwBadge(); return nw }
 function nwBadge(){ const n=nw.items.filter(x=>x.new).length; const c=$('newsC'); if(c) c.textContent=nw.items.filter(x=>!x.soon).length||'';
   ['newsN','newsN2'].forEach(id=>{ const b=$(id); if(b){ b.textContent=n; b.hidden=!n } }); const d=$('dscDot'); if(d) d.hidden=!n }
 async function nwLoad(force){ const box=$('nwBody'); if(!nw.items.length||force) box.innerHTML=loadingHTML('Leyendo el catálogo…',1);
@@ -3796,14 +3975,18 @@ function sceneCats(){ if(!nw.items.length) return ''; const live=nw.items.filter
   const cats=[['games','Ports nativos','gamepad','#3a8ef0'],['emulators','Emuladores','joystick','#45c3dc'],['apps','Aplicaciones','grid','#4fc9a4'],['tools','Herramientas','tools','#e0a24a']];
   return `<div class="sc-cats">${cats.map(([k,l,ic,c])=>`<button type="button" class="sc-cat" data-ncat="${k}" style="--c:${c}"><span class="sci">${ico(ic)}</span><b>${esc(tr(l))}</b><i>${n(k)}</i></button>`).join('')}</div>` }
 // dos carruseles de la scene repartidos por Inicio: los ports tras los emuladores, y lo popular (o lo siguiente más nuevo) antes de las apps
+// recién llegados: por fecha de alta si el catálogo la trae; si no, lo que PS5 Directo ha visto aparecer y, de base,
+// lo último del catálogo (la lista de «newer» primero y, dentro de cada lista, lo añadido al final)
+function arrivals(live){ const srcW=k=>/newer|new|v2/i.test(k||'')?1:0;
+  return live.slice().sort((a,b)=>(a.added&&b.added?String(b.added).localeCompare(String(a.added)):0)||((b.seen||0)-(a.seen||0))||(srcW(b.src)-srcW(a.src))||((b.pos||0)-(a.pos||0))) }
+function arrivedAt(x){ const d=x.added?new Date(x.added):x.seen?new Date(x.seen*1000):null; return d&&!isNaN(d)?d:null }
 function sceneRows(){ const E={pop:'',fresh:'',ports:''}; if(!nw.items.length) return E; const live=nw.items.filter(x=>!x.soon);
   let pop=live.filter(x=>x.prank).sort((a,b)=>a.prank-b.prank); if(pop.length<4) pop=live.filter(x=>x.pop>0).sort((a,b)=>b.pop-a.pop);
   pop.forEach((x,i)=>x._rk=i+1); if(pop.length>=4&&pop.length<10){ const seen=new Set(pop.map(x=>x.id)); pop=pop.concat(live.filter(x=>!seen.has(x.id)&&x.cat!=='tools').slice(0,10-pop.length).map(x=>Object.assign(x,{_rk:0}))) }
   E.pop=pop.length>=4?sqRow(tr('Más populares'),pop.slice(0,14),''):sqRow(tr('Emuladores de la scene'),live.filter(x=>x.cat==='emulators').slice(0,14),'emulators');
   // recién llegados: por fecha de alta si el catálogo la trae; si no, lo que PS5 Directo ha visto aparecer y, de base,
   // lo último del catálogo (la lista de «newer» primero y, dentro de cada lista, lo añadido al final)
-  const srcW=k=>/newer|new|v2/i.test(k||'')?1:0;
-  const fresh=live.slice().sort((a,b)=>(a.added&&b.added?String(b.added).localeCompare(String(a.added)):0)||((b.seen||0)-(a.seen||0))||(srcW(b.src)-srcW(a.src))||((b.pos||0)-(a.pos||0)));
+  const fresh=arrivals(live);
   E.fresh=sqRow(tr('Recién llegados'),fresh.slice(0,14),'all');
   E.ports=sqRow(tr('Ports nativos'),live.filter(x=>x.cat==='games').slice(0,14),'games');
   return E }
@@ -3855,6 +4038,9 @@ function nwCardHTML(x){
 function nwPaint(){ const q=($('nwQ').value||'').toLowerCase().trim(), c=nw.cat;
   $('nwCat').querySelectorAll('button[data-c]').forEach(b=>{ const k=b.dataset.c, n=nw.items.filter(x=>!k?!x.soon:k==='soon'?x.soon:x.cat===k&&!x.soon).length; let i=b.querySelector('i'); if(!i){ i=document.createElement('i'); b.appendChild(i) } i.textContent=n?' '+n:'' });
   const list=nw.items.filter(x=>(!c||(c==='soon'?x.soon:(x.cat===c&&!x.soon)))&&(!q||(x.name+' '+x.author+' '+x.blurb+' '+(x.tags||[]).join(' ')).toLowerCase().includes(q)));
+  const so=$('nwSort').value; if(so==='new'){ const a=arrivals(list); list.length=0; list.push(...a) }
+  else if(so==='pop'){ list.sort((a,b)=>(a.prank||1e9)-(b.prank||1e9)||(b.pop||0)-(a.pop||0)) }
+  else if(so==='az'){ list.sort((a,b)=>a.name.localeCompare(b.name,LANG)) }
   const shown=list.slice(0,nw.lim||60);
   $('nwBody').innerHTML=list.length?`<div class="nwgrid">${shown.map(nwCardHTML).join('')}</div>`
     :`<p class="hint">${esc(tr('Nada por aquí con ese filtro.'))}</p>`;
@@ -3862,7 +4048,7 @@ function nwPaint(){ const q=($('nwQ').value||'').toLowerCase().trim(), c=nw.cat;
   else if(list.length) $('nwBody').insertAdjacentHTML('beforeend',`<p class="hint nwmore">${esc(tr('{0} en el catálogo de RecompStore para PS5').replace('{0}',list.length))}</p>`)
   nwTranslate() }
 $('nwCat').addEventListener('click',e=>{ const b=e.target.closest('button[data-c]'); if(!b) return; nw.cat=b.dataset.c; nw.lim=60; $('nwCat').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); nwPaint() });
-$('nwQ').oninput=()=>{ nw.lim=60; nwPaint() }; $('nwRe').onclick=()=>nwLoad(true);
+$('nwQ').oninput=()=>{ nw.lim=60; nwPaint() }; try{ $('nwSort').value=localStorage.getItem('ps5d_nwsort')||'upd' }catch(_){} $('nwSort').onchange=()=>{ try{ localStorage.setItem('ps5d_nwsort',$('nwSort').value) }catch(_){} nw.lim=60; nwPaint() }; $('nwRe').onclick=()=>nwLoad(true);
 // --- 🏷 ordenar nombres (imágenes y .pkg con un nombre claro, desde su propio param.json)
 const ren={items:[]};
 async function renOpen(){ $('dlgRen').showModal(); await renLoad() }
@@ -3891,19 +4077,35 @@ $('libRen').onclick=renOpen;
 // --- 🧩 payloads al día (Payload Manager)
 async function pdLoad(act){ const box=$('pdBody'); if(!box.children.length||act) box.innerHTML=loadingHTML(act&&act.update?'Actualizando…':'Mirando Payload Manager…');
   let r; try{ r=await api('/api/pld/updates',act||{check:1}); if(!r.ok) throw new Error(r.error) }catch(e){ box.innerHTML=`<p class="err">${esc(e.message)}</p>`; return }
-  if(act&&act.update) toast(tr('{0} actualizado a la {1}. Se usará la próxima vez que se cargue (o reinicia la consola).').replace('{0}',r.done).replace('{1}',r.version));
+  if(act&&act.update) toast(r.auto===false?tr('{0} {1} ya está en Payload Manager, junto al antiguo. No estaba en tu autoarranque: cárgalo desde Payload Manager o añádelo a su lista.').replace('{0}',r.done).replace('{1}',r.version)
+    :r.auto?tr('{0} {1} ya está en Payload Manager y ocupa el sitio del antiguo en tu autoarranque. Reinicia la consola para usarlo.').replace('{0}',r.done).replace('{1}',r.version)
+    :tr('{0} actualizado a la {1}. Se usará la próxima vez que se cargue (o reinicia la consola).').replace('{0}',r.done).replace('{1}',r.version),9000);
   if(!r.pm){ box.innerHTML=`<p class="hint">${esc(tr(r.error||'Payload Manager no está abierto en la consola.'))}</p>`; return }
   const its=r.items||[];
   if(!its.length){ box.innerHTML=`<p class="hint">${esc(tr('No tienes payloads guardados en Payload Manager.'))}</p>`; return }
   box.innerHTML=(r.updates?`<div class="gdbig bad">⬆ <b>${esc(tr('Hay {0} con versión nueva').replace('{0}',r.updates))}</b></div>`:`<div class="gdbig ok">✔ <b>${esc(tr('Todo al día'))}</b><div class="hint">${esc(tr('Payload Manager {0}').replace('{0}',r.pm))}</div></div>`)
     +`<div class="pdlist">${its.map(x=>`<div class="cr-row"><div><b data-noi18n>${esc(x.name)}</b> <span class="hint" data-noi18n>${esc(x.have?'v'+x.have.replace(/^v/i,''):tr('versión desconocida'))}</span>${x.new?` <span class="bdg warn" data-noi18n>→ v${esc(x.new.replace(/^v/i,''))}</span>`:''}
-      <div class="hint">${esc(x.source?tr('De {0}').replace('{0}',x.source):x.repo?tr('Subido a mano'):'')}</div></div>
-      <div class="act">${x.new&&x.repo?`<button class="small" data-pcn="${esc(x.slot||x.name)}">📝 ${esc(tr('Qué cambia'))}</button>`:''}${x.how==='pm'?`<button class="small primary" data-pu="${esc(x.slot)}">${esc(tr('Actualizar'))}</button>`:''}${x.how==='restart'?`<span class="hint">${esc(tr('Se aplica al reiniciar la consola'))}</span>`:''}${x.repo&&x.how!=='pm'&&x.how!=='restart'?`<a class="small btnlink" href="https://github.com/${esc(x.repo)}/releases/latest" target="_blank" rel="noopener">GitHub ↗</a>`:''}</div></div>`).join('')}</div>`
+      <div class="hint">${esc(x.source?tr('De {0}').replace('{0}',x.source):x.repo?tr('Subido a mano'):'')}${x.how==='github'&&x.source?' · '+esc(tr('en GitHub ya hay versión nueva; el catálogo de Payload Manager aún no la tiene')):''}${x.replaced?' · '+esc(tr('ya tienes la {0} puesta como «{1}»').replace('{0}',x.replaced_ver).replace('{1}',x.replaced)):''}</div></div>
+      <div class="act">${x.new&&x.repo?`<button class="small" data-pcn="${esc(x.slot||x.name)}">📝 ${esc(tr('Qué cambia'))}</button>`:''}${(x.how==='pm'||x.how==='github'&&x.slot)?`<button class="small primary" data-pu="${esc(x.slot)}" title="${esc(x.how==='github'?tr('Lo baja de GitHub y lo pone en Payload Manager por ti (el antiguo se queda por si quieres volver)'):'')}">${esc(tr(x.how==='github'?'Instalar en la consola':'Actualizar'))}</button>${x.how==='github'&&x.repo?`<a class="small btnlink" href="https://github.com/${esc(x.repo)}/releases" target="_blank" rel="noopener" title="GitHub">↗</a>`:''}`:''}${x.how==='restart'?`<span class="hint">${esc(tr('Se aplica al reiniciar la consola'))}</span>`:''}${x.repo&&x.how!=='pm'&&x.how!=='restart'?`<a class="small btnlink" href="https://github.com/${esc(x.repo)}/releases/latest" target="_blank" rel="noopener">GitHub ↗</a>`:''}</div></div>`).join('')}</div>`
     +(r.error?`<p class="hint">${esc(tr('No he podido leer el catálogo de Payload Manager: {0}').replace('{0}',r.error))}</p>`:'');
   box.querySelectorAll('[data-pu]').forEach(b=>b.onclick=()=>pdLoad({update:b.dataset.pu}));
   box.querySelectorAll('[data-pcn]').forEach(b=>b.onclick=()=>{ const x=its.find(y=>(y.slot||y.name)===b.dataset.pcn); if(!x) return;
-    changesOpen({name:x.name,repo:x.repo,have:x.have,latest:x.new,go:x.how==='pm'?()=>pdLoad({update:x.slot}):null}) }) }
+    changesOpen({name:x.name,repo:x.repo,have:x.have,latest:x.new,go:(x.how==='pm'||x.how==='github'&&x.slot)?()=>pdLoad({update:x.slot}):null}) }) }
 $('pdRe').onclick=()=>pdLoad({refresh:1});
+// aviso pequeño cuando hay versión nueva de un payload (una vez por versión), con su «Qué cambia»
+async function pldPopup(){ if(state.remote||document.querySelector('dialog[open]')) return setTimeout(pldPopup,20000);
+  let r; try{ r=await api('/api/pld/updates',{}); if(r.ok&&!r.t) r=await api('/api/pld/updates',{check:1}) }catch(e){ return }
+  if(!r||!r.ok||!r.pm) return; let seen={}; try{ seen=JSON.parse(localStorage.getItem('ps5d_pld_seen')||'{}') }catch(e){}
+  const its=(r.items||[]).filter(x=>x.new&&!seen[(x.slot||x.name)+'@'+x.new]); if(!its.length) return;
+  $('plList').innerHTML=its.map(x=>`<div class="cr-row"><div><b data-noi18n>${esc(x.name)}</b> <span class="hint" data-noi18n>${esc(x.have?'v'+x.have.replace(/^v/i,''):'')}</span> <span class="bdg warn" data-noi18n>→ v${esc(x.new.replace(/^v/i,''))}</span></div>
+    <div class="act">${x.repo?`<button class="small" data-plc="${esc(x.slot||x.name)}">📝 ${esc(tr('Qué cambia'))}</button>`:''}${(x.how==='pm'||x.how==='github'&&x.slot)?`<button class="small primary" data-plu="${esc(x.slot)}">${esc(tr(x.how==='github'?'Instalar en la consola':'Actualizar'))}</button>`:x.repo&&x.how!=='restart'?`<a class="small btnlink" href="https://github.com/${esc(x.repo)}/releases" target="_blank" rel="noopener">GitHub ↗</a>`:''}</div></div>`).join('');
+  const mark=()=>{ its.forEach(x=>seen[(x.slot||x.name)+'@'+x.new]=1); try{ localStorage.setItem('ps5d_pld_seen',JSON.stringify(seen)) }catch(e){} };
+  $('plList').querySelectorAll('[data-plc]').forEach(b=>b.onclick=()=>{ const x=its.find(y=>(y.slot||y.name)===b.dataset.plc); changesOpen({name:x.name,repo:x.repo,have:x.have,latest:x.new,go:(x.how==='pm'||x.how==='github'&&x.slot)?()=>pdLoad({update:x.slot}):null}) });
+  $('plList').querySelectorAll('[data-plu]').forEach(b=>b.onclick=async()=>{ b.disabled=true; b.textContent=tr('Actualizando…'); try{ const x=await api('/api/pld/updates',{update:b.dataset.plu}); if(!x.ok) throw new Error(x.error); b.textContent='✓'; toast(tr('{0} actualizado a la {1}. Se usará la próxima vez que se cargue (o reinicia la consola).').replace('{0}',x.done).replace('{1}',x.version)) }catch(e){ b.disabled=false; b.textContent=tr('Actualizar'); toast(e.message) } });
+  $('plOk').onclick=$('plX').onclick=()=>{ mark(); $('dlgPld').close() };
+  $('plSys').onclick=()=>{ mark(); $('dlgPld').close(); showTab('System'); setTimeout(()=>{ const c=$('pldCard'); if(c) c.scrollIntoView({behavior:'smooth',block:'start'}) },300) };
+  $('dlgPld').showModal() }
+setTimeout(pldPopup,12000);
 // --- 🛡 guardián del firmware
 let gd=null;
 async function gdLoad(act){ const box=$('gdBody'); if(!gd&&!act) box.innerHTML=loadingHTML('Mirando la consola…');
@@ -4502,20 +4704,119 @@ async function showNews(all){
   $('dlgNews').showModal();
 }
 $('btnNewsOk').onclick=()=>{$('dlgNews').close(); setTimeout(maybeTour20,300)};
-$('fmtAlembic').onclick=()=>{ goApps('tool'); setTimeout(()=>{ const q=$('recQ'); if(q){ q.value='Alembic'; q.dispatchEvent(new Event('input')) } },700) };
 $('btnNewsX').onclick=()=>$('btnNewsOk').click();
 // la primera vez con la 2.0 (si ya venías de antes): la guía de lo que hay, una sola vez
 function maybeTour20(){ if(state.remote||!state.settings||tourEls||$('dlgNews').open||document.querySelector('dialog[open]')) return;
-  if(!state.settings.spot_packs) return showSpot();
+  if((state.settings.spot_ver||'')!==SPOT_V) return showSpot();
   if(state.settings.tour20_done) return; startTour() }
 // una vez: recordar que existe LZ4 / zstd (ocupan mucho menos)
-function showSpot(){
-  if(LANG==='en'){ $('spP').innerHTML='PS5 Directo can convert your titles to <b>LZ4</b> or <b>zstd</b>: it packs their data so they take up much less space and the console reads it on the fly, with almost no loss of speed. Fewer gigabytes: shorter transfers and more room on your SSD.';
-    $('spHow').innerHTML='<li><b>When sending to the PS5:</b> in Transfers, “Format on the PS5” › “Convert to another format” › LZ4 or zstd. It\'s converted on your PC and sent already converted.</li><li><b>If you only download it to your PC:</b> pick LZ4 or zstd as the format and it\'s converted by itself when the download ends.</li>' }
-  state.settings.spot_packs=true; api('/api/settings',{spot_packs:true}).catch(()=>{}); $('dlgSpot').showModal() }
+// el recorrido «¿Qué hace PS5 Directo?»: los pasos salen de aquí (es + en) y se pintan al abrirlo
+const SPOT_V='2.0.4';
+const S2=(es,en)=>LANG==='en'?en:es;
+const SPOT=[
+ {go:()=>{ showTab('Transfers'); setTimeout(()=>{ if($('fmtBody').hidden) $('fmtBar').click(); $('fmtBar').scrollIntoView({behavior:'smooth',block:'center'}) },250) },
+  badge:['Formatos','Formats'], h:['Títulos que ocupan mucho menos','Titles that take far less space'],
+  p:['Convierte tus títulos mientras los mandas. Los dos que más ahorran son <b>LZ4</b> y <b>zstd</b>: la consola los lee al vuelo, casi sin perder velocidad.','Convert your titles while you send them. The two that save the most are <b>LZ4</b> and <b>zstd</b>: the console reads them on the fly, with almost no speed loss.'],
+  vis:()=>`<div class="sp-bar"><span>Original</span><i style="--w:100%"></i><span>LZ4</span><i class="l" style="--w:68%"></i><span>zstd</span><i class="z" style="--w:43%"></i></div>
+    <p class="sp-cap">${S2('Ejemplo real: 26 GB quedaron en 17,5 GB con LZ4 y en 11 GB con zstd.','Real example: 26 GB became 17.5 GB with LZ4 and 11 GB with zstd.')}</p>
+    <div class="sp-fmts"><span class="hi">LZ4</span><span class="hi z">zstd</span><span>.exfat</span><span>.ffpkg</span><span>.ffpfs</span><span>.ffpfsc</span><span>.fpkg</span><span>${S2('carpeta','folder')}</span></div>`,
+  li:[['<b>Tú eliges el formato:</b> también imágenes (.exfat, .ffpkg, .ffpfsc…) y paquete .fpkg, con una tarjeta que explica cada uno.','<b>You pick the format:</b> also images (.exfat, .ffpkg, .ffpfsc…) and .fpkg packages, with a card explaining each one.'],
+      ['<b>Siempre la última versión de PS5 Dump Forge:</b> se actualiza sola, sin que hagas nada.','<b>Always the latest PS5 Dump Forge:</b> it updates itself, nothing for you to do.'],
+      ['Sirve para títulos AMPR (la mayoría). Comprueba que arranca antes de borrar el original.','Works for AMPR titles (most of them). Check it boots before deleting the original.']]},
+ {go:()=>{ showTab('Transfers'); setTimeout(()=>{ if($('fmtBody').hidden) $('fmtBar').click(); const w=$('fmtWhere'); if(w&&!w.hidden) w.scrollIntoView({behavior:'smooth',block:'center'}) },250) },
+  badge:['A tu gusto','Your way'], h:['Conviértelo en tu PC o en la propia PS5','Convert it on your PC or on the PS5 itself'],
+  p:['Dos caminos, el mismo resultado. Elige en «Formato en la PS5» › «Dónde se convierte».','Two paths, same result. Choose in “Format on the PS5” › “Where it\'s converted”.'],
+  vis:()=>`<div class="sp-where"><div class="sw-o a"><span>💻</span><b>${S2('En tu PC','On your PC')}</b><small>PS5 Dump Forge</small><em>${S2('Llega ya convertido','Arrives already converted')}</em></div>
+    <div class="sw-k"><i></i></div><div class="sw-o b"><span>🎮</span><b>${S2('En la PS5','On the PS5')}</b><small>Alembic</small><em>${S2('Baja y envía a la vez','Downloads and sends at once')}</em></div></div>`,
+  li:[['<b>En tu PC:</b> lo más probado. Usa la CPU del PC y manda menos gigas.','<b>On your PC:</b> the most tested. Uses your PC\'s CPU and sends fewer gigabytes.'],
+      ['<b>En la PS5 (en pruebas):</b> no pasa por el disco del PC; al llegar, la consola lo convierte con Alembic. Si no lo tienes cargado, PS5 Directo lo carga solo.','<b>On the PS5 (experimental):</b> nothing touches your PC\'s disk; when it arrives, the console converts it with Alembic. If it isn\'t loaded, PS5 Directo loads it for you.']]},
+ {go:()=>{ showTab('Transfers'); setTimeout(()=>{ const u=$('lines'); if(u){ u.focus(); u.scrollIntoView({behavior:'smooth',block:'center'}) } },250) },
+  badge:['Lo que no hace ninguna otra','What no other tool does'], h:['Pegas el enlace y en la PS5 sale listo','Paste the link and it shows up ready on the PS5'],
+  p:['Descarga, convierte y manda <b>a la vez</b>: mientras baja, ya va llegando a la consola.','Downloads, converts and sends <b>at the same time</b>: while it downloads, it\'s already reaching the console.'],
+  vis:()=>`<div class="sp-flow"><div class="sf-n"><span>🔗</span><b>${S2('Enlace','Link')}</b></div><i class="sf-l"><em></em></i>
+      <div class="sf-n"><span>💻</span><b>${S2('Tu PC','Your PC')}</b><div class="sf-b"><u style="--d:0s"></u></div><small>${S2('baja · convierte','downloads · converts')}</small></div><i class="sf-l"><em style="animation-delay:.6s"></em></i>
+      <div class="sf-n"><span>🎮</span><b>PS5</b><div class="sf-b"><u style="--d:.5s"></u></div><small>${S2('recibe · coloca','receives · places')}</small></div></div>`,
+  li:[['<b>Enlaces, torrents, rutas del PC, carpetas de tu NAS (SMB o FTP)</b>, todo en la misma caja. O deja que capte lo que copies, o vigile una carpeta.','<b>Links, torrents, PC paths, your NAS folders (SMB or FTP)</b>, all in the same box. Or let it catch what you copy, or watch a folder.'],
+      ['<b>Descargas estables a toda velocidad</b>, como un gestor de descargas, con hasta 16 conexiones y reanudación.','<b>Steady full-speed downloads</b>, like a download manager, with up to 16 connections and resume.'],
+      ['Si trae comprimidos, <b>se descomprimen solos</b> (en la PS5 o en tu PC) y queda en su sitio.','If it comes in archives, <b>they\'re extracted by themselves</b> (on the PS5 or your PC) and it lands in place.']]},
+ {go:()=>{ showTab('Transfers'); setTimeout(()=>{ const t=$('btnPcMode'); if(t){ t.classList.add('flash'); setTimeout(()=>t.classList.remove('flash'),2400) } },250) },
+  badge:['Todo se puede elegir','Everything is up to you'], h:['Funciona como tú quieras','It works the way you want'],
+  p:['Cada paso tiene su opción, con lo recomendado ya puesto. Si no tocas nada, va solo.','Every step has its option, with the recommended one already set. If you touch nothing, it just works.'],
+  vis:()=>`<div class="sp-opts">${[[S2('Modo PC: todo se queda en tu PC','PC mode: everything stays on your PC'),1],[S2('Dónde descomprimir: PS5 o PC','Where to extract: PS5 or PC'),0],[S2('Destino: interno, M.2 o USB','Destination: internal, M.2 or USB'),1],[S2('Programar la cola para la noche','Schedule the queue for the night'),0],[S2('Límite de velocidad','Speed limit'),1],[S2('Avisos en la PS5, Telegram o Discord','Notices on the PS5, Telegram or Discord'),1]].map(([t,on],k)=>`<div style="--k:${k}"><span>${t}</span><i class="${on?'on':''}"></i></div>`).join('')}</div>`,
+  li:[['<b>Modo PC</b> (arriba, junto a FTP): para bajar, descomprimir o convertir sin mandar nada a la consola. Luego lo pasas por USB o cuando quieras.','<b>PC mode</b> (top, next to FTP): download, extract or convert without sending anything to the console. Move it later by USB or whenever you like.'],
+      ['Conviértelo también <b>lo que ya tienes en el PC</b>, sin mandarlo.','Also convert <b>what you already have on your PC</b>, without sending it.']]},
+ {go:()=>showTab('Library'),
+  badge:['Biblioteca','Library'], h:['Todo lo que tienes, de un vistazo','Everything you have, at a glance'],
+  p:['Portadas, versión, tamaño, firmware que pide cada título, formato (LZ4, zstd, imagen…), si hay actualización y dónde está guardado. En la consola y en tu PC.','Covers, version, size, the firmware each title needs, format (LZ4, zstd, image…), whether there\'s an update and where it\'s stored. On the console and on your PC.'],
+  vis:()=>`<div class="sp-lib"><div style="--k:0"><i></i><b></b><s>LZ4</s></div><div style="--k:1"><i></i><b></b><s>zstd</s></div><div style="--k:2"><i></i><b></b><s>FW ✓</s></div><div style="--k:3"><i></i><b></b><s>M.2</s></div><div style="--k:4"><i></i><b></b><s>Backport</s></div><div style="--k:5"><i></i><b></b><s>v1.04</s></div></div>`,
+  li:[['<b>Filtra por tipo</b> y busca al momento. <b>Exporta la lista</b> a hoja de cálculo o página web.','<b>Filter by type</b> and search instantly. <b>Export the list</b> to a spreadsheet or web page.'],
+      ['<b>Conviértelo, muévelo o bórralo</b> desde el PC, sin tocar la consola.','<b>Convert, move or delete it</b> from your PC, without touching the console.']]},
+ {go:()=>showTab('Files'),
+  badge:['Gestor de archivos','File manager'], h:['Los archivos de la consola, como en tu PC','The console\'s files, like on your PC'],
+  p:['Navega por la PS5 (interno, M.2 y USB) como en el explorador: arrastra para subir, clic derecho para el menú.','Browse the PS5 (internal, M.2 and USB) like a file explorer: drag to upload, right-click for the menu.'],
+  vis:()=>`<div class="sp-fm"><div class="fm-l">${['📁 homebrew','📁 PPSA01234-app','📦 data.ffpkg','📄 config.ini'].map((t,k)=>`<div style="--k:${k}"${k===2?' class="sel"':''}>${t}</div>`).join('')}</div>
+    <div class="fm-m">${[S2('Copiar','Copy'),S2('Mover a…','Move to…'),S2('Renombrar','Rename'),S2('Descargar al PC','Download to PC'),S2('Permisos 777','Permissions 777'),S2('Borrar (papelera)','Delete (trash)')].map((t,k)=>`<div style="--k:${k}">${t}</div>`).join('')}</div></div>`,
+  li:[['<b>Copiar, cortar, mover, renombrar, borrar</b> con atajos de teclado (Ctrl+C, F2, Supr…) y <b>papelera</b> para deshacer.','<b>Copy, cut, move, rename, delete</b> with keyboard shortcuts (Ctrl+C, F2, Del…) and a <b>trash</b> to undo.'],
+      ['<b>Sube carpetas enteras</b> o baja lo que quieras al PC.','<b>Upload whole folders</b> or download anything to your PC.']]},
+ {go:()=>goApps('home'),
+  badge:['Descubrir','Discover'], h:['Emuladores, apps y recomps en un clic','Emulators, apps and recomps in one click'],
+  p:['Lo mejor de la scene con su ficha y un botón: de Switch 2 a PS2, ports recompilados del catálogo de RecompStore, reproductores, Linux y herramientas.','The best of the scene, each with its page and one button: from Switch 2 to PS2, recompiled ports from the RecompStore catalog, media players, Linux and tools.'],
+  vis:()=>`<div class="sp-dsc">${[['Switch 2',260],['PS2',210],['Recomps',170],['Retro',130],[S2('Vídeo','Video'),30],['Linux',0]].map(([t,h],k)=>`<div style="--k:${k}"><i style="--h:${h}"></i><b>${t}</b><s>${S2('Instalar','Install')}</s></div>`).join('')}</div>`,
+  li:[['<b>Novedades de la scene</b> en un cartel que se actualiza solo.','<b>Scene news</b> in a banner that updates itself.'],
+      ['Te avisa de cada <b>versión nueva</b> y te enseña <b>qué cambia</b>, traducido. Los payloads, también.','Tells you about every <b>new version</b> and shows <b>what\'s new</b>, translated. Payloads too.'],
+      ['<b>Tus BIOS, claves y contenido</b> en su sitio con un asistente.','<b>Your BIOS, keys and content</b> in the right place with a wizard.']]},
+ {go:()=>{ showTab('System'); setTimeout(()=>{ const c=$('gdBody'); if(c) c.closest('section').scrollIntoView({behavior:'smooth',block:'start'}) },300) },
+  badge:['Tu jailbreak, a salvo','Your jailbreak, safe'], h:['Que una actualización no te lo quite','Don\'t let an update take it away'],
+  p:['Si la consola descarga una actualización del sistema, te avisa para quitarla antes de que te la ofrezca. Y si usas Y2JB, deja YouTube sin actualizaciones.','If the console downloads a system update, you\'re warned so you can remove it before it\'s offered. And if you use Y2JB, it keeps YouTube from updating.'],
+  vis:()=>`<div class="sp-shield"><div class="sh-up">⬇ 14.22</div><div class="sh-s">🛡</div><div class="sh-yt">▶ YouTube 99.999.999</div></div>`,
+  li:[['<b>Guardián del firmware</b> en Sistema: mira cada 10 minutos (y te avisa por Telegram o Discord si quieres).','<b>Firmware guard</b> in System: checks every 10 minutes (and can alert you on Telegram or Discord).'],
+      ['<b>YouTube sin actualizaciones</b> para Y2JB, con copia para deshacerlo.','<b>YouTube without updates</b> for Y2JB, with a backup to undo it.']]},
+ {go:()=>showTab('Space'),
+  badge:['Espacio','Space'], h:['Qué te ocupa la consola, de verdad','What\'s really filling your console'],
+  p:['Un gráfico con lo que ocupa cada cosa, con nombres y tamaños. Te avisa de lo repetido, de envíos a medias y de restos que se pueden borrar.','A chart of what takes up space, with names and sizes. It flags duplicates, half-finished transfers and leftovers you can delete.'],
+  vis:()=>`<div class="sp-pie"><svg viewBox="0 0 42 42"><circle r="15.9" cx="21" cy="21" class="pb"/><circle r="15.9" cx="21" cy="21" class="p1"/><circle r="15.9" cx="21" cy="21" class="p2"/><circle r="15.9" cx="21" cy="21" class="p3"/><circle r="15.9" cx="21" cy="21" class="p4"/></svg>
+      <ul><li><i style="--c:#5b8cff"></i>${S2('Títulos','Titles')} <b>612 GB</b></li><li><i style="--c:#b06cff"></i>${S2('Emuladores','Emulators')} <b>148 GB</b></li><li><i style="--c:#ffb454"></i>${S2('Repetido','Duplicates')} <b>96 GB</b></li><li><i style="--c:#ff6b6b"></i>${S2('Restos','Leftovers')} <b>41 GB</b></li></ul></div>`,
+  li:[['<b>Borra lo repetido y los restos</b> con un clic, sabiendo qué es cada cosa. Por disco: interno, M.2 y USB.','<b>Delete duplicates and leftovers</b> in one click, knowing what each thing is. Per drive: internal, M.2 and USB.']]},
+ {go:()=>{ const b=$('btnPhone')||$('btnMobile'); if(b) b.click() },
+  badge:['Desde donde estés','From anywhere'], h:['Mándalo desde el móvil o el navegador','Send it from your phone or browser'],
+  p:['Abre PS5 Directo en el móvil (escanea un QR) y añade enlaces desde el sofá. Con la extensión del navegador, clic derecho en un enlace y a la cola.','Open PS5 Directo on your phone (scan a QR) and add links from the couch. With the browser extension, right-click a link and it\'s queued.'],
+  vis:()=>`<div class="sp-phone"><div class="ph"><i></i><b>🔗</b><u>${S2('Añadir','Add')}</u></div><em></em><div class="pc">💻<small>${S2('Cola','Queue')}</small></div><em></em><div class="pc">🎮<small>PS5</small></div></div>`,
+  li:[['Ves el progreso en el móvil y <b>te avisa en la PS5</b> al terminar. Extensión para Chrome, Edge y Firefox.','See progress on your phone and <b>get a notice on the PS5</b> when it\'s done. Extension for Chrome, Edge and Firefox.']]},
+ {go:()=>showTab('Backup'),
+  badge:['Tranquilidad','Peace of mind'], h:['Tus partidas y capturas, a salvo en el PC','Your saves and captures, safe on your PC'],
+  p:['Copia de tus partidas, ajustes de ShadowMountPlus y payloads, y la base de datos de aplicaciones. Y las capturas y vídeos de la consola, al PC o a Telegram y Discord.','Backups of your saves, ShadowMountPlus and payload settings, and the app database. And the console\'s screenshots and videos, to your PC or to Telegram and Discord.'],
+  vis:()=>`<div class="sp-bk"><div style="--k:0">💾</div><div style="--k:1">⚙</div><div style="--k:2">🖼</div><div style="--k:3">🎬</div><em></em><b>💻</b></div>`, li:[]},
+ {go:()=>goApps('home'),
+  badge:['Todo en una','All in one'], h:['Lo que necesitas para tu PS5, en una sola app','Everything your PS5 needs, in one app'],
+  p:['Otras herramientas hacen una cosa. PS5 Directo junta todo y te lo explica paso a paso.','Other tools do one thing. PS5 Directo brings it all together and explains it step by step.'],
+  vis:()=>`<div class="sp-all">${[['Descarga y envío a la vez','Download and send at once'],['LZ4 · zstd · imágenes','LZ4 · zstd · images'],['Convierte en PC o en PS5','Convert on PC or PS5'],['Biblioteca con portadas','Library with covers'],['Gestor de archivos','File manager'],['Emuladores, apps y recomps','Emulators, apps and recomps'],['Payloads al día','Payloads up to date'],['Guardián del firmware','Firmware guard'],['Espacio y limpieza','Space and cleanup'],['Copias y capturas','Backups and captures'],['Móvil y navegador','Phone and browser'],['Remote Play','Remote Play'],['Linux en la PS5','Linux on the PS5'],['Sensores y temperatura','Sensors and temperature'],['Modo PC','PC mode'],['Tu NAS por SMB o FTP','Your NAS over SMB or FTP'],['Avisos en la PS5, Telegram y Discord','Notices on PS5, Telegram and Discord'],['En español e inglés','In Spanish and English']].map((t,k)=>`<div style="--k:${k}"><s>✓</s>${S2(t[0],t[1])}</div>`).join('')}</div>`,
+  li:[]}
+];
+const SPOT_N=SPOT.length;
+function spBuild(){ const d=$('dlgSpot'), L=a=>S2(a[0],a[1]);
+  d.querySelector('.sp-steps').innerHTML=SPOT.map((s,k)=>`<div class="sp-step" data-s="${k}"${k?' hidden':''}><div class="sp-hero"><div class="sp-badge">${L(s.badge)}</div><h2>${L(s.h)}</h2><p>${L(s.p)}</p>${s.vis()}</div>
+    ${s.li.length||k===SPOT_N-1?`<div class="body">${s.li.length?`<ul class="sp-how">${s.li.map(x=>`<li>${L(x)}</li>`).join('')}</ul>`:''}${k===SPOT_N-1?`<p class="hint">${S2('Puedes volver a ver esto cuando quieras en <b>⋯ › ¿Qué hace PS5 Directo?</b>','You can see this again any time in <b>⋯ › What does PS5 Directo do?</b>')}</p><button type="button" class="small" id="spGuide">🧭 ${S2('Guía de uso paso a paso (2 minutos)','Step-by-step guide (2 minutes)')}</button>`:''}</div>`:''}</div>`).join('');
+  d.querySelector('.sp-dots').innerHTML=SPOT.map((s,k)=>`<button type="button" data-s="${k}" aria-label="${k+1}"></button>`).join('');
+  d.querySelectorAll('.sp-dots button').forEach(b=>b.onclick=()=>spShow(+b.dataset.s));
+  const g=$('spGuide'); if(g) g.onclick=()=>{ d.close(); setTimeout(()=>startTour(),250) } }
+let spI=0;
+function spShow(k){ spI=k; if(k===SPOT_N-1&&state.settings&&state.settings.spot_done!==SPOT_V){ state.settings.spot_done=SPOT_V; api('/api/settings',{spot_done:SPOT_V}).catch(()=>{}); try{spotHintPaint()}catch(_){} } document.querySelectorAll('#dlgSpot .sp-step').forEach(e=>e.hidden=+e.dataset.s!==k);
+  document.querySelectorAll('#dlgSpot .sp-dots button').forEach(b=>b.classList.toggle('on',+b.dataset.s===k));
+  $('spGo').textContent=tr(k===SPOT_N-1?'Empezar':'Siguiente') }
+// bocadillo junto a «Modo PC»: hasta que veas las tarjetas enteras (o lo cierres), por si pulsaste «Ahora no»
+function spotHintPaint(){ const h=$('spotHint'); if(!h||!state.settings) return;
+  h.hidden=!!state.remote||state.settings.spot_done===SPOT_V||state.settings.spot_hint_x===SPOT_V||!state.settings.tour_done }
+$('spotHintGo').onclick=()=>{ showSpot() };
+$('spotHintX').onclick=()=>{ state.settings.spot_hint_x=SPOT_V; api('/api/settings',{spot_hint_x:SPOT_V}).catch(()=>{}); spotHintPaint() };
+function showSpot(){ spBuild();
+  state.settings.spot_ver=SPOT_V; api('/api/settings',{spot_ver:SPOT_V,spot_packs:true}).catch(()=>{}); spShow(0); $('dlgSpot').showModal() }
+
 $('spLater').onclick=()=>{ $('dlgSpot').close(); setTimeout(maybeTour20,300) };
-$('spGo').onclick=()=>{ $('dlgSpot').close(); showTab('Transfers'); setTimeout(()=>{ if($('fmtBody').hidden) $('fmtBar').click(); $('fmtBar').scrollIntoView({behavior:'smooth',block:'center'}) },250) };
+$('spTry').onclick=()=>{ $('dlgSpot').close(); SPOT[spI].go() };
+$('spGo').onclick=()=>{ if(spI<SPOT_N-1) spShow(spI+1); else { $('dlgSpot').close(); setTimeout(maybeTour20,300) } };
 $('btnNews').onclick=()=>showNews(true);
+$('dlgSpot').addEventListener('close',()=>{ try{spotHintPaint()}catch(_){} });
+$('btnWhat').onclick=()=>{ document.querySelectorAll('.menu-pop,.npanel').forEach(m=>m.hidden=true); showSpot() };
 // --- créditos: autores de los proyectos libres que usa o recomienda la app
 const CR_KIND={core:'Base',payload:'Payloads',emu:'Emuladores',media:'Multimedia',rp:'Remote Play',tool:'Herramientas',app:'Aplicaciones'};
 let crItems=[];
@@ -5144,7 +5445,7 @@ function fmtNote(){
   if(cm){ if(!cm.note[fmtComp]) fmtComp=cm.def;
     cb.querySelectorAll('.seg button').forEach(b=>{b.classList.toggle('on',b.dataset.c===fmtComp); b.hidden=!cm.note[b.dataset.c]});
     $('fmtCompNote').textContent=tr(cm.note[fmtComp]) }
-  const warnPc=f&&f!=='plain'?tr('Se convierte en tu PC antes de enviarlo: mientras tanto ocupa espacio en el disco del PC (más o menos lo que ocupa descomprimido). Al terminar se borra.')
+  const warnPc=f&&f!=='plain'&&!convPs5()?tr('Se convierte en tu PC antes de enviarlo: mientras tanto ocupa espacio en el disco del PC (más o menos lo que ocupa descomprimido). Al terminar se borra.')
     :f==='plain'?tr('Si es una imagen, un .fpkg o LZ4, se deshace en tu PC antes de enviarlo y mientras tanto ocupa espacio en el disco del PC. Un comprimido normal no ocupa nada extra.'):'';
   n.innerHTML=`<span class="lead ${inf[1]}">${esc(tr(inf[0]))}</span> ${esc(tr(inf[2]))}`
     +(f==='fpkg'&&fpkgBlocked()?`<div class="fwbad">✖ ${esc(tr('Tu PS5 tiene firmware {0}: este formato no te funcionará. Elige «Sin convertir», «Carpeta» o «Imagen .exfat».').replace('{0}',state.settings.console_fw))}</div>`:'')
@@ -5154,15 +5455,30 @@ function fmtNote(){
 const FMT_NAME={'':'Sin convertir',plain:'Carpeta normal',exfat:'Imagen .exfat',ffpkg:'Imagen .ffpkg',ffpfs:'Imagen .ffpfs',ffpfsc:'Imagen comprimida .ffpfsc',fpkg:'Paquete .fpkg',lz4:'LZ4 (carpeta)',lz4ffpkg:'LZ4 en imagen .ffpkg',zstd:'zstd (carpeta)',zstdffpkg:'zstd en imagen .ffpkg'};
 let fmtOpen=false; try{fmtOpen=localStorage.getItem('ps5d_fmt_open')==='1'}catch(e){}
 function setFmtOpen(v,keep){fmtOpen=!!v; if(keep!==false){try{localStorage.setItem('ps5d_fmt_open',fmtOpen?'1':'0')}catch(e){}} paintFmtBar()}
-function paintFmtBar(){
+const ALEMBIC_OK=['exfat','ffpkg','ffpfsc','lz4','zstd','lz4ffpkg','zstdffpkg'];
+let convAt='pc'; try{ convAt=localStorage.getItem('ps5d_conv_at')||'pc' }catch(e){}
+function convPs5(){ const f=$('fmt').value; return convAt==='ps5'&&['ps5','pc'].includes($('where').value)&&ALEMBIC_OK.includes(f) }
+function paintFmtWhere(){ const w=$('fmtWhere'); if(!w) return; w.hidden=!['ps5','pc'].includes($('where').value)||state.remote;
+  w.querySelectorAll('[data-cw]').forEach(b=>b.classList.toggle('on',b.dataset.cw===convAt)); const f=$('fmt').value;
+  $('fmtWhereH').textContent=convAt==='ps5'?(!f||f==='plain'?tr('Elige un formato para convertir en la PS5.'):ALEMBIC_OK.includes(f)?tr('Se descarga y envía a la vez (lo más rápido) y al terminar Alembic lo convierte dentro de la consola. Sin pasar por el disco del PC.'):tr('Alembic no hace este formato: se convierte en tu PC.')):tr('Con la última versión de PS5 Dump Forge, que se actualiza sola.');
+  if(convAt==='ps5'&&ALEMBIC_OK.includes(f)) alemState() }
+let alemS=null, alemT=0;
+async function alemState(){ const h=$('fmtWhereH'); const paint=()=>{ if(!alemS||convAt!=='ps5') return; const sp=document.createElement('span'); sp.className='alem-st '+(alemS.running?'ok':alemS.can_load?'':'bad');
+    sp.textContent=' '+(alemS.running?'✓ '+tr('Alembic está cargado en la consola.'):alemS.can_load?tr('Alembic no está cargado: lo cargo yo al terminar (lo bajo de GitHub y lo dejo en Payload Manager para la próxima vez).'):tr('Alembic no está cargado y no veo Payload Manager ni el cargador de ELF (9021): ábrelos en la consola o se quedará sin convertir.'));
+    h.querySelectorAll('.alem-st').forEach(e=>e.remove()); h.appendChild(sp) };
+  if(Date.now()-alemT<30000) return paint(); alemT=Date.now();
+  try{ alemS=await api('/api/alembic',{}) }catch(e){ alemS=null } paint() }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-cw]'); if(!b) return; convAt=b.dataset.cw; try{ localStorage.setItem('ps5d_conv_at',convAt) }catch(_){} paintFmtBar(); try{fmtNote()}catch(_){} });
+function paintFmtBar(){ paintFmtWhere();
   const f=$('fmt').value, b=$('fmtBar'), card=fmtCard(f);
   b.style.setProperty('--c', card?card.style.getPropertyValue('--c'):'#7fa3d6');
   $('fmtBarName').textContent=tr(FMT_NAME[f]||FMT_NAME['']);
-  $('fmtBarDesc').textContent=tr(!f?'(se envía tal cual)':'(se prepara en el PC)');
+  $('fmtBarDesc').textContent=tr(!f?'(se envía tal cual)':convPs5()?'(se convierte en la PS5)':'(se prepara en el PC)');
   const isTor=/(^|\n)\s*(magnet:\?|\S+\.torrent(\?|\s|$))/i.test($('lines').value||'');
-  const fast=(!f||f==='plain')&&$('where').value!=='pc'&&!isTor, fb=$('fmtBarFast');
+  const fast=(!f||f==='plain'||convPs5())&&$('where').value!=='pc'&&!isTor, fb=$('fmtBarFast');
   fb.hidden=false; fb.classList.toggle('slow',!fast);
-  if(fast){fb.textContent='⚡ '+tr('Descarga y envío a la vez: lo más rápido'); fb.title=tr('Mientras se descarga, cada trozo va directo a la PS5: no hay que esperar a que termine la descarga ni a convertir, y no se guarda nada en el disco del PC. Después se descomprime en la consola.')}
+  if(fast&&convPs5()){fb.textContent='⚡ '+tr('Descarga y envío a la vez, y la PS5 lo convierte después'); fb.title=tr('Se manda tal cual mientras se descarga (lo más rápido) y, al terminar, Alembic lo convierte dentro de la consola. Si algo falla, el título se queda como se mandó.')}
+  else if(fast){fb.textContent='⚡ '+tr('Descarga y envío a la vez: lo más rápido'); fb.title=tr('Mientras se descarga, cada trozo va directo a la PS5: no hay que esperar a que termine la descarga ni a convertir, y no se guarda nada en el disco del PC. Después se descomprime en la consola.')}
   else if(isTor&&(!f||f==='plain')){fb.textContent='⏱ '+tr('Torrent: primero se baja entero al PC y luego se envía'); fb.title=tr('Un torrent llega en trozos desordenados de mucha gente, así que no se puede ir enviando mientras baja: se descarga al PC (con aria2) y después sigue como un archivo del PC. Al terminar se borra del PC.')}
   else if(f&&f!=='plain'){fb.textContent='⏱ '+tr('3 pasos: bajar al PC, convertir y enviar · tarda más'); fb.title=tr('Primero se descarga entero al PC, luego se convierte y al final se envía a la PS5. Cada paso espera al anterior, así que tarda más que sin convertir y necesita sitio en el disco del PC.')}
   else {fb.textContent='⏱ '+tr('2 pasos: bajar al PC y enviar · tarda más'); fb.title=tr('Primero se descarga al PC y luego se envía a la PS5 ya descomprimido. Tarda más que descargar y enviar a la vez y necesita sitio en el disco del PC.')}
@@ -5194,7 +5510,7 @@ $('fmtDlgBack').onclick=()=>{ $('dlgFmt').close(); $('fmt').value=''; $('fmt').d
 $('fmt').addEventListener('change',()=>{
   $('fmt').dataset.touched='1';
   if(!$('fmt').value&&$('where').dataset.auto==='1'){$('where').value='ps5';$('where').dataset.auto=''}
-  if($('fmt').value&&$('fmt').value!=='plain'&&$('where').value!=='pc'&&$('where').value!=='keep'){$('where').value='pc';$('zdlHint').hidden=true;$('where').dataset.auto='1';$('where').dataset.touched='1';toast(tr('Las imágenes, LZ4 y zstd se preparan en el PC: he cambiado «Dónde descomprimir» a En el PC.'))}
+  if($('fmt').value&&$('fmt').value!=='plain'&&$('where').value!=='pc'&&$('where').value!=='keep'&&!(convAt==='ps5'&&ALEMBIC_OK.includes($('fmt').value))){$('where').value='pc';$('zdlHint').hidden=true;$('where').dataset.auto='1';$('where').dataset.touched='1';toast(tr('Las imágenes, LZ4 y zstd se preparan en el PC: he cambiado «Dónde descomprimir» a En el PC.'))}
   if($('fmt').value){ if(!pcSpace) loadPcSpace(); fmtFirstTime() }
   fmtNote();
 });
@@ -5471,7 +5787,7 @@ function fgPaint(){ const r=fg.info; if(!r) return;
   $('fgDlgUpd').hidden=!r.update; $('fgGh').href=r.latest_url||'https://github.com/quer3q/ps5-dump-forge/releases';
   const u=r.upd||{}; $('fgProg').hidden=!u.busy&&!u.error;
   $('fgProgT').textContent=u.error?('✘ '+tr(u.error)):tr(u.text||''); $('fgProgI').style.width=(u.busy?u.pct:0)+'%';
-  $('fgNotes').innerHTML=(r.notes||[]).length?(r.notes).map(n=>`<h3>${esc(n.tag)}<small>${esc(n.date||'')}</small></h3>${n.body?mdLite(n.body):`<p class="hint">${esc(tr('Esta versión no trae notas.'))} <a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(tr('Ver en GitHub'))}</a></p>`}`).join(''):`<p class="hint">${esc(tr('No hay novedades pendientes.'))}</p>`;
+  $('fgNotes').innerHTML=(r.notes||[]).length?(r.notes).map(n=>`<h3>${esc(n.tag)}<small>${esc(n.date||'')}</small></h3>${n.body?mdLite((fg.tr&&!fg.orig&&fg.tr[n.tag])||n.body):`<p class="hint">${esc(tr('Esta versión no trae notas.'))} <a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(tr('Ver en GitHub'))}</a></p>`}`).join(''):`<p class="hint">${esc(tr('No hay novedades pendientes.'))}</p>`;
   if(u.busy&&!fg.poll) fg.poll=setInterval(async()=>{ await fgLoad(); if(!(fg.info.upd||{}).busy){ clearInterval(fg.poll); fg.poll=null; if(fg.info.upd.done) toast(tr('PS5 Dump Forge actualizado a la {0}').replace('{0}',fg.info.upd.done)) } },1000);
   // barra de aviso arriba
   const bar=$('fgBar'); let hid=''; try{hid=localStorage.getItem('ps5d_fghide')||''}catch(e){}
@@ -5480,7 +5796,16 @@ function fgPaint(){ const r=fg.info; if(!r) return;
     bar.innerHTML=`<span style="font-size:20px">🛠</span><div class="nb-t"><b>${esc(tr('Hay una versión nueva de PS5 Dump Forge: {0}').replace('{0}',r.latest))}</b><br>${esc(tr('Es el conversor de formatos. Mira sus novedades y actualiza cuando quieras (tienes la {0}).').replace('{0}',r.installed))}</div><button class="small" id="fbN">${esc(tr('Ver novedades'))}</button><button class="small primary" id="fbU">${esc(tr('Actualizar ahora'))}</button><button class="nb-x" id="fbX" title="${esc(tr('Ocultar'))}">✕</button>`;
     $('fbN').onclick=fgOpen; $('fbU').onclick=fgUpdate;
     $('fbX').onclick=()=>{ try{localStorage.setItem('ps5d_fghide',r.latest)}catch(e){} bar.hidden=true } } }
-function fgOpen(){ $('dlgForge').showModal(); fgPaint() }
+function fgOpen(){ $('dlgForge').showModal(); fgPaint(); fgTr() }
+// las notas de Forge vienen en inglés: se traducen al idioma de la app (con el original a un clic)
+async function fgTr(){ const ns=((fg.info||{}).notes||[]).filter(n=>n.body); fg.tr=fg.tr||{};
+  const want=ns.filter(n=>!fg.tr[n.tag]); if(!want.length) return fgOrigBtn();
+  try{ const r=await api('/api/md/tr',{texts:want.map(n=>n.body),to:LANG}); if(!r.ok) return;
+    want.forEach((n,i)=>{ if(r.items[i]&&r.items[i]!==n.body) fg.tr[n.tag]=r.items[i] }); fgPaint(); fgOrigBtn() }catch(e){} }
+function fgOrigBtn(){ let b=$('fgOrig'); if(!Object.keys(fg.tr||{}).length){ if(b) b.hidden=true; return }
+  if(!b){ b=document.createElement('label'); b.className='check'; b.id='fgOrig'; b.style.marginTop='8px'; b.innerHTML=`<input type="checkbox"> ${esc(tr('Ver el texto original'))}`;
+    $('fgNotes').after(b); b.querySelector('input').onchange=e=>{ fg.orig=e.target.checked; fgPaint() } }
+  b.hidden=false }
 async function fgUpdate(){ try{ await api('/api/forge/update',{}); await fgLoad() }catch(e){ toast(e.message) } }
 $('fgNotesBtn').onclick=fgOpen; $('fgUpdBtn').onclick=fgUpdate; $('fgDlgUpd').onclick=fgUpdate; $('fgClose').onclick=()=>$('dlgForge').close();
 $('fgCheck').onclick=async()=>{ $('fgSt').textContent=tr('Buscando…'); await fgLoad(true) };
@@ -5816,7 +6141,7 @@ function suShow(i){
         <div class="su-x" style="--hc:#5bd08a"><span>📱</span><div><b>${esc(tr('Úsalo desde el móvil'))}</b><div class="hint">${esc(tr('Escanea un QR y añade enlaces o mira la cola desde el sofá.'))}</div></div><button class="small" id="suPhone">${esc(tr('Activar'))}</button></div>
         <div class="su-x" style="--hc:#f0a35e"><span>🧩</span><div><b>${esc(tr('Extensión del navegador'))}</b><div class="hint">${esc(tr('Al descargar algo en Chrome, Edge o Firefox, el enlace llega solo, sin copiar y pegar.'))}</div></div><button class="small" id="suExt">${esc(tr('Instalar'))}</button></div>
         <p class="hint">${esc(tr('Los dos están también arriba a la derecha, cuando quieras.'))}</p></div>`;
-    $('suTour').onclick=()=>{suFinish(); startTour()};
+    $('suTour').onclick=()=>{suFinish(false); startTour()};
     $('suPhone').onclick=()=>{suFinish(); openLan()};
     $('suExt').onclick=()=>{suFinish(); $('btnExtHead').click()};
   }
@@ -5843,7 +6168,9 @@ async function suSaveStep(){
   if(k==='fw'){const v=$('suFw').value.trim(); await api('/api/settings',{console_fw:v}); state.settings.console_fw=v;}
   return true;
 }
-function suFinish(){ try{$('dlgSetup').close()}catch(e){} api('/api/settings',{tour_done:true}).catch(()=>{}); if(state.settings) state.settings.tour_done=true; refresh(); checkConn() }
+function suFinish(spot=true){ try{$('dlgSetup').close()}catch(e){} api('/api/settings',{tour_done:true}).catch(()=>{}); if(state.settings) state.settings.tour_done=true; refresh(); checkConn(); try{spotHintPaint()}catch(_){}
+  // usuario nuevo: tras conectar, lo que puede hacer PS5 Directo (las tarjetas), una vez
+  if(spot&&state.settings&&(state.settings.spot_ver||'')!==SPOT_V) setTimeout(()=>{ if(!document.querySelector('dialog[open]')) showSpot() },500) }
 function openSetup(){ try{$('dlg').open&&$('dlg').close()}catch(e){} su.ok={ftp:null,bf:null}; $('dlgSetup').showModal(); suShow(0) }
 $('suNext').onclick=async()=>{ try{ if(!(await suSaveStep())) return }catch(e){toast(e.message);return} if(SU_STEPS[su.i]==='fin') return suFinish(); suShow(su.i+1) };
 $('suBack').onclick=()=>suShow(su.i-1);

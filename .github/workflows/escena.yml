@@ -1,0 +1,31 @@
+# Novedades de la scene para el cartel de Descubrir: cada 3 horas mira GitHub y actualiza escena.json.
+# Necesita: Settings › Actions › General › Workflow permissions › «Read and write permissions».
+name: Novedades de la scene
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency: escena
+jobs:
+  escena:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generar escena.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/escena.py escena.json
+      - name: Subir si ha cambiado
+        run: |
+          git config user.name "escena-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add escena.json
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "Novedades de la scene"
+          git push
