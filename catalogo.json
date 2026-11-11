@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "gta4-ps5",
+      "kind": "app",
+      "group": "tool",
+      "name": "gta4-ps5",
+      "repo": "elripalda/gta4-ps5",
+      "exp": true,
+      "what": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI."
+      },
+      "icon": "https://github.com/elripalda.png",
+      "tid": "PPSA94004",
+      "sys": "Aplicación · PPSA94004",
+      "asset": [
+        "(?i)^PPSA.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
