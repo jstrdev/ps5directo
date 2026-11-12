@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.2
+PS5 DIRECTO 2.1.6
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,63 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.1.6
+- «Más populares» ya no se queda fijo: el robot de novedades cuenta cada
+  día las descargas en GitHub de todo el catálogo, y salen primero las más
+  descargadas de la última semana.
+- Cada sección de Descubrir (Emuladores, Apps…) se puede ordenar: lo
+  actualizado hace poco (de serie), lo recién añadido, lo más popular, el
+  orden recomendado o de la A a la Z. Lo de RecompStore de cada sección
+  sigue el mismo orden.
+- Al abrir una sección, si desde tu última visita ha llegado algo nuevo o
+  hay versiones nuevas, te avisa con un bocadillo.
+- «Añadidos por ti» con guía: PS5 Directo saca una guía rápida de su README
+  (pasos de instalación y uso, y lo que pide), traducida, con enlace para
+  leerlo entero. Sus descripciones también se traducen.
+- Títulos que se cierran: además de la campana, sale un aviso a la vista con
+  la causa más probable y un botón para revisarlo y arreglarlo. Si la causa
+  es una ampr-emu-ng vieja, lo arregla en el momento y te lo dice. Distingue
+  si se cerró al arrancar o al rato (al cargar partida, por ejemplo), y
+  también avisa si un título se cierra solo a los pocos segundos dos veces
+  seguidas aunque ShadowMountPlus no apunte nada.
+
+NOVEDADES 2.1.5
+- Encender la consola desde reposo: botón «☀ Encender» en Sistema (también
+  desde el móvil). La PS5 solo acepta esa señal de un dispositivo vinculado
+  con ella, así que hace falta vincularla una vez con chiaki-ng (solo da
+  permiso, no tienes que jugar por Remote Play). PS5 Directo coge ese
+  vínculo solo del chiaki-ng del PC y lo deja en la consola para que el
+  móvil u otro PC también puedan encenderla. Si aún no está vinculada,
+  «Preparar el encendido» abre la guía paso a paso.
+- En la PS5 tienen que estar activados, en Ahorro de energía › Funciones
+  disponibles en modo de reposo: «Mantener la conexión a internet» y
+  «Permitir encender la PS5 desde la red». Apagada del todo no se puede
+  encender.
+- Sistema dice si la consola está encendida o en reposo.
+
+NOVEDADES 2.1.4
+- Si algo vuelve a poner una ampr-emu-ng vieja en un título que ya estaba al
+  día (casi siempre ShadowMountPlus actualizando el fakelib al montar), te
+  avisa en la campana para que quites esa opción, y la vuelve a cambiar.
+- Novedades de la scene: los proyectos nuevos que aún no están en Descubrir
+  tienen «Añadir a Descubrir»; desde «Añadidos por ti» se instalan y eliges
+  en qué menú salen.
+- «Actualizado hace poco» ahora ordena de verdad por fecha (antes dejaba el
+  orden del catálogo), y «Ver todos» de «Recién llegados» abre la lista
+  ordenada por llegada.
+- El robot de propuestas ya no propone tiendas de contenido.
+
+NOVEDADES 2.1.3
+- AMPR automático: lo empaquetado en zstd o LZ4 lleva siempre la última
+  ampr-emu-ng. Al convertir en el PC, si PS5 Dump Forge mete una más vieja,
+  PS5 Directo la cambia antes de enviar; y cada 6 horas pone la última en
+  los títulos de la consola que la tienen vieja (la anterior queda como
+  .bak) y te avisa en la campana. Se puede quitar en Ajustes.
+- «Comprobar arranque» avisa si un título lleva una ampr-emu-ng vieja, que
+  suele ser lo que lo hace cerrarse al arrancar o al cargar partida.
+- El cambio en la consola se hace escribiendo al lado y renombrando encima,
+  así que es seguro aunque el título esté abierto.
 
 NOVEDADES 2.1.2
 - Encender y apagar la consola: en Sistema (y en ⋯ › «Encender y apagar la

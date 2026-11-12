@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.2 — USER GUIDE (English)
+PS5 DIRECTO 2.1.6 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,54 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.1.6 - "Most popular" no longer stays frozen: the news robot counts the
+    GitHub downloads of the whole catalogue every day, and the most
+    downloaded in the last week come first.
+  - Every Discover section (Emulators, Apps...) can be sorted: recently
+    updated (default), recently added, most popular, recommended order or
+    A to Z. The RecompStore items in each section follow the same order.
+  - When you open a section, a bubble tells you if something new arrived
+    or got a new version since your last visit.
+  - "Added by you" with a guide: PS5 Directo makes a quick guide from its
+    README (install and usage steps, and what it needs), translated, with a
+    link to read it all. Their descriptions are translated too.
+  - Titles that close: besides the bell, a visible notice shows the most
+    likely cause and a button to check and fix it. If the cause is an old
+    ampr-emu-ng, it fixes it right away and tells you. It tells apart
+    closing on startup from closing later (e.g. when loading a save), and
+    also warns when a title closes by itself within seconds twice in a row
+    even if ShadowMountPlus logs nothing.
+
+2.1.5 - Turn the console on from rest mode: "☀ Turn on" button in System
+    (also from the phone). The PS5 only accepts that signal from a device
+    paired with it, so it has to be paired once with chiaki-ng (it only
+    gives permission, you don't have to play over Remote Play). PS5 Directo
+    picks up that pairing from chiaki-ng on the PC by itself and leaves it
+    on the console so the phone or another PC can turn it on too. If it
+    isn't paired yet, "Set up turning on" opens the step-by-step guide.
+  - On the PS5, in Power Saving > Features Available in Rest Mode, "Stay
+    Connected to the Internet" and "Enable Turning On PS5 from Network"
+    must be on. It can't be turned on when fully powered off.
+  - System shows whether the console is on or in rest mode.
+
+2.1.4 - If something puts an old ampr-emu-ng back in a title that was up to
+    date (almost always ShadowMountPlus updating the fakelib when mounting),
+    the bell tells you to turn that option off, and it swaps it again.
+  - Scene news: new projects not yet in Discover have "Add to Discover";
+    from "Added by you" you install them and choose their menu.
+  - "Recently updated" now really sorts by date, and "See all" from
+    "Newest arrivals" opens the list sorted by arrival.
+  - The proposals robot no longer proposes content stores.
+
+2.1.3 - Automatic AMPR: zstd or LZ4 packed titles always carry the latest
+    ampr-emu-ng. When converting on the PC, if PS5 Dump Forge adds an older
+    one, PS5 Directo swaps it before sending; and every 6 hours it puts the
+    latest in the console's titles that have an old one (the previous one is
+    kept as .bak) and tells you in the bell. It can be turned off in
+    Settings.
+  - "Check startup" warns when a title has an old ampr-emu-ng, which is
+    usually what makes it close on startup or when loading a save.
+
 2.1.2 - Console power: System (and ⋯ › "Console power") has buttons to put
     the console in rest mode, restart it or turn it off, also from the
     phone. Prospero Manager does it with the console's own functions; if it

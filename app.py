@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.1.2"
+VERSION = "2.1.6"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -87,6 +87,7 @@ DEFAULTS = {
     "passwords": [],
     "guess_passwords": True,
     "delete_archives": True,
+    "ampr_auto": True, "ampr_set": {}, "rp_wake": {}, "card_seen": {},            # poner siempre la última ampr-emu-ng en lo empaquetado (al convertir y en la consola)
     "trash_on": True,          # Biblioteca y Archivos: «Borrar» manda a la papelera de la consola (se recupera)
     "trash_days": 7,           # lo de la papelera se borra solo pasados estos dias
     "watch_since": 0.0,       # lo de la carpeta vigilada anterior a esto ya se vio
@@ -2189,7 +2190,11 @@ def fm_api(p, b):
         with LOCK:
             return {"grab": json.loads(json.dumps(GRAB))}
     if p == "/api/ps5/power":
+        if str(b.get("action") or "") == "wake":
+            return ps5_wake()
         return ps5_power(str(b.get("action") or ""))
+    if p == "/api/ps5/wakeinfo":
+        return wake_info()
     if p == "/api/ampr/scan":
         return ampr_scan()
     if p == "/api/ampr/update":
@@ -2965,6 +2970,24 @@ def launch_check(path, minutes=30, quick=False):
                 add("info", "Pide firmware %s. Pon el de tu PS5 en Ajustes para comprobarlo." % need)
             if backport:
                 add("info", "Lleva backport (carpeta fakelib).")
+                # ampr-emu-ng de los empaquetados con PS5 Dump Forge: si es vieja, suele ser lo que hace fallar el título
+                for fl in [d for d in ("fakelib", "fakelib2") if d in ls]:
+                    buf = bytearray()
+                    try:
+                        f.retrbinary("RETR %s/%s/libSceAmpr.sprx" % (path, fl), buf.extend, 65536)
+                    except ftplib.all_errors:
+                        continue
+                    cur = _ampr_ver(bytes(buf))
+                    try:
+                        last = ampr_latest()[0] if cur else ""
+                    except Exception:
+                        last = ""
+                    if cur and last and _ver_tuple(cur) < _ver_tuple(last):
+                        add("warn", "Lleva ampr-emu-ng %s y ya hay la %s. Si se cierra al arrancar o al cargar partida, "
+                                    "suele arreglarlo la nueva." % (cur, last),
+                            "Ponla en Sistema › «AMPR de tus títulos empaquetados» (o deja que PS5 Directo lo haga solo).")
+                    elif cur:
+                        add("ok", "ampr-emu-ng %s, al día." % cur)
             # LZ4 / AMPR
             amp = [n for n in ls if n.lower().startswith("ampr_assets")]
             if amp:
@@ -4071,6 +4094,8 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
         F.forge_convert(exe, src_path, out, fmt, pw_ok, cancel, prog, lambda m: jlog(job, "Forge: " + m), extra)
         with open(marker, "w") as fh:
             fh.write("ok")
+    if os.path.isdir(out):
+        ampr_freshen_dir(out, lambda m: jlog(job, m))
     size = _dir_size(out) if os.path.isdir(out) else os.path.getsize(out)
     jlog(job, "Listo en el PC: %s (%s)" % (name, human(size)))
     if total and size:
@@ -8518,6 +8543,13 @@ def played_poll():
                 st = opened.pop(tid, None)
                 if st and 0 < ts - st < 24 * 3600:
                     t["secs"] = t.get("secs", 0) + int(ts - st)
+                # se ha cerrado a los pocos segundos de abrirse (y es reciente): si pasa dos veces seguidas, algo falla
+                if st and 0 < ts - st < 45 and now - ts < 15 * 60:
+                    sh = [x for x in t.get("short") or [] if now - x < 3600] + [ts]
+                    t["short"] = sh[-5:]
+                    if len(sh) >= 2 and now - float((CRASH.get("by") or {}).get(tid) or 0) > 600:
+                        CRASH.setdefault("by", {})[tid] = now
+                        threading.Thread(target=crash_explain, args=(tid, "", ts - st), daemon=True).start()
         if changed:
             d["seen"] = sorted(seen)[-3000:]
             try:
@@ -8631,6 +8663,325 @@ def ps5_power(action):
 
 
 # ---------------------------------------------------------------------------
+# Encender desde reposo. La PS5 dormida solo escucha la señal de «despertar» de Remote Play (UDP 9302), y solo la
+# acepta con la clave de un dispositivo que hayas vinculado con ella. PS5 Directo no vincula nada (eso lo hace
+# chiaki-ng, una vez): lee esa clave del chiaki-ng de este PC, la guarda, y la deja también en la consola
+# (/data/ps5directo/encender.json) para que el móvil u otro PC puedan encenderla sin tener chiaki-ng.
+# ---------------------------------------------------------------------------
+DDP_PORT = 9302
+DDP_VER = "00030010"
+PS5_WAKE_PATH = "/data/ps5directo/encender.json"
+
+
+def _qt_unescape(v):
+    """Valor @ByteArray(...) de un .conf de Qt (con sus escapes \\x.., \\0, \\n...) -> bytes."""
+    v = v.strip()
+    if len(v) >= 2 and v[0] == '"' and v[-1] == '"':
+        v = v[1:-1]
+    out, i = bytearray(), 0
+    simple = {"a": 7, "b": 8, "f": 12, "n": 10, "r": 13, "t": 9, "v": 11, '"': 34, "\\": 92, "'": 39, "?": 63}
+    while i < len(v):
+        c = v[i]
+        if c == "\\" and i + 1 < len(v):
+            n = v[i + 1]
+            if n in "xX":
+                j = i + 2
+                while j < len(v) and v[j] in "0123456789abcdefABCDEF":
+                    j += 1
+                out.append(int(v[i + 2:j] or "0", 16) & 255)
+                i = j
+                continue
+            if n in "01234567":
+                j = i + 1
+                while j < len(v) and j < i + 4 and v[j] in "01234567":
+                    j += 1
+                out.append(int(v[i + 1:j], 8) & 255)
+                i = j
+                continue
+            out.append(simple.get(n, ord(n) & 255))
+            i += 2
+            continue
+        out.extend(c.encode("latin-1", "replace"))
+        i += 1
+    return bytes(out)
+
+
+def _qt_bytes(v):
+    """Lo que Qt guarda para un QByteArray (texto «@ByteArray(...)», REG_BINARY o datos de plist) -> bytes."""
+    if isinstance(v, (bytes, bytearray)):
+        b = bytes(v)
+        try:                                           # el registro de Windows lo guarda como texto UTF-16
+            t = b.decode("utf-16-le")
+            if t.startswith("@ByteArray("):
+                return t[len("@ByteArray("):].rstrip("\x00").rstrip(")").encode("latin-1", "replace")
+        except UnicodeDecodeError:
+            pass
+        return b
+    v = str(v or "")
+    if v.startswith('"') and v.endswith('"'):
+        v = v[1:-1]
+    if v.startswith("@ByteArray(") and v.endswith(")"):
+        return _qt_unescape(v[len("@ByteArray("):-1])
+    return v.encode("latin-1", "replace")
+
+
+def _rp_from_flat(flat, src):
+    """flat: {"registered_hosts/1/rp_regist_key": valor, ...} -> vínculos con su clave de encendido."""
+    hosts = {}
+    for k, v in flat.items():
+        m = re.match(r"^registered_hosts[/\\.](\d+)[/\\.](\w+)$", k)
+        if m:
+            hosts.setdefault(m.group(1), {})[m.group(2)] = v
+    out = []
+    for h in hosts.values():
+        key = _qt_bytes(h.get("rp_regist_key")).split(b"\x00")[0]
+        mac = _qt_bytes(h.get("server_mac"))
+        try:
+            cred = int(key.decode("ascii"), 16) if key and len(key) <= 8 else 0
+        except ValueError:
+            cred = 0
+        if not cred:
+            continue
+        tgt = str(h.get("target") or "")
+        out.append({"nick": str(h.get("server_nickname") or "").strip('"')[:60], "mac": mac.hex().upper() if len(mac) == 6 else "",
+                    "cred": str(cred), "ps5": not tgt or (tgt.lstrip("-").isdigit() and int(tgt) >= 1000000), "src": src})
+    return out
+
+
+def _ini_flat(path):
+    flat, sect = {}, ""
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        for ln in fh:
+            ln = ln.rstrip("\r\n")
+            if ln.startswith("[") and ln.endswith("]"):
+                sect = ln[1:-1]
+            elif "=" in ln and sect == "registered_hosts":
+                k, v = ln.split("=", 1)
+                flat["registered_hosts/" + k.strip().replace("\\\\", "/").replace("\\", "/")] = v.strip()
+    return flat
+
+
+def chiaki_regs():
+    """Los vínculos de Remote Play que tiene el chiaki-ng de este PC (todos sus perfiles)."""
+    import glob
+    out = []
+    home = os.path.expanduser("~")
+    if os.name == "nt":
+        try:
+            import winreg
+            root = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Chiaki")
+            i = 0
+            while True:
+                try:
+                    prof = winreg.EnumKey(root, i)
+                except OSError:
+                    break
+                i += 1
+                if not prof.lower().startswith("chiaki"):
+                    continue
+                flat = {}
+                try:
+                    rh = winreg.OpenKey(root, prof + r"\registered_hosts")
+                except OSError:
+                    continue
+                j = 0
+                while True:
+                    try:
+                        idx = winreg.EnumKey(rh, j)
+                    except OSError:
+                        break
+                    j += 1
+                    try:
+                        hk = winreg.OpenKey(rh, idx)
+                        k = 0
+                        while True:
+                            try:
+                                name, val, _t = winreg.EnumValue(hk, k)
+                            except OSError:
+                                break
+                            k += 1
+                            flat["registered_hosts/%s/%s" % (idx, name)] = val
+                    except OSError:
+                        pass
+                out += _rp_from_flat(flat, "chiaki-ng (%s)" % prof)
+        except OSError:
+            pass
+        for d in (os.environ.get("APPDATA") or "", os.environ.get("LOCALAPPDATA") or ""):   # versiones portables
+            for pth in glob.glob(os.path.join(d, "Chiaki", "Chiaki*.ini")) if d else []:
+                try:
+                    out += _rp_from_flat(_ini_flat(pth), pth)
+                except OSError:
+                    pass
+    elif sys.platform == "darwin":
+        import plistlib
+        for pth in glob.glob(os.path.join(home, "Library", "Preferences", "com.chiaki.Chiaki*.plist")):
+            try:
+                with open(pth, "rb") as fh:
+                    d = plistlib.load(fh)
+            except Exception:
+                continue
+            flat = {}
+
+            def walk(x, pre):
+                if isinstance(x, dict):
+                    for k2, v2 in x.items():
+                        walk(v2, (pre + "/" if pre else "") + str(k2))
+                elif isinstance(x, list):
+                    for n2, v2 in enumerate(x, 1):
+                        walk(v2, pre + "/" + str(n2))
+                else:
+                    flat[pre.replace(".", "/")] = x
+            walk(d, "")
+            out += _rp_from_flat(flat, pth)
+    else:
+        for base in (os.environ.get("XDG_CONFIG_HOME") or os.path.join(home, ".config"),
+                     os.path.join(home, ".var", "app", CHIAKI_FLATPAK, "config")):
+            for pth in glob.glob(os.path.join(base, "Chiaki", "Chiaki*.conf")):
+                try:
+                    out += _rp_from_flat(_ini_flat(pth), pth)
+                except OSError:
+                    pass
+    seen, uniq = set(), []
+    for x in out:
+        if x["cred"] not in seen:
+            seen.add(x["cred"])
+            uniq.append(x)
+    return uniq
+
+
+def ps5_ddp(ip, timeout=1.2):
+    """Pregunta a la consola cómo está (sin entrar en ella): {"state": "on"|"rest", "id", "name"} o None si no responde."""
+    host = E.clean_host(ip)[0]
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.settimeout(timeout)
+        s.sendto(("SRCH * HTTP/1.1\ndevice-discovery-protocol-version:%s\n" % DDP_VER).encode(), (host, DDP_PORT))
+        data, _a = s.recvfrom(4096)
+    except OSError:
+        return None
+    finally:
+        s.close()
+    t = data.decode("utf-8", "replace").splitlines()
+    if not t or not t[0].startswith("HTTP/"):
+        return None
+    hd = {}
+    for ln in t[1:]:
+        if ":" in ln:
+            k, v = ln.split(":", 1)
+            hd[k.strip().lower()] = v.strip()
+    code = (t[0].split() + ["", ""])[1]
+    return {"state": "on" if code == "200" else "rest" if code == "620" else code, "id": hd.get("host-id", "").upper(),
+            "name": hd.get("host-name", "")}
+
+
+def _wake_pick(regs, info):
+    if not regs:
+        return None
+    if info and info.get("id"):
+        for r in regs:
+            if r.get("mac") and r["mac"] == info["id"]:
+                return r
+    ps5 = [r for r in regs if r.get("ps5")]
+    if len(ps5) == 1:
+        return ps5[0]
+    if info and info.get("name"):
+        for r in regs:
+            if r.get("nick") and r["nick"] == info["name"]:
+                return r
+    return (ps5 or regs)[0] if len(regs) == 1 else None
+
+
+def wake_learn(info=None):
+    """Busca la clave de encendido (chiaki-ng de este PC) y la guarda. Devuelve la guardada (o None)."""
+    try:
+        regs = chiaki_regs()
+    except Exception as e:
+        print("No pude leer chiaki-ng: %s" % e)
+        regs = []
+    cur = SETTINGS.get("rp_wake") or {}
+    if cur.get("cred") and not regs:
+        return cur
+    r = _wake_pick(regs, info)
+    if r and (r["cred"] != cur.get("cred") or (r.get("mac") and r["mac"] != cur.get("mac"))):
+        with LOCK:
+            SETTINGS["rp_wake"] = {"cred": r["cred"], "mac": r.get("mac", ""), "nick": r.get("nick", ""), "t": time.time()}
+        save_settings()
+        return SETTINGS["rp_wake"]
+    return cur if cur.get("cred") else None
+
+
+def wake_sync(f):
+    """Con la consola despierta: comparte la clave de encendido entre este equipo y la consola (gana la más nueva)."""
+    cur = SETTINGS.get("rp_wake") or {}
+    buf = bytearray()
+    try:
+        f.retrbinary("RETR " + PS5_WAKE_PATH, buf.extend, 65536)
+        con = json.loads(bytes(buf).decode("utf-8", "replace") or "{}")
+    except Exception:
+        con = {}
+    if not isinstance(con, dict):
+        con = {}
+    if con.get("cred") and float(con.get("t") or 0) > float(cur.get("t") or 0):
+        with LOCK:
+            SETTINGS["rp_wake"] = {k: con.get(k) for k in ("cred", "mac", "nick", "t")}
+        save_settings()
+    elif cur.get("cred") and (con.get("cred") != cur.get("cred") or con.get("mac") != cur.get("mac")):
+        try:
+            try:
+                f.mkd(WORK_ROOT)
+            except ftplib.all_errors:
+                pass
+            f.storbinary("STOR " + PS5_WAKE_PATH, io.BytesIO(json.dumps(cur).encode("utf-8")))
+        except ftplib.all_errors as e:
+            print("No pude guardar la clave de encendido en la consola: %s" % e)
+
+
+def wake_info():
+    ip = SETTINGS.get("ps5_ip") or ""
+    info = ps5_ddp(ip) if ip else None
+    w = None if PHONE else wake_learn(info)
+    w = w or (SETTINGS.get("rp_wake") or None)
+    return {"state": (info or {}).get("state") or "", "name": (info or {}).get("name") or "", "ready": bool(w and w.get("cred")),
+            "nick": (w or {}).get("nick") or "", "phone": PHONE}
+
+
+def ps5_wake(wait=45):
+    ip = SETTINGS.get("ps5_ip") or ""
+    if not ip:
+        raise E.PipeError("Falta la IP de la PS5: ponla en Ajustes")
+    info = ps5_ddp(ip)
+    if info and info.get("state") == "on":
+        return {"already": True}
+    w = (None if PHONE else wake_learn(info)) or SETTINGS.get("rp_wake") or {}
+    if not w.get("cred"):
+        raise E.PipeError("noreg")
+    host = E.clean_host(ip)[0]
+    pkt = ("WAKEUP * HTTP/1.1\nclient-type:vr\nauth-type:R\nmodel:w\napp-type:r\nuser-credential:%s\n"
+           "device-discovery-protocol-version:%s\n" % (w["cred"], DDP_VER)).encode()
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        for _i in range(3):
+            s.sendto(pkt, (host, DDP_PORT))
+            time.sleep(0.3)
+    except OSError as e:
+        raise E.PipeError("No he podido mandar la señal de encendido (%s)" % E.net_reason(e))
+    finally:
+        s.close()
+    t0 = time.time()
+    while time.time() - t0 < wait:
+        time.sleep(2)
+        st = ps5_ddp(ip)
+        if st and st.get("state") == "on":
+            print("Consola: encendida desde reposo")
+            return {"woke": True, "secs": int(time.time() - t0)}
+    if info is None:
+        raise E.PipeError("La consola no responde: si está apagada del todo (no en reposo) hay que encenderla con su botón. "
+                          "Si está en reposo, mira que tenga «Permitir encender la PS5 desde la red» activado.")
+    raise E.PipeError("He mandado la señal pero no se ha despertado. Mira en la PS5 que esté activado «Permitir encender la PS5 "
+                      "desde la red» y «Mantener la conexión a internet» en reposo, y que el vínculo de chiaki-ng sea de esta consola.")
+
+
+# ---------------------------------------------------------------------------
 # AMPR de los títulos empaquetados (zstd o LZ4 de PS5 Dump Forge): cada uno lleva su propio libSceAmpr.sprx
 # (ampr-emu-ng) en fakelib, de la versión que traía Forge al convertirlo. Si un título falla, suele bastar con poner
 # la última versión de ampr-emu-ng (quer3q/ampr-emu-ng): PS5 Directo la compara y la cambia (dejando .bak).
@@ -8648,8 +8999,8 @@ def ampr_scan():
     cfg = cfg_snapshot()
     tag, latest = "", ""
     try:
-        tag, assets = F.github_release(AMPR_REPO)
-        latest = re.sub(r"^v", "", tag or "")
+        latest = ampr_latest()[0]
+        tag = "v" + latest
     except Exception as e:
         print("ampr-emu-ng: %s" % e)
     lib = lib_load().get("titles") or {}
@@ -8683,24 +9034,134 @@ def ampr_scan():
     return {"latest": latest, "tag": tag, "items": items}
 
 
+_AMPR = {"t": 0.0, "ver": "", "data": b""}
+
+
+def ampr_latest():
+    """(versión, bytes) de la última ampr-emu-ng, comprobada con su SHA256SUMS. Se guarda en el PC 6 horas."""
+    if _AMPR["data"] and time.time() - _AMPR["t"] < 6 * 3600:
+        return _AMPR["ver"], _AMPR["data"]
+    d = os.path.join(DATA_DIR, "ampr")
+    try:
+        tag, assets = F.github_release(AMPR_REPO)
+        lib_a = next((a for a in assets if a.get("name") == "libSceAmpr.sprx"), None)
+        sums = next((a for a in assets if a.get("name") == "SHA256SUMS"), None)
+        if not lib_a:
+            raise E.PipeError("La última versión de ampr-emu-ng (%s) no trae libSceAmpr.sprx" % tag)
+        data = F.http_get(lib_a["browser_download_url"], 8 * 1024 * 1024)
+        if sums:
+            txt = F.http_get(sums["browser_download_url"], 65536).decode("utf-8", "replace")
+            want = next((ln.split()[0].lower() for ln in txt.splitlines() if ln.strip().endswith(" libSceAmpr.sprx")
+                         or ln.strip().endswith("*libSceAmpr.sprx")), "")
+            if want and hashlib.sha256(data).hexdigest() != want:
+                raise E.PipeError("La descarga de ampr-emu-ng no coincide con su suma de comprobación: no he cambiado nada")
+        ver = _ampr_ver(data)
+        if not ver:
+            raise E.PipeError("Lo descargado no parece ampr-emu-ng: no he cambiado nada")
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, "libSceAmpr.sprx"), "wb") as fh:
+            fh.write(data)
+        _AMPR.update(t=time.time(), ver=ver, data=data)
+    except Exception:
+        try:                                   # sin internet: la última que se bajó
+            with open(os.path.join(d, "libSceAmpr.sprx"), "rb") as fh:
+                data = fh.read()
+            if _ampr_ver(data) and not _AMPR["data"]:
+                _AMPR.update(t=time.time() - 5 * 3600, ver=_ampr_ver(data), data=data)
+                return _AMPR["ver"], _AMPR["data"]
+        except OSError:
+            pass
+        raise
+    return _AMPR["ver"], _AMPR["data"]
+
+
+def ampr_freshen_dir(folder, log=print):
+    """Al convertir en el PC: si Forge ha metido una ampr-emu-ng más vieja que la última, se cambia antes de enviar."""
+    if not SETTINGS.get("ampr_auto", True) or not os.path.isdir(folder):
+        return
+    for fl in ("fakelib", "fakelib2"):
+        p = os.path.join(folder, fl, "libSceAmpr.sprx")
+        if not os.path.isfile(p):
+            continue
+        with open(p, "rb") as fh:
+            cur = _ampr_ver(fh.read())
+        if not cur:
+            continue                           # otro runtime (ampr_emu): no se toca
+        try:
+            ver, data = ampr_latest()
+        except Exception as e:
+            log("AMPR: no he podido mirar la última ampr-emu-ng (%s); se queda la %s" % (e, cur))
+            return
+        if _ver_tuple(cur) < _ver_tuple(ver):
+            with open(p + ".tmp", "wb") as fh:
+                fh.write(data)
+            os.replace(p + ".tmp", p)
+            log("AMPR: pongo ampr-emu-ng %s (PS5 Dump Forge traía la %s)" % (ver, cur))
+
+
+def _ftp_swap(f, path, data, old):
+    """Escribe al lado y renombra encima (un título abierto no se queda con el archivo a medias)."""
+    f.storbinary("STOR " + path + ".bak", io.BytesIO(old))
+    f.storbinary("STOR " + path + ".new", io.BytesIO(data))
+    chk = bytearray()
+    f.retrbinary("RETR " + path + ".new", chk.extend, 65536)
+    if bytes(chk) != data:
+        try:
+            f.delete(path + ".new")
+        except ftplib.all_errors:
+            pass
+        return False
+    try:
+        f.rename(path + ".new", path)
+    except ftplib.all_errors:
+        f.storbinary("STOR " + path, io.BytesIO(data))      # sin renombrar encima: se escribe directo
+        try:
+            f.delete(path + ".new")
+        except ftplib.all_errors:
+            pass
+    return True
+
+
+def ampr_auto_console():
+    """Cada 6 h (si está activado): pone la última ampr-emu-ng en los títulos de la consola que la tienen vieja."""
+    if not SETTINGS.get("ampr_auto", True) or not (SETTINGS.get("ps5_ip") or ""):
+        return
+    try:
+        r = ampr_scan()
+    except Exception:
+        return
+    old = [x["path"] for x in r["items"] if x.get("old")]
+    if not old:
+        return
+    # ¿alguno que ya pusimos al día ha vuelto a una versión vieja? Eso lo hace otro programa al arrancar el título,
+    # casi siempre ShadowMountPlus con su opción de actualizar el fakelib: se avisa para que la quite.
+    put = SETTINGS.get("ampr_set") or {}
+    back = [x for x in r["items"] if x.get("old") and put.get(x["path"]) and x.get("ver")
+            and _ver_tuple(x["ver"]) < _ver_tuple(put[x["path"]])]
+    if back:
+        names = ", ".join(sorted({x["name"] for x in back}))[:300]
+        notify("warn", "Algo vuelve a poner una ampr-emu-ng vieja",
+               "En %s puse la %s y ahora vuelve a estar la %s. Suele ser ShadowMountPlus actualizando el fakelib al "
+               "montar: quita esa opción en su configuración, porque si no se cerrará al "
+               "arrancar o al cargar partida. La vuelvo a cambiar ahora." % (names, put[back[0]["path"]], back[0]["ver"]),
+               {"tab": "System"}, key="amprback:%s" % ",".join(sorted(x["path"] for x in back))[:200])
+    try:
+        res = ampr_update(old)
+    except Exception as e:
+        print("AMPR automático: %s" % e)
+        return
+    if res["done"]:
+        names = ", ".join(sorted({x["name"] for x in r["items"] if x["path"] in res["done"]}))[:300]
+        notify("ok", "AMPR al día en %d título(s)" % len(res["done"]),
+               "He puesto ampr-emu-ng %s en: %s. La de antes queda como .bak." % (res["ver"], names),
+               {"tab": "System"}, key="ampr:%s:%d" % (res["ver"], len(res["done"])))
+
+
 def ampr_update(paths):
     """Pone la última ampr-emu-ng en esos títulos (solo en los que ya la llevan), guardando la de antes como .bak."""
     cfg = cfg_snapshot()
-    tag, assets = F.github_release(AMPR_REPO)
-    lib_a = next((a for a in assets if a.get("name") == "libSceAmpr.sprx"), None)
-    sums = next((a for a in assets if a.get("name") == "SHA256SUMS"), None)
-    if not lib_a:
-        raise E.PipeError("La última versión de ampr-emu-ng (%s) no trae libSceAmpr.sprx" % tag)
-    data = F.http_get(lib_a["browser_download_url"], 8 * 1024 * 1024)
-    if sums:
-        txt = F.http_get(sums["browser_download_url"], 65536).decode("utf-8", "replace")
-        want = next((ln.split()[0].lower() for ln in txt.splitlines() if ln.strip().endswith("libSceAmpr.sprx")
-                     and not ln.strip().endswith("-debug.sprx")), "")
-        if want and hashlib.sha256(data).hexdigest() != want:
-            raise E.PipeError("La descarga de ampr-emu-ng no coincide con su suma de comprobación: no he cambiado nada")
-    new_ver = _ampr_ver(data)
-    if not new_ver:
-        raise E.PipeError("Lo descargado no parece ampr-emu-ng: no he cambiado nada")
+    new_ver, data = ampr_latest()
+    tag, assets = "v" + new_ver, []
     paths = [p for p in paths if re.match(r"^/(data|mnt/(ext|usb)\d)/homebrew/[^/]+/fakelib2?/libSceAmpr\.sprx$", p or "")]
 
     def go(f):
@@ -8712,20 +9173,21 @@ def ampr_update(paths):
             except ftplib.all_errors:
                 skipped.append(path)
                 continue
-            if not _ampr_ver(bytes(buf)):
-                skipped.append(path)          # no es ampr-emu-ng (otro runtime): no se toca
+            cur = _ampr_ver(bytes(buf))
+            if not cur or _ver_tuple(cur) >= _ver_tuple(new_ver):
+                skipped.append(path)          # otro runtime (ampr_emu) o ya al día: no se toca
                 continue
-            f.storbinary("STOR " + path + ".bak", io.BytesIO(bytes(buf)))
-            f.storbinary("STOR " + path, io.BytesIO(data))
-            chk = bytearray()
-            f.retrbinary("RETR " + path, chk.extend, 65536)
-            if bytes(chk) != data:
-                f.storbinary("STOR " + path, io.BytesIO(bytes(buf)))     # algo salió mal: se deja como estaba
+            if _ftp_swap(f, path, data, bytes(buf)):
+                done.append(path)
+            else:
                 skipped.append(path)
-                continue
-            done.append(path)
         return done, skipped
     done, skipped = E.Ftp(cfg).call(go)
+    if done:                                   # se apunta qué versión pusimos, para ver si algo la deshace luego
+        put = SETTINGS.setdefault("ampr_set", {})
+        for pth in done:
+            put[pth] = new_ver
+        save_settings()
     return {"ver": new_ver, "done": done, "skipped": skipped}
 
 
@@ -8846,12 +9308,27 @@ def rec_list():
         inst = {c["id"] for c in F.CATALOG if c.get("kind") == "app"
                 and any(t in have for t in [c.get("tid")] + list(c.get("also") or []))}
         try:
-            E.Ftp(cfg).call(lambda f: (console_vers_sync(f, inst), mine_sync(f)))
+            E.Ftp(cfg).call(lambda f: (console_vers_sync(f, inst), mine_sync(f), wake_sync(f)))
         except Exception as e:
             print("No pude leer las versiones de la consola: %s" % e)
     out = []
+    escena()
+    seen = SETTINGS.setdefault("card_seen", {})
+    first, now_s, new_seen = not seen, int(time.time()), False
     for c in F.CATALOG:
-        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam", "mine", "auto_tr", "show") if k in c}
+        if c["id"] not in seen:
+            seen[c["id"]] = 0 if first else now_s     # las de siempre cuentan como «de antes»
+            new_seen = True
+    if new_seen:
+        save_settings()
+    for c in F.CATALOG:
+        it = {k: c[k] for k in ("id", "kind", "group", "name", "what", "needs", "repo", "fam", "mine", "auto_tr", "show",
+                                "guide_src", "readme_needs") if k in c}
+        rp = [r.lower() for r in [c.get("repo")] + list(c.get("alts") or []) if r]
+        rl = next((ESC["rel"][r] for r in rp if r in ESC["rel"]), None)
+        it["rel_t"] = rl[1] if rl else (next((F.GH_DATES[r] for r in rp if F.GH_DATES.get(r)), "") or "")
+        it["pop"] = max([ESC["pop"].get(r, 0) for r in rp] or [0])
+        it["seen"] = int(seen.get(c["id"]) or 0)
         it["exp"] = bool(c.get("exp"))
         it["sys"] = c.get("sys", "")
         it["update"] = c.get("update", "")
@@ -8867,7 +9344,7 @@ def rec_list():
             it["repo"] = rec_repo(c)
             it["official"] = c["repo"]
             it["alts"] = [c["repo"]] + [r for r in (c.get("alts") or []) if r.lower() != c["repo"].lower()]
-            it["guide"] = (c.get("emu") or {}).get("guide") or []
+            it["guide"] = (c.get("emu") or {}).get("guide") or c.get("guide") or []
             em = c.get("emu") or {}
             it["has_bios"] = bool(em.get("bios"))
             it["has_games"] = bool(em.get("games"))
@@ -8875,6 +9352,8 @@ def rec_list():
         elif c["kind"] == "payload":
             p = next((x for x in F.EXTRA_PAYLOADS if x["id"] == c["id"]), None)
             it["once"] = bool(p and not p.get("port"))
+            if c.get("guide"):
+                it["guide"] = c["guide"]
             it["running"] = _port_open(cfg["ps5_ip"], p["port"], 1.2) if p and p.get("port") else False
             it["url"] = "http://%s:%d" % (E.clean_host(cfg.get("ps5_ip") or "")[0], p["port"]) if p and p.get("port") else ""
         elif c["kind"] == "link":
@@ -9247,7 +9726,12 @@ def _mine_apply(lst):
     for x in lst:
         c = {"id": x["id"], "kind": x["kind"], "group": "mine", "name": x["name"], "repo": x["repo"], "mine": True,
              "show": x.get("show") if x.get("show") in MINE_SHOW else "",
-             "what": x.get("what") or "Añadido por ti desde GitHub.", "sys": x.get("sys") or ""}
+             "what": x.get("what") or "Añadido por ti desde GitHub.", "sys": x.get("sys") or "",
+             "auto_tr": bool(x.get("what")), "guide_src": x.get("guide_src") or ""}
+        if x.get("guide"):
+            c["guide"] = list(x["guide"])[:8]
+        if x.get("needs") or x.get("readme_needs"):
+            c["needs"] = x.get("needs") or x.get("readme_needs")
         if x["kind"] == "app":
             c["tid"] = x.get("tid") or ""
             c["asset"] = x["asset"]
@@ -9256,6 +9740,7 @@ def _mine_apply(lst):
         elif x["kind"] == "link":
             c["needs"] = x.get("needs") or ""
             c["guide"] = x.get("guide") or []
+            c["readme_needs"] = x.get("readme_needs") or ""
         else:
             F.EXTRA_PAYLOADS.append({"id": x["id"], "name": x["name"], "repo": x["repo"], "port": None,
                                      "pick": x["asset"], "what": c["what"], "mine": True})
@@ -9412,6 +9897,7 @@ def mine_add(text, show=None):
                    guide=["Ábrelo en GitHub y sigue su guía (el README).",
                           "Te aviso en la campana cuando saque una versión nueva."])
     ent["seen"] = tag or ""
+    _mine_add_guide(ent)
     ent["t"] = time.time()
     ent["show"] = show if show in MINE_SHOW else "" if show == "" else _mine_guess(" ".join([real, what, " ".join(names)]))
     lst = [x for x in lst if x["id"] != ent["id"]] + [ent]
@@ -9444,9 +9930,102 @@ def mine_learn(lt):
     mine_push()
 
 
+_GUIDE_HOW = re.compile(r"(?i)instal|usage|how ?to|getting started|set ?up|quick ?start|uso\b|c[oó]mo|running|launch|first steps")
+_GUIDE_REQ = re.compile(r"(?i)requir|prerequis|requisit|you need|you will need|dependenc|necesitas")
+_GUIDE_SKIP = re.compile(r"(?i)build|compil|develop|contribut|license|credit|thank|donat|sponsor|changelog|faq|screenshot|known issues")
+
+
+def _md_line(t):
+    t = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", t)                       # imágenes
+    t = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", t)                     # enlaces: se queda el texto
+    t = re.sub(r"<[^>]+>", "", t)
+    t = re.sub(r"[*_`]+", "", t)
+    t = re.sub(r"^\s*(?:[-*+]|\d+[.)])\s+", "", t)
+    t = re.sub(r"\s+", " ", t).strip(" :")
+    return t
+
+
+def _short_step(t, n=150):
+    t = re.split(r"(?<=[.!?])\s", t, 1)[0] if len(t) > n else t     # una frase: un paso corto, no el texto entero
+    return t if len(t) <= n else t[:n].rsplit(" ", 1)[0] + "…"
+
+
+def readme_guide(repo):
+    """Guía rápida de un proyecto añadido a mano, resumida de su README: los pasos de instalación y uso (cortos, como
+    las demás guías) y lo que pide. Para el detalle, su README en GitHub."""
+    req = urllib.request.Request(F.GH_API + "/repos/%s/readme" % repo,
+                                 headers=dict(F._ua(), Accept="application/vnd.github.raw"))
+    with urllib.request.urlopen(req, timeout=20) as r:
+        md = r.read(400000).decode("utf-8", "replace")
+    if md.lstrip().startswith("{"):                # algunas API devuelven el JSON con el contenido en base64
+        try:
+            import base64
+            md = base64.b64decode(json.loads(md).get("content") or "").decode("utf-8", "replace")
+        except Exception:
+            pass
+    md = re.sub(r"```.*?```", "", md, flags=re.S)
+    secs, cur = [], None
+    for ln in md.splitlines():
+        h = re.match(r"^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$", ln)
+        if h:
+            cur = {"t": _md_line(h.group(2)), "lv": len(h.group(1)), "lines": []}
+            secs.append(cur)
+        elif cur is not None:
+            cur["lines"].append(ln)
+
+    def items(sec):
+        out = []
+        for ln in sec["lines"]:
+            if re.match(r"^\s*(?:[-*+]|\d+[.)])\s+\S", ln):
+                t = _md_line(ln)
+                if len(t) > 3 and not re.match(r"(?i)^https?://", t):
+                    out.append(_short_step(t))
+        if not out:                                 # sin lista: la primera frase de cada párrafo
+            par = " ".join(_md_line(x) for x in sec["lines"] if x.strip()).strip()
+            out = [_short_step(x) for x in re.split(r"(?<=[.!?])\s+", par) if len(x) > 12][:3]
+        return out
+
+    steps, needs = [], []
+    for sec in secs:
+        if _GUIDE_SKIP.search(sec["t"]):
+            continue
+        if _GUIDE_REQ.search(sec["t"]) and not needs:
+            needs = items(sec)[:3]
+        elif _GUIDE_HOW.search(sec["t"]):
+            steps += items(sec)
+        if len(steps) >= 6:
+            break
+    return {"guide": steps[:6], "needs": "; ".join(needs)[:260]}
+
+
+def _mine_add_guide(ent):
+    """Pone en un añadido la guía sacada de su README (si la hay). Devuelve True si ha cambiado algo."""
+    try:
+        g = readme_guide(ent["repo"])
+    except Exception as e:
+        print("Guía de %s: %s" % (ent["repo"], e))
+        ent["guide_try"] = time.time()
+        return True
+    ent["guide_try"] = time.time()
+    if not g["guide"] and not g["needs"]:
+        return True
+    ent["guide_src"] = "readme"
+    if ent.get("kind") == "link":
+        ent["guide"] = g["guide"] + ["Te aviso en la campana cuando saque una versión nueva."] if g["guide"] else ent.get("guide") or []
+        ent["readme_needs"] = g["needs"]
+    else:
+        ent["guide"] = g["guide"]
+        ent["needs"] = g["needs"]
+    return True
+
+
 def mine_follow():
-    """Los añadidos que solo se siguen: aviso en la campana cuando sacan versión nueva."""
+    """Los añadidos que solo se siguen: aviso en la campana cuando sacan versión nueva. Y a los que no tienen guía se
+    les hace una de su README (una vez por semana como mucho, por si el autor la añade más tarde)."""
     lst, changed = _mine_read(), False
+    for x in lst:
+        if x.get("guide_src") != "readme" and time.time() - float(x.get("guide_try") or 0) > 7 * 86400:
+            changed = _mine_add_guide(x) or changed
     for x in lst:
         if x.get("kind") != "link":
             continue
@@ -9461,6 +10040,7 @@ def mine_follow():
     if changed:
         with LOCK:
             _save_json(MINE_FILE, lst)
+            _mine_apply(lst)
 
 
 def mine_del(cid):
@@ -9864,6 +10444,10 @@ def emu_news():
         mine_follow()
     except Exception as e:
         print("Añadidos: %s" % e)
+    try:
+        ampr_auto_console()
+    except Exception as e:
+        print("AMPR automático: %s" % e)
     vers = _emu_vers()
     for c in F.CATALOG:
         if c.get("kind") != "app" or c["id"] not in vers:
@@ -10309,6 +10893,8 @@ def cleanup_scan():
             for x in sub:
                 add("%s/%s/%s" % (WORK_ROOT, n, x["name"]),
                     ("Partes enviadas: " if n == "incoming" else "Descompresion a medias: ") + x["name"])
+        elif n in ("versiones.json", "anadidos.json", "encender.json"):
+            continue                                   # datos de PS5 Directo compartidos entre equipos: no son restos
         else:
             add("%s/%s" % (WORK_ROOT, n), "Otro: " + n)
     items.sort(key=lambda x: -x["size"])
@@ -11742,7 +12328,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p.startswith("/api/ampr/") or p in ("/api/discover", "/api/played", "/api/job/reveal", "/api/ps5/power") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
+        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p.startswith("/api/ampr/") or p in ("/api/discover", "/api/played", "/api/job/reveal", "/api/ps5/power", "/api/ps5/wakeinfo") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
             try:
                 return self._send(200, dict(ok=True, **fm_api(p, b)))
             except E.PipeError as e:
@@ -12649,10 +13235,12 @@ def _lib_path_for(tid):
     return None, tid
 
 
-def crash_explain(tid, sig=""):
-    """Revisa un titulo que no ha arrancado y avisa con lo mas probable."""
+def crash_explain(tid, sig="", after=None):
+    """Revisa un titulo que se ha cerrado y avisa con lo mas probable. Si es algo que PS5 Directo sabe arreglar sin
+    riesgo (la ampr-emu-ng vieja de lo empaquetado), lo arregla en el momento y lo dice. after: segundos que llevaba
+    abierto (para distinguir «al arrancar» de «mientras lo usabas», p. ej. al cargar partida)."""
     path, title = _lib_path_for(tid)
-    top = None
+    top, fixed = None, ""
     if path:
         try:
             r = launch_check(path, 15, quick=True)
@@ -12661,19 +13249,33 @@ def crash_explain(tid, sig=""):
                             and not c["text"].startswith("Falta la portada")], key=lambda c: -rank[c["level"]])
             top = probs[0] if probs else None
             title = r.get("title") or title
+            amp = next((c for c in probs if c["text"].startswith("Lleva ampr-emu-ng")), None)
+            if amp and SETTINGS.get("ampr_auto", True):
+                try:
+                    res = ampr_update(["%s/%s/libSceAmpr.sprx" % (path, fl) for fl in ("fakelib", "fakelib2")])
+                    if res["done"]:
+                        fixed = res["ver"]
+                        top = amp
+                except Exception as e:
+                    print("Arreglar AMPR tras el cierre:", e)
         except Exception as e:
             print("Revisar cierre:", e)
-    if top:
+    when = "al arrancar" if after is None or after < 75 else "a los %d min de abrirlo" % max(1, int(after // 60))
+    if fixed:
+        body = ("Llevaba una ampr-emu-ng vieja, que suele ser la causa. Ya le he puesto la %s (la de antes queda como "
+                ".bak): ábrelo otra vez. Si vuelve a pasar, pulsa aquí para revisarlo." % fixed)
+    elif top:
         body = "Lo más probable: %s %s" % (top["text"], top.get("fix") or "")
     elif sig:
         body = LAUNCH_CODES.get(sig) or "Se cerró con %s." % sig
     else:
         body = "No encuentro nada raro en la carpeta. Pulsa para ver el registro y las últimas capturas."
-    notify("err", "«%s» se ha cerrado al arrancar%s" % (title, " (%s)" % sig if sig else ""), body,
+    notify("ok" if fixed else "err", "«%s» se ha cerrado %s%s" % (title, when, " (%s)" % sig if sig else ""), body,
            {"tab": "Library", "check": path, "title": title} if path else {"tab": "Library"},
            key="crash-%s-%d" % (tid, int(time.time() // 120)))
     with LOCK:
-        CRASH["last"].insert(0, {"t": time.time(), "tid": tid, "title": title, "sig": sig, "body": body, "path": path})
+        CRASH["last"].insert(0, {"t": time.time(), "tid": tid, "title": title, "sig": sig, "body": body, "path": path,
+                                 "fixed": fixed, "when": when})
         del CRASH["last"][10:]
 
 
@@ -12700,7 +13302,19 @@ def crash_tick(force=False):
         CRASH["init"] = True
         return
     for _, tid, sig in fresh[-3:]:
-        crash_explain(tid, sig)
+        CRASH.setdefault("by", {})[tid] = time.time()
+        crash_explain(tid, sig, _open_secs(tid))
+
+
+def _open_secs(tid):
+    """Cuánto llevaba abierto un título según el registro de aperturas (None si no se sabe)."""
+    try:
+        with PLAYED_LOCK:
+            d = played_load()
+        st = (d.get("open") or {}).get(tid) or (d.get("titles") or {}).get(tid, {}).get("last")
+        return max(0, time.time() - float(st)) if st else None
+    except Exception:
+        return None
 
 
 def after_launch(tid):
@@ -12840,7 +13454,7 @@ def featured():
 
 
 SCENE_SKIP_RX = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|"
-                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control")
+                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|free.?(ps5.?)?games")
 CAT_URL = os.environ.get("PS5D_CATALOGO") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/catalogo.json"
 CAT = {"t": 0.0, "tr": {}}
 
@@ -12880,7 +13494,7 @@ def catalog_remote():
 
 
 ESC_URL = os.environ.get("PS5D_ESCENA") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/escena.json"
-ESC = {"t": 0.0, "d": [], "upd": "", "hot": []}
+ESC = {"t": 0.0, "d": [], "upd": "", "hot": [], "pop": {}, "rel": {}}
 
 
 def escena():
@@ -12921,8 +13535,16 @@ def escena():
                         "text": str(h.get("text") or "")[:400], "from": str(h.get("from") or "")[:10],
                         "big": str(h.get("big") or "")[:8], "stars": int(h.get("stars") or 0) if str(h.get("stars") or "0").isdigit() else 0,
                         "url": u if u.startswith("https://github.com/") else "https://github.com/" + h["repo"]})
+    pop, rel = {}, {}
+    if isinstance(j, dict):                    # descargas de la última semana y fecha de la última versión de cada repo
+        for k, v in (j.get("pop") or {}).items() if isinstance(j.get("pop"), dict) else []:
+            if isinstance(k, str) and isinstance(v, int) and v > 0:
+                pop[k.lower()[:120]] = v
+        for k, v in (j.get("rel") or {}).items() if isinstance(j.get("rel"), dict) else []:
+            if isinstance(k, str) and isinstance(v, list) and len(v) == 2:
+                rel[k.lower()[:120]] = [str(v[0])[:40], str(v[1])[:25]]
     if j is not None:
-        ESC.update(t=time.time(), d=out[:80], upd=str((j or {}).get("updated") or "")[:30], hot=hot[:3])
+        ESC.update(t=time.time(), d=out[:80], upd=str((j or {}).get("updated") or "")[:30], hot=hot[:3], pop=pop, rel=rel)
     else:
         ESC["t"] = time.time() - 3000           # sin red: se reintenta en 10 minutos
     return ESC["d"]
@@ -13146,7 +13768,7 @@ def extra_api(h, p, b):
             with LOCK:
                 its, err, upd = RECOMP["items"], RECOMP["error"], RECOMP["updated"]
             return {"ok": True, "items": its, "covers": fix, "error": err, "updated": upd,
-                    "source": "recompstore.com", "feat": featured(), "scene": escena(), "hot": ESC["hot"]}
+                    "source": "recompstore.com", "feat": featured(), "scene": escena(), "hot": ESC["hot"], "pop": ESC["pop"]}
         if p == "/api/wiki":
             return dict(ok=True, **wiki_summary(b.get("title"), b.get("lang")))
         if p == "/api/pld/updates":
