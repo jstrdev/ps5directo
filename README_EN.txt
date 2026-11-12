@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.1 — USER GUIDE (English)
+PS5 DIRECTO 2.1.2 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,17 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.1.2 - Console power: System (and ⋯ › "Console power") has buttons to put
+    the console in rest mode, restart it or turn it off, also from the
+    phone. Prospero Manager does it with the console's own functions; if it
+    isn't open, PS5 Directo opens it. Restarting or turning off loses the
+    jailbreak until you run it again.
+  - AMPR in your packed titles: zstd or LZ4 titles from PS5 Dump Forge carry
+    their own ampr-emu-ng in their fakelib folder, in the version Forge had
+    when converting. In System › "AMPR in your packed titles", PS5 Directo
+    shows which ones have an old one and puts the latest with one click
+    (checking the download and keeping the previous one as .bak).
+
 2.1.1 - "Added by you" is shared: the list is also kept on the console
     (/data/ps5directo/anadidos.json), so what you add, move to another
     section or remove on the PC shows the same on the phone without a PC

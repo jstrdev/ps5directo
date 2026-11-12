@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.1
+PS5 DIRECTO 2.1.2
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,18 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.1.2
+- Encender y apagar la consola: en Sistema (y en ⋯ › «Encender y apagar la
+  consola») hay botones para ponerla en reposo, reiniciarla o apagarla,
+  también desde el móvil. Lo hace Prospero Manager con las funciones de la
+  propia consola; si no está abierto, PS5 Directo lo abre solo. Al reiniciar
+  o apagar se pierde el jailbreak hasta que lo vuelvas a hacer.
+- AMPR de tus títulos empaquetados: los títulos en zstd o LZ4 de PS5 Dump
+  Forge llevan su propio ampr-emu-ng en la carpeta fakelib, de la versión
+  que tenía Forge al convertirlos. En Sistema › «AMPR de tus títulos
+  empaquetados», PS5 Directo te dice cuáles la tienen vieja y pone la
+  última con un clic (comprueba la descarga y guarda la de antes como .bak).
 
 NOVEDADES 2.1.1
 - «Añadidos por ti» compartidos: la lista se guarda también en la consola

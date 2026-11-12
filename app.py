@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.1.1"
+VERSION = "2.1.2"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -2188,6 +2188,12 @@ def fm_api(p, b):
     if p == "/api/grab/state":
         with LOCK:
             return {"grab": json.loads(json.dumps(GRAB))}
+    if p == "/api/ps5/power":
+        return ps5_power(str(b.get("action") or ""))
+    if p == "/api/ampr/scan":
+        return ampr_scan()
+    if p == "/api/ampr/update":
+        return ampr_update([str(x) for x in (b.get("paths") or [])][:200])
     if p == "/api/discover":
         return discover_ps5(hint=str(b.get("hint") or "")[:80])
     if p == "/api/played":
@@ -8589,6 +8595,140 @@ def extra_payload(pid, action):
     return {"running": _port_open(cfg["ps5_ip"], p["port"], 1.5), "url": url, "name": p["name"]}
 
 
+# ---------------------------------------------------------------------------
+# Apagar, reiniciar o poner en reposo la consola: con Prospero Manager (notmaj0r/ProsperoMgr, puerto 7070), que lo
+# hace con las funciones de la propia consola. Si no está abierto, PS5 Directo lo inicia (Payload Manager o ELF).
+# ---------------------------------------------------------------------------
+POWER_ACTS = ("standby", "reboot", "shutdown")
+
+
+def ps5_power(action):
+    if action not in POWER_ACTS:
+        raise E.PipeError("Acción desconocida")
+    cfg = cfg_snapshot()
+    ip = cfg.get("ps5_ip") or ""
+    if not ip:
+        raise E.PipeError("Falta la IP de la PS5: ponla en Ajustes")
+    started = False
+    if not _port_open(ip, 7070, 1.5):
+        r = extra_payload("prosperomgr", "send")      # lo baja de su GitHub y lo abre
+        started = True
+        if not r.get("running"):
+            raise E.PipeError("Prospero Manager no ha arrancado en la consola. Ábrelo con Payload Manager y vuelve a probar.")
+    req = urllib.request.Request("http://%s:7070/api/power" % E.clean_host(ip)[0], method="POST",
+                                 data=json.dumps({"action": action}).encode(), headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as r:
+            j = json.loads(r.read(4096).decode("utf-8", "replace") or "{}")
+    except urllib.error.HTTPError as e:
+        raise E.PipeError("Prospero Manager no ha aceptado la orden (HTTP %d). Actualízalo desde Descubrir." % e.code)
+    except Exception as e:
+        raise E.PipeError("No he podido hablar con Prospero Manager (%s)" % E.net_reason(e))
+    if not j.get("ok"):
+        raise E.PipeError("Prospero Manager no lo ha hecho: %s" % (j.get("error") or "sin motivo"))
+    print("Consola: %s (Prospero Manager%s)" % (action, ", recién abierto" if started else ""))
+    return {"action": action, "started": started}
+
+
+# ---------------------------------------------------------------------------
+# AMPR de los títulos empaquetados (zstd o LZ4 de PS5 Dump Forge): cada uno lleva su propio libSceAmpr.sprx
+# (ampr-emu-ng) en fakelib, de la versión que traía Forge al convertirlo. Si un título falla, suele bastar con poner
+# la última versión de ampr-emu-ng (quer3q/ampr-emu-ng): PS5 Directo la compara y la cambia (dejando .bak).
+# ---------------------------------------------------------------------------
+AMPR_REPO = "quer3q/ampr-emu-ng"
+
+
+def _ampr_ver(data):
+    m = re.search(rb"ampr-emu-ng (\d+\.\d+\.\d+)", data or b"")
+    return m.group(1).decode() if m else ""
+
+
+def ampr_scan():
+    """Los títulos de la consola que llevan ampr-emu-ng en su fakelib, con su versión, y la última que hay."""
+    cfg = cfg_snapshot()
+    tag, latest = "", ""
+    try:
+        tag, assets = F.github_release(AMPR_REPO)
+        latest = re.sub(r"^v", "", tag or "")
+    except Exception as e:
+        print("ampr-emu-ng: %s" % e)
+    lib = lib_load().get("titles") or {}
+
+    def go(f):
+        out = []
+        for base in ("/data/homebrew", "/mnt/ext0/homebrew", "/mnt/ext1/homebrew", "/mnt/usb0/homebrew", "/mnt/usb1/homebrew"):
+            try:
+                ents = E.ftp_listdir(f, base)
+            except Exception:
+                continue
+            for n, isdir in ents:
+                if not isdir:
+                    continue
+                for fl in ("fakelib", "fakelib2"):
+                    path = "%s/%s/%s/libSceAmpr.sprx" % (base, n, fl)
+                    buf = bytearray()
+                    try:
+                        f.retrbinary("RETR " + path, buf.extend, 65536)
+                    except ftplib.all_errors:
+                        continue
+                    ver = _ampr_ver(bytes(buf))
+                    tid = E.title_id(n) or n
+                    name = ((lib.get(tid) or {}).get("name") or n) if isinstance(lib.get(tid), dict) else n
+                    out.append({"path": path, "folder": "%s/%s" % (base, n), "tid": tid, "name": name, "ver": ver,
+                                "ng": bool(ver), "size": len(buf)})
+        return out
+    items = E.Ftp(cfg).call(go)
+    for x in items:
+        x["old"] = bool(x["ver"] and latest and _ver_tuple(x["ver"]) < _ver_tuple(latest))
+    return {"latest": latest, "tag": tag, "items": items}
+
+
+def ampr_update(paths):
+    """Pone la última ampr-emu-ng en esos títulos (solo en los que ya la llevan), guardando la de antes como .bak."""
+    cfg = cfg_snapshot()
+    tag, assets = F.github_release(AMPR_REPO)
+    lib_a = next((a for a in assets if a.get("name") == "libSceAmpr.sprx"), None)
+    sums = next((a for a in assets if a.get("name") == "SHA256SUMS"), None)
+    if not lib_a:
+        raise E.PipeError("La última versión de ampr-emu-ng (%s) no trae libSceAmpr.sprx" % tag)
+    data = F.http_get(lib_a["browser_download_url"], 8 * 1024 * 1024)
+    if sums:
+        txt = F.http_get(sums["browser_download_url"], 65536).decode("utf-8", "replace")
+        want = next((ln.split()[0].lower() for ln in txt.splitlines() if ln.strip().endswith("libSceAmpr.sprx")
+                     and not ln.strip().endswith("-debug.sprx")), "")
+        if want and hashlib.sha256(data).hexdigest() != want:
+            raise E.PipeError("La descarga de ampr-emu-ng no coincide con su suma de comprobación: no he cambiado nada")
+    new_ver = _ampr_ver(data)
+    if not new_ver:
+        raise E.PipeError("Lo descargado no parece ampr-emu-ng: no he cambiado nada")
+    paths = [p for p in paths if re.match(r"^/(data|mnt/(ext|usb)\d)/homebrew/[^/]+/fakelib2?/libSceAmpr\.sprx$", p or "")]
+
+    def go(f):
+        done, skipped = [], []
+        for path in paths:
+            buf = bytearray()
+            try:
+                f.retrbinary("RETR " + path, buf.extend, 65536)
+            except ftplib.all_errors:
+                skipped.append(path)
+                continue
+            if not _ampr_ver(bytes(buf)):
+                skipped.append(path)          # no es ampr-emu-ng (otro runtime): no se toca
+                continue
+            f.storbinary("STOR " + path + ".bak", io.BytesIO(bytes(buf)))
+            f.storbinary("STOR " + path, io.BytesIO(data))
+            chk = bytearray()
+            f.retrbinary("RETR " + path, chk.extend, 65536)
+            if bytes(chk) != data:
+                f.storbinary("STOR " + path, io.BytesIO(bytes(buf)))     # algo salió mal: se deja como estaba
+                skipped.append(path)
+                continue
+            done.append(path)
+        return done, skipped
+    done, skipped = E.Ftp(cfg).call(go)
+    return {"ver": new_ver, "done": done, "skipped": skipped}
+
+
 def rec_installed(f):
     """Title IDs que hay en las carpetas de aplicaciones de la consola."""
     have = set()
@@ -11602,7 +11742,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p in ("/api/discover", "/api/played", "/api/job/reveal") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
+        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p.startswith("/api/ampr/") or p in ("/api/discover", "/api/played", "/api/job/reveal", "/api/ps5/power") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
             try:
                 return self._send(200, dict(ok=True, **fm_api(p, b)))
             except E.PipeError as e:
