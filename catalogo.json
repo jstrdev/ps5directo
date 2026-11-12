@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "jobeeslair",
+      "kind": "app",
+      "group": "tool",
+      "name": "JobeesLair",
+      "repo": "JVK3R/JobeesLair",
+      "exp": true,
+      "what": "Standalone, content-neutral PS5 homebrew indexer and media framework. Proudly built alongside AI by JVK3R.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Standalone, content-neutral PS5 homebrew indexer and media framework. Proudly built alongside AI by JVK3R."
+      },
+      "icon": "https://github.com/JVK3R.png",
+      "tid": "PPSA99471",
+      "sys": "Aplicación · PPSA99471",
+      "asset": [
+        "(?i)^update.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
