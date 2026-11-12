@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5lm",
+      "kind": "app",
+      "group": "tool",
+      "name": "PS5LM",
+      "repo": "cobanov/PS5LM",
+      "exp": true,
+      "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8"
+      },
+      "icon": "https://github.com/cobanov.png",
+      "tid": "PPSA99575",
+      "sys": "Aplicación · PPSA99575",
+      "asset": [
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
