@@ -38,7 +38,7 @@ BASE = ["drakmor/ShadowMountPlus", "ps5-payload-dev/ftpsrv", "ps5-payload-dev/el
 # lo que decidimos no recomendar (y cualquier cosa de piratería): no sale nunca
 SKIP = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|save.?(manager|edit)"
                   r"|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|store.?(pkg|game)|free.?games|pkg.?(links|store)"
-                  r"|nopaystation|psbox|hen.?store|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|free.?(ps5.?)?games")
+                  r"|nopaystation|psbox|hen.?store|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|free.?(ps5.?)?games")
 
 
 def gh(path, params=None):
@@ -260,18 +260,21 @@ def recomp_repos():
 
 
 def downloads(repo):
-    """(descargas de todas sus versiones, descargas de las versiones de los últimos 30 días)."""
+    """(descargas de todas sus versiones, descargas de las versiones de los últimos 30 días, [tag, fecha] de la última)."""
     rels = gh("/repos/%s/releases" % repo, {"per_page": 30}) or []
     lim = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%S")
     total = recent = 0
+    last = None
     for r in rels if isinstance(rels, list) else []:
         if not isinstance(r, dict) or r.get("draft"):
             continue
+        if r.get("published_at") and (last is None or r["published_at"] > last[1]):
+            last = [r.get("tag_name") or "", r["published_at"]]
         n = sum(int(a.get("download_count") or 0) for a in r.get("assets") or [] if isinstance(a, dict))
         total += n
         if str(r.get("published_at") or "") >= lim:
             recent += n
-    return total, recent
+    return total, recent, last
 
 
 def popularity(old, repos, now):
@@ -280,13 +283,15 @@ def popularity(old, repos, now):
     como «Más populares» de RecompStore, en vez de quedarse fijo."""
     t_old = str(old.get("pop_t") or "")
     if old.get("pop") and t_old and t_old > (now - dt.timedelta(hours=POP_EVERY_H)).strftime("%Y-%m-%dT%H:%M:%SZ"):
-        return old["pop"], old.get("dlh") or {}, t_old
+        return old["pop"], old.get("dlh") or {}, t_old, old.get("relx") or {}
     today = now.strftime("%Y-%m-%d")
-    dlh, pop = dict(old.get("dlh") or {}), {}
+    dlh, pop, relx = dict(old.get("dlh") or {}), {}, {}
     for repo in sorted(set(repos), key=str.lower):
         low = repo.lower()
         try:
-            total, recent = downloads(repo)
+            total, recent, last = downloads(repo)
+            if last:
+                relx[low] = last
         except Exception as e:
             print("! descargas", repo, e)
             continue
@@ -303,7 +308,7 @@ def popularity(old, repos, now):
             pop[low] = score
         time.sleep(0 if "127.0.0.1" in API else 0.3)
     dlh = {k: v for k, v in dlh.items() if k in {r.lower() for r in repos}}
-    return pop, dlh, now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    return pop, dlh, now.strftime("%Y-%m-%dT%H:%M:%SZ"), relx
 
 
 def newest(repo):
@@ -454,11 +459,12 @@ def main(out, props_out=""):
         for k in [k for k in x if k.startswith("_")]:
             del x[k]
         x.pop("installable", None)
-    pop, dlh, pop_t = popularity(old, list(repos.values()) + recomp_repos(), now)
+    pop, dlh, pop_t, relx = popularity(old, list(repos.values()) + recomp_repos(), now)
+    rel_dates = dict(relx, **rel_dates)          # fecha de la última versión también de todo lo de RecompStore
     data = {"_como": "Lo genera solo tools/escena.py (GitHub Action cada 3 horas). No lo edites a mano: "
                      "para destacar algo usa destacados.json.",
             "updated": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "items": items[:80], "hot": hot, "hist": hist,
-            "rel": rel_dates, "pop": pop, "pop_t": pop_t, "dlh": dlh}
+            "rel": rel_dates, "relx": relx, "pop": pop, "pop_t": pop_t, "dlh": dlh}
     with open(out, "w", encoding="utf-8") as fh:
         json.dump(data, fh, ensure_ascii=False, indent=1)
     print("escena.json: %d novedades, %d en portada" % (len(items), len(hot)))

@@ -332,6 +332,21 @@ public class MainActivity extends Activity {
             return other;
         }
 
+        /** «Captar lo que copies» en el movil: lo copiado, al volver a PS5 Directo (Android solo deja leerlo con la app delante). */
+        @JavascriptInterface
+        public String clip() {
+            try {
+                android.content.ClipboardManager cm = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (cm == null || !cm.hasPrimaryClip()) return "";
+                android.content.ClipData cd = cm.getPrimaryClip();
+                if (cd == null || cd.getItemCount() == 0) return "";
+                CharSequence t = cd.getItemAt(0).coerceToText(MainActivity.this);
+                return t == null ? "" : t.toString();
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
         @JavascriptInterface
         public boolean isApp() {
             return true;

@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.6 — USER GUIDE (English)
+PS5 DIRECTO 2.1.8 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,35 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.1.8 - Catch links on the phone, like the PC extension: "Share" a page
+    (a post, a forum) with PS5 Directo and it takes the download links it
+    has; new "🔍 Links from a page" button in Send (also on the PC);
+    "Catch what you copy" in the phone app: copy a link in any app and
+    when you come back to PS5 Directo it's in the box (needs the new
+    phone app).
+  - Pull down to refresh on touch screens.
+  - Every card shows "Updated...", Discover ones too: yellow if it's from
+    the last two weeks, grey if older.
+  - Discover Home rows show the recently updated first.
+  - PS5 Game Updater: if you don't have it, one click installs it from
+    Library; if you have it and there's a new version, it tells you and
+    updates it with one click (if it's in the RecompStore catalogue).
+  - The header no longer splits into two rows on laptop screens.
+
+2.1.7 - Power button at the top, next to the bell: Turn on, Rest mode,
+    Restart and Turn off in one tap, with a dot that shows whether the
+    console is on (green) or in rest mode (yellow).
+  - No longer offers as an "update" a version with a lower number than
+    yours (like EglantinePS5 1.000.000 after 1.219.029), unless its author
+    published it after you installed yours.
+  - Scene news: "Recently updated" also uses each project's real latest
+    GitHub release date, so new arrivals no longer sink to the bottom.
+  - Discover cards show when their latest version is from (in yellow if
+    it's from this week).
+  - PatchDL's "See in Discover" takes you straight to its card.
+  - Fan control tools no longer show in the news.
+  - On the phone, the sort and "Check again" share one row.
+
 2.1.6 - "Most popular" no longer stays frozen: the news robot counts the
     GitHub downloads of the whole catalogue every day, and the most
     downloaded in the last week come first.

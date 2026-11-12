@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.6
+PS5 DIRECTO 2.1.8
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,40 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.1.8
+- Captar enlaces en el móvil, como la extensión del PC:
+  · «Compartir» una página (un post, un foro) con PS5 Directo saca los
+    enlaces de descarga que tiene y eliges cuáles poner en la caja.
+  · Nuevo botón «🔍 Enlaces de una página» en Enviar (también en el PC).
+  · «Captar lo que copies» en la app del móvil: copias un enlace en
+    cualquier app y, al volver a PS5 Directo, ya está en la caja.
+    (Hace falta la app del móvil nueva.)
+- Tirar hacia abajo para recargar, en pantallas táctiles.
+- Todas las tarjetas dicen «Actualizado hace…», también las de Descubrir:
+  en amarillo si es de estas dos semanas y en gris si es más viejo.
+- Las filas del Inicio de Descubrir enseñan primero lo actualizado hace
+  poco.
+- PS5 Game Updater: si no lo tienes, se instala con un clic desde
+  Biblioteca; si lo tienes y sale versión nueva, te avisa y se actualiza
+  con un clic (si está en el catálogo de RecompStore).
+- La cabecera ya no se parte en dos filas en pantallas de portátil.
+
+NOVEDADES 2.1.7
+- Botón de encendido arriba, al lado de la campana: Encender, Reposo,
+  Reiniciar y Apagar a un toque, con un punto que dice si la consola está
+  encendida (verde) o en reposo (amarillo).
+- Ya no avisa como «actualización» de una versión con número más bajo que
+  la tuya (como EglantinePS5 1.000.000 tras la 1.219.029), salvo que su
+  autor la haya publicado después de que instalaras la tuya.
+- Novedades de la scene: «Actualizado hace poco» usa también la fecha real
+  de la última versión en GitHub de cada proyecto, así lo recién llegado ya
+  no se queda al final por no traer fecha.
+- Las tarjetas de Descubrir dicen de cuándo es su última versión (en
+  amarillo si es de esta semana).
+- «Ver en Descubrir» de PatchDL te lleva directo a su tarjeta.
+- Lo de control de ventiladores ya no sale en las novedades.
+- En el móvil, el orden y «Volver a mirar» van en la misma fila.
 
 NOVEDADES 2.1.6
 - «Más populares» ya no se queda fijo: el robot de novedades cuenta cada

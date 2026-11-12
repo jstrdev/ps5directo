@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.1.6"
+VERSION = "2.1.8"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -2195,6 +2195,10 @@ def fm_api(p, b):
         return ps5_power(str(b.get("action") or ""))
     if p == "/api/ps5/wakeinfo":
         return wake_info()
+    if p == "/api/links/scan":
+        return links_scan(str(b.get("url") or ""))
+    if p == "/api/clip/push":
+        return clip_push(str(b.get("text") or "")[:20000])
     if p == "/api/ampr/scan":
         return ampr_scan()
     if p == "/api/ampr/update":
@@ -6778,6 +6782,13 @@ def gu_status():
                 out["problem"] = ("Está en %s, pero tiene que estar en /data/homebrew/%s para que funcione."
                                   % (out["fix_from"], GU_TID))
                 break
+        if out["present"]:                       # versión que tienes (para avisar si hay una nueva)
+            try:
+                pj = json.loads(F.ftp_read(f, "/data/homebrew/%s/sce_sys/param.json" % GU_TID, 0, 200000)
+                                .decode("utf-8", "replace"))
+                out["ver"] = str(pj.get("contentVersion") or pj.get("masterVersion") or "")[:30]
+            except Exception:
+                pass
         port = 7920
         try:
             raw = F.ftp_read(f, "/data/GameUpdater/engine.port", 0, 32).decode("ascii", "ignore").strip()
@@ -6793,6 +6804,10 @@ def gu_status():
             out["problem"] = "No pude mirarlo: %s" % e
         return out
     out["url"] = "http://%s:%d/" % (cfg["ps5_ip"], port)
+    src = gu_source()                          # de dónde se instala/actualiza (catálogo de RecompStore)
+    if src:
+        out["src"], out["latest"] = src["id"], src.get("version") or ""
+        out["newer"] = bool(out.get("ver") and out["latest"] and _ver_tuple(out["latest"]) > _ver_tuple(out["ver"]))
     try:
         s = socket.create_connection((cfg["ps5_ip"], port), timeout=1.5)
         s.close()
@@ -6800,6 +6815,25 @@ def gu_status():
     except OSError:
         pass
     return out
+
+
+def gu_source():
+    """PS5 Game Updater en el catálogo de RecompStore (para instalarlo o ponerlo al día con un clic)."""
+    with LOCK:
+        items = list(RECOMP.get("items") or [])
+    return next((x for x in items if x.get("repo") and re.search(r"(?i)game.?updater", x.get("name") or "")), None)
+
+
+def gu_news():
+    """Cada 6 h: si tienes PS5 Game Updater y hay una versión nueva, aviso en la campana."""
+    try:
+        st = gu_status()
+    except Exception:
+        return
+    if st.get("present") and st.get("newer"):
+        notify("info", "Versión nueva de PS5 Game Updater: %s" % st["latest"],
+               "Tienes la %s. En Biblioteca › Aplicaciones de la consola, «Actualizar» la pone encima." % st["ver"],
+               {"tab": "Library"}, key="gu:%s" % st["latest"])
 
 
 def library_bases(bf, f):
@@ -8315,6 +8349,71 @@ def watch_dir_tick():
     save_settings()
 
 
+HOST_PAGE_RX = re.compile(r"(?i)^https?://(?:[\w-]+\.)*(?:pixeldrain\.com/(?:u|l)/|mediafire\.com/(?:file|folder)/|mega\.nz/"
+                          r"(?:file|folder)/|drive\.google\.com/(?:file|drive|open|uc)|dropbox\.com/(?:s|scl)/|gofile\.io/d/|"
+                          r"1fichier\.com/\?|buzzheavier\.com/|qiwi\.gg/(?:file|folder)/|krakenfiles\.com/view/|"
+                          r"github\.com/[^/]+/[^/]+/releases/download/)")
+
+
+def page_links(text, base=""):
+    """De un texto o una página web: los enlaces que parecen una descarga (archivos y páginas de alojamientos)."""
+    import html as _h
+    from urllib.parse import urljoin
+    txt = _h.unescape(text or "")
+    cands = re.findall(r"""(?i)(?:href|src|data-(?:url|href|link))\s*=\s*["']([^"'<>\s]+)["']""", txt)
+    cands += re.findall(r"(?i)(?:https?|ftp)://[^\s\"'<>]+|magnet:\?xt=urn:[^\s\"'<>]+", txt)
+    seen, out = set(), []
+    for u in cands:
+        u = u.strip().rstrip(".,);]")
+        if base and not re.match(r"(?i)^(?:https?|ftp|magnet):", u):
+            u = urljoin(base, u)
+        if u in seen or u == base:
+            continue
+        if F.clipboard_links(u) or HOST_PAGE_RX.match(u):
+            seen.add(u)
+            out.append(u)
+    return out[:300]
+
+
+def links_scan(url):
+    """«Buscar enlaces en una página» (sobre todo para el móvil, donde no hay extensión): abre la página y saca los
+    enlaces de descarga que tiene, como hace la extensión al navegar. No entra en páginas con cuenta ni ejecuta nada."""
+    url = (url or "").strip()
+    if not re.match(r"(?i)^https?://", url):
+        raise E.PipeError("Pega la dirección de la página (empieza por http:// o https://)")
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 "
+                                                             "(KHTML, like Gecko) Chrome/130 Mobile Safari/537.36",
+                                               "Accept": "text/html,application/xhtml+xml,*/*;q=0.8"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            ct = r.headers.get("Content-Type") or ""
+            final = r.geturl()
+            if not re.search(r"(?i)text|html|json|xml", ct):
+                return {"links": [final], "direct": True}       # ya era un archivo
+            raw = r.read(4 * 1024 * 1024)
+    except urllib.error.HTTPError as e:
+        raise E.PipeError("La página contesta %d: puede que pida iniciar sesión." % e.code)
+    except Exception as e:
+        raise E.PipeError("No he podido abrir la página (%s)" % E.net_reason(e))
+    m = re.search(r"(?i)charset=([\w-]+)", ct)
+    txt = raw.decode(m.group(1) if m else "utf-8", "replace")
+    title = re.search(r"(?is)<title[^>]*>(.*?)</title>", txt)
+    return {"links": page_links(txt, final), "title": re.sub(r"\s+", " ", title.group(1)).strip()[:120] if title else ""}
+
+
+def clip_push(text):
+    """El móvil manda lo que has copiado (al volver a PS5 Directo): los enlaces de descarga van a la caja."""
+    links = list(dict.fromkeys(F.clipboard_links(text) + [u for u in page_links(text) if HOST_PAGE_RX.match(u)]))
+    new = 0
+    with LOCK:
+        for u in links:
+            if not any(x["url"] == u for x in INBOX):
+                INBOX.append({"url": u, "name": urllib.parse.unquote(u.rstrip("/").rsplit("/", 1)[-1])[:120], "t": time.time()})
+                new += 1
+        del INBOX[:-200]
+    return {"added": new, "found": len(links)}
+
+
 def clip_watch():
     """«Captar enlaces que copies»: si copias enlaces de descarga (en cualquier programa), van a la caja de enlaces
     de PS5 Directo, como con la extension. Solo enlaces de archivos (.rar, .7z, .zip, partes, .pkg, imagenes...)."""
@@ -9341,6 +9440,7 @@ def rec_list():
             it["ver"] = _emu_vers().get(c["id"]) or ""
             it["latest"] = rec_latest(rec_repo(c)) if it["installed"] else ""
             it["latest_t"] = F.GH_DATES.get(rec_repo(c).lower(), "") if it["latest"] else ""
+            it["newer"] = ver_newer(it["latest"], it["ver"], c["id"]) if it["ver"] else bool(it["latest"])
             it["repo"] = rec_repo(c)
             it["official"] = c["repo"]
             it["alts"] = [c["repo"]] + [r for r in (c.get("alts") or []) if r.lower() != c["repo"].lower()]
@@ -10438,6 +10538,26 @@ def rp_play(open_only=False, full=False, ds=False, nick=""):
     return {"opened": "app" if open_only else "stream"}
 
 
+def ver_newer(new, cur, cid=""):
+    """¿La versión «new» es más nueva que la que tienes? Por número; si el número es MENOR (p. ej. 1.000.000 tras la
+    1.219.029) solo cuenta como nueva si su autor la publicó después de que pusieras la tuya (ha cambiado de numeración)."""
+    if not new or not cur or new == cur:
+        return False
+    a, b = _ver_tuple(new), _ver_tuple(cur)
+    if not a or not b or a == b:
+        return new != cur and not (a and a == b)
+    if a > b:
+        return True
+    put = float((SETTINGS.get("emu_vers_t") or {}).get(cid) or 0)
+    c = next((x for x in F.CATALOG if x["id"] == cid), None)
+    d = F.GH_DATES.get(rec_repo(c).lower(), "") if c else ""
+    try:
+        pub = time.mktime(time.strptime(d[:19], "%Y-%m-%dT%H:%M:%S")) if d else 0
+    except ValueError:
+        pub = 0
+    return bool(put and pub and pub > put + 86400)
+
+
 def emu_news():
     """Cada 6 h: si hay version nueva de un emulador que tienes, avisa en la campana (una vez por version)."""
     try:
@@ -10448,12 +10568,13 @@ def emu_news():
         ampr_auto_console()
     except Exception as e:
         print("AMPR automático: %s" % e)
+    gu_news()
     vers = _emu_vers()
     for c in F.CATALOG:
         if c.get("kind") != "app" or c["id"] not in vers:
             continue
         new = rec_latest(rec_repo(c))
-        if new and new != vers[c["id"]]:
+        if new and ver_newer(new, vers[c["id"]], c["id"]):
             notify("info", "Versión nueva de %s: %s" % (c["name"], new),
                    "Tienes la %s. En Descubrir, «Qué cambia» te enseña sus novedades y «Actualizar» la pone sin tocar "
                    "tus ajustes, partidas, BIOS ni contenido." % vers[c["id"]], {"tab": "Library", "view": "rec"}, key="emu:%s:%s" % (c["id"], new))
@@ -12328,7 +12449,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p.startswith("/api/ampr/") or p in ("/api/discover", "/api/played", "/api/job/reveal", "/api/ps5/power", "/api/ps5/wakeinfo") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
+        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p.startswith("/api/ampr/") or p in ("/api/discover", "/api/played", "/api/job/reveal", "/api/ps5/power", "/api/ps5/wakeinfo", "/api/links/scan", "/api/clip/push") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
             try:
                 return self._send(200, dict(ok=True, **fm_api(p, b)))
             except E.PipeError as e:
@@ -13454,7 +13575,7 @@ def featured():
 
 
 SCENE_SKIP_RX = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|"
-                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|free.?(ps5.?)?games")
+                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|free.?(ps5.?)?games")
 CAT_URL = os.environ.get("PS5D_CATALOGO") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/catalogo.json"
 CAT = {"t": 0.0, "tr": {}}
 
@@ -13768,7 +13889,8 @@ def extra_api(h, p, b):
             with LOCK:
                 its, err, upd = RECOMP["items"], RECOMP["error"], RECOMP["updated"]
             return {"ok": True, "items": its, "covers": fix, "error": err, "updated": upd,
-                    "source": "recompstore.com", "feat": featured(), "scene": escena(), "hot": ESC["hot"], "pop": ESC["pop"]}
+                    "source": "recompstore.com", "feat": featured(), "scene": escena(), "hot": ESC["hot"], "pop": ESC["pop"],
+                    "rel": {k: v[1] for k, v in ESC["rel"].items()}}
         if p == "/api/wiki":
             return dict(ok=True, **wiki_summary(b.get("title"), b.get("lang")))
         if p == "/api/pld/updates":
