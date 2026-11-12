@@ -19,6 +19,25 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5-library",
+      "kind": "payload",
+      "group": "tool",
+      "name": "ps5-library",
+      "repo": "deox1111/ps5-library",
+      "exp": true,
+      "what": "Game library for jailbroken PS5: pick a game, it downloads, installs and appears on your home screen.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Game library for jailbroken PS5: pick a game, it downloads, installs and appears on your home screen."
+      },
+      "icon": "https://github.com/deox1111.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
