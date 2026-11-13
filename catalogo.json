@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "swanstationps5",
+      "kind": "app",
+      "group": "tool",
+      "name": "SwanStationPS5",
+      "repo": "darkxex/SwanStationPS5",
+      "exp": true,
+      "what": "SwanStationPS5: a PlayStation 1 emulator running natively on jailbroken PS5, based on SwanStation. https://discord.gg/Drx8tsqq3B",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "SwanStationPS5: a PlayStation 1 emulator running natively on jailbroken PS5, based on SwanStation. https://discord.gg/Drx8tsqq3B"
+      },
+      "icon": "https://github.com/darkxex.png",
+      "tid": "PPSA98510",
+      "sys": "Aplicación · PPSA98510",
+      "asset": [
+        "(?i)^PPSA.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
