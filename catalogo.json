@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "y2jb-update-blocker",
+      "kind": "payload",
+      "group": "tool",
+      "name": "y2jb-update-blocker",
+      "repo": "Epinorr/y2jb-update-blocker",
+      "exp": true,
+      "what": "A PlayStation 5 payload for blocking YouTube update metadata",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "A PlayStation 5 payload for blocking YouTube update metadata"
+      },
+      "icon": "https://github.com/Epinorr.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^YT\\-Blocker.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
