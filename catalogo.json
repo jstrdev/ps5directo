@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "orbit-play-ps5",
+      "kind": "payload",
+      "group": "tool",
+      "name": "orbit-play-ps5",
+      "repo": "saawant12/orbit-play-ps5",
+      "exp": true,
+      "what": "Remote Play for jailbroken PS5s on Mac, Windows and Linux. Play at home without PSN sign-in, or away from home over a direct, encrypted connection. Supports local PS5 accounts and sets up Remote Play for you.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Remote Play for jailbroken PS5s on Mac, Windows and Linux. Play at home without PSN sign-in, or away from home over a direct, encrypted connection. Supports local PS5 accounts and sets up Remote Play for you."
+      },
+      "icon": "https://github.com/saawant12.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^orbit\\-play.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
