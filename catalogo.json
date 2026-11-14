@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5-airplay",
+      "kind": "payload",
+      "group": "tool",
+      "name": "ps5-airplay",
+      "repo": "rodri0x/ps5-airplay",
+      "exp": true,
+      "what": "AirPlay screen-mirroring receiver for jailbroken PS5: mirror an iPhone, iPad or Mac to your TV with sound, as a payload (not official)",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "AirPlay screen-mirroring receiver for jailbroken PS5: mirror an iPhone, iPad or Mac to your TV with sound, as a payload (not official)"
+      },
+      "icon": "https://github.com/rodri0x.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^airplay\\-installer.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
