@@ -19,6 +19,25 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "12-xx-linux-loader",
+      "kind": "payload",
+      "group": "tool",
+      "name": "12.xx-linux-loader",
+      "repo": "Wigglez-sudo/12.xx-linux-loader",
+      "exp": true,
+      "what": "Working Linux Loader For PS5 Firmware 12.00/12.02/12.20/12.40/12.60/12.70 — Phat and Slim",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Working Linux Loader For PS5 Firmware 12.00/12.02/12.20/12.40/12.60/12.70 — Phat and Slim"
+      },
+      "icon": "https://github.com/Wigglez-sudo.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
