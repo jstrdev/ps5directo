@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "botty-plus",
+      "kind": "app",
+      "group": "tool",
+      "name": "Botty-Plus",
+      "repo": "Portablelle/Botty-Plus",
+      "exp": true,
+      "what": "Botty+ PS5 native app, download manager, torrent engine and compression services",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Botty+ PS5 native app, download manager, torrent engine and compression services"
+      },
+      "icon": "https://github.com/Portablelle.png",
+      "tid": "PPSA99071",
+      "sys": "Aplicación · PPSA99071",
+      "asset": [
+        "(?i)^botty\\-plus.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
