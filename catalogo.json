@@ -19,6 +19,28 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5droid",
+      "kind": "link",
+      "group": "tool",
+      "name": "PS5Droid",
+      "repo": "aarvsn/PS5Droid",
+      "exp": true,
+      "what": "Android games on your PS5",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "Android games on your PS5",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/aarvsn.png"
     }
   ]
 }
