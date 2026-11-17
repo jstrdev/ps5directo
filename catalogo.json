@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "lineup",
+      "kind": "app",
+      "group": "tool",
+      "name": "lineup",
+      "repo": "bps2414/lineup",
+      "exp": true,
+      "what": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React."
+      },
+      "icon": "https://github.com/bps2414.png",
+      "tid": "PPSA99077",
+      "sys": "Aplicación · PPSA99077",
+      "asset": [
+        "(?i)^Lineup.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
