@@ -19,6 +19,25 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5-lz4-game-compressor",
+      "kind": "payload",
+      "group": "tool",
+      "name": "PS5-LZ4-Game-Compressor",
+      "repo": "gameboy829/PS5-LZ4-Game-Compressor",
+      "exp": true,
+      "what": "LZ4 game compression for PS5 homebrew — beta.1",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "LZ4 game compression for PS5 homebrew — beta.1"
+      },
+      "icon": "https://github.com/gameboy829.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
