@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "hearbridge-ps5",
+      "kind": "payload",
+      "group": "tool",
+      "name": "HearBridge-PS5",
+      "repo": "X-F1REBALL-X/HearBridge-PS5",
+      "exp": true,
+      "what": "Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5"
+      },
+      "icon": "https://github.com/X-F1REBALL-X.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^HearBridge.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
