@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5lm-plus",
+      "kind": "app",
+      "group": "tool",
+      "name": "PS5LM-Plus",
+      "repo": "abhi245y/PS5LM-Plus",
+      "exp": true,
+      "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8"
+      },
+      "icon": "https://github.com/abhi245y.png",
+      "tid": "PPSA99581",
+      "sys": "Aplicación · PPSA99581",
+      "asset": [
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
