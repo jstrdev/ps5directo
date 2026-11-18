@@ -19,6 +19,28 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5-hackintosh",
+      "kind": "link",
+      "group": "tool",
+      "name": "ps5-hackintosh",
+      "repo": "rodri0x/ps5-hackintosh",
+      "exp": true,
+      "what": "XNU booting bare-metal on a PS5's Zen 2 SoC. UEFI, OpenCore, a crash-kexec hop, and a TV as the only logic analyzer.",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "XNU booting bare-metal on a PS5's Zen 2 SoC. UEFI, OpenCore, a crash-kexec hop, and a TV as the only logic analyzer.",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/rodri0x.png"
     }
   ]
 }
