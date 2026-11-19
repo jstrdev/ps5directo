@@ -19,6 +19,28 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "kytyps5-enhanced",
+      "kind": "link",
+      "group": "emu",
+      "name": "KytyPS5-Enhanced",
+      "repo": "MilliMailmanOverpass/KytyPS5-Enhanced",
+      "exp": true,
+      "what": "Enhanced KytyPS5 PS5 emulator with launcher, shader cache, frame pacing and per-game profiles. Tuned for Grand Theft Auto VI on Windows. Bring your own legally dumped game.",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "Enhanced KytyPS5 PS5 emulator with launcher, shader cache, frame pacing and per-game profiles. Tuned for Grand Theft Auto VI on Windows. Bring your own legally dumped game.",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/MilliMailmanOverpass.png"
     }
   ]
 }
