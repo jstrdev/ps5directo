@@ -19,6 +19,28 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "gta6-kytyps5-gta-6",
+      "kind": "link",
+      "group": "emu",
+      "name": "GTA6-KytyPS5-GTA-6",
+      "repo": "EnamelSlugAcclaim/GTA6-KytyPS5-GTA-6",
+      "exp": true,
+      "what": "GTA6 PS5 emulator based on KytyPS5 with a focus on playable GTA VI: performance work, per-game profiles, shader cache and compatibility fixes. Windows. Bring GTA 6 on your PC now.",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "GTA6 PS5 emulator based on KytyPS5 with a focus on playable GTA VI: performance work, per-game profiles, shader cache and compatibility fixes. Windows. Bring GTA 6 on your PC now.",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/EnamelSlugAcclaim.png"
     }
   ]
 }
