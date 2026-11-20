@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5-webkit-autoloader-esp32",
+      "kind": "payload",
+      "group": "tool",
+      "name": "ps5-webkit-autoloader-esp32",
+      "repo": "percdotdev/ps5-webkit-autoloader-esp32",
+      "exp": true,
+      "what": "ESP32 firmware: An automated payload loader for exploited PS5 consoles",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "ESP32 firmware: An automated payload loader for exploited PS5 consoles"
+      },
+      "icon": "https://github.com/percdotdev.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^esp.*\\.bin$",
+        "(?i)\\.bin$"
+      ]
     }
   ]
 }
