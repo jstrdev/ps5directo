@@ -1,21 +1,51 @@
 {
  "_como": "Lo genera solo tools/escena.py (GitHub Action cada 3 horas). No lo edites a mano: para destacar algo usa destacados.json.",
- "updated": "2026-11-20T02:19:39Z",
+ "updated": "2026-11-20T11:36:54Z",
  "items": [
   {
-   "id": "percdotdev/ps5-webkit-autoloader-esp32@0.8.0",
+   "id": "kvaps/ProsperoWeb@v0.3.0",
+   "kind": "new",
+   "repo": "kvaps/ProsperoWeb",
+   "cid": "",
+   "name": "ProsperoWeb",
+   "tag": "v0.3.0",
+   "pre": false,
+   "date": "2026-11-20T09:48:25Z",
+   "desc": "ProsperoWeb: homebrew web browser for PlayStation 5, upstream WebKit (PlayStation port) built with the open ps5-payload-sdk",
+   "notes": "Added - AV1 video decoding. The ffmpeg media engine now plays AV1 (WebM and MP4), decoded by libdav1d. The PS5 SDK ships ffmpeg without libdav1d, so dav1d and a re-built ffmpeg (with --enable-libdav1d ) are cross-compiled into the dependency prefix alongside the other dependencies. - Native dropdowns. Opening a select now shows a controller-driven popup menu with D-pad and…",
+   "stars": 51,
+   "url": "https://github.com/kvaps/ProsperoWeb",
+   "score": 6.04
+  },
+  {
+   "id": "percdotdev/ps5-webkit-autoloader-esp32@0.8.1",
    "kind": "new",
    "repo": "percdotdev/ps5-webkit-autoloader-esp32",
    "cid": "",
    "name": "ps5-webkit-autoloader-esp32",
-   "tag": "0.8.0",
+   "tag": "0.8.1",
    "pre": false,
-   "date": "2026-11-20T01:05:23Z",
+   "date": "2026-11-20T08:32:04Z",
    "desc": "ESP32 firmware: An automated payload loader for exploited PS5 consoles",
-   "notes": "ESP32 firmware that serves itsPLK's WebKit Autoloader 0.8.0 to the PS5 over its own Wi-Fi, ESP32 PORTAL . Flash it Easiest: open the web flasher in Chrome or Edge. Choose your board, plug it in holding BOOT , press Install. It writes this release, checks it and restarts the board into the portal. By hand with esptool: put the board in download mode, then write the file for…",
-   "stars": 16,
+   "notes": "ESP32 firmware that serves itsPLK's WebKit Autoloader 0.8.1 to the PS5 over its own Wi-Fi, ESP32 PORTAL . Flash it Easiest: open the web flasher in Chrome or Edge. Choose your board, plug it in holding BOOT , press Install. It writes this release, checks it and restarts the board into the portal. By hand with esptool: put the board in download mode, then write the file for…",
+   "stars": 17,
    "url": "https://github.com/percdotdev/ps5-webkit-autoloader-esp32",
-   "score": 4.84
+   "score": 5.08
+  },
+  {
+   "id": "heydemoura/PS5_Longshot@v0.1.4",
+   "kind": "new",
+   "repo": "heydemoura/PS5_Longshot",
+   "cid": "",
+   "name": "PS5_Longshot",
+   "tag": "v0.1.4",
+   "pre": true,
+   "date": "2026-11-20T02:25:11Z",
+   "desc": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
+   "notes": "Prerelease: the base PS5 memory work for the Castle Town crash, for testing. Please report how the first start and Castle Town go on your console (issues 4, 24). Highlights - The first start prepares the game's graphics. The builder now puts the game's shader list (made from your own game) and a pipeline list in the title folder. The first start builds every pipeline before…",
+   "stars": 177,
+   "url": "https://github.com/heydemoura/PS5_Longshot",
+   "score": 13.2
   },
   {
    "id": "bornaradusin/PC5@v2.4.3",
@@ -47,21 +77,6 @@
    "score": 1.5
   },
   {
-   "id": "MilliMailmanOverpass/KytyPS5-Enhanced@v0.1.5",
-   "kind": "new",
-   "repo": "MilliMailmanOverpass/KytyPS5-Enhanced",
-   "cid": "",
-   "name": "KytyPS5-Enhanced",
-   "tag": "v0.1.5",
-   "pre": false,
-   "date": "2026-11-19T20:44:33Z",
-   "desc": "Enhanced KytyPS5 PS5 emulator with launcher, shader cache, frame pacing and per-game profiles. Tuned for Grand Theft Auto VI on Windows. Bring your own legally dumped game.",
-   "notes": "KytyPS5-Enhanced v0.1.5: Performance & Compatibility Update Fifth public build of KytyPS5-Enhanced , our KytyPS5 build tuned for Grand Theft Auto VI on PC. This update brings a notable CPU speed-up, better compatibility on AMD GPUs and a few quality-of-life features in the launcher. ⚠️ Experimental. Expect crashes and glitches. You need your own legally dumped copy of the…",
-   "stars": 132,
-   "url": "https://github.com/MilliMailmanOverpass/KytyPS5-Enhanced",
-   "score": 7.28
-  },
-  {
    "id": "X-F1REBALL-X/HearBridge-PS5@v1.4.3",
    "kind": "new",
    "repo": "X-F1REBALL-X/HearBridge-PS5",
@@ -72,9 +87,9 @@
    "date": "2026-11-19T19:48:23Z",
    "desc": "Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5",
    "notes": "HearBridge 1.4.3 - Headset connect and disconnect auto mode works - Interface layout updates for TV use - Optional ESP32-S3 board: plugs into the PS5 over USB and shows up as headphones, so Tempest 3D Audio can turn on while HearBridge still sends the sound to your real Bluetooth headset Flash file for the ESP32-S3: ESP32-S3-PS5-Audio-Sink.bin (write at offset 0x0 on the UART…",
-   "stars": 213,
+   "stars": 214,
    "url": "https://github.com/X-F1REBALL-X/HearBridge-PS5",
-   "score": 10.0
+   "score": 10.2
   },
   {
    "id": "monirchemrubd/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -87,9 +102,9 @@
    "date": "2026-11-19T19:24:30Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/monirchemrubd/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "johnstiles/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -102,9 +117,9 @@
    "date": "2026-11-19T19:24:09Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/johnstiles/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "EpicGiantite13205/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -117,9 +132,9 @@
    "date": "2026-11-19T19:24:00Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/EpicGiantite13205/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "hanataki41-ui/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -132,24 +147,9 @@
    "date": "2026-11-19T19:23:55Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/hanataki41-ui/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
-  },
-  {
-   "id": "zalman-ua/GTA-6-Switch-Version--PC-Emulator-2026@",
-   "kind": "new",
-   "repo": "zalman-ua/GTA-6-Switch-Version--PC-Emulator-2026",
-   "cid": "",
-   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
-   "tag": "",
-   "pre": false,
-   "date": "2026-11-19T19:23:55Z",
-   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
-   "notes": "",
-   "stars": 36,
-   "url": "https://github.com/zalman-ua/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "Fisheriks/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -162,9 +162,9 @@
    "date": "2026-11-19T19:23:54Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/Fisheriks/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "Kkaramaddinnn/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -192,9 +192,9 @@
    "date": "2026-11-19T19:23:40Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/yassinebourzza1/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "AntikvarX/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -207,9 +207,9 @@
    "date": "2026-11-19T19:23:26Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/AntikvarX/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "simadan11/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -222,9 +222,9 @@
    "date": "2026-11-19T19:23:15Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/simadan11/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "WLfear/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -237,9 +237,9 @@
    "date": "2026-11-19T19:23:06Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/WLfear/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "Andriy-samp/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -252,9 +252,9 @@
    "date": "2026-11-19T19:23:04Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/Andriy-samp/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "kamesha12/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -267,9 +267,9 @@
    "date": "2026-11-19T19:22:49Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/kamesha12/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "stancaedy10-glitch/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -282,9 +282,9 @@
    "date": "2026-11-19T19:22:46Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/stancaedy10-glitch/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "kazim768/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -297,9 +297,9 @@
    "date": "2026-11-19T19:22:18Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/kazim768/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "mecidovv/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -312,9 +312,9 @@
    "date": "2026-11-19T19:22:04Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/mecidovv/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "meirz911/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -327,9 +327,9 @@
    "date": "2026-11-19T19:21:56Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/meirz911/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "mohamedhamdytaha/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -342,9 +342,9 @@
    "date": "2026-11-19T19:21:53Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/mohamedhamdytaha/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "qwerthegoe-hash/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -357,9 +357,9 @@
    "date": "2026-11-19T19:21:49Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/qwerthegoe-hash/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "ITprogamatikDedSec/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -387,9 +387,9 @@
    "date": "2026-11-19T19:21:44Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/sebastianor08/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "Woshilaji8763/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -402,9 +402,9 @@
    "date": "2026-11-19T19:21:42Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 36,
+   "stars": 35,
    "url": "https://github.com/Woshilaji8763/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
+   "score": 3.4
   },
   {
    "id": "Ernestoracua/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -437,33 +437,18 @@
    "score": 3.44
   },
   {
-   "id": "mancommits/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "id": "eluyonga/GTA-6-Switch-Version--PC-Emulator-2026@",
    "kind": "new",
-   "repo": "mancommits/GTA-6-Switch-Version--PC-Emulator-2026",
+   "repo": "eluyonga/GTA-6-Switch-Version--PC-Emulator-2026",
    "cid": "",
    "name": "GTA-6-Switch-Version--PC-Emulator-2026",
    "tag": "",
    "pre": false,
-   "date": "2026-11-19T19:20:46Z",
+   "date": "2026-11-19T19:20:47Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
    "stars": 36,
-   "url": "https://github.com/mancommits/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.44
-  },
-  {
-   "id": "kemans35/GTA-6-Switch-Version--PC-Emulator-2026@",
-   "kind": "new",
-   "repo": "kemans35/GTA-6-Switch-Version--PC-Emulator-2026",
-   "cid": "",
-   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
-   "tag": "",
-   "pre": false,
-   "date": "2026-11-19T19:20:46Z",
-   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
-   "notes": "",
-   "stars": 36,
-   "url": "https://github.com/kemans35/GTA-6-Switch-Version--PC-Emulator-2026",
+   "url": "https://github.com/eluyonga/GTA-6-Switch-Version--PC-Emulator-2026",
    "score": 3.44
   },
   {
@@ -482,6 +467,51 @@
    "score": 3.44
   },
   {
+   "id": "mancommits/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "kind": "new",
+   "repo": "mancommits/GTA-6-Switch-Version--PC-Emulator-2026",
+   "cid": "",
+   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
+   "tag": "",
+   "pre": false,
+   "date": "2026-11-19T19:20:46Z",
+   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
+   "notes": "",
+   "stars": 35,
+   "url": "https://github.com/mancommits/GTA-6-Switch-Version--PC-Emulator-2026",
+   "score": 3.4
+  },
+  {
+   "id": "kemans35/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "kind": "new",
+   "repo": "kemans35/GTA-6-Switch-Version--PC-Emulator-2026",
+   "cid": "",
+   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
+   "tag": "",
+   "pre": false,
+   "date": "2026-11-19T19:20:46Z",
+   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
+   "notes": "",
+   "stars": 35,
+   "url": "https://github.com/kemans35/GTA-6-Switch-Version--PC-Emulator-2026",
+   "score": 3.4
+  },
+  {
+   "id": "ShukvaniPlayz/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "kind": "new",
+   "repo": "ShukvaniPlayz/GTA-6-Switch-Version--PC-Emulator-2026",
+   "cid": "",
+   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
+   "tag": "",
+   "pre": false,
+   "date": "2026-11-19T19:18:45Z",
+   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
+   "notes": "",
+   "stars": 36,
+   "url": "https://github.com/ShukvaniPlayz/GTA-6-Switch-Version--PC-Emulator-2026",
+   "score": 3.44
+  },
+  {
    "id": "VivaLaVent/ps5-bazzite-deck@v3.0",
    "kind": "update",
    "repo": "VivaLaVent/ps5-bazzite-deck",
@@ -492,8 +522,8 @@
    "date": "2026-11-19T19:07:17Z",
    "notes": "What's new Everything since v2.13, the last Stable. Fixed - A GPU hang no longer freezes the display. The game may still close. From the official PS5 kernel. - Game Mode starts again after a crash. When gamescope crashed and Steam hung, the screen stayed on a text console until a forced shutdown. - The console's Bluetooth no longer shuts down after a burst of USB activity…",
    "url": "https://github.com/VivaLaVent/ps5-bazzite-deck/releases/tag/v3.0",
-   "stars": 587,
-   "score": 5.0
+   "stars": 588,
+   "score": 5.2
   },
   {
    "id": "holdmysocks/ps5-tailscale@v0.7.5",
@@ -520,9 +550,9 @@
    "date": "2026-11-19T11:29:35Z",
    "desc": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
    "notes": "EmuFive 1.0.12: no more black screen with emufive.mode= What's new - Fixed: a black screen with emufive.mode= in bootargs.txt (PS4 Multiboot 10). EmuFive set the TV's 1080p mode, then its home screen switched to another 1920x1080 mode (59.96 Hz, 173 MHz) that isn't one of the TV's modes, and some TVs show nothing with it. The home screen now keeps the mode EmuFive set. Checked…",
-   "stars": 336,
+   "stars": 340,
    "url": "https://github.com/blue0x1/EmuFive",
-   "score": 8.2
+   "score": 9.0
   },
   {
    "id": "xXBneutzerNameXx/PS5-Cleanup@v1.2",
@@ -535,9 +565,9 @@
    "date": "2026-11-18T14:57:35Z",
    "desc": "Clean up a jailbroken PS5 like new, no reinstall.",
    "notes": "Changelog 1.2 - Behoben – Firmware 13.x: Auf Firmware 13.x (u. a. 13.20/13.60) scheiterte das Löschen bisher mit „Bad file descriptor\". PS5 Cleanup geht jetzt – wie Playden – jeden Schritt über den ganzen Pfad, sobald die Konsole den kurzen Weg ablehnt. Löschen läuft damit auf 13.x genauso wie auf 12.x. - Sicherheit: Vor dem Löschen wird geprüft, dass der Weg zu allen Dateien…",
-   "stars": 117,
+   "stars": 121,
    "url": "https://github.com/xXBneutzerNameXx/PS5-Cleanup",
-   "score": 8.68
+   "score": 9.64
   },
   {
    "id": "bornaradusin/Emby5@1.3.3",
@@ -583,21 +613,6 @@
    "score": 8.52
   },
   {
-   "id": "heydemoura/PS5_Longshot@v0.1.3",
-   "kind": "new",
-   "repo": "heydemoura/PS5_Longshot",
-   "cid": "",
-   "name": "PS5_Longshot",
-   "tag": "v0.1.3",
-   "pre": false,
-   "date": "2026-11-16T21:47:56Z",
-   "desc": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
-   "notes": "Fixes the Linux builder. v0.1.1 and v0.1.2 on Linux stopped at \"Reading the game's program\" with ValueError: ZBIC: decompression failed (-2 of 63201744 bytes) . If you saw that, download this version and build again. The Windows builder was not affected; it is rebuilt here with the same check. What was wrong The game's main program is ZBIC-compressed in a dump, and the builder…",
-   "stars": 167,
-   "url": "https://github.com/heydemoura/PS5_Longshot",
-   "score": 12.2
-  },
-  {
    "id": "ZiZc3/XPSemu@v3.6",
    "kind": "update",
    "repo": "ZiZc3/XPSemu",
@@ -636,8 +651,8 @@
    "date": "2026-11-16T15:47:29Z",
    "notes": "New - ampr-emu-ng v0.4.1. The bundled runtime is the v0.4.1 release, in place of v0.3.4. - payloads.json for ps5-payload-manager. Each release now carries a payloads.json catalog. Add https://github.com/quer3q/ps5-dump-forge/releases/latest/download/payloads.json as a custom repository in ps5-payload-manager, and it installs and updates the PS5 payload. - Static Linux CLI. A…",
    "url": "https://github.com/quer3q/ps5-dump-forge/releases/tag/v0.5.6",
-   "stars": 524,
-   "score": 1.0
+   "stars": 526,
+   "score": 1.4
   },
   {
    "id": "gasb07/NeoEnabler@0.7.0",
@@ -650,8 +665,8 @@
    "date": "2026-11-16T10:20:02Z",
    "notes": "1. Experimental 8 GB support for 12.20 contributed by Serotoniner 2. Experimental 8 GB support for 9.00 contributed by nirajvenkat",
    "url": "https://github.com/gasb07/NeoEnabler/releases/tag/0.7.0",
-   "stars": 237,
-   "score": 2.5
+   "stars": 238,
+   "score": 2.7
   },
   {
    "id": "Swordpdf/PS5SX2@vk-285-321",
@@ -664,8 +679,8 @@
    "date": "2026-11-15T19:28:21Z",
    "notes": "PS5SX2 2.50 (build vk-285-321) Lossless Scaling frame generation, a new settings sheet, and a long list of fixes from your reports. Restart the console once after updating : the disc helper is now 171q. Lossless Scaling frame generation - A second frame generation method. On a game's settings: Picture Frame gen method Lossless Scaling , and frame generation on. - It uses your…",
    "url": "https://github.com/Swordpdf/PS5SX2/releases/tag/vk-285-321",
-   "stars": 1691,
-   "score": 1.0
+   "stars": 1692,
+   "score": 1.2
   },
   {
    "id": "fthdgn-gh/Alembic@v0.7.0",
@@ -839,9 +854,9 @@
    "date": "2026-11-12T21:07:17Z",
    "desc": "VERY experimental Nintendo Switch 2 emulator port for PS5",
    "notes": "Pre-release. The emulator core is now upstream Eglantine (nx2, November 2026) with our PlayStation 5 changes, kept as part of this repository instead of a patched submodule. - Faster in Zelda: Ocarina of Time : gameplay holds the game's 30 FPS cap (about 20 FPS before), at the same picture. - Donkey Kong Bananza no longer crashes when you smash the first rock wall after the…",
-   "stars": 413,
+   "stars": 415,
    "url": "https://github.com/heydemoura/EglantinePS5",
-   "score": 12.0
+   "score": 12.4
   },
   {
    "id": "jstrdev/ps5directo@v2.1.8",
@@ -943,8 +958,8 @@
    "date": "2026-11-10T12:44:22Z",
    "notes": "New: GPU presentation and CRT filters FBNeo PS5 2.4 adds Vulkan/RADV output. The CPU core generates the original game frame; the GPU handles texture scaling, CRT filtering, interface composition and final presentation. - Eleven CRT filters now run on the GPU, including the default CRT Easymode style . - Aspect ratio, smoothing, scanlines, vertical games, HUD transparency and…",
    "url": "https://github.com/MisterTemaki/fbneo-ps5/releases/tag/v2.4",
-   "stars": 17,
-   "score": 2.5
+   "stars": 18,
+   "score": 2.7
   },
   {
    "id": "ZiZc3/VLC@v0.6.1",
@@ -971,9 +986,9 @@
    "date": "2026-11-09T19:18:08Z",
    "desc": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI.",
    "notes": "Fixes - Endless loading screens are fixed. The rooftop in Lure, and other spots where the game got stuck loading, now go through. This was the game running out of room for something it needed to load, not the frame rate, so it's fixed at every resolution. - The final mission can be finished. Climbing into the chopper works again. That button mash was made for 30 FPS and didn't…",
-   "stars": 104,
+   "stars": 105,
    "url": "https://github.com/elripalda/gta4-ps5",
-   "score": 11.16
+   "score": 11.4
   },
   {
    "id": "streetpea/chiaki-ng@weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
@@ -986,8 +1001,8 @@
    "date": "2026-11-09T08:20:23Z",
    "notes": "Weekly Test Build",
    "url": "https://github.com/chiaki-ng/chiaki-ng/releases/tag/weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
-   "stars": 3191,
-   "score": 6.2
+   "stars": 3199,
+   "score": 7.8
   },
   {
    "id": "aarvsn/PS5Droid@v1.0.5",
@@ -1015,9 +1030,9 @@
    "date": "2026-11-09T04:21:27Z",
    "desc": "Standalone, content-neutral PS5 homebrew indexer and media framework. Proudly built alongside AI by JVK3R.",
    "notes": "New games keep reaching the store between releases, in a new catalog format. Changed - The store's catalog comes in a new format. New games keep arriving between releases. 0.5.6 and earlier stop receiving them and keep the games they already have, so update to keep the store current. Installing On 0.5.2 to 0.5.6: open Jobee'sLair and it offers 0.5.7. Download it, then Restart…",
-   "stars": 312,
+   "stars": 313,
    "url": "https://github.com/JVK3R/JobeesLair",
-   "score": 10.0
+   "score": 10.2
   },
   {
    "id": "ps5-payload-dev/ftpsrv@v0.22",
@@ -1044,8 +1059,8 @@
    "date": "2026-11-08T20:02:14Z",
    "notes": "- Introduced configuration format v2, with separate config.ini and profiles.ini, automatic migration, and runtime reloads. - Improved mount and launch recovery, including safer cleanup of sandbox layers and handling for M.2 storage. - Made library scans more resilient to inaccessible folders and source changes. - Improved metadata and filename handling for PS4 trophies, sce…",
    "url": "https://github.com/drakmor/ShadowMountPlus/releases/tag/1.7beta12",
-   "stars": 1435,
-   "score": 0.2
+   "stars": 1438,
+   "score": 0.8
   },
   {
    "id": "mihawk-99/PS5_MihawkOS@v8.2.0-alpha-8",
@@ -1058,8 +1073,8 @@
    "date": "2026-11-08T13:11:54Z",
    "notes": "PS5 MihawkOS-v8.2.0-alpha-8 MihawkOS is a passion project, not a piracy project. It exists so you can play the games you own on the console you own. - Piracy is not condoned. - No games, saves, keys, firmware or exploits are included, and they never will be. - Use only games and programs you have the right to run : your own copies, bought or installed by you. - Requests for,…",
    "url": "https://github.com/mihawk-99/PS5_MihawkOS/releases/tag/v8.2.0-alpha-8",
-   "stars": 408,
-   "score": 1.5
+   "stars": 409,
+   "score": 1.7
   },
   {
    "id": "MasterShivnath007/ytps5-sponsorblock@v1.2.0",
@@ -1101,8 +1116,8 @@
    "date": "2026-11-03T19:07:50Z",
    "notes": "Porpoise 4.5 A new look, PlayStation Move motion controls, up to four players in Wii games, Triforce arcade games, and VRR. The new look - A new Porpoise look built around your collection: real disc cases you move through with the stick, in Light , Dark or OLED - The side menu: press Triangle , or swipe in from the right edge of the touch pad, to reach Settings and everything…",
    "url": "https://github.com/elripalda/Porpoise-Dolphin-Emulator-for-PS5/releases/tag/v4.5",
-   "stars": 246,
-   "score": 2.7
+   "stars": 247,
+   "score": 2.9
   },
   {
    "id": "disco-trooper/hush@v1.1.1",
@@ -1132,21 +1147,6 @@
    "url": "https://github.com/Herbrax/Chiral-FTP/releases/tag/v1.2",
    "stars": 10,
    "score": 2.5
-  },
-  {
-   "id": "kvaps/ProsperoWeb@v0.2.1",
-   "kind": "new",
-   "repo": "kvaps/ProsperoWeb",
-   "cid": "",
-   "name": "ProsperoWeb",
-   "tag": "v0.2.1",
-   "pre": false,
-   "date": "2026-11-02T14:41:29Z",
-   "desc": "ProsperoWeb: homebrew web browser for PlayStation 5, upstream WebKit (PlayStation port) built with the open ps5-payload-sdk",
-   "notes": "Fixed - Startup on consoles whose ELF loader keeps the launch connection open until the payload exits (etaHEN's bundled elfldr, and some jailbreak hosts). The loader request is now sent asynchronously and the UI connects to the spawn broker as soon as it is listening, instead of blocking on the loader's response while the broker timed out with no client. The browser now starts…",
-   "stars": 51,
-   "url": "https://github.com/kvaps/ProsperoWeb",
-   "score": 6.04
   },
   {
    "id": "mucahidkambur/EglantinePS5@v1.000.000",
@@ -1404,7 +1404,7 @@
    ],
    [
     "2026-11-20",
-    587
+    588
    ]
   ],
   "mistertemaki/fbneo-ps5": [
@@ -1438,7 +1438,7 @@
    ],
    [
     "2026-11-20",
-    17
+    18
    ]
   ],
   "zizc3/vlc": [
@@ -1540,7 +1540,7 @@
    ],
    [
     "2026-11-20",
-    117
+    121
    ]
   ],
   "quer3q/ps5-dump-forge": [
@@ -1574,7 +1574,7 @@
    ],
    [
     "2026-11-20",
-    524
+    526
    ]
   ],
   "elripalda/gta4-ps5": [
@@ -1608,7 +1608,7 @@
    ],
    [
     "2026-11-20",
-    104
+    105
    ]
   ],
   "blue0x1/emufive": [
@@ -1642,7 +1642,7 @@
    ],
    [
     "2026-11-20",
-    336
+    340
    ]
   ],
   "streetpea/chiaki-ng": [
@@ -1676,7 +1676,7 @@
    ],
    [
     "2026-11-20",
-    3191
+    3199
    ]
   ],
   "aarvsn/ps5droid": [
@@ -1744,7 +1744,7 @@
    ],
    [
     "2026-11-20",
-    312
+    313
    ]
   ],
   "notmaj0r/prosperomgr": [
@@ -1846,7 +1846,7 @@
    ],
    [
     "2026-11-20",
-    1435
+    1438
    ]
   ],
   "x1nons/prefbar": [
@@ -1914,7 +1914,7 @@
    ],
    [
     "2026-11-20",
-    408
+    409
    ]
   ],
   "percdotdev/ps5-webkit-autoloader-esp32": [
@@ -1948,7 +1948,7 @@
    ],
    [
     "2026-11-20",
-    16
+    17
    ]
   ],
   "nothavocc/ps5-hwcon-plugin": [
@@ -2072,7 +2072,7 @@
    ],
    [
     "2026-11-20",
-    1691
+    1692
    ]
   ],
   "gasb07/ps4mount": [
@@ -2262,7 +2262,7 @@
    ],
    [
     "2026-11-20",
-    246
+    247
    ]
   ],
   "disco-trooper/hush": [
@@ -2364,7 +2364,7 @@
    ],
    [
     "2026-11-20",
-    237
+    238
    ]
   ],
   "knutwurst/ps5-patchdl": [
@@ -2760,7 +2760,7 @@
    ],
    [
     "2026-11-20",
-    67
+    68
    ]
   ],
   "freefelt/transmission-ps5": [
@@ -2964,7 +2964,7 @@
    ],
    [
     "2026-11-20",
-    413
+    415
    ]
   ],
   "elripalda/recompstore": [
@@ -3902,7 +3902,7 @@
    ],
    [
     "2026-11-20",
-    48
+    50
    ]
   ],
   "abhi245y/ps5lm-plus": [
@@ -4460,7 +4460,7 @@
    ],
    [
     "2026-11-20",
-    113
+    114
    ]
   ],
   "synopiia/psxs5": [
@@ -4698,7 +4698,7 @@
    ],
    [
     "2026-11-20",
-    213
+    214
    ]
   ],
   "sub0x00001/octet": [
@@ -4850,7 +4850,7 @@
    ],
    [
     "2026-11-20",
-    167
+    177
    ]
   ],
   "forcevacavity/ps5-emulator-pc": [
@@ -4889,6 +4889,10 @@
    [
     "2026-11-19",
     124
+   ],
+   [
+    "2026-11-20",
+    123
    ]
   ],
   "jbuildr/nubix": [
@@ -4912,7 +4916,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "johnstiles/gta-6-switch-version--pc-emulator-2026": [
@@ -4922,7 +4926,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "epicgiantite13205/gta-6-switch-version--pc-emulator-2026": [
@@ -4932,7 +4936,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "zalman-ua/gta-6-switch-version--pc-emulator-2026": [
@@ -4952,7 +4956,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "kkaramaddinnn/gta-6-switch-version--pc-emulator-2026": [
@@ -4972,7 +4976,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "antikvarx/gta-6-switch-version--pc-emulator-2026": [
@@ -4982,7 +4986,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "simadan11/gta-6-switch-version--pc-emulator-2026": [
@@ -4992,7 +4996,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "wlfear/gta-6-switch-version--pc-emulator-2026": [
@@ -5002,7 +5006,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "andriy-samp/gta-6-switch-version--pc-emulator-2026": [
@@ -5012,7 +5016,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "kamesha12/gta-6-switch-version--pc-emulator-2026": [
@@ -5022,7 +5026,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "stancaedy10-glitch/gta-6-switch-version--pc-emulator-2026": [
@@ -5032,7 +5036,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "python001-dev/gta-6-switch-version--pc-emulator-2026": [
@@ -5048,7 +5052,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "mecidovv/gta-6-switch-version--pc-emulator-2026": [
@@ -5058,7 +5062,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "mohamedhamdytaha/gta-6-switch-version--pc-emulator-2026": [
@@ -5068,7 +5072,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "qwerthegoe-hash/gta-6-switch-version--pc-emulator-2026": [
@@ -5078,7 +5082,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "itprogamatikdedsec/gta-6-switch-version--pc-emulator-2026": [
@@ -5098,7 +5102,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "woshilaji8763/gta-6-switch-version--pc-emulator-2026": [
@@ -5108,7 +5112,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "ernestoracua/gta-6-switch-version--pc-emulator-2026": [
@@ -5144,7 +5148,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "kemans35/gta-6-switch-version--pc-emulator-2026": [
@@ -5154,7 +5158,7 @@
    ],
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "samokoto/gta-6-switch-version--pc-emulator-2026": [
@@ -5180,13 +5184,31 @@
   "hanataki41-ui/gta-6-switch-version--pc-emulator-2026": [
    [
     "2026-11-20",
-    36
+    35
    ]
   ],
   "meirz911/gta-6-switch-version--pc-emulator-2026": [
    [
     "2026-11-20",
+    35
+   ]
+  ],
+  "eluyonga/gta-6-switch-version--pc-emulator-2026": [
+   [
+    "2026-11-20",
     36
+   ]
+  ],
+  "shukvaniplayz/gta-6-switch-version--pc-emulator-2026": [
+   [
+    "2026-11-20",
+    36
+   ]
+  ],
+  "azurejelly/ps5-discord-rpc": [
+   [
+    "2026-11-20",
+    5
    ]
   ]
  },
@@ -5232,8 +5254,8 @@
    "2026-11-10T18:46:58Z"
   ],
   "bornaradusin/pc5": [
-   "v2.4.2",
-   "2026-11-16T20:31:31Z"
+   "v2.4.3",
+   "2026-11-19T22:44:59Z"
   ],
   "bornaradusin/prosperoradio": [
    "01.000.010",
@@ -5916,8 +5938,8 @@
    "2026-11-09T08:20:23Z"
   ],
   "strongt1me/ps5-cooling-system-center-pro": [
-   "v1.88.1",
-   "2026-11-19T17:30:41Z"
+   "v1.89.0",
+   "2026-11-20T01:43:54Z"
   ],
   "svengdk/prospero-explorer": [
    "v1.0",
@@ -6074,8 +6096,8 @@
    "2026-11-10T18:46:58Z"
   ],
   "bornaradusin/pc5": [
-   "v2.4.2",
-   "2026-11-16T20:31:31Z"
+   "v2.4.3",
+   "2026-11-19T22:44:59Z"
   ],
   "bornaradusin/prosperoradio": [
    "01.000.010",
@@ -6674,8 +6696,8 @@
    "2026-09-05T08:40:09Z"
   ],
   "ps5-payload-dev/elfldr": [
-   "v0.27",
-   "2026-10-21T17:42:19Z"
+   "v0.28",
+   "2026-11-19T22:44:29Z"
   ],
   "ps5-payload-dev/ftpsrv": [
    "v0.22",
@@ -6758,8 +6780,8 @@
    "2026-11-09T08:20:23Z"
   ],
   "strongt1me/ps5-cooling-system-center-pro": [
-   "v1.88.1",
-   "2026-11-19T17:30:41Z"
+   "v1.89.0",
+   "2026-11-20T01:43:54Z"
   ],
   "svengdk/prospero-explorer": [
    "v1.0",
@@ -6875,216 +6897,216 @@
   ]
  },
  "pop": {
-  "02dnot/jelly5": 499,
-  "abhi245y/ps5lm-plus": 304,
-  "abhi245y/spot5": 483,
-  "animatian112/ytps5-sponsorblock": 4582,
-  "anime0t4ku/prospero-hi-fi": 255,
-  "bilawalriaz/nuvio-ps5-homebrew": 297,
-  "bizkut/ps5-forever": 326,
-  "bornaradusin/blur5": 195,
-  "bornaradusin/emby5": 679,
-  "bornaradusin/home5": 212,
-  "bornaradusin/pc5": 4777,
-  "bornaradusin/prosperoradio": 355,
-  "bps2414/lineup": 1237,
-  "brinootk/ps5x360": 5337,
-  "bystritskiy/repop-ps5": 164,
-  "bystritskiy/reundr-ps5": 593,
-  "bystritskiy/reundr2-ps5": 1567,
-  "bystritskiy/speedbreaker-ps5": 720,
-  "bystritskiy/xerenge-ps5": 267,
-  "carlchina/wiliwili": 814,
-  "chadea1/raptorps5": 100,
-  "chaostheory1075/crackdown-ps5": 339,
-  "chaostheory1075/mgr-ps5": 317,
-  "chaostheory1075/mp3-ps5": 574,
-  "chaostheory1075/proto-ps5": 147,
-  "chaostheory1075/sh-ps5": 112,
-  "cherryduck/ps5_eccodefender": 40,
-  "cobanov/ps5lm": 578,
-  "codemasterv/the_legend_of_dragoon_ps5_recomp": 43,
-  "cptlamarca/aot-tdc-ps5": 197,
-  "cptlamarca/grfs-ps5": 117,
-  "cptlamarca/mk9-ps5": 334,
-  "cptlamarca/recomptrophy": 108,
-  "damiantw/ps5_shipwright": 365,
-  "dantaipan/ps64": 486,
-  "darkatek7/prosperothemes": 2677,
-  "darkatek7/ps5sd": 142,
-  "darkxex/fftarecomp-ps5": 95,
-  "darkxex/prosperostore": 20709,
-  "darkxex/ps5_celeste": 169,
-  "darkxex/rekhcom-ps5": 160,
-  "darkxex/swanstationps5": 3382,
-  "desstannsoftware/ps5-pkg-folderizer": 1280,
-  "desstannsoftware/pscord": 448,
-  "devvnirvana/afterglow": 397,
-  "dragonscales123/lostodysseyrecompps5": 168,
-  "dragonscales123/reblueps5": 181,
-  "drakmor/shadowmountplus": 12871,
-  "echostretch/kstuff": 1001,
-  "elripalda/dbz-budokai3-ps5": 216,
-  "elripalda/defjam-ps5": 489,
-  "elripalda/fifastreet-ps5": 237,
-  "elripalda/gta4-ps5": 3661,
-  "elripalda/nbajam-ps5": 129,
-  "elripalda/nbastreet-ps5": 98,
-  "elripalda/porpoise-dolphin-emulator-for-ps5": 3564,
-  "elripalda/skate3-ps5": 524,
-  "elripalda/svr2007-ps5": 53,
-  "elripalda/svr2008-recomp-ps5": 57,
-  "elripalda/svr2011-ps5": 255,
-  "elripalda/wwe13-ps5": 76,
-  "elripalda/wwe2k14-ps5": 141,
-  "elripalda/wweallstars-ps5": 97,
-  "erickdavestech/ps5-dualsense-overlay": 8,
-  "felipemelchior/driftcheck5": 590,
-  "fthdgn-gh/alembic": 8604,
-  "gasb07/neoenabler": 468,
-  "gasb07/ps4mount": 1951,
-  "gezine/y2jb": 2513,
-  "gordonprosperoman/xash3d-ps5": 280,
-  "griches/jamespond2robocodrecomp": 268,
-  "griches/ps5_artswap": 723,
-  "griches/ps5_burnout3": 351,
-  "griches/ps5_devilutionx": 104,
-  "griches/ps5_doom3": 163,
-  "griches/ps5_dusklight": 487,
-  "griches/ps5_eternaldarkness": 307,
-  "griches/ps5_geometrywars2": 133,
-  "griches/ps5_ghostship": 825,
-  "griches/ps5_quake3e": 165,
-  "griches/ps5_sunshine": 521,
-  "griches/ps5_switchwaker": 416,
-  "gummibri/parasite-eve-ps5": 280,
-  "handshakehackin/youtube-maxd": 858,
-  "herbrax/chiral-ftp": 658,
-  "hexreaper711/hixflix": 469,
-  "hexreaper711/splinter-cell-blacklist-ps5": 149,
-  "heydemoura/prosperoeden": 4028,
-  "heydemoura/ps5-forwarder-manager": 687,
-  "holdmysocks/ps5-tailscale": 270,
-  "idlesauce/ps5-remoteplay-get-pin": 260,
-  "illusionyy/ps-patch-system": 1127,
-  "iswebro/console-shelf-ps5": 323,
-  "itsblurf/bfpilot": 584,
-  "itsplk/ps5-pkg-manager": 1302,
-  "jmelovich/ps5-gyroaim": 176,
-  "jmelovich/steam-link-ps5": 571,
-  "kamb205/tna-impact-reloaded-ps5": 55,
-  "karnerf/smplusgui": 7,
-  "kauansilvalopes/estante": 322,
-  "kauansilvalopes/trophy": 399,
-  "kernelforgelabs/prosperoeden-switch-ui": 1538,
-  "khalifa007/capymobile": 229,
-  "knutwurst/ps5-patchdl": 1904,
-  "kongatime/spider-man-edge-of-time-ps5": 412,
-  "kvaps/syobon-action-ps5": 170,
-  "larazadelsol/wings-app": 96,
-  "ledybacer/prosperolight": 700,
-  "leolobato/playden-ps5": 23500,
-  "lightningmods/etahen": 1685,
-  "lowbit/ps5-doom": 737,
-  "lowbit/ps5-openrct2": 94,
-  "lozazamastro/cd-player": 302,
-  "lozazamastro/pixel-museum": 189728,
-  "lozazamastro/stremio-plus": 950,
-  "lozazamastro/thesimpsonsgame-ps5-builder": 618,
-  "lucasliet/battleship-remix": 5020,
-  "m0s4ysh3ll0/mediathek-ps5": 328,
-  "marice/jsrf-ps5": 264,
-  "marice/oliseplayer": 155,
-  "marice/ps5-exporter": 247,
-  "marice/ps5-payloader": 595,
-  "marice/ps5-signal-companion": 406,
-  "marice/rush2-ps5": 146,
-  "marice/screentester5": 171,
-  "marice/stk-ps5": 323,
-  "marice/wave-race-64-ps5": 196,
-  "megacadedev/naughtybearrecomp": 57,
-  "melvindevries/retro-rewind-ps5-patcher": 485,
-  "mihawk-99/ps5_mihawkos": 2942,
-  "mihawk-99/ps5_retroarch": 8413,
-  "mihawk-99/ps5_vkquake": 112,
-  "miladrtx/breeze": 381,
-  "mistertemaki/beetlepceps5": 349,
-  "mistertemaki/fbneo-ps5": 1117,
-  "mistertemaki/genplusgxps5": 874,
-  "mistertemaki/mediaplayerclassicps5": 842,
-  "mistertemaki/snes9xps5": 1397,
-  "mortaljinx/mortalfin": 164,
-  "mortaljinx/seedee5": 148,
-  "mpereiraesaa/prospero-win": 716,
-  "mshivam019/ac-ps5": 231,
-  "mshivam019/la-ps5": 286,
-  "mshivam019/morrowind-ps5": 141,
-  "mshivam019/naruto-ps5": 163,
-  "mshivam019/tmm64-ps5": 329,
-  "mucahidkambur/eglantineps5": 373,
-  "nazky/unleashedrecomp-prospero": 179,
-  "nikay99/ps5mg": 133,
-  "notmaj0r/cheatrunner": 1910,
-  "notmaj0r/prosperomgr": 10059,
-  "opencloudgaming/opennow-ps5": 2890,
-  "portablelle/codex-ps5": 1064,
-  "premohq/ps5-ecam": 2596,
-  "press5elect/crux2": 1099,
-  "press5elect/ogbox": 2957,
-  "press5elect/psflycast": 1614,
-  "press5elect/psswanstation": 1419,
-  "ps5-linux/ps5-linux-loader": 838,
-  "ps5-payload-dev/elfldr": 1849,
-  "ps5-payload-dev/ftpsrv": 4100,
-  "quatrixone/prosperoai": 594,
-  "quer3q/ps5-dump-forge": 24382,
-  "rafaelngp/pico8-ps5": 173,
-  "rafaelngp/xbox-cloud-gaming-ps5": 1447,
-  "s0liton/rommps": 2658,
-  "sainsaji/evo-player-ps5": 1351,
-  "sainsaji/ps5-audio-passthrough-research": 214,
-  "samclay8/cbfd-recompiled-ps5": 490,
-  "samclay8/dk64-rekongpiled-ps5": 599,
-  "secondcoat/second-coat-london": 1657,
-  "seregonwar/zftpd": 1011,
+  "02dnot/jelly5": 489,
+  "abhi245y/ps5lm-plus": 298,
+  "abhi245y/spot5": 486,
+  "animatian112/ytps5-sponsorblock": 4565,
+  "anime0t4ku/prospero-hi-fi": 257,
+  "bilawalriaz/nuvio-ps5-homebrew": 287,
+  "bizkut/ps5-forever": 285,
+  "bornaradusin/blur5": 175,
+  "bornaradusin/emby5": 675,
+  "bornaradusin/home5": 204,
+  "bornaradusin/pc5": 4657,
+  "bornaradusin/prosperoradio": 353,
+  "bps2414/lineup": 1167,
+  "brinootk/ps5x360": 5389,
+  "bystritskiy/repop-ps5": 160,
+  "bystritskiy/reundr-ps5": 560,
+  "bystritskiy/reundr2-ps5": 1471,
+  "bystritskiy/speedbreaker-ps5": 663,
+  "bystritskiy/xerenge-ps5": 249,
+  "carlchina/wiliwili": 793,
+  "chadea1/raptorps5": 98,
+  "chaostheory1075/crackdown-ps5": 332,
+  "chaostheory1075/mgr-ps5": 283,
+  "chaostheory1075/mp3-ps5": 528,
+  "chaostheory1075/proto-ps5": 138,
+  "chaostheory1075/sh-ps5": 109,
+  "cherryduck/ps5_eccodefender": 43,
+  "cobanov/ps5lm": 556,
+  "codemasterv/the_legend_of_dragoon_ps5_recomp": 37,
+  "cptlamarca/aot-tdc-ps5": 193,
+  "cptlamarca/grfs-ps5": 115,
+  "cptlamarca/mk9-ps5": 318,
+  "cptlamarca/recomptrophy": 101,
+  "damiantw/ps5_shipwright": 338,
+  "dantaipan/ps64": 514,
+  "darkatek7/prosperothemes": 2559,
+  "darkatek7/ps5sd": 151,
+  "darkxex/fftarecomp-ps5": 93,
+  "darkxex/prosperostore": 20843,
+  "darkxex/ps5_celeste": 172,
+  "darkxex/rekhcom-ps5": 158,
+  "darkxex/swanstationps5": 3529,
+  "desstannsoftware/ps5-pkg-folderizer": 1202,
+  "desstannsoftware/pscord": 447,
+  "devvnirvana/afterglow": 377,
+  "dragonscales123/lostodysseyrecompps5": 164,
+  "dragonscales123/reblueps5": 169,
+  "drakmor/shadowmountplus": 12588,
+  "echostretch/kstuff": 955,
+  "elripalda/dbz-budokai3-ps5": 208,
+  "elripalda/defjam-ps5": 458,
+  "elripalda/fifastreet-ps5": 223,
+  "elripalda/gta4-ps5": 3371,
+  "elripalda/nbajam-ps5": 122,
+  "elripalda/nbastreet-ps5": 90,
+  "elripalda/porpoise-dolphin-emulator-for-ps5": 3414,
+  "elripalda/skate3-ps5": 499,
+  "elripalda/svr2007-ps5": 54,
+  "elripalda/svr2008-recomp-ps5": 53,
+  "elripalda/svr2011-ps5": 221,
+  "elripalda/wwe13-ps5": 74,
+  "elripalda/wwe2k14-ps5": 135,
+  "elripalda/wweallstars-ps5": 85,
+  "erickdavestech/ps5-dualsense-overlay": 7,
+  "felipemelchior/driftcheck5": 572,
+  "fthdgn-gh/alembic": 8247,
+  "gasb07/neoenabler": 449,
+  "gasb07/ps4mount": 1934,
+  "gezine/y2jb": 2507,
+  "gordonprosperoman/xash3d-ps5": 277,
+  "griches/jamespond2robocodrecomp": 279,
+  "griches/ps5_artswap": 687,
+  "griches/ps5_burnout3": 333,
+  "griches/ps5_devilutionx": 100,
+  "griches/ps5_doom3": 156,
+  "griches/ps5_dusklight": 481,
+  "griches/ps5_eternaldarkness": 296,
+  "griches/ps5_geometrywars2": 123,
+  "griches/ps5_ghostship": 813,
+  "griches/ps5_quake3e": 159,
+  "griches/ps5_sunshine": 480,
+  "griches/ps5_switchwaker": 392,
+  "gummibri/parasite-eve-ps5": 272,
+  "handshakehackin/youtube-maxd": 832,
+  "herbrax/chiral-ftp": 649,
+  "hexreaper711/hixflix": 463,
+  "hexreaper711/splinter-cell-blacklist-ps5": 138,
+  "heydemoura/prosperoeden": 3884,
+  "heydemoura/ps5-forwarder-manager": 652,
+  "holdmysocks/ps5-tailscale": 297,
+  "idlesauce/ps5-remoteplay-get-pin": 268,
+  "illusionyy/ps-patch-system": 1108,
+  "iswebro/console-shelf-ps5": 306,
+  "itsblurf/bfpilot": 576,
+  "itsplk/ps5-pkg-manager": 1309,
+  "jmelovich/ps5-gyroaim": 177,
+  "jmelovich/steam-link-ps5": 553,
+  "kamb205/tna-impact-reloaded-ps5": 50,
+  "karnerf/smplusgui": 6,
+  "kauansilvalopes/estante": 307,
+  "kauansilvalopes/trophy": 377,
+  "kernelforgelabs/prosperoeden-switch-ui": 1461,
+  "khalifa007/capymobile": 232,
+  "knutwurst/ps5-patchdl": 1680,
+  "kongatime/spider-man-edge-of-time-ps5": 397,
+  "kvaps/syobon-action-ps5": 173,
+  "larazadelsol/wings-app": 93,
+  "ledybacer/prosperolight": 686,
+  "leolobato/playden-ps5": 22898,
+  "lightningmods/etahen": 1648,
+  "lowbit/ps5-doom": 810,
+  "lowbit/ps5-openrct2": 93,
+  "lozazamastro/cd-player": 284,
+  "lozazamastro/pixel-museum": 176053,
+  "lozazamastro/stremio-plus": 903,
+  "lozazamastro/thesimpsonsgame-ps5-builder": 620,
+  "lucasliet/battleship-remix": 4825,
+  "m0s4ysh3ll0/mediathek-ps5": 313,
+  "marice/jsrf-ps5": 241,
+  "marice/oliseplayer": 149,
+  "marice/ps5-exporter": 239,
+  "marice/ps5-payloader": 549,
+  "marice/ps5-signal-companion": 375,
+  "marice/rush2-ps5": 143,
+  "marice/screentester5": 172,
+  "marice/stk-ps5": 327,
+  "marice/wave-race-64-ps5": 182,
+  "megacadedev/naughtybearrecomp": 52,
+  "melvindevries/retro-rewind-ps5-patcher": 477,
+  "mihawk-99/ps5_mihawkos": 2655,
+  "mihawk-99/ps5_retroarch": 7941,
+  "mihawk-99/ps5_vkquake": 113,
+  "miladrtx/breeze": 362,
+  "mistertemaki/beetlepceps5": 345,
+  "mistertemaki/fbneo-ps5": 1056,
+  "mistertemaki/genplusgxps5": 833,
+  "mistertemaki/mediaplayerclassicps5": 807,
+  "mistertemaki/snes9xps5": 1359,
+  "mortaljinx/mortalfin": 157,
+  "mortaljinx/seedee5": 145,
+  "mpereiraesaa/prospero-win": 692,
+  "mshivam019/ac-ps5": 220,
+  "mshivam019/la-ps5": 264,
+  "mshivam019/morrowind-ps5": 137,
+  "mshivam019/naruto-ps5": 155,
+  "mshivam019/tmm64-ps5": 318,
+  "mucahidkambur/eglantineps5": 371,
+  "nazky/unleashedrecomp-prospero": 167,
+  "nikay99/ps5mg": 131,
+  "notmaj0r/cheatrunner": 1848,
+  "notmaj0r/prosperomgr": 10001,
+  "opencloudgaming/opennow-ps5": 2878,
+  "portablelle/codex-ps5": 1057,
+  "premohq/ps5-ecam": 2438,
+  "press5elect/crux2": 1119,
+  "press5elect/ogbox": 2604,
+  "press5elect/psflycast": 1609,
+  "press5elect/psswanstation": 1456,
+  "ps5-linux/ps5-linux-loader": 836,
+  "ps5-payload-dev/elfldr": 2010,
+  "ps5-payload-dev/ftpsrv": 4038,
+  "quatrixone/prosperoai": 556,
+  "quer3q/ps5-dump-forge": 23956,
+  "rafaelngp/pico8-ps5": 172,
+  "rafaelngp/xbox-cloud-gaming-ps5": 1434,
+  "s0liton/rommps": 2665,
+  "sainsaji/evo-player-ps5": 1219,
+  "sainsaji/ps5-audio-passthrough-research": 205,
+  "samclay8/cbfd-recompiled-ps5": 433,
+  "samclay8/dk64-rekongpiled-ps5": 559,
+  "secondcoat/second-coat-london": 1602,
+  "seregonwar/zftpd": 987,
   "shabbypenguin/pokemmo-prospero": 191,
-  "shwan-ps5/pulse": 166,
-  "skarift/jewelcase": 301,
-  "smoxa/ps5-new-overlay": 405,
-  "stl1te/medievaltennis": 171,
-  "stonedmodder/pshare": 170,
-  "stonedmodder/vita5": 313,
-  "streetpea/chiaki-ng": 48947,
-  "svengdk/prospero-explorer": 814,
-  "svengdk/prospero-multi-tools": 598,
-  "swordpdf/ps5sx2": 15952,
-  "synopiia/psxs5": 1070,
-  "tertiumndatur/ps5-cloud-play": 369,
-  "thatguykalvin/prosperotv": 1415,
-  "thatretireddude/tokenstation5": 187,
-  "thelinkin3000/halo-ce-universal": 1557,
-  "therealretro/mupen64plus-ps5": 957,
-  "thesmokesession-bit/perfect-eye": 995,
-  "tsuramatsu1/psp5": 1215,
-  "tsvetomirgt/symphonystation5": 135,
-  "unicxrn/twispero": 222,
-  "venezuelanbiggie24/machete-ps5sd-img-and-vid": 181,
-  "venezuelanbiggie24/machetesvg-ps5-save-manager": 534,
-  "vivalavent/ps5-bazzite-deck": 13981,
-  "vivalavent/ps5mc": 362,
-  "viviandsx/regie5": 127,
-  "xen-made/orion-media-center": 658,
-  "yahballon/ps5gbcx": 146,
-  "yaibakamikaze/izunarecomp": 907,
-  "yaibakamikaze/ninjas-dawn-ps5": 45,
-  "zizc3/hydroid": 945,
-  "zizc3/infinity-blade-ps5": 457,
-  "zizc3/ruffle-flash-ps5": 135,
-  "zizc3/vlc": 1223,
-  "zizc3/xpsemu": 1958,
+  "shwan-ps5/pulse": 162,
+  "skarift/jewelcase": 297,
+  "smoxa/ps5-new-overlay": 424,
+  "stl1te/medievaltennis": 172,
+  "stonedmodder/pshare": 164,
+  "stonedmodder/vita5": 303,
+  "streetpea/chiaki-ng": 55836,
+  "svengdk/prospero-explorer": 798,
+  "svengdk/prospero-multi-tools": 567,
+  "swordpdf/ps5sx2": 15784,
+  "synopiia/psxs5": 1044,
+  "tertiumndatur/ps5-cloud-play": 360,
+  "thatguykalvin/prosperotv": 1365,
+  "thatretireddude/tokenstation5": 190,
+  "thelinkin3000/halo-ce-universal": 1454,
+  "therealretro/mupen64plus-ps5": 945,
+  "thesmokesession-bit/perfect-eye": 914,
+  "tsuramatsu1/psp5": 1157,
+  "tsvetomirgt/symphonystation5": 131,
+  "unicxrn/twispero": 217,
+  "venezuelanbiggie24/machete-ps5sd-img-and-vid": 168,
+  "venezuelanbiggie24/machetesvg-ps5-save-manager": 513,
+  "vivalavent/ps5-bazzite-deck": 14821,
+  "vivalavent/ps5mc": 356,
+  "viviandsx/regie5": 128,
+  "xen-made/orion-media-center": 603,
+  "yahballon/ps5gbcx": 138,
+  "yaibakamikaze/izunarecomp": 909,
+  "yaibakamikaze/ninjas-dawn-ps5": 42,
+  "zizc3/hydroid": 923,
+  "zizc3/infinity-blade-ps5": 469,
+  "zizc3/ruffle-flash-ps5": 131,
+  "zizc3/vlc": 1184,
+  "zizc3/xpsemu": 1857,
   "zx0cf1/retropapaps5-beta": 3
  },
- "pop_t": "2026-11-19T20:36:32Z",
+ "pop_t": "2026-11-20T11:36:54Z",
  "dlh": {
   "02dnot/jelly5": [
    [
@@ -7118,6 +7140,10 @@
    [
     "2026-11-19",
     9628
+   ],
+   [
+    "2026-11-20",
+    9659
    ]
   ],
   "abhi245y/ps5lm-plus": [
@@ -7152,6 +7178,10 @@
    [
     "2026-11-19",
     3954
+   ],
+   [
+    "2026-11-20",
+    3967
    ]
   ],
   "abhi245y/spot5": [
@@ -7186,6 +7216,10 @@
    [
     "2026-11-19",
     4898
+   ],
+   [
+    "2026-11-20",
+    4942
    ]
   ],
   "animatian112/ytps5-sponsorblock": [
@@ -7220,6 +7254,10 @@
    [
     "2026-11-19",
     32782
+   ],
+   [
+    "2026-11-20",
+    33636
    ]
   ],
   "anime0t4ku/prospero-hi-fi": [
@@ -7254,6 +7292,10 @@
    [
     "2026-11-19",
     1728
+   ],
+   [
+    "2026-11-20",
+    1752
    ]
   ],
   "bilawalriaz/nuvio-ps5-homebrew": [
@@ -7288,6 +7330,10 @@
    [
     "2026-11-19",
     6082
+   ],
+   [
+    "2026-11-20",
+    6105
    ]
   ],
   "bizkut/ps5-forever": [
@@ -7322,6 +7368,10 @@
    [
     "2026-11-19",
     3206
+   ],
+   [
+    "2026-11-20",
+    3214
    ]
   ],
   "bornaradusin/blur5": [
@@ -7356,6 +7406,10 @@
    [
     "2026-11-19",
     1176
+   ],
+   [
+    "2026-11-20",
+    1177
    ]
   ],
   "bornaradusin/emby5": [
@@ -7390,6 +7444,10 @@
    [
     "2026-11-19",
     6367
+   ],
+   [
+    "2026-11-20",
+    6402
    ]
   ],
   "bornaradusin/home5": [
@@ -7424,6 +7482,10 @@
    [
     "2026-11-19",
     1645
+   ],
+   [
+    "2026-11-20",
+    1658
    ]
   ],
   "bornaradusin/pc5": [
@@ -7458,6 +7520,10 @@
    [
     "2026-11-19",
     21624
+   ],
+   [
+    "2026-11-20",
+    22228
    ]
   ],
   "bornaradusin/prosperoradio": [
@@ -7492,6 +7558,10 @@
    [
     "2026-11-19",
     2011
+   ],
+   [
+    "2026-11-20",
+    2041
    ]
   ],
   "bps2414/lineup": [
@@ -7526,6 +7596,10 @@
    [
     "2026-11-19",
     6669
+   ],
+   [
+    "2026-11-20",
+    6733
    ]
   ],
   "brinootk/ps5x360": [
@@ -7560,6 +7634,10 @@
    [
     "2026-11-19",
     81135
+   ],
+   [
+    "2026-11-20",
+    81719
    ]
   ],
   "bystritskiy/repop-ps5": [
@@ -7594,6 +7672,10 @@
    [
     "2026-11-19",
     1015
+   ],
+   [
+    "2026-11-20",
+    1025
    ]
   ],
   "bystritskiy/reundr-ps5": [
@@ -7628,6 +7710,10 @@
    [
     "2026-11-19",
     2409
+   ],
+   [
+    "2026-11-20",
+    2435
    ]
   ],
   "bystritskiy/reundr2-ps5": [
@@ -7662,6 +7748,10 @@
    [
     "2026-11-19",
     3562
+   ],
+   [
+    "2026-11-20",
+    3638
    ]
   ],
   "bystritskiy/speedbreaker-ps5": [
@@ -7696,6 +7786,10 @@
    [
     "2026-11-19",
     2519
+   ],
+   [
+    "2026-11-20",
+    2533
    ]
   ],
   "bystritskiy/xerenge-ps5": [
@@ -7730,6 +7824,10 @@
    [
     "2026-11-19",
     1151
+   ],
+   [
+    "2026-11-20",
+    1159
    ]
   ],
   "carlchina/wiliwili": [
@@ -7764,6 +7862,10 @@
    [
     "2026-11-19",
     3371
+   ],
+   [
+    "2026-11-20",
+    3399
    ]
   ],
   "chadea1/raptorps5": [
@@ -7798,6 +7900,10 @@
    [
     "2026-11-19",
     946
+   ],
+   [
+    "2026-11-20",
+    950
    ]
   ],
   "chaostheory1075/crackdown-ps5": [
@@ -7832,6 +7938,10 @@
    [
     "2026-11-19",
     767
+   ],
+   [
+    "2026-11-20",
+    771
    ]
   ],
   "chaostheory1075/mgr-ps5": [
@@ -7866,6 +7976,10 @@
    [
     "2026-11-19",
     1611
+   ],
+   [
+    "2026-11-20",
+    1622
    ]
   ],
   "chaostheory1075/mp3-ps5": [
@@ -7900,6 +8014,10 @@
    [
     "2026-11-19",
     3624
+   ],
+   [
+    "2026-11-20",
+    3649
    ]
   ],
   "chaostheory1075/proto-ps5": [
@@ -7934,6 +8052,10 @@
    [
     "2026-11-19",
     681
+   ],
+   [
+    "2026-11-20",
+    686
    ]
   ],
   "chaostheory1075/sh-ps5": [
@@ -7968,6 +8090,10 @@
    [
     "2026-11-19",
     344
+   ],
+   [
+    "2026-11-20",
+    345
    ]
   ],
   "cherryduck/ps5_eccodefender": [
@@ -8002,6 +8128,10 @@
    [
     "2026-11-19",
     226
+   ],
+   [
+    "2026-11-20",
+    234
    ]
   ],
   "cobanov/ps5lm": [
@@ -8036,6 +8166,10 @@
    [
     "2026-11-19",
     5010
+   ],
+   [
+    "2026-11-20",
+    5040
    ]
   ],
   "codemasterv/the_legend_of_dragoon_ps5_recomp": [
@@ -8070,6 +8204,10 @@
    [
     "2026-11-19",
     244
+   ],
+   [
+    "2026-11-20",
+    245
    ]
   ],
   "cptlamarca/aot-tdc-ps5": [
@@ -8104,6 +8242,10 @@
    [
     "2026-11-19",
     718
+   ],
+   [
+    "2026-11-20",
+    736
    ]
   ],
   "cptlamarca/grfs-ps5": [
@@ -8138,6 +8280,10 @@
    [
     "2026-11-19",
     562
+   ],
+   [
+    "2026-11-20",
+    571
    ]
   ],
   "cptlamarca/mk9-ps5": [
@@ -8172,6 +8318,10 @@
    [
     "2026-11-19",
     1440
+   ],
+   [
+    "2026-11-20",
+    1467
    ]
   ],
   "cptlamarca/recomptrophy": [
@@ -8206,6 +8356,10 @@
    [
     "2026-11-19",
     396
+   ],
+   [
+    "2026-11-20",
+    405
    ]
   ],
   "damiantw/ps5_shipwright": [
@@ -8240,6 +8394,10 @@
    [
     "2026-11-19",
     2672
+   ],
+   [
+    "2026-11-20",
+    2695
    ]
   ],
   "dantaipan/ps64": [
@@ -8274,6 +8432,10 @@
    [
     "2026-11-19",
     3244
+   ],
+   [
+    "2026-11-20",
+    3298
    ]
   ],
   "darkatek7/prosperothemes": [
@@ -8308,6 +8470,10 @@
    [
     "2026-11-19",
     23372
+   ],
+   [
+    "2026-11-20",
+    23546
    ]
   ],
   "darkatek7/ps5sd": [
@@ -8342,6 +8508,10 @@
    [
     "2026-11-19",
     2706
+   ],
+   [
+    "2026-11-20",
+    2770
    ]
   ],
   "darkxex/fftarecomp-ps5": [
@@ -8376,6 +8546,10 @@
    [
     "2026-11-19",
     688
+   ],
+   [
+    "2026-11-20",
+    693
    ]
   ],
   "darkxex/prosperostore": [
@@ -8410,6 +8584,10 @@
    [
     "2026-11-19",
     219280
+   ],
+   [
+    "2026-11-20",
+    220963
    ]
   ],
   "darkxex/ps5_celeste": [
@@ -8444,6 +8622,10 @@
    [
     "2026-11-19",
     1821
+   ],
+   [
+    "2026-11-20",
+    1839
    ]
   ],
   "darkxex/rekhcom-ps5": [
@@ -8478,6 +8660,10 @@
    [
     "2026-11-19",
     1433
+   ],
+   [
+    "2026-11-20",
+    1443
    ]
   ],
   "darkxex/swanstationps5": [
@@ -8512,6 +8698,10 @@
    [
     "2026-11-19",
     35562
+   ],
+   [
+    "2026-11-20",
+    35891
    ]
   ],
   "desstannsoftware/ps5-pkg-folderizer": [
@@ -8546,6 +8736,10 @@
    [
     "2026-11-19",
     13483
+   ],
+   [
+    "2026-11-20",
+    13543
    ]
   ],
   "desstannsoftware/pscord": [
@@ -8580,6 +8774,10 @@
    [
     "2026-11-19",
     2484
+   ],
+   [
+    "2026-11-20",
+    2522
    ]
   ],
   "devvnirvana/afterglow": [
@@ -8614,6 +8812,10 @@
    [
     "2026-11-19",
     3601
+   ],
+   [
+    "2026-11-20",
+    3628
    ]
   ],
   "dragonscales123/lostodysseyrecompps5": [
@@ -8648,6 +8850,10 @@
    [
     "2026-11-19",
     849
+   ],
+   [
+    "2026-11-20",
+    861
    ]
   ],
   "dragonscales123/reblueps5": [
@@ -8682,6 +8888,10 @@
    [
     "2026-11-19",
     573
+   ],
+   [
+    "2026-11-20",
+    582
    ]
   ],
   "drakmor/shadowmountplus": [
@@ -8716,6 +8926,10 @@
    [
     "2026-11-19",
     294601
+   ],
+   [
+    "2026-11-20",
+    295369
    ]
   ],
   "echostretch/kstuff": [
@@ -8750,6 +8964,10 @@
    [
     "2026-11-19",
     94904
+   ],
+   [
+    "2026-11-20",
+    94989
    ]
   ],
   "elripalda/dbz-budokai3-ps5": [
@@ -8784,6 +9002,10 @@
    [
     "2026-11-19",
     1527
+   ],
+   [
+    "2026-11-20",
+    1538
    ]
   ],
   "elripalda/defjam-ps5": [
@@ -8818,6 +9040,10 @@
    [
     "2026-11-19",
     3288
+   ],
+   [
+    "2026-11-20",
+    3313
    ]
   ],
   "elripalda/fifastreet-ps5": [
@@ -8852,6 +9078,10 @@
    [
     "2026-11-19",
     2311
+   ],
+   [
+    "2026-11-20",
+    2321
    ]
   ],
   "elripalda/gta4-ps5": [
@@ -8886,6 +9116,10 @@
    [
     "2026-11-19",
     25065
+   ],
+   [
+    "2026-11-20",
+    25238
    ]
   ],
   "elripalda/nbajam-ps5": [
@@ -8920,6 +9154,10 @@
    [
     "2026-11-19",
     1036
+   ],
+   [
+    "2026-11-20",
+    1043
    ]
   ],
   "elripalda/nbastreet-ps5": [
@@ -8954,6 +9192,10 @@
    [
     "2026-11-19",
     772
+   ],
+   [
+    "2026-11-20",
+    774
    ]
   ],
   "elripalda/porpoise-dolphin-emulator-for-ps5": [
@@ -8988,6 +9230,10 @@
    [
     "2026-11-19",
     50980
+   ],
+   [
+    "2026-11-20",
+    51192
    ]
   ],
   "elripalda/skate3-ps5": [
@@ -9022,6 +9268,10 @@
    [
     "2026-11-19",
     2975
+   ],
+   [
+    "2026-11-20",
+    3012
    ]
   ],
   "elripalda/svr2007-ps5": [
@@ -9056,6 +9306,10 @@
    [
     "2026-11-19",
     752
+   ],
+   [
+    "2026-11-20",
+    762
    ]
   ],
   "elripalda/svr2008-recomp-ps5": [
@@ -9090,6 +9344,10 @@
    [
     "2026-11-19",
     511
+   ],
+   [
+    "2026-11-20",
+    514
    ]
   ],
   "elripalda/svr2011-ps5": [
@@ -9124,6 +9382,10 @@
    [
     "2026-11-19",
     2109
+   ],
+   [
+    "2026-11-20",
+    2118
    ]
   ],
   "elripalda/wwe13-ps5": [
@@ -9158,6 +9420,10 @@
    [
     "2026-11-19",
     661
+   ],
+   [
+    "2026-11-20",
+    666
    ]
   ],
   "elripalda/wwe2k14-ps5": [
@@ -9192,6 +9458,10 @@
    [
     "2026-11-19",
     1078
+   ],
+   [
+    "2026-11-20",
+    1087
    ]
   ],
   "elripalda/wweallstars-ps5": [
@@ -9226,6 +9496,10 @@
    [
     "2026-11-19",
     669
+   ],
+   [
+    "2026-11-20",
+    672
    ]
   ],
   "erickdavestech/ps5-dualsense-overlay": [
@@ -9259,6 +9533,10 @@
    ],
    [
     "2026-11-19",
+    123
+   ],
+   [
+    "2026-11-20",
     123
    ]
   ],
@@ -9294,6 +9572,10 @@
    [
     "2026-11-19",
     6360
+   ],
+   [
+    "2026-11-20",
+    6404
    ]
   ],
   "fthdgn-gh/alembic": [
@@ -9328,6 +9610,10 @@
    [
     "2026-11-19",
     35976
+   ],
+   [
+    "2026-11-20",
+    36392
    ]
   ],
   "gasb07/neoenabler": [
@@ -9362,6 +9648,10 @@
    [
     "2026-11-19",
     4978
+   ],
+   [
+    "2026-11-20",
+    5001
    ]
   ],
   "gasb07/ps4mount": [
@@ -9396,6 +9686,10 @@
    [
     "2026-11-19",
     16970
+   ],
+   [
+    "2026-11-20",
+    17093
    ]
   ],
   "gezine/y2jb": [
@@ -9430,6 +9724,10 @@
    [
     "2026-11-19",
     124201
+   ],
+   [
+    "2026-11-20",
+    124371
    ]
   ],
   "gordonprosperoman/xash3d-ps5": [
@@ -9464,6 +9762,10 @@
    [
     "2026-11-19",
     3272
+   ],
+   [
+    "2026-11-20",
+    3290
    ]
   ],
   "griches/jamespond2robocodrecomp": [
@@ -9498,6 +9800,10 @@
    [
     "2026-11-19",
     1750
+   ],
+   [
+    "2026-11-20",
+    1780
    ]
   ],
   "griches/ps5_artswap": [
@@ -9532,6 +9838,10 @@
    [
     "2026-11-19",
     5307
+   ],
+   [
+    "2026-11-20",
+    5349
    ]
   ],
   "griches/ps5_burnout3": [
@@ -9566,6 +9876,10 @@
    [
     "2026-11-19",
     2591
+   ],
+   [
+    "2026-11-20",
+    2609
    ]
   ],
   "griches/ps5_devilutionx": [
@@ -9600,6 +9914,10 @@
    [
     "2026-11-19",
     739
+   ],
+   [
+    "2026-11-20",
+    745
    ]
   ],
   "griches/ps5_doom3": [
@@ -9634,6 +9952,10 @@
    [
     "2026-11-19",
     1327
+   ],
+   [
+    "2026-11-20",
+    1335
    ]
   ],
   "griches/ps5_dusklight": [
@@ -9668,6 +9990,10 @@
    [
     "2026-11-19",
     5313
+   ],
+   [
+    "2026-11-20",
+    5350
    ]
   ],
   "griches/ps5_eternaldarkness": [
@@ -9702,6 +10028,10 @@
    [
     "2026-11-19",
     2716
+   ],
+   [
+    "2026-11-20",
+    2734
    ]
   ],
   "griches/ps5_geometrywars2": [
@@ -9736,6 +10066,10 @@
    [
     "2026-11-19",
     748
+   ],
+   [
+    "2026-11-20",
+    752
    ]
   ],
   "griches/ps5_ghostship": [
@@ -9770,6 +10104,10 @@
    [
     "2026-11-19",
     11586
+   ],
+   [
+    "2026-11-20",
+    11644
    ]
   ],
   "griches/ps5_quake3e": [
@@ -9804,6 +10142,10 @@
    [
     "2026-11-19",
     2221
+   ],
+   [
+    "2026-11-20",
+    2231
    ]
   ],
   "griches/ps5_sunshine": [
@@ -9838,6 +10180,10 @@
    [
     "2026-11-19",
     5009
+   ],
+   [
+    "2026-11-20",
+    5037
    ]
   ],
   "griches/ps5_switchwaker": [
@@ -9872,6 +10218,10 @@
    [
     "2026-11-19",
     5674
+   ],
+   [
+    "2026-11-20",
+    5689
    ]
   ],
   "gummibri/parasite-eve-ps5": [
@@ -9906,6 +10256,10 @@
    [
     "2026-11-19",
     1492
+   ],
+   [
+    "2026-11-20",
+    1510
    ]
   ],
   "handshakehackin/nuvio-maxd-releases": [
@@ -9940,6 +10294,10 @@
    [
     "2026-11-19",
     8110
+   ],
+   [
+    "2026-11-20",
+    8163
    ]
   ],
   "handshakehackin/youtube-maxd": [
@@ -9974,6 +10332,10 @@
    [
     "2026-11-19",
     10356
+   ],
+   [
+    "2026-11-20",
+    10422
    ]
   ],
   "herbrax/chiral-ftp": [
@@ -10008,6 +10370,10 @@
    [
     "2026-11-19",
     3114
+   ],
+   [
+    "2026-11-20",
+    3150
    ]
   ],
   "hexreaper711/hixflix": [
@@ -10042,6 +10408,10 @@
    [
     "2026-11-19",
     1152
+   ],
+   [
+    "2026-11-20",
+    1176
    ]
   ],
   "hexreaper711/splinter-cell-blacklist-ps5": [
@@ -10076,6 +10446,10 @@
    [
     "2026-11-19",
     597
+   ],
+   [
+    "2026-11-20",
+    608
    ]
   ],
   "heydemoura/prosperoeden": [
@@ -10110,6 +10484,10 @@
    [
     "2026-11-19",
     9680
+   ],
+   [
+    "2026-11-20",
+    9911
    ]
   ],
   "heydemoura/ps5-forwarder-manager": [
@@ -10144,6 +10522,10 @@
    [
     "2026-11-19",
     11444
+   ],
+   [
+    "2026-11-20",
+    11489
    ]
   ],
   "holdmysocks/ps5-tailscale": [
@@ -10178,6 +10560,10 @@
    [
     "2026-11-19",
     3333
+   ],
+   [
+    "2026-11-20",
+    3385
    ]
   ],
   "idlesauce/ps5-remoteplay-get-pin": [
@@ -10212,6 +10598,10 @@
    [
     "2026-11-19",
     5614
+   ],
+   [
+    "2026-11-20",
+    5639
    ]
   ],
   "illusionyy/ps-patch-system": [
@@ -10246,6 +10636,10 @@
    [
     "2026-11-19",
     26402
+   ],
+   [
+    "2026-11-20",
+    26481
    ]
   ],
   "iswebro/console-shelf-ps5": [
@@ -10280,6 +10674,10 @@
    [
     "2026-11-19",
     2265
+   ],
+   [
+    "2026-11-20",
+    2282
    ]
   ],
   "itsblurf/bfpilot": [
@@ -10314,6 +10712,10 @@
    [
     "2026-11-19",
     13227
+   ],
+   [
+    "2026-11-20",
+    13278
    ]
   ],
   "itsplk/ps5-pkg-manager": [
@@ -10348,6 +10750,10 @@
    [
     "2026-11-19",
     18896
+   ],
+   [
+    "2026-11-20",
+    19009
    ]
   ],
   "jmelovich/ps5-gyroaim": [
@@ -10382,6 +10788,10 @@
    [
     "2026-11-19",
     1801
+   ],
+   [
+    "2026-11-20",
+    1816
    ]
   ],
   "jmelovich/steam-link-ps5": [
@@ -10416,6 +10826,10 @@
    [
     "2026-11-19",
     9293
+   ],
+   [
+    "2026-11-20",
+    9330
    ]
   ],
   "kamb205/tna-impact-reloaded-ps5": [
@@ -10450,6 +10864,10 @@
    [
     "2026-11-19",
     217
+   ],
+   [
+    "2026-11-20",
+    218
    ]
   ],
   "karnerf/smplusgui": [
@@ -10484,6 +10902,10 @@
    [
     "2026-11-19",
     75
+   ],
+   [
+    "2026-11-20",
+    76
    ]
   ],
   "kauansilvalopes/estante": [
@@ -10518,6 +10940,10 @@
    [
     "2026-11-19",
     3267
+   ],
+   [
+    "2026-11-20",
+    3287
    ]
   ],
   "kauansilvalopes/trophy": [
@@ -10552,6 +10978,10 @@
    [
     "2026-11-19",
     2483
+   ],
+   [
+    "2026-11-20",
+    2504
    ]
   ],
   "kernelforgelabs/prosperoeden-switch-ui": [
@@ -10586,6 +11016,10 @@
    [
     "2026-11-19",
     9585
+   ],
+   [
+    "2026-11-20",
+    9680
    ]
   ],
   "khalifa007/capymobile": [
@@ -10620,6 +11054,10 @@
    [
     "2026-11-19",
     2170
+   ],
+   [
+    "2026-11-20",
+    2191
    ]
   ],
   "knutwurst/ps5-patchdl": [
@@ -10654,6 +11092,10 @@
    [
     "2026-11-19",
     12587
+   ],
+   [
+    "2026-11-20",
+    12663
    ]
   ],
   "kongatime/spider-man-edge-of-time-ps5": [
@@ -10688,6 +11130,10 @@
    [
     "2026-11-19",
     3585
+   ],
+   [
+    "2026-11-20",
+    3615
    ]
   ],
   "kvaps/syobon-action-ps5": [
@@ -10722,6 +11168,10 @@
    [
     "2026-11-19",
     1593
+   ],
+   [
+    "2026-11-20",
+    1610
    ]
   ],
   "larazadelsol/wings-app": [
@@ -10756,6 +11206,10 @@
    [
     "2026-11-19",
     734
+   ],
+   [
+    "2026-11-20",
+    740
    ]
   ],
   "lavavex/rpcs3-ps5": [
@@ -10789,6 +11243,10 @@
    ],
    [
     "2026-11-19",
+    0
+   ],
+   [
+    "2026-11-20",
     0
    ]
   ],
@@ -10824,6 +11282,10 @@
    [
     "2026-11-19",
     14471
+   ],
+   [
+    "2026-11-20",
+    14517
    ]
   ],
   "leolobato/playden-ps5": [
@@ -10858,6 +11320,10 @@
    [
     "2026-11-19",
     154559
+   ],
+   [
+    "2026-11-20",
+    156145
    ]
   ],
   "lightningmods/etahen": [
@@ -10892,6 +11358,10 @@
    [
     "2026-11-19",
     154467
+   ],
+   [
+    "2026-11-20",
+    154584
    ]
   ],
   "lowbit/ps5-doom": [
@@ -10926,6 +11396,10 @@
    [
     "2026-11-19",
     7098
+   ],
+   [
+    "2026-11-20",
+    7210
    ]
   ],
   "lowbit/ps5-openrct2": [
@@ -10960,6 +11434,10 @@
    [
     "2026-11-19",
     1336
+   ],
+   [
+    "2026-11-20",
+    1344
    ]
   ],
   "lozazamastro/cd-player": [
@@ -10994,6 +11472,10 @@
    [
     "2026-11-19",
     4088
+   ],
+   [
+    "2026-11-20",
+    4104
    ]
   ],
   "lozazamastro/pixel-museum": [
@@ -11028,6 +11510,10 @@
    [
     "2026-11-19",
     678831
+   ],
+   [
+    "2026-11-20",
+    688539
    ]
   ],
   "lozazamastro/stremio-plus": [
@@ -11062,6 +11548,10 @@
    [
     "2026-11-19",
     14310
+   ],
+   [
+    "2026-11-20",
+    14360
    ]
   ],
   "lozazamastro/thesimpsonsgame-ps5-builder": [
@@ -11096,6 +11586,10 @@
    [
     "2026-11-19",
     7649
+   ],
+   [
+    "2026-11-20",
+    7696
    ]
   ],
   "lucasliet/battleship-remix": [
@@ -11130,6 +11624,10 @@
    [
     "2026-11-19",
     8335
+   ],
+   [
+    "2026-11-20",
+    8572
    ]
   ],
   "m0s4ysh3ll0/mediathek-ps5": [
@@ -11164,6 +11662,10 @@
    [
     "2026-11-19",
     1886
+   ],
+   [
+    "2026-11-20",
+    1903
    ]
   ],
   "marice/jsrf-ps5": [
@@ -11198,6 +11700,10 @@
    [
     "2026-11-19",
     1303
+   ],
+   [
+    "2026-11-20",
+    1313
    ]
   ],
   "marice/oliseplayer": [
@@ -11232,6 +11738,10 @@
    [
     "2026-11-19",
     1666
+   ],
+   [
+    "2026-11-20",
+    1674
    ]
   ],
   "marice/ps5-exporter": [
@@ -11266,6 +11776,10 @@
    [
     "2026-11-19",
     1464
+   ],
+   [
+    "2026-11-20",
+    1488
    ]
   ],
   "marice/ps5-payloader": [
@@ -11300,6 +11814,10 @@
    [
     "2026-11-19",
     5013
+   ],
+   [
+    "2026-11-20",
+    5035
    ]
   ],
   "marice/ps5-signal-companion": [
@@ -11334,6 +11852,10 @@
    [
     "2026-11-19",
     7000
+   ],
+   [
+    "2026-11-20",
+    7024
    ]
   ],
   "marice/rush2-ps5": [
@@ -11368,6 +11890,10 @@
    [
     "2026-11-19",
     1350
+   ],
+   [
+    "2026-11-20",
+    1358
    ]
   ],
   "marice/screentester5": [
@@ -11402,6 +11928,10 @@
    [
     "2026-11-19",
     1744
+   ],
+   [
+    "2026-11-20",
+    1761
    ]
   ],
   "marice/stk-ps5": [
@@ -11436,6 +11966,10 @@
    [
     "2026-11-19",
     1979
+   ],
+   [
+    "2026-11-20",
+    1998
    ]
   ],
   "marice/wave-race-64-ps5": [
@@ -11470,6 +12004,10 @@
    [
     "2026-11-19",
     2008
+   ],
+   [
+    "2026-11-20",
+    2019
    ]
   ],
   "megacadedev/naughtybearrecomp": [
@@ -11504,6 +12042,10 @@
    [
     "2026-11-19",
     350
+   ],
+   [
+    "2026-11-20",
+    352
    ]
   ],
   "melvindevries/retro-rewind-ps5-patcher": [
@@ -11538,6 +12080,10 @@
    [
     "2026-11-19",
     1434
+   ],
+   [
+    "2026-11-20",
+    1457
    ]
   ],
   "mihawk-99/ps5_hookshot": [
@@ -11571,6 +12117,10 @@
    ],
    [
     "2026-11-19",
+    0
+   ],
+   [
+    "2026-11-20",
     0
    ]
   ],
@@ -11606,6 +12156,10 @@
    [
     "2026-11-19",
     0
+   ],
+   [
+    "2026-11-20",
+    0
    ]
   ],
   "mihawk-99/ps5_mihawkos": [
@@ -11640,6 +12194,10 @@
    [
     "2026-11-19",
     37115
+   ],
+   [
+    "2026-11-20",
+    37217
    ]
   ],
   "mihawk-99/ps5_retroarch": [
@@ -11674,6 +12232,10 @@
    [
     "2026-11-19",
     91460
+   ],
+   [
+    "2026-11-20",
+    91890
    ]
   ],
   "mihawk-99/ps5_vkquake": [
@@ -11708,6 +12270,10 @@
    [
     "2026-11-19",
     1539
+   ],
+   [
+    "2026-11-20",
+    1550
    ]
   ],
   "miladrtx/breeze": [
@@ -11742,6 +12308,10 @@
    [
     "2026-11-19",
     3371
+   ],
+   [
+    "2026-11-20",
+    3392
    ]
   ],
   "mistertemaki/beetlepceps5": [
@@ -11776,6 +12346,10 @@
    [
     "2026-11-19",
     1726
+   ],
+   [
+    "2026-11-20",
+    1759
    ]
   ],
   "mistertemaki/fbneo-ps5": [
@@ -11810,6 +12384,10 @@
    [
     "2026-11-19",
     6503
+   ],
+   [
+    "2026-11-20",
+    6574
    ]
   ],
   "mistertemaki/genplusgxps5": [
@@ -11844,6 +12422,10 @@
    [
     "2026-11-19",
     5539
+   ],
+   [
+    "2026-11-20",
+    5593
    ]
   ],
   "mistertemaki/mediaplayerclassicps5": [
@@ -11878,6 +12460,10 @@
    [
     "2026-11-19",
     6005
+   ],
+   [
+    "2026-11-20",
+    6065
    ]
   ],
   "mistertemaki/snes9xps5": [
@@ -11912,6 +12498,10 @@
    [
     "2026-11-19",
     13125
+   ],
+   [
+    "2026-11-20",
+    13222
    ]
   ],
   "mortaljinx/mortalfin": [
@@ -11946,6 +12536,10 @@
    [
     "2026-11-19",
     2341
+   ],
+   [
+    "2026-11-20",
+    2348
    ]
   ],
   "mortaljinx/seedee5": [
@@ -11980,6 +12574,10 @@
    [
     "2026-11-19",
     1593
+   ],
+   [
+    "2026-11-20",
+    1603
    ]
   ],
   "mpereiraesaa/prospero-win": [
@@ -12014,6 +12612,10 @@
    [
     "2026-11-19",
     11472
+   ],
+   [
+    "2026-11-20",
+    11520
    ]
   ],
   "mshivam019/ac-ps5": [
@@ -12048,6 +12650,10 @@
    [
     "2026-11-19",
     1870
+   ],
+   [
+    "2026-11-20",
+    1886
    ]
   ],
   "mshivam019/la-ps5": [
@@ -12082,6 +12688,10 @@
    [
     "2026-11-19",
     2969
+   ],
+   [
+    "2026-11-20",
+    2979
    ]
   ],
   "mshivam019/morrowind-ps5": [
@@ -12116,6 +12726,10 @@
    [
     "2026-11-19",
     1376
+   ],
+   [
+    "2026-11-20",
+    1384
    ]
   ],
   "mshivam019/naruto-ps5": [
@@ -12150,6 +12764,10 @@
    [
     "2026-11-19",
     919
+   ],
+   [
+    "2026-11-20",
+    926
    ]
   ],
   "mshivam019/tmm64-ps5": [
@@ -12184,6 +12802,10 @@
    [
     "2026-11-19",
     2619
+   ],
+   [
+    "2026-11-20",
+    2641
    ]
   ],
   "mucahidkambur/eglantineps5": [
@@ -12218,6 +12840,10 @@
    [
     "2026-11-19",
     8734
+   ],
+   [
+    "2026-11-20",
+    8761
    ]
   ],
   "nazky/unleashedrecomp-prospero": [
@@ -12252,6 +12878,10 @@
    [
     "2026-11-19",
     1831
+   ],
+   [
+    "2026-11-20",
+    1835
    ]
   ],
   "nikay99/ps5mg": [
@@ -12286,6 +12916,10 @@
    [
     "2026-11-19",
     990
+   ],
+   [
+    "2026-11-20",
+    999
    ]
   ],
   "notmaj0r/cheatrunner": [
@@ -12320,6 +12954,10 @@
    [
     "2026-11-19",
     51385
+   ],
+   [
+    "2026-11-20",
+    51488
    ]
   ],
   "notmaj0r/prosperomgr": [
@@ -12354,6 +12992,10 @@
    [
     "2026-11-19",
     75205
+   ],
+   [
+    "2026-11-20",
+    75690
    ]
   ],
   "opencloudgaming/opennow-ps5": [
@@ -12388,6 +13030,10 @@
    [
     "2026-11-19",
     6120
+   ],
+   [
+    "2026-11-20",
+    6377
    ]
   ],
   "portablelle/codex-ps5": [
@@ -12422,6 +13068,10 @@
    [
     "2026-11-19",
     2911
+   ],
+   [
+    "2026-11-20",
+    2995
    ]
   ],
   "premohq/ps5-ecam": [
@@ -12456,6 +13106,10 @@
    [
     "2026-11-19",
     27519
+   ],
+   [
+    "2026-11-20",
+    27666
    ]
   ],
   "press5elect/crux2": [
@@ -12490,6 +13144,10 @@
    [
     "2026-11-19",
     3744
+   ],
+   [
+    "2026-11-20",
+    3804
    ]
   ],
   "press5elect/ogbox": [
@@ -12524,6 +13182,10 @@
    [
     "2026-11-19",
     6433
+   ],
+   [
+    "2026-11-20",
+    6525
    ]
   ],
   "press5elect/psflycast": [
@@ -12558,6 +13220,10 @@
    [
     "2026-11-19",
     14366
+   ],
+   [
+    "2026-11-20",
+    14458
    ]
   ],
   "press5elect/psswanstation": [
@@ -12592,6 +13258,10 @@
    [
     "2026-11-19",
     15207
+   ],
+   [
+    "2026-11-20",
+    15317
    ]
   ],
   "ps5-linux/ps5-linux-loader": [
@@ -12626,6 +13296,10 @@
    [
     "2026-11-19",
     15482
+   ],
+   [
+    "2026-11-20",
+    15557
    ]
   ],
   "ps5-payload-dev/elfldr": [
@@ -12660,6 +13334,10 @@
    [
     "2026-11-19",
     38229
+   ],
+   [
+    "2026-11-20",
+    38511
    ]
   ],
   "ps5-payload-dev/ftpsrv": [
@@ -12694,6 +13372,10 @@
    [
     "2026-11-19",
     115644
+   ],
+   [
+    "2026-11-20",
+    115954
    ]
   ],
   "quatrixone/prosperoai": [
@@ -12728,6 +13410,10 @@
    [
     "2026-11-19",
     6590
+   ],
+   [
+    "2026-11-20",
+    6624
    ]
   ],
   "quer3q/ps5-dump-forge": [
@@ -12762,6 +13448,10 @@
    [
     "2026-11-19",
     61199
+   ],
+   [
+    "2026-11-20",
+    62279
    ]
   ],
   "rafaelngp/pico8-ps5": [
@@ -12796,6 +13486,10 @@
    [
     "2026-11-19",
     1954
+   ],
+   [
+    "2026-11-20",
+    1966
    ]
   ],
   "rafaelngp/xbox-cloud-gaming-ps5": [
@@ -12830,6 +13524,10 @@
    [
     "2026-11-19",
     2312
+   ],
+   [
+    "2026-11-20",
+    2483
    ]
   ],
   "s0liton/rommps": [
@@ -12864,6 +13562,10 @@
    [
     "2026-11-19",
     13926
+   ],
+   [
+    "2026-11-20",
+    14200
    ]
   ],
   "sainsaji/evo-player-ps5": [
@@ -12898,6 +13600,10 @@
    [
     "2026-11-19",
     17682
+   ],
+   [
+    "2026-11-20",
+    17744
    ]
   ],
   "sainsaji/ps5-audio-passthrough-research": [
@@ -12932,6 +13638,10 @@
    [
     "2026-11-19",
     2322
+   ],
+   [
+    "2026-11-20",
+    2334
    ]
   ],
   "samclay8/cbfd-recompiled-ps5": [
@@ -12966,6 +13676,10 @@
    [
     "2026-11-19",
     1132
+   ],
+   [
+    "2026-11-20",
+    1150
    ]
   ],
   "samclay8/dk64-rekongpiled-ps5": [
@@ -13000,6 +13714,10 @@
    [
     "2026-11-19",
     1547
+   ],
+   [
+    "2026-11-20",
+    1580
    ]
   ],
   "secondcoat/second-coat-london": [
@@ -13034,6 +13752,10 @@
    [
     "2026-11-19",
     4395
+   ],
+   [
+    "2026-11-20",
+    4453
    ]
   ],
   "seregonwar/zftpd": [
@@ -13068,6 +13790,10 @@
    [
     "2026-11-19",
     41296
+   ],
+   [
+    "2026-11-20",
+    41366
    ]
   ],
   "shabbypenguin/pokemmo-prospero": [
@@ -13102,6 +13828,10 @@
    [
     "2026-11-19",
     2857
+   ],
+   [
+    "2026-11-20",
+    2876
    ]
   ],
   "shwan-ps5/pulse": [
@@ -13136,6 +13866,10 @@
    [
     "2026-11-19",
     1208
+   ],
+   [
+    "2026-11-20",
+    1225
    ]
   ],
   "skarift/jewelcase": [
@@ -13170,6 +13904,10 @@
    [
     "2026-11-19",
     3476
+   ],
+   [
+    "2026-11-20",
+    3497
    ]
   ],
   "smoxa/ps5-new-overlay": [
@@ -13204,6 +13942,10 @@
    [
     "2026-11-19",
     3326
+   ],
+   [
+    "2026-11-20",
+    3375
    ]
   ],
   "stl1te/medievaltennis": [
@@ -13238,6 +13980,10 @@
    [
     "2026-11-19",
     1673
+   ],
+   [
+    "2026-11-20",
+    1690
    ]
   ],
   "stonedmodder/pshare": [
@@ -13272,6 +14018,10 @@
    [
     "2026-11-19",
     2532
+   ],
+   [
+    "2026-11-20",
+    2549
    ]
   ],
   "stonedmodder/vita5": [
@@ -13306,6 +14056,10 @@
    [
     "2026-11-19",
     4130
+   ],
+   [
+    "2026-11-20",
+    4149
    ]
   ],
   "streetpea/chiaki-ng": [
@@ -13340,6 +14094,10 @@
    [
     "2026-11-19",
     431954
+   ],
+   [
+    "2026-11-20",
+    440161
    ]
   ],
   "strongt1me/ps5-cooling-system-center-pro": [
@@ -13374,6 +14132,10 @@
    [
     "2026-11-19",
     843
+   ],
+   [
+    "2026-11-20",
+    956
    ]
   ],
   "svengdk/prospero-explorer": [
@@ -13408,6 +14170,10 @@
    [
     "2026-11-19",
     15290
+   ],
+   [
+    "2026-11-20",
+    15356
    ]
   ],
   "svengdk/prospero-multi-tools": [
@@ -13442,6 +14208,10 @@
    [
     "2026-11-19",
     9396
+   ],
+   [
+    "2026-11-20",
+    9431
    ]
   ],
   "swordpdf/ps5sx2": [
@@ -13476,6 +14246,10 @@
    [
     "2026-11-19",
     263765
+   ],
+   [
+    "2026-11-20",
+    264664
    ]
   ],
   "synopiia/psxs5": [
@@ -13510,6 +14284,10 @@
    [
     "2026-11-19",
     17506
+   ],
+   [
+    "2026-11-20",
+    17581
    ]
   ],
   "tertiumndatur/ps5-cloud-play": [
@@ -13544,6 +14322,10 @@
    [
     "2026-11-19",
     4201
+   ],
+   [
+    "2026-11-20",
+    4233
    ]
   ],
   "thatguykalvin/prosperotv": [
@@ -13578,6 +14360,10 @@
    [
     "2026-11-19",
     29594
+   ],
+   [
+    "2026-11-20",
+    29680
    ]
   ],
   "thatretireddude/tokenstation5": [
@@ -13612,6 +14398,10 @@
    [
     "2026-11-19",
     1160
+   ],
+   [
+    "2026-11-20",
+    1173
    ]
   ],
   "thelinkin3000/halo-ce-universal": [
@@ -13646,6 +14436,10 @@
    [
     "2026-11-19",
     6995
+   ],
+   [
+    "2026-11-20",
+    7115
    ]
   ],
   "therealretro/mupen64plus-ps5": [
@@ -13680,6 +14474,10 @@
    [
     "2026-11-19",
     8312
+   ],
+   [
+    "2026-11-20",
+    8398
    ]
   ],
   "thesmokesession-bit/perfect-eye": [
@@ -13714,6 +14512,10 @@
    [
     "2026-11-19",
     4667
+   ],
+   [
+    "2026-11-20",
+    4714
    ]
   ],
   "tsuramatsu1/psp5": [
@@ -13748,6 +14550,10 @@
    [
     "2026-11-19",
     10759
+   ],
+   [
+    "2026-11-20",
+    10834
    ]
   ],
   "tsvetomirgt/symphonystation5": [
@@ -13782,6 +14588,10 @@
    [
     "2026-11-19",
     1616
+   ],
+   [
+    "2026-11-20",
+    1624
    ]
   ],
   "unicxrn/twispero": [
@@ -13816,6 +14626,10 @@
    [
     "2026-11-19",
     2780
+   ],
+   [
+    "2026-11-20",
+    2796
    ]
   ],
   "venezuelanbiggie24/machete-ps5sd-img-and-vid": [
@@ -13850,6 +14664,10 @@
    [
     "2026-11-19",
     2293
+   ],
+   [
+    "2026-11-20",
+    2303
    ]
   ],
   "venezuelanbiggie24/machetesvg-ps5-save-manager": [
@@ -13884,6 +14702,10 @@
    [
     "2026-11-19",
     4050
+   ],
+   [
+    "2026-11-20",
+    4078
    ]
   ],
   "vivalavent/ps5-bazzite-deck": [
@@ -13918,6 +14740,10 @@
    [
     "2026-11-19",
     33083
+   ],
+   [
+    "2026-11-20",
+    34918
    ]
   ],
   "vivalavent/ps5mc": [
@@ -13952,6 +14778,10 @@
    [
     "2026-11-19",
     7153
+   ],
+   [
+    "2026-11-20",
+    7170
    ]
   ],
   "viviandsx/regie5": [
@@ -13986,6 +14816,10 @@
    [
     "2026-11-19",
     1499
+   ],
+   [
+    "2026-11-20",
+    1514
    ]
   ],
   "xen-made/orion-media-center": [
@@ -14020,6 +14854,10 @@
    [
     "2026-11-19",
     10821
+   ],
+   [
+    "2026-11-20",
+    10864
    ]
   ],
   "yahballon/ps5gbcx": [
@@ -14054,6 +14892,10 @@
    [
     "2026-11-19",
     813
+   ],
+   [
+    "2026-11-20",
+    819
    ]
   ],
   "yaibakamikaze/izunarecomp": [
@@ -14088,6 +14930,10 @@
    [
     "2026-11-19",
     3083
+   ],
+   [
+    "2026-11-20",
+    3134
    ]
   ],
   "yaibakamikaze/ninjas-dawn-ps5": [
@@ -14122,6 +14968,10 @@
    [
     "2026-11-19",
     446
+   ],
+   [
+    "2026-11-20",
+    447
    ]
   ],
   "zizc3/hydroid": [
@@ -14156,6 +15006,10 @@
    [
     "2026-11-19",
     4191
+   ],
+   [
+    "2026-11-20",
+    4263
    ]
   ],
   "zizc3/infinity-blade-ps5": [
@@ -14190,6 +15044,10 @@
    [
     "2026-11-19",
     1965
+   ],
+   [
+    "2026-11-20",
+    2009
    ]
   ],
   "zizc3/ruffle-flash-ps5": [
@@ -14224,6 +15082,10 @@
    [
     "2026-11-19",
     1877
+   ],
+   [
+    "2026-11-20",
+    1887
    ]
   ],
   "zizc3/vlc": [
@@ -14258,6 +15120,10 @@
    [
     "2026-11-19",
     16564
+   ],
+   [
+    "2026-11-20",
+    16656
    ]
   ],
   "zizc3/xpsemu": [
@@ -14292,6 +15158,10 @@
    [
     "2026-11-19",
     31594
+   ],
+   [
+    "2026-11-20",
+    31683
    ]
   ],
   "zx0cf1/retropapaps5-beta": [
@@ -14325,6 +15195,10 @@
    ],
    [
     "2026-11-19",
+    74
+   ],
+   [
+    "2026-11-20",
     74
    ]
   ]
