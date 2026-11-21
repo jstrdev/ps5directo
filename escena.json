@@ -1,7 +1,21 @@
 {
  "_como": "Lo genera solo tools/escena.py (GitHub Action cada 3 horas). No lo edites a mano: para destacar algo usa destacados.json.",
- "updated": "2026-11-21T02:13:31Z",
+ "updated": "2026-11-21T10:59:41Z",
  "items": [
+  {
+   "id": "mihawk-99/PS5_RetroArch@v4.1.0-beta-4",
+   "kind": "update",
+   "repo": "mihawk-99/PS5_RetroArch",
+   "cid": "retroarch",
+   "name": "RetroArch",
+   "tag": "v4.1.0-beta-4",
+   "pre": false,
+   "date": "2026-11-21T02:57:37Z",
+   "notes": "PS5 RetroArch-v4.1.0-beta-4 PS5 RetroArch is a passion project, not a piracy project. It exists so you can play the games you own on the console you own. - Piracy is not condoned. - No games, BIOS files, console firmware or decryption keys are included, and they never will be. - Use only legally obtained backups of games you own , made yourself from your own discs, cartridges…",
+   "url": "https://github.com/mihawk-99/PS5_RetroArch/releases/tag/v4.1.0-beta-4",
+   "stars": 444,
+   "score": 2.7
+  },
   {
    "id": "heydemoura/PS5_Longshot@v0.1.5",
    "kind": "new",
@@ -13,9 +27,9 @@
    "date": "2026-11-21T00:38:03Z",
    "desc": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
    "notes": "Prerelease: builds on computers with little memory, and Longshot's own title ID. Please report how the build goes on your computer, especially with Memory to use set low. Highlights - The builder now works on computers with little free memory. Before, it wanted about 10 GB free, and on some PCs the compile step was stopped for lack of memory. The window has a new Memory to use…",
-   "stars": 194,
+   "stars": 204,
    "url": "https://github.com/heydemoura/PS5_Longshot",
-   "score": 11.0
+   "score": 13.0
   },
   {
    "id": "NotHavocc/ps5-hwcon-plugin@v2.0.0",
@@ -58,9 +72,9 @@
    "date": "2026-11-20T18:04:53Z",
    "desc": "VERY experimental Nintendo Switch 2 emulator port for PS5",
    "notes": "Pre-release. 21 pull requests since v1.000.002, most of them upstream Eglantine work ported to the PS5. - Zelda: Ocarina of Time runs faster. 29 upstream Zelda fixes and speedups are ported (empty GPU submits skipped, cheaper command-list copies and query reports, faster fast-draw paths, x86-64 JIT code generation). In our console test scene it went from about 30 FPS to…",
-   "stars": 419,
+   "stars": 424,
    "url": "https://github.com/heydemoura/EglantinePS5",
-   "score": 12.6
+   "score": 13.6
   },
   {
    "id": "percdotdev/ps5-webkit-autoloader-esp32@0.8.2",
@@ -88,9 +102,9 @@
    "date": "2026-11-20T14:17:24Z",
    "desc": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
    "notes": "PC5 2.4.5 fixes games that closed the moment their window opened while a controller was connected. Install - ProsperoStore : update PC5 from its page in the store. - PC5's own updater : Settings › System › Update now , or Update now when PC5 asks as it opens. It downloads only what changed when you have the version before, otherwise the whole app. PC5 restarts by itself when…",
-   "stars": 154,
+   "stars": 155,
    "url": "https://github.com/bornaradusin/PC5",
-   "score": 13.0
+   "score": 13.2
   },
   {
    "id": "EnamelSlugAcclaim/GTA6-KytyPS5-GTA-6@v1.0.0",
@@ -103,9 +117,9 @@
    "date": "2026-11-20T10:35:15Z",
    "desc": "GTA6 PS5 emulator based on KytyPS5 with a focus on playable GTA VI: performance work, per-game profiles, shader cache and compatibility fixes. Windows. Bring GTA 6 on your PC now.",
    "notes": "FREE 1 DAY KEY: KYTYG-4IVNT-2095N How to use 1. Download and launch kitty. 2. Find an available PS5 console. 3. Connect to the console. 4. Launch GTA 6. 5. Stream the gameplay directly to your PC. Requirements: Windows PC Stable internet connection Controller (recommended) How it works: The game runs on a real PS5, while KittyPS5 streams the video to your PC and sends your…",
-   "stars": 228,
+   "stars": 238,
    "url": "https://github.com/EnamelSlugAcclaim/GTA6-KytyPS5-GTA-6",
-   "score": 10.2
+   "score": 12.0
   },
   {
    "id": "kvaps/ProsperoWeb@v0.3.0",
@@ -118,9 +132,9 @@
    "date": "2026-11-20T09:48:25Z",
    "desc": "ProsperoWeb: homebrew web browser for PlayStation 5, upstream WebKit (PlayStation port) built with the open ps5-payload-sdk",
    "notes": "Added - AV1 video decoding. The ffmpeg media engine now plays AV1 (WebM and MP4), decoded by libdav1d. The PS5 SDK ships ffmpeg without libdav1d, so dav1d and a re-built ffmpeg (with --enable-libdav1d ) are cross-compiled into the dependency prefix alongside the other dependencies. - Native dropdowns. Opening a select now shows a controller-driven popup menu with D-pad and…",
-   "stars": 52,
+   "stars": 54,
    "url": "https://github.com/kvaps/ProsperoWeb",
-   "score": 6.08
+   "score": 6.56
   },
   {
    "id": "ps5-payload-dev/elfldr@v0.28",
@@ -135,6 +149,21 @@
    "url": "https://github.com/ps5-payload-dev/elfldr/releases/tag/v0.28",
    "stars": 179,
    "score": 1.5
+  },
+  {
+   "id": "SandyPandyMandy/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "kind": "new",
+   "repo": "SandyPandyMandy/GTA-6-Switch-Version--PC-Emulator-2026",
+   "cid": "",
+   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
+   "tag": "",
+   "pre": false,
+   "date": "2026-11-19T19:24:34Z",
+   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
+   "notes": "",
+   "stars": 35,
+   "url": "https://github.com/SandyPandyMandy/GTA-6-Switch-Version--PC-Emulator-2026",
+   "score": 3.4
   },
   {
    "id": "monirchemrubd/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -152,33 +181,18 @@
    "score": 3.4
   },
   {
-   "id": "johnstiles/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "id": "zalman-ua/GTA-6-Switch-Version--PC-Emulator-2026@",
    "kind": "new",
-   "repo": "johnstiles/GTA-6-Switch-Version--PC-Emulator-2026",
+   "repo": "zalman-ua/GTA-6-Switch-Version--PC-Emulator-2026",
    "cid": "",
    "name": "GTA-6-Switch-Version--PC-Emulator-2026",
    "tag": "",
    "pre": false,
-   "date": "2026-11-19T19:24:09Z",
+   "date": "2026-11-19T19:23:55Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
    "stars": 35,
-   "url": "https://github.com/johnstiles/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.4
-  },
-  {
-   "id": "EpicGiantite13205/GTA-6-Switch-Version--PC-Emulator-2026@",
-   "kind": "new",
-   "repo": "EpicGiantite13205/GTA-6-Switch-Version--PC-Emulator-2026",
-   "cid": "",
-   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
-   "tag": "",
-   "pre": false,
-   "date": "2026-11-19T19:24:00Z",
-   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
-   "notes": "",
-   "stars": 35,
-   "url": "https://github.com/EpicGiantite13205/GTA-6-Switch-Version--PC-Emulator-2026",
+   "url": "https://github.com/zalman-ua/GTA-6-Switch-Version--PC-Emulator-2026",
    "score": 3.4
   },
   {
@@ -222,9 +236,9 @@
    "date": "2026-11-19T19:23:51Z",
    "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
    "notes": "",
-   "stars": 37,
+   "stars": 38,
    "url": "https://github.com/Kkaramaddinnn/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.48
+   "score": 3.72
   },
   {
    "id": "yassinebourzza1/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -332,6 +346,36 @@
    "score": 3.4
   },
   {
+   "id": "lloweryfn-rgb/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "kind": "new",
+   "repo": "lloweryfn-rgb/GTA-6-Switch-Version--PC-Emulator-2026",
+   "cid": "",
+   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
+   "tag": "",
+   "pre": false,
+   "date": "2026-11-19T19:22:40Z",
+   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
+   "notes": "",
+   "stars": 35,
+   "url": "https://github.com/lloweryfn-rgb/GTA-6-Switch-Version--PC-Emulator-2026",
+   "score": 3.4
+  },
+  {
+   "id": "python001-dev/GTA-6-Switch-Version--PC-Emulator-2026@",
+   "kind": "new",
+   "repo": "python001-dev/GTA-6-Switch-Version--PC-Emulator-2026",
+   "cid": "",
+   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
+   "tag": "",
+   "pre": false,
+   "date": "2026-11-19T19:22:39Z",
+   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
+   "notes": "",
+   "stars": 35,
+   "url": "https://github.com/python001-dev/GTA-6-Switch-Version--PC-Emulator-2026",
+   "score": 3.4
+  },
+  {
    "id": "kazim768/GTA-6-Switch-Version--PC-Emulator-2026@",
    "kind": "new",
    "repo": "kazim768/GTA-6-Switch-Version--PC-Emulator-2026",
@@ -374,21 +418,6 @@
    "notes": "",
    "stars": 35,
    "url": "https://github.com/meirz911/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.4
-  },
-  {
-   "id": "mohamedhamdytaha/GTA-6-Switch-Version--PC-Emulator-2026@",
-   "kind": "new",
-   "repo": "mohamedhamdytaha/GTA-6-Switch-Version--PC-Emulator-2026",
-   "cid": "",
-   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
-   "tag": "",
-   "pre": false,
-   "date": "2026-11-19T19:21:53Z",
-   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
-   "notes": "",
-   "stars": 35,
-   "url": "https://github.com/mohamedhamdytaha/GTA-6-Switch-Version--PC-Emulator-2026",
    "score": 3.4
   },
   {
@@ -527,21 +556,6 @@
    "score": 3.4
   },
   {
-   "id": "kemans35/GTA-6-Switch-Version--PC-Emulator-2026@",
-   "kind": "new",
-   "repo": "kemans35/GTA-6-Switch-Version--PC-Emulator-2026",
-   "cid": "",
-   "name": "GTA-6-Switch-Version--PC-Emulator-2026",
-   "tag": "",
-   "pre": false,
-   "date": "2026-11-19T19:20:46Z",
-   "desc": "GTA VI PC Installer hub for Grand Theft Auto 6 on Windows 10/11. Explore PC release updates, installation preparation, Rockstar Games Launcher setup, graphics optimization, system compatibility, and a step-by-step installation guide for the upcoming PC version.",
-   "notes": "",
-   "stars": 35,
-   "url": "https://github.com/kemans35/GTA-6-Switch-Version--PC-Emulator-2026",
-   "score": 3.4
-  },
-  {
    "id": "ShukvaniPlayz/GTA-6-Switch-Version--PC-Emulator-2026@",
    "kind": "new",
    "repo": "ShukvaniPlayz/GTA-6-Switch-Version--PC-Emulator-2026",
@@ -567,8 +581,8 @@
    "date": "2026-11-19T19:07:17Z",
    "notes": "What's new Everything since v2.13, the last Stable. Fixed - A GPU hang no longer freezes the display. The game may still close. From the official PS5 kernel. - Game Mode starts again after a crash. When gamescope crashed and Steam hung, the screen stayed on a text console until a forced shutdown. - The console's Bluetooth no longer shuts down after a burst of USB activity…",
    "url": "https://github.com/VivaLaVent/ps5-bazzite-deck/releases/tag/v3.0",
-   "stars": 593,
-   "score": 5.4
+   "stars": 594,
+   "score": 5.6
   },
   {
    "id": "holdmysocks/ps5-tailscale@v0.7.5",
@@ -595,9 +609,9 @@
    "date": "2026-11-19T11:29:35Z",
    "desc": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
    "notes": "EmuFive 1.0.12: no more black screen with emufive.mode= What's new - Fixed: a black screen with emufive.mode= in bootargs.txt (PS4 Multiboot 10). EmuFive set the TV's 1080p mode, then its home screen switched to another 1920x1080 mode (59.96 Hz, 173 MHz) that isn't one of the TV's modes, and some TVs show nothing with it. The home screen now keeps the mode EmuFive set. Checked…",
-   "stars": 344,
+   "stars": 347,
    "url": "https://github.com/blue0x1/EmuFive",
-   "score": 8.6
+   "score": 9.2
   },
   {
    "id": "xXBneutzerNameXx/PS5-Cleanup@v1.2",
@@ -610,9 +624,9 @@
    "date": "2026-11-18T14:57:35Z",
    "desc": "Clean up a jailbroken PS5 like new, no reinstall.",
    "notes": "Changelog 1.2 - Behoben – Firmware 13.x: Auf Firmware 13.x (u. a. 13.20/13.60) scheiterte das Löschen bisher mit „Bad file descriptor\". PS5 Cleanup geht jetzt – wie Playden – jeden Schritt über den ganzen Pfad, sobald die Konsole den kurzen Weg ablehnt. Löschen läuft damit auf 13.x genauso wie auf 12.x. - Sicherheit: Vor dem Löschen wird geprüft, dass der Weg zu allen Dateien…",
-   "stars": 123,
+   "stars": 124,
    "url": "https://github.com/xXBneutzerNameXx/PS5-Cleanup",
-   "score": 8.92
+   "score": 9.16
   },
   {
    "id": "bornaradusin/Emby5@1.3.3",
@@ -681,8 +695,8 @@
    "date": "2026-11-16T15:47:29Z",
    "notes": "New - ampr-emu-ng v0.4.1. The bundled runtime is the v0.4.1 release, in place of v0.3.4. - payloads.json for ps5-payload-manager. Each release now carries a payloads.json catalog. Add https://github.com/quer3q/ps5-dump-forge/releases/latest/download/payloads.json as a custom repository in ps5-payload-manager, and it installs and updates the PS5 payload. - Static Linux CLI. A…",
    "url": "https://github.com/quer3q/ps5-dump-forge/releases/tag/v0.5.6",
-   "stars": 529,
-   "score": 1.2
+   "stars": 530,
+   "score": 1.4
   },
   {
    "id": "gasb07/NeoEnabler@0.7.0",
@@ -695,8 +709,8 @@
    "date": "2026-11-16T10:20:02Z",
    "notes": "1. Experimental 8 GB support for 12.20 contributed by Serotoniner 2. Experimental 8 GB support for 9.00 contributed by nirajvenkat",
    "url": "https://github.com/gasb07/NeoEnabler/releases/tag/0.7.0",
-   "stars": 238,
-   "score": 2.5
+   "stars": 239,
+   "score": 2.7
   },
   {
    "id": "Swordpdf/PS5SX2@vk-285-321",
@@ -781,9 +795,9 @@
    "date": "2026-11-14T22:44:59Z",
    "desc": "Y2JB Installer for PS5",
    "notes": "Changelog : https://github.com/jamesst20/ps5-y2jb-installer/blob/59a572a/CHANGELOG.md Full Changelog : https://github.com/jamesst20/ps5-y2jb-installer/compare/v1.3.0...v1.4.0 Y2JB Installer 1.4.0 1.4.0 — 2026-11-14 Changed - The console card offers one action for the current state: Connect and Scan while nothing answers, then Disconnect once elfldr or the payload is found.…",
-   "stars": 180,
+   "stars": 182,
    "url": "https://github.com/jamesst20/ps5-y2jb-installer",
-   "score": 8.0
+   "score": 8.4
   },
   {
    "id": "saawant12/orbit-play-ps5@v0.8.1",
@@ -811,8 +825,8 @@
    "date": "2026-11-14T12:10:44Z",
    "notes": "Someone republished PatchDL 0.3.12 as \"Updater Games\" and replaced my name with theirs in every file: B4ckd0orl/Updater-Games (my request to fix it). This release makes the authorship visible in PatchDL itself. - The settings page now ends with an About box: copyright, license, a link to the source, and where the ELF was built. Official builds say \"Built from…",
    "url": "https://github.com/knutwurst/ps5-patchdl/releases/tag/v0.3.13",
-   "stars": 288,
-   "score": 1.0
+   "stars": 289,
+   "score": 1.2
   },
   {
    "id": "HeroFromUnicorn67004/PS5X-Next-Generation-PlayStation-Emulation-Platform@v1.0.0",
@@ -884,9 +898,9 @@
    "date": "2026-11-12T20:27:11Z",
    "desc": "Gestor de archivos para PS5 con jailbreak: descarga, convierte y envía en un solo paso. Biblioteca, copias de seguridad y diagnóstico. / File manager for jailbroken PS5: download, convert and send in one step.",
    "notes": "PS5 Directo 2.1.8 Todo lo nuevo desde la 2.1.6: 2.1.8 - Captar enlaces en el móvil, como la extensión del PC. «Compartir» una página (un post, un foro) con PS5 Directo saca los enlaces de descarga que tiene y eliges cuáles poner en la caja. Nuevo botón «🔍 Enlaces de una página» en Enviar (también en el PC). Y «Captar lo que copies» en la app del móvil: copias un enlace en…",
-   "stars": 88,
+   "stars": 89,
    "url": "https://github.com/jstrdev/ps5directo",
-   "score": 5.52
+   "score": 5.76
   },
   {
    "id": "premohq/PS5-ECAM@es-de-1",
@@ -957,8 +971,8 @@
    "date": "2026-11-10T02:59:27Z",
    "notes": "VLC for PS5 v0.6.1 Share files and folders in playlists, Playlists on Home. What's new SMB files and folders in playlists - In Browse, highlight a video or song on a share, press Options and pick Add to playlist . - Highlight a folder, on the console or on a share, and pick Add this folder to playlist or Add this folder + subfolders to playlist . - Share files show their name,…",
    "url": "https://github.com/ZiZc3/VLC/releases/tag/v0.6.1",
-   "stars": 76,
-   "score": 1.0
+   "stars": 77,
+   "score": 1.2
   },
   {
    "id": "elripalda/gta4-ps5@v1.5",
@@ -986,8 +1000,8 @@
    "date": "2026-11-09T08:20:23Z",
    "notes": "Weekly Test Build",
    "url": "https://github.com/chiaki-ng/chiaki-ng/releases/tag/weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
-   "stars": 3216,
-   "score": 5.2
+   "stars": 3226,
+   "score": 7.2
   },
   {
    "id": "aarvsn/PS5Droid@v1.0.5",
@@ -1044,8 +1058,8 @@
    "date": "2026-11-08T20:02:14Z",
    "notes": "- Introduced configuration format v2, with separate config.ini and profiles.ini, automatic migration, and runtime reloads. - Improved mount and launch recovery, including safer cleanup of sandbox layers and handling for M.2 storage. - Made library scans more resilient to inaccessible folders and source changes. - Improved metadata and filename handling for PS4 trophies, sce…",
    "url": "https://github.com/drakmor/ShadowMountPlus/releases/tag/1.7beta12",
-   "stars": 1442,
-   "score": 0.4
+   "stars": 1441,
+   "score": 0.2
   },
   {
    "id": "mihawk-99/PS5_MihawkOS@v8.2.0-alpha-8",
@@ -1160,21 +1174,6 @@
    "url": "https://github.com/Press5elect/PSSwanStation/releases/tag/build26",
    "stars": 39,
    "score": 6.0
-  },
-  {
-   "id": "Oliv3rmoon/Solanum@0.4.0",
-   "kind": "new",
-   "repo": "Oliv3rmoon/Solanum",
-   "cid": "",
-   "name": "Solanum",
-   "tag": "0.4.0",
-   "pre": false,
-   "date": "2026-10-31T19:57:08Z",
-   "desc": "A store for open-source PS5 homebrew: installs and updates the apps of the open Solanum catalog from their own GitHub releases. A Nightshade app.",
-   "notes": "Solanum 0.4.0: 154 apps. ProsperoStore's catalog's apps are in Solanum's catalog now, 98 more, and Solanum installs them all: apps that publish only pre-releases, ports that need your own game files, and apps that share a title ID with another. Install: unzip PPSA76526.zip and copy its PPSA76526 folder to /data/homebrew/ with permissions 777 , over 0.3.0 or new. It needs the…",
-   "stars": 15,
-   "url": "https://github.com/Oliv3rmoon/Solanum",
-   "score": 4.6
   }
  ],
  "hot": [
@@ -1239,7 +1238,7 @@
    ],
    [
     "2026-11-21",
-    154
+    155
    ]
   ],
   "jstrdev/ps5directo": [
@@ -1273,7 +1272,7 @@
    ],
    [
     "2026-11-21",
-    88
+    89
    ]
   ],
   "fthdgn-gh/alembic": [
@@ -1403,7 +1402,7 @@
    ],
    [
     "2026-11-21",
-    593
+    594
    ]
   ],
   "mistertemaki/fbneo-ps5": [
@@ -1471,7 +1470,7 @@
    ],
    [
     "2026-11-21",
-    76
+    77
    ]
   ],
   "zizc3/xpsemu": [
@@ -1539,7 +1538,7 @@
    ],
    [
     "2026-11-21",
-    123
+    124
    ]
   ],
   "quer3q/ps5-dump-forge": [
@@ -1573,7 +1572,7 @@
    ],
    [
     "2026-11-21",
-    529
+    530
    ]
   ],
   "elripalda/gta4-ps5": [
@@ -1641,7 +1640,7 @@
    ],
    [
     "2026-11-21",
-    344
+    347
    ]
   ],
   "streetpea/chiaki-ng": [
@@ -1675,7 +1674,7 @@
    ],
    [
     "2026-11-21",
-    3216
+    3226
    ]
   ],
   "aarvsn/ps5droid": [
@@ -1845,7 +1844,7 @@
    ],
    [
     "2026-11-21",
-    1442
+    1441
    ]
   ],
   "x1nons/prefbar": [
@@ -2357,7 +2356,7 @@
    ],
    [
     "2026-11-21",
-    238
+    239
    ]
   ],
   "knutwurst/ps5-patchdl": [
@@ -2391,7 +2390,7 @@
    ],
    [
     "2026-11-21",
-    288
+    289
    ]
   ],
   "cobanov/ps5lm": [
@@ -2481,7 +2480,7 @@
    ],
    [
     "2026-11-21",
-    52
+    54
    ]
   ],
   "bornaradusin/emby5": [
@@ -2957,7 +2956,7 @@
    ],
    [
     "2026-11-21",
-    419
+    424
    ]
   ],
   "elripalda/recompstore": [
@@ -2991,7 +2990,7 @@
    ],
    [
     "2026-11-21",
-    404
+    405
    ]
   ],
   "niakw/prosperoeden-encore": [
@@ -3025,7 +3024,7 @@
    ],
    [
     "2026-11-21",
-    123
+    124
    ]
   ],
   "heydemoura/prosperoeden": [
@@ -3059,7 +3058,7 @@
    ],
    [
     "2026-11-21",
-    51
+    52
    ]
   ],
   "holdmysocks/mcla-recomp": [
@@ -3779,7 +3778,7 @@
    ],
    [
     "2026-11-21",
-    74
+    76
    ]
   ],
   "smoxa/ps5-new-overlay": [
@@ -3929,7 +3928,7 @@
    ],
    [
     "2026-11-21",
-    524
+    526
    ]
   ],
   "zigzagboi1/ps5-14.10-research": [
@@ -3963,7 +3962,7 @@
    ],
    [
     "2026-11-21",
-    530
+    534
    ]
   ],
   "pinkythegawd/ps5-webkit-autoloader": [
@@ -4065,7 +4064,7 @@
    ],
    [
     "2026-11-21",
-    87
+    88
    ]
   ],
   "larazadelsol/wings-app": [
@@ -4385,7 +4384,7 @@
    ],
    [
     "2026-11-21",
-    265
+    266
    ]
   ],
   "mortyzip/keepawake": [
@@ -4589,7 +4588,7 @@
    ],
    [
     "2026-11-21",
-    180
+    182
    ]
   ],
   "iziman127/ps5-dualsense-deadzone": [
@@ -4863,7 +4862,7 @@
    ],
    [
     "2026-11-21",
-    194
+    204
    ]
   ],
   "forcevacavity/ps5-emulator-pc": [
@@ -4980,6 +4979,10 @@
    [
     "2026-11-20",
     35
+   ],
+   [
+    "2026-11-21",
+    35
    ]
   ],
   "fisheriks/gta-6-switch-version--pc-emulator-2026": [
@@ -5007,7 +5010,7 @@
    ],
    [
     "2026-11-21",
-    37
+    38
    ]
   ],
   "yassinebourzza1/gta-6-switch-version--pc-emulator-2026": [
@@ -5112,6 +5115,10 @@
    [
     "2026-11-19",
     36
+   ],
+   [
+    "2026-11-21",
+    35
    ]
   ],
   "kazim768/gta-6-switch-version--pc-emulator-2026": [
@@ -5355,7 +5362,7 @@
    ],
    [
     "2026-11-21",
-    228
+    238
    ]
   ],
   "pastawithpesto/ps5-14.10-jailbreak-research": [
@@ -5365,7 +5372,19 @@
    ],
    [
     "2026-11-21",
-    32
+    33
+   ]
+  ],
+  "sandypandymandy/gta-6-switch-version--pc-emulator-2026": [
+   [
+    "2026-11-21",
+    35
+   ]
+  ],
+  "lloweryfn-rgb/gta-6-switch-version--pc-emulator-2026": [
+   [
+    "2026-11-21",
+    35
    ]
   ]
  },
@@ -5895,8 +5914,8 @@
    "2026-11-08T13:11:54Z"
   ],
   "mihawk-99/ps5_retroarch": [
-   "v4.0.0-beta-4",
-   "2026-10-19T20:58:35Z"
+   "v4.1.0-beta-4",
+   "2026-11-21T02:57:37Z"
   ],
   "mihawk-99/ps5_vkquake": [
    "1.0",
