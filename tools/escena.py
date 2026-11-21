@@ -38,7 +38,7 @@ BASE = ["drakmor/ShadowMountPlus", "ps5-payload-dev/ftpsrv", "ps5-payload-dev/el
 # lo que decidimos no recomendar (y cualquier cosa de piratería): no sale nunca
 SKIP = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|save.?(manager|edit)"
                   r"|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|store.?(pkg|game)|free.?games|pkg.?(links|store)"
-                  r"|nopaystation|psbox|hen.?store|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|free.?(ps5.?)?games")
+                  r"|nopaystation|psbox|hen.?store|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|save.?mgr|ps5.?save\b|ps5.?library|free.?(ps5.?)?games")
 
 
 def gh(path, params=None):

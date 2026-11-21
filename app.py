@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.1.8"
+VERSION = "2.2.3"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -87,7 +87,7 @@ DEFAULTS = {
     "passwords": [],
     "guess_passwords": True,
     "delete_archives": True,
-    "ampr_auto": True, "ampr_set": {}, "rp_wake": {}, "card_seen": {},            # poner siempre la última ampr-emu-ng en lo empaquetado (al convertir y en la consola)
+    "ampr_auto": True, "ampr_set": {}, "rp_wake": {}, "card_seen": {}, "routines": [],            # poner siempre la última ampr-emu-ng en lo empaquetado (al convertir y en la consola)
     "trash_on": True,          # Biblioteca y Archivos: «Borrar» manda a la papelera de la consola (se recupera)
     "trash_days": 7,           # lo de la papelera se borra solo pasados estos dias
     "watch_since": 0.0,       # lo de la carpeta vigilada anterior a esto ya se vio
@@ -104,6 +104,7 @@ DEFAULTS = {
     "pc_mode": False,          # «Modo PC»: todo va a tu PC (bajar, descomprimir o convertir), nada a la consola
     "pc_mode_steps": "extract",  # en Modo PC: dl, extract o convert (lo que usan la extension y el movil)
     "pc_mode_fmt": "",         # en Modo PC con convert: formato
+    "forge_consent": False,      # el usuario ha aceptado bajar PS5 Dump Forge (programa de otro autor) la primera vez
     "forge_auto_update": False,  # bajar solo las versiones nuevas de PS5 Dump Forge (si no, avisa y pregunta)
     "tour_done": False,       # la guia de bienvenida ya se vio
     "tour20_done": False, "spot_packs": False, "spot_ver": "", "spot_done": "", "spot_hint_x": "", "emu_vers_t": {}, "mine_del": {}, "rec_src": {}, "ps5_toasts": True, "chiaki_path": "", "rp_nick": "",     # la guia de la 2.0 (lo nuevo) ya se vio
@@ -2195,6 +2196,23 @@ def fm_api(p, b):
         return ps5_power(str(b.get("action") or ""))
     if p == "/api/ps5/wakeinfo":
         return wake_info()
+    if p == "/api/routines":
+        return rt_state()
+    if p == "/api/routines/save":
+        return rt_save(b)
+    if p == "/api/routines/del":
+        return rt_del(str(b.get("id") or ""))
+    if p == "/api/routines/toggle":
+        rt_patch(str(b.get("id") or ""), on=bool(b.get("on")))
+        return rt_state()
+    if p == "/api/routines/run":
+        r = next((x for x in rt_list() if x.get("id") == b.get("id")), None)
+        if not r:
+            raise E.PipeError("Esa rutina ya no existe")
+        if RT["running"]:
+            raise E.PipeError("Ya hay otra rutina en marcha: espera a que termine")
+        threading.Thread(target=rt_run, args=(r, True), daemon=True).start()
+        return {"started": True}
     if p == "/api/links/scan":
         return links_scan(str(b.get("url") or ""))
     if p == "/api/clip/push":
@@ -2601,6 +2619,23 @@ _CONN_RX = re.compile(r"(?i)10054|10053|10060|10061|10065|connection (reset|refu
 MAC_LAN_MSG = ("macOS no deja a PS5 Directo usar la red local. Ve a Ajustes del Sistema → Privacidad y seguridad → Red local, activa «PS5 Directo» (o «python3») y vuelve a abrir el programa. Si no sale en esa lista, cierra PS5 Directo (Salir) y ábrelo otra vez desde Aplicaciones: macOS pregunta la primera vez que intenta conectar con la consola.")
 
 
+def mac_lan_text():
+    """El aviso de «Red local» con el paso que toca según cómo se ha abierto la app (issue #41)."""
+    b = os.environ.get("PS5D_BUNDLE") or ""
+    if "/AppTranslocation/" in b or (b and not (b.startswith("/Applications/") or "/Applications/" in b)):
+        return ("macOS no deja a PS5 Directo usar la red local porque la app se está abriendo desde fuera de "
+                "Aplicaciones (macOS la ejecuta desde una copia temporal y el permiso no le vale). Arrastra «PS5 Directo» "
+                "a la carpeta Aplicaciones, ábrela desde ahí y, en Ajustes del Sistema → Privacidad y seguridad → Red "
+                "local, activa «PS5 Directo».")
+    if not b:
+        return ("macOS no deja usar la red local. Has abierto PS5 Directo desde Terminal (o con python3): el permiso "
+                "se lo tienes que dar a Terminal en Ajustes del Sistema → Privacidad y seguridad → Red local, o abrir "
+                "la app «PS5 Directo» desde Aplicaciones.")
+    return (MAC_LAN_MSG + " Si ya estaba activado y sigue igual: desactívalo, vuelve a activarlo y reinicia el Mac "
+            "(algunas versiones de macOS no lo aplican hasta reiniciar). Si hay dos entradas («PS5 Directo» y "
+            "«python3»), activa las dos.")
+
+
 def mac_lan_blocked(host=None):
     """En macOS 15+ hace falta el permiso «Red local». Si no lo tiene, conectar con la consola falla al
     instante con "No route to host" (errno 65), aunque la PS5 este encendida."""
@@ -2622,7 +2657,7 @@ def conn_error_text(e):
     se cambian por un mensaje claro sobre la conexión con la consola."""
     t = str(e) or e.__class__.__name__
     if sys.platform == "darwin" and re.search(r"(?i)no route to host|errno 65", t):
-        return MAC_LAN_MSG + " (%s)" % t
+        return mac_lan_text() + " (%s)" % t
     if isinstance(e, (ConnectionError, TimeoutError, socket.timeout)) or _CONN_RX.search(t):
         return ("No hay conexión con la consola. Comprueba que la PS5 está encendida, que el FTP está cargado "
                 "(arriba el punto «FTP» tiene que estar en verde) y pulsa Actualizar. (%s)" % t)
@@ -2689,6 +2724,10 @@ def diagnose(job):
         for rx, cause, fixes in DIAG_RULES:
             if cause in seen or not re.search(rx, src):
                 continue
+            # las causas de conversión solo si este trabajo convertía algo (issue #12: salían sin haber elegido formato)
+            if cause in ("Ha fallado la conversión de formato en el PC.", "LZ4 no vale para este contenido.") \
+                    and (job.get("fmt") or "") in ("", "plain", "folder"):
+                continue
             seen.add(cause)
             found.append({"cause": cause, "fixes": fixes})
     if not found:
@@ -2700,7 +2739,7 @@ def diagnose(job):
     return {"items": found[:4], "codes": codes}
 
 
-SECRET_KEYS = ("ftp_pass", "passwords", "lan_token", "token", "password")
+SECRET_KEYS = ("ftp_pass", "passwords", "lan_token", "token", "password", "secret", "hook")
 
 
 def _clean_settings():
@@ -2730,6 +2769,50 @@ def _ext_version(folder):
         return ""
 
 
+def ext_secret():
+    """Secreto que comparten PS5 Directo y su extensión (issue #10). Se crea una vez y va en pair.json, dentro de la
+    carpeta de la extensión que copia PS5 Directo. Nunca va al repositorio ni al móvil."""
+    with LOCK:
+        if not SETTINGS.get("ext_secret"):
+            SETTINGS["ext_secret"] = secrets.token_hex(32)
+            changed = True
+        else:
+            changed = False
+        sec = SETTINGS["ext_secret"]
+    if changed:
+        save_settings()
+    return sec
+
+
+def ext_proof(msg):
+    import hmac as _hm
+    return _hm.new(ext_secret().encode(), msg.encode(), hashlib.sha256).hexdigest()
+
+
+def ext_auth_ok(h):
+    """La petición viene de NUESTRA extensión (lleva la firma del secreto compartido)."""
+    import hmac as _hm
+    return _hm.compare_digest(str(h.headers.get("X-Ext-Auth") or ""), ext_proof("ps5d-ext"))
+
+
+def _write_pair():
+    try:
+        os.makedirs(EXT_DIR, exist_ok=True)
+        fp = os.path.join(EXT_DIR, "pair.json")
+        want = json.dumps({"secret": ext_secret()})
+        try:
+            with open(fp, encoding="utf-8") as f:
+                if f.read() == want:
+                    return
+        except OSError:
+            pass
+        with open(fp + ".tmp", "w", encoding="utf-8") as f:
+            f.write(want)
+        os.replace(fp + ".tmp", fp)
+    except Exception as e:
+        print("No pude emparejar la extension:", e)
+
+
 def sync_extension():
     """Copia la extension a una carpeta que no cambia (~/.ps5directo/extension). Asi, aunque PS5 Directo se
     mueva o se actualice, el navegador siempre la carga del mismo sitio y basta recargarla (lo hace ella sola)."""
@@ -2737,6 +2820,7 @@ def sync_extension():
     src = os.path.join(HERE, "extension")
     if not os.path.isdir(src):
         return
+    _write_pair()
     if _ext_version(src) and _ext_version(src) == _ext_version(EXT_DIR):
         return
     try:
@@ -2792,6 +2876,12 @@ def make_report(job_id=None, form=None):
             "os": platform.platform(), "python": sys.version.split()[0],
             "forge": os.path.basename(os.path.dirname(forge)) if forge else None,
             "console_fw": SETTINGS.get("console_fw")}
+    if sys.platform == "darwin":       # para el permiso de «Red local» (issue #41)
+        info["mac_bundle"] = os.environ.get("PS5D_BUNDLE") or "(sin app: Terminal o python3)"
+        try:
+            info["mac_lan_blocked"] = mac_lan_blocked()
+        except Exception:
+            pass
     try:
         info["connection"] = test_connection(cfg_snapshot())
     except Exception as e:
@@ -2833,6 +2923,13 @@ def make_report(job_id=None, form=None):
                        "".join(re.sub(r"([#?&]t=)[\w-]+", r"\1(oculto)", ln) for ln in lines))
         except OSError:
             pass
+        if sys.platform == "darwin":   # registro del lanzador de la app de Mac (cómo arrancó, Rosetta, Aplicaciones…)
+            try:
+                with open(os.path.expanduser("~/Library/Application Support/PS5 Directo/lanzador.log"),
+                          encoding="utf-8", errors="replace") as fh:
+                    z.writestr("lanzador_mac.txt", "".join(fh.readlines()[-200:]))
+            except OSError:
+                pass
         with AUTOBUG_LOCK:
             if AUTOBUG["items"]:
                 z.writestr("fallos_detectados.json", json.dumps(AUTOBUG["items"], ensure_ascii=False, indent=1))
@@ -2961,6 +3058,7 @@ def launch_check(path, minutes=30, quick=False):
                 except Exception:
                     pass
             backport = "fakelib" in ls or "fakelib2" in ls
+            info["fakelib"] = backport
             need = (fw_exe if backport else None) or facts.get("fw_param") or fw_exe
             mine = (SETTINGS.get("console_fw") or "").strip()
             if need and mine:
@@ -3089,6 +3187,11 @@ def launch_check(path, minutes=30, quick=False):
     E.Ftp(cfg).call(run)
     # cierres que ha visto ShadowMountPlus (signal / general protection fault) en los registros recientes
     tid = (info.get("tid") or "").upper()
+    if not quick and tid and info.get("fakelib"):
+        g = smp_game(tid)
+        if g and g.get("fakelib_effective_enabled") is False:
+            add("bad", "ShadowMountPlus tiene el fakelib desactivado para este título, así que su backport y su AMPR no se "
+                       "aplican al abrirlo.", "Actívalo en la web de ShadowMountPlus (ficha del título › fakelib) y vuelve a abrirlo.")
     for lg in info.get("logs") or []:
         m = None
         for m in re.finditer(r"game error: ([A-Z]{4}\d{5})[^\n]*?: signal: (\d+) \((\w+)\)(?:\s*thread name: (\S+))?",
@@ -3579,6 +3682,10 @@ def ensure_forge(job, cfg):
         exe = F.find_forge(cfg.get("forge_path"), DATA_DIR)
         if exe:
             return exe
+        if not SETTINGS.get("forge_consent"):
+            raise E.PipeError("Para convertir hace falta PS5 Dump Forge, un programa de otro autor (quer3q, en GitHub). "
+                              "No lo bajo sin tu permiso: acéptalo en el PC al añadir la transferencia (o en Sistema), "
+                              "o elige «Carpeta normal».")
         setj(job, phase="Descargando PS5 Dump Forge de GitHub (solo la primera vez)")
         try:
             exe, tag = F.download_forge(DATA_DIR, log=lambda m: jlog(job, m))
@@ -3595,6 +3702,7 @@ def ensure_forge(job, cfg):
 # ---------------------------------------------------------------------------
 
 ARIA2_URL = "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip"
+ARIA2_SHA256 = "67d015301eef0b612191212d564c5bb0a14b5b9c4796b76454276a4d28d9b288"   # fijada: si cambia, no se usa
 ARIA2_LOCK = threading.Lock()
 _UNITS = {"B": 1, "KIB": 1024, "MIB": 1024 ** 2, "GIB": 1024 ** 3, "TIB": 1024 ** 4}
 _ARIA_RX = re.compile(r"\[#(\w+)\s+([\d.]+)(\w*B)/([\d.]+)(\w*B)(?:\((\d+)%\))?([^\]]*)\]")
@@ -3647,6 +3755,7 @@ def ensure_aria2(job, cfg):
         tmp = mine + ".zip"
         try:
             F.http_get(ARIA2_URL, limit=50 * 1024 * 1024, timeout=120, dest=tmp)
+            F.check_sha256(tmp, ARIA2_SHA256, "El paquete de aria2")
             import zipfile
             with zipfile.ZipFile(tmp) as z:
                 n = next((x for x in z.namelist() if x.lower().endswith("/aria2c.exe")), None)
@@ -5560,7 +5669,7 @@ def _extract_job(job, info, cancel):
         # sin BFpilot: renombrar por FTP es instantaneo (mismo disco)
         name = info["name"]
         low = name.lower()
-        target_dir = "/data/pkg" if low.endswith(".pkg") else dest
+        target_dir = pkg_dir(dest) if low.endswith(".pkg") else dest
         target = target_dir + "/" + name
         box = {"target": target}
 
@@ -5593,7 +5702,7 @@ def _extract_job(job, info, cancel):
     if info["mode"] == "file":
         name = info["name"]
         low = name.lower()
-        target_dir = "/data/pkg" if low.endswith(".pkg") else dest
+        target_dir = pkg_dir(dest) if low.endswith(".pkg") else dest
         target = target_dir + "/" + name
         if bf.exists(target):
             base, ext = os.path.splitext(target)
@@ -5607,7 +5716,15 @@ def _extract_job(job, info, cancel):
         except Exception:
             pass
         if low.endswith(".pkg"):
-            jlog(job, "Es un .pkg: instalalo con ps5upload (Install Package) desde /data/pkg.")
+            if target_dir != "/data/pkg":
+                jlog(job, "Es un .pkg y está en la raíz del USB: si es de PS4, PS4Mount lo abre sin instalar "
+                          "(Descubrir › Mejorar tus títulos); también puedes instalarlo desde Archivos de la consola.")
+            else:
+                jlog(job, "Es un .pkg y ya está en /data/pkg. Para instalarlo: en Archivos de la consola, botón derecho › "
+                          "«Instalar .pkg» (con zftpd, o con la web de ShadowMountPlus 1.7 si la tienes).")
+            notify("ok", "Paquete listo para instalar: %s" % name[:80],
+                   "Está en %s. Pulsa aquí para verlo en Archivos de la consola e instalarlo." % target_dir,
+                   {"tab": "Files", "path": target_dir}, key="pkg:" + name[:80])
         return [target]
 
     src = info["dir"] + "/" + info["first"]
@@ -7839,6 +7956,301 @@ def resume_after_now():
                 WAKE.notify_all()
 
 
+# ---------------------------------------------------------------------------
+# Rutinas: «cuando pase esto, haz esto». Unen lo que PS5 Directo ya sabe hacer (encender, reposo, payloads, copia,
+# capturas, AMPR, avisos) para que la consola se cuide sola. Cada rutina: un disparador y una lista de pasos.
+# ---------------------------------------------------------------------------
+RT = {"lock": threading.Lock(), "running": "", "log": [], "prev": {}, "ddp": None, "ddp_t": 0.0, "qw_t": 0.0, "hot": {}}
+RT_WHEN = ("time", "queue_done", "queue_wait", "console_on", "console_rest", "temp_over", "job_error")
+RT_DO = ("wake", "standby", "restore", "payloads", "resume", "backup", "shots", "ampr", "notify", "ps5_toast", "wait")
+
+
+def rt_list():
+    with LOCK:
+        return [dict(r) for r in SETTINGS.get("routines") or [] if isinstance(r, dict)]
+
+
+def rt_clean(b):
+    """Valida una rutina que llega de la interfaz."""
+    w = b.get("when") if isinstance(b.get("when"), dict) else {}
+    typ = w.get("type")
+    if typ not in RT_WHEN:
+        raise E.PipeError("Elige cuándo se lanza la rutina")
+    when = {"type": typ}
+    if typ == "time":
+        m = re.match(r"^(\d{1,2}):(\d{2})$", str(w.get("at") or ""))
+        if not m or int(m.group(1)) > 23 or int(m.group(2)) > 59:
+            raise E.PipeError("Hora no valida (usa HH:MM)")
+        when["at"] = "%02d:%s" % (int(m.group(1)), m.group(2))
+        days = [int(d) for d in w.get("days") or [] if str(d).isdigit() and 0 <= int(d) <= 6]
+        if days and len(set(days)) < 7:
+            when["days"] = sorted(set(days))
+    if typ == "temp_over":
+        try:
+            when["temp"] = max(50, min(100, int(w.get("temp") or 85)))
+        except (TypeError, ValueError):
+            when["temp"] = 85
+    steps = []
+    for st in b.get("steps") or []:
+        if not isinstance(st, dict) or st.get("do") not in RT_DO:
+            continue
+        x = {"do": st["do"]}
+        if st["do"] in ("notify", "ps5_toast"):
+            x["text"] = str(st.get("text") or "").strip()[:120]
+        if st["do"] == "wait":
+            try:
+                x["min"] = max(1, min(120, int(st.get("min") or 5)))
+            except (TypeError, ValueError):
+                x["min"] = 5
+        steps.append(x)
+    if not steps:
+        raise E.PipeError("Añade al menos un paso a la rutina")
+    return {"id": re.sub(r"[^a-z0-9]", "", str(b.get("id") or ""))[:12] or secrets.token_hex(4),
+            "name": str(b.get("name") or "").strip()[:60] or "Rutina", "tpl": str(b.get("tpl") or "")[:20],
+            "on": bool(b.get("on", True)), "when": when, "steps": steps[:10]}
+
+
+def rt_save(b):
+    r = rt_clean(b)
+    with LOCK:
+        lst = [x for x in SETTINGS.get("routines") or [] if isinstance(x, dict)]
+        old = next((x for x in lst if x.get("id") == r["id"]), None)
+        if old:
+            r["last"] = old.get("last")
+            lst[lst.index(old)] = r
+        else:
+            if len(lst) >= 20:
+                raise E.PipeError("Ya tienes 20 rutinas: borra alguna antes de añadir otra")
+            lst.append(r)
+        SETTINGS["routines"] = lst
+    save_settings()
+    return rt_state()
+
+
+def rt_patch(rid, **kw):
+    with LOCK:
+        for x in SETTINGS.get("routines") or []:
+            if isinstance(x, dict) and x.get("id") == rid:
+                x.update(kw)
+    save_settings()
+
+
+def rt_del(rid):
+    with LOCK:
+        SETTINGS["routines"] = [x for x in SETTINGS.get("routines") or [] if isinstance(x, dict) and x.get("id") != rid]
+    save_settings()
+    return rt_state()
+
+
+def rt_state():
+    w = SETTINGS.get("rp_wake") or {}
+    return {"items": rt_list(), "log": list(RT["log"][:25]), "running": RT["running"], "wake_ready": bool(w.get("cred")),
+            "console": RT["ddp"] or "", "phone": PHONE}
+
+
+def _rt_log(r, ok, msg):
+    e = {"t": time.time(), "id": r["id"], "name": r["name"], "ok": ok, "msg": msg[:300]}
+    RT["log"].insert(0, e)
+    del RT["log"][40:]
+    rt_patch(r["id"], last={"t": e["t"], "ok": ok, "msg": e["msg"]})
+
+
+class _RtSkip(Exception):
+    pass
+
+
+def _rt_wait_ftp(secs):
+    cfg = cfg_snapshot()
+    t0 = time.time()
+    while time.time() - t0 < secs:
+        if _svc_ok("ftpsrv", cfg)[0]:
+            return True
+        time.sleep(5)
+    return False
+
+
+def _rt_step(st, ctx):
+    """Hace un paso. Devuelve el texto de lo hecho; _RtSkip si no tocaba; PipeError si falla."""
+    do = st["do"]
+    ip = SETTINGS.get("ps5_ip") or ""
+    if do == "wake":
+        info = ps5_ddp(ip) if ip else None
+        if info and info.get("state") == "on":
+            return "la consola ya estaba encendida"
+        try:
+            ps5_wake(wait=60)
+        except E.PipeError as e:
+            if str(e) == "noreg":
+                raise E.PipeError("falta preparar el encendido una vez (Sistema › Encender y apagar)")
+            raise
+        ctx["woke"] = True
+        return "consola encendida"
+    if do in ("standby", "restore"):
+        if do == "restore" and not ctx.get("woke"):
+            raise _RtSkip("la consola ya estaba encendida antes: la dejo como estaba")
+        if busy():
+            raise _RtSkip("hay trabajos en marcha: no la pongo en reposo")
+        try:
+            played_poll()
+        except Exception:
+            pass
+        if open_titles(6 * 3600):
+            raise _RtSkip("hay algo abierto en la consola: no la pongo en reposo")
+        ps5_power("standby")
+        return "consola en reposo"
+    if do == "payloads":
+        if not _rt_wait_ftp(5):
+            console_auto(0)
+            if not _rt_wait_ftp(120 if ctx.get("woke") else 40):
+                raise E.PipeError("la consola no tiene el FTP en marcha (¿está hecho el jailbreak y abierto Payload Manager?)")
+        return "payloads en marcha"
+    if do == "resume":
+        auto_resume()
+        with WAKE:
+            WAKE.notify_all()
+        return "cola reanudada"
+    if do == "backup":
+        if BK["busy"]:
+            raise _RtSkip("ya hay una copia en marcha")
+        backup_run(label="rutina")
+        if BK.get("error"):
+            raise E.PipeError("la copia ha fallado: %s" % BK["error"])
+        return "copia de seguridad hecha"
+    if do == "shots":
+        shots_sync()
+        return "capturas bajadas"
+    if do == "ampr":
+        ampr_auto_console()
+        return "AMPR revisado"
+    if do == "notify":
+        notify("info", st.get("text") or ctx["name"], "Rutina «%s»" % ctx["name"], key=None)
+        return "aviso en la campana"
+    if do == "ps5_toast":
+        ps5_toast(st.get("text") or ctx["name"])
+        return "aviso en la pantalla de la consola"
+    if do == "wait":
+        time.sleep(60 * int(st.get("min") or 1) if not ctx.get("fast") else 0.1)
+        return "espera de %d min" % int(st.get("min") or 1)
+    return ""
+
+
+def rt_run(r, manual=False, fast=False):
+    """Ejecuta una rutina (una cada vez). Si un paso falla se para ahí y avisa; los que no tocan se saltan."""
+    if not RT["lock"].acquire(blocking=False):
+        if manual:
+            raise E.PipeError("Ya hay otra rutina en marcha: espera a que termine")
+        return
+    RT["running"] = r["id"]
+    done, ok = [], True
+    ctx = {"name": r["name"], "woke": False, "fast": fast}
+    try:
+        for st in r.get("steps") or []:
+            try:
+                txt = _rt_step(st, ctx)
+                if txt:
+                    done.append(txt)
+            except _RtSkip as e:
+                done.append("(%s)" % e)
+            except Exception as e:
+                ok = False
+                done.append("no pude seguir: %s" % (e if isinstance(e, E.PipeError) else conn_error_text(e)))
+                break
+        msg = "; ".join(done) or "sin pasos"
+        _rt_log(r, ok, msg)
+        print("Rutina «%s»: %s" % (r["name"], msg))
+        if not ok and not manual:
+            notify("warn", "La rutina «%s» no ha terminado" % r["name"], msg[:1].upper() + msg[1:] + ".",
+                   {"action": "routines"}, key="rt:%s:%s" % (r["id"], time.strftime("%Y-%m-%d-%H")))
+    finally:
+        RT["running"] = ""
+        RT["lock"].release()
+    return {"ok": ok, "msg": msg}
+
+
+def rt_fire(typ, test=None):
+    for r in rt_list():
+        if r.get("on") and (r.get("when") or {}).get("type") == typ and (test is None or test(r)):
+            threading.Thread(target=rt_run, args=(r,), daemon=True).start()
+            time.sleep(0.2)
+
+
+def _rt_queue_waiting():
+    with LOCK:
+        return any(j.get("where") not in ("pc", "keep") and (j["status"] == "pendiente" or (
+            j["status"] == "error" and j.get("auto_retry") and (j.get("auto_tries") or 0) < 5)) for j in JOBS)
+
+
+def rt_tick():
+    items = [r for r in rt_list() if r.get("on")]
+    if not items:
+        RT["prev"] = {}
+        return
+    types = {(r.get("when") or {}).get("type") for r in items}
+    now = time.time()
+    prev = RT["prev"]
+    # hora fija (con 10 min de margen por si el PC estaba ocupado o recién abierto)
+    lt = time.localtime(now)
+    today = time.strftime("%Y-%m-%d", lt)
+    for r in items:
+        w = r.get("when") or {}
+        if w.get("type") != "time" or r.get("day") == today:
+            continue
+        if w.get("days") and (lt.tm_wday + 1) % 7 not in w["days"]:      # 0 = domingo
+            continue
+        hh, mm = (int(x) for x in w["at"].split(":"))
+        mins = lt.tm_hour * 60 + lt.tm_min - (hh * 60 + mm)
+        if 0 <= mins < 10:
+            rt_patch(r["id"], day=today)
+            threading.Thread(target=rt_run, args=(r,), daemon=True).start()
+    # la cola
+    b = busy()
+    with LOCK:
+        errs = sum(1 for j in JOBS if j["status"] == "error")
+    if prev.get("busy") and not b and not _rt_queue_waiting():
+        rt_fire("queue_done")
+    if "errs" in prev and errs > prev["errs"]:
+        rt_fire("job_error")
+    # estado de la consola (pregunta ligera, cada 30 s)
+    ip = SETTINGS.get("ps5_ip") or ""
+    if ip and types & {"console_on", "console_rest", "queue_wait"} and now - RT["ddp_t"] > 30:
+        RT["ddp_t"] = now
+        info = ps5_ddp(ip)
+        st = (info or {}).get("state") or ""
+        if st in ("on", "rest"):
+            old = RT["ddp"]
+            RT["ddp"] = st
+            if old and old != st:
+                rt_fire("console_on" if st == "on" else "console_rest")
+        if st == "rest" and "queue_wait" in types and now - RT["qw_t"] > 300 and _rt_queue_waiting():
+            RT["qw_t"] = now
+            rt_fire("queue_wait")
+    # temperatura (de la muestra que ya toma la pestaña Sistema)
+    if "temp_over" in types and SYS_HIST and now - SYS_HIST[-1][0] < 200:
+        temp = SYS_HIST[-1][1]
+        for r in items:
+            w = r.get("when") or {}
+            if w.get("type") != "temp_over" or temp is None:
+                continue
+            lim = int(w.get("temp") or 85)
+            hot = RT["hot"].get(r["id"]) or 0
+            if temp >= lim and now - hot > 1800:
+                RT["hot"][r["id"]] = now
+                threading.Thread(target=rt_run, args=(r,), daemon=True).start()
+            elif temp < lim - 3:
+                RT["hot"].pop(r["id"], None)
+    RT["prev"] = {"busy": b, "errs": errs}
+
+
+def rt_loop():
+    time.sleep(25)
+    while True:
+        try:
+            rt_tick()
+        except Exception:
+            traceback.print_exc()
+        time.sleep(10)
+
+
 def monitor():
     """Cada pocos segundos: que el PC no se duerma con trabajo y la accion al acabar la cola."""
     awake = None
@@ -7996,7 +8408,7 @@ def console_status():
                              "autoload": bool(slot and slot.get("slot") in autoload), "lost": LOST[p["id"]]})
     out["reachable"] = bool(ver or out["loader"] or any(i["ok"] for i in out["items"]) or
                             _port_open(cfg["ps5_ip"], 2121, 1) or _port_open(cfg["ps5_ip"], 5905, 1))
-    out["mac_lan"] = MAC_LAN_MSG if (not out["reachable"] and mac_lan_blocked(cfg["ps5_ip"])) else ""
+    out["mac_lan"] = mac_lan_text() if (not out["reachable"] and mac_lan_blocked(cfg["ps5_ip"])) else ""
     # sin nada que conteste: ¿esta apagada, o encendida pero sin jailbreak (por ejemplo, recien reiniciada)?
     out["alive"] = True if out["reachable"] else (False if out["mac_lan"] else _host_alive(cfg["ps5_ip"]))
     return out
@@ -9040,7 +9452,15 @@ def wake_info():
     info = ps5_ddp(ip) if ip else None
     w = None if PHONE else wake_learn(info)
     w = w or (SETTINGS.get("rp_wake") or None)
-    return {"state": (info or {}).get("state") or "", "name": (info or {}).get("name") or "", "ready": bool(w and w.get("cred")),
+    opened = []
+    if (info or {}).get("state") == "on":
+        try:
+            for tid in list(open_titles(12 * 3600))[:3]:
+                opened.append((_lib_path_for(tid)[1] or tid)[:60])
+        except Exception:
+            pass
+    return {"open": opened,
+            "state": (info or {}).get("state") or "", "name": (info or {}).get("name") or "", "ready": bool(w and w.get("cred")),
             "nick": (w or {}).get("nick") or "", "phone": PHONE}
 
 
@@ -9241,7 +9661,7 @@ def ampr_auto_console():
         names = ", ".join(sorted({x["name"] for x in back}))[:300]
         notify("warn", "Algo vuelve a poner una ampr-emu-ng vieja",
                "En %s puse la %s y ahora vuelve a estar la %s. Suele ser ShadowMountPlus actualizando el fakelib al "
-               "montar: quita esa opción en su configuración, porque si no se cerrará al "
+               "montar: quita esa opción en su configuración (la 1.7 deja elegir el modo de fakelib de cada título en su web), porque si no se cerrará al "
                "arrancar o al cargar partida. La vuelvo a cambiar ahora." % (names, put[back[0]["path"]], back[0]["ver"]),
                {"tab": "System"}, key="amprback:%s" % ",".join(sorted(x["path"] for x in back))[:200])
     try:
@@ -9587,6 +10007,7 @@ def _patches_zip(max_age=86400):
             req = urllib.request.Request(a["browser_download_url"], headers={"User-Agent": "PS5Directo/" + VERSION})
             with urllib.request.urlopen(req, timeout=60) as r:
                 data = r.read(80 * 1024 * 1024)
+            F.verify_asset(assets, a, data)
             os.makedirs(PATCH_DIR, exist_ok=True)
             with open(path + ".part", "wb") as fh:
                 fh.write(data)
@@ -9921,7 +10342,10 @@ def mine_search(q):
                 continue                          # la segunda búsqueda, solo lo que es de PS5
             seen.add(full.lower())
             c = have.get(full.lower())
-            out.append({"repo": full, "name": r.get("name") or full, "desc": (r.get("description") or "")[:200],
+            rk = repo_risk(full, r, [])
+            out.append({"risk": [x["text"] for x in rk if x["level"] == "bad"][:1],
+                        "young": any(x["level"] == "warn" and "días" in x["text"] for x in rk),
+                        "repo": full, "name": r.get("name") or full, "desc": (r.get("description") or "")[:200],
                         "stars": int(r.get("stargazers_count") or 0), "updated": (r.get("pushed_at") or "")[:10],
                         "in": c["name"] if c and not c.get("mine") else "", "mine": bool(c and c.get("mine")),
                         "owner_img": "https://github.com/%s.png" % full.split("/")[0]})
@@ -9930,7 +10354,51 @@ def mine_search(q):
     return {"items": out[:15]}
 
 
-def mine_add(text, show=None):
+# ---------------------------------------------------------------------------
+# Escudo para lo que añades a mano: en GitHub circulan copias falsas de proyectos conocidos (AnyPS5, KytyPS5…) que
+# traen programas para Windows que roban contraseñas. Antes de guardar un añadido se miran las señales típicas.
+# ---------------------------------------------------------------------------
+RISK_EXE = re.compile(r"(?i)\.(exe|scr|msi|msix|bat|cmd|ps1|vbs|vbe|js|jse|hta|lnk|jar|dll|com|pif|cpl|reg|iso\.exe)$")
+RISK_PC_EMU = re.compile(r"(?i)^(any.?ps5|kytt?y.?ps5|ps5.?emu(lator)?|spine.?ps5|obliteration)$")
+RISK_WORDS = re.compile(r"(?i)free (ps5 )?games|download (any|all) games|crack(ed)?\b|keygen|activator|unlock all games")
+
+
+def repo_risk(repo, j=None, assets=None):
+    """Señales de que un proyecto de GitHub puede ser una trampa. [{"level": "bad"|"warn", "text": ...}]"""
+    out = []
+    j = j or {}
+    owner, name = (repo.split("/") + [""])[:2]
+    known = {}
+    for c in F.CATALOG:
+        for r in [c.get("repo")] + list(c.get("alts") or []):
+            if r and "/" in r:
+                known.setdefault(r.split("/")[1].lower(), set()).add(r.split("/")[0].lower())
+    if name.lower() in known and owner.lower() not in known[name.lower()]:
+        out.append({"level": "bad", "text": "Se llama igual que «%s», que ya está en Descubrir, pero es de otra cuenta (%s). "
+                    "Las copias con el mismo nombre son el truco más usado para colar virus." % (name, owner)})
+    if RISK_PC_EMU.match(name):
+        out.append({"level": "bad", "text": "Dice ser un emulador de PS5 para PC: no es algo para la consola, y en GitHub hay copias "
+                    "falsas de estos (AnyPS5, KytyPS5) que roban contraseñas. Bájalo solo de la web oficial del proyecto."})
+    exes = sorted({a.get("name") for a in assets or [] if RISK_EXE.search(a.get("name") or "")})
+    if exes:
+        out.append({"level": "bad", "text": "Su versión trae programas para Windows (%s). Lo de la PS5 viene en .elf, .bin o .zip: "
+                    "no abras esos archivos en tu PC si no sabes qué son." % ", ".join(exes[:4])})
+    if any(re.search(r"(?i)pass(word)?|contrase", a.get("name") or "") for a in assets or []):
+        out.append({"level": "bad", "text": "Un archivo dice llevar contraseña: es la forma de esconder un virus al antivirus."})
+    if RISK_WORDS.search(" ".join([name, j.get("description") or ""] + list(j.get("topics") or []))):
+        out.append({"level": "bad", "text": "Promete juegos gratis o desbloqueos: no es homebrew y suele ser una trampa."})
+    try:
+        age = time.time() - time.mktime(time.strptime((j.get("created_at") or "")[:19], "%Y-%m-%dT%H:%M:%S"))
+    except ValueError:
+        age = None
+    if age is not None and age < 21 * 86400:
+        out.append({"level": "warn", "text": "El proyecto tiene %d días." % max(0, int(age // 86400))})
+    if j and int(j.get("stargazers_count") or 0) < 5:
+        out.append({"level": "warn", "text": "Casi nadie lo sigue todavía (%d estrellas)." % int(j.get("stargazers_count") or 0) if int(j.get("stargazers_count") or 0) != 1 else "Casi nadie lo sigue todavía (1 estrella)."})
+    return out
+
+
+def mine_add(text, show=None, force=False):
     m = re.match(r"^\s*(?:https?://)?(?:www\.)?(?:github\.com/)?([\w.-]+)/([\w.-]+?)(?:\.git)?(?:[/#?].*)?\s*$", text or "")
     if not m:
         raise E.PipeError("Pega el enlace de GitHub del proyecto (github.com/autor/proyecto)")
@@ -9950,7 +10418,7 @@ def mine_add(text, show=None):
             raise E.PipeError("No encuentro %s en GitHub, o no tiene ninguna versión publicada (Releases)" % repo)
         raise
     names = [a.get("name") or "" for a in assets]
-    what, real = "", repo
+    what, real, j = "", repo, {}
     try:
         req = urllib.request.Request(F.GH_API + "/repos/%s" % repo, headers=F._ua())
         with urllib.request.urlopen(req, timeout=20) as r:
@@ -9958,6 +10426,9 @@ def mine_add(text, show=None):
         what, real = (j.get("description") or "").strip()[:300], j.get("full_name") or repo
     except Exception:
         pass
+    risk = repo_risk(real, j, assets)
+    if any(x["level"] == "bad" for x in risk) and not force:
+        return {"risk": risk, "repo": real, "id": "", "name": real.split("/")[1], "kind": "", "tag": tag, "learn": False}
     ent = {"id": "gh-" + re.sub(r"[^a-z0-9]+", "-", real.lower()).strip("-"), "repo": real,
            "name": real.split("/")[1], "what": what, "added": int(time.time())}
     zips = [a for a in assets if (a.get("name") or "").lower().endswith(".zip")]
@@ -10706,7 +11177,73 @@ def title_launch(tid):
     return {"tid": tid}
 
 
+# ---------------------------------------------------------------------------
+# ShadowMountPlus 1.7: trae web y API propias en la consola (puerto 10101). Con ella instala .pkg (base, parches y
+# DLC), y dice su versión, sus ajustes y la política de fakelib de cada título. PS5 Directo solo LEE su API
+# documentada (/api/v1/version, settings, games); instalar se hace en su web, que es quien sabe hacerlo.
+# ---------------------------------------------------------------------------
+SMP = {"t": 0.0, "d": None}
+SMP_PORT = 10101
+
+
+def _smp_post(ip, route, body=None, timeout=4):
+    req = urllib.request.Request("http://%s:%d%s" % (E.clean_host(ip)[0], SMP_PORT, route),
+                                 data=json.dumps(body or {}).encode(), method="POST",
+                                 headers={"Content-Type": "application/json", "User-Agent": "PS5Directo"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        j = json.loads(r.read(4 * 1024 * 1024).decode("utf-8", "replace") or "{}")
+    return j if isinstance(j, dict) else {}
+
+
+def smp_info(fresh=False):
+    """{"on": bool, "ver", "url", "caps", "pkg": bool, "settings": {...}} de ShadowMountPlus 1.7+ (cache de 60 s)."""
+    if not fresh and SMP["d"] is not None and time.time() - SMP["t"] < 60:
+        return SMP["d"]
+    ip = SETTINGS.get("ps5_ip") or ""
+    d = {"on": False, "ver": "", "url": "", "caps": [], "pkg": False, "settings": {}}
+    if ip:
+        try:
+            v = _smp_post(ip, "/api/v1/version")
+            if v.get("status") == 0 or v.get("shadowmount_version"):
+                caps = [str(c) for c in v.get("capabilities") or [] if isinstance(c, str)][:80]
+                d.update(on=True, ver=str(v.get("shadowmount_version") or "")[:30], caps=caps,
+                         url="http://%s:%d/" % (E.clean_host(ip)[0], SMP_PORT),
+                         pkg=any("pkg" in c.lower() or "install" in c.lower() for c in caps))
+                try:
+                    st = _smp_post(ip, "/api/v1/settings")
+                    d["settings"] = {k: st[k] for k in ("update_emulators", "auto_update_ampr", "quiet_mode",
+                                                        "allow_lan_access") if k in st}
+                except Exception:
+                    pass
+        except Exception:
+            pass
+    SMP.update(t=time.time(), d=d)
+    return d
+
+
+def smp_game(tid):
+    """Lo que ShadowMountPlus sabe de un título (o None): fakelib_enabled, fakelib_effective_enabled…"""
+    ip = SETTINGS.get("ps5_ip") or ""
+    if not ip or not tid or not smp_info().get("on"):
+        return None
+    try:
+        g = _smp_post(ip, "/api/v1/games", {"include_size": False}, timeout=8)
+    except Exception:
+        return None
+    for x in g.get("games") or []:
+        if isinstance(x, dict) and str(x.get("title_id") or "").upper() == tid.upper():
+            return x
+    return None
+
+
 PKG = {"path": "", "t": 0}
+
+
+def pkg_dir(dest):
+    """Dónde se deja un .pkg: en /data/pkg, salvo que el destino sea un USB o disco externo; ahí va a su raíz, que es
+    donde lo buscan PS4Mount (para abrirlo sin instalar) y el instalador de ShadowMountPlus."""
+    m = re.match(r"^(/mnt/(?:usb|ext)\d+)(?:/|$)", dest or "")
+    return m.group(1) if m else "/data/pkg"
 
 
 def pkg_install(path, overwrite=False):
@@ -10714,7 +11251,13 @@ def pkg_install(path, overwrite=False):
     path = fm_clean(path)
     if not path.lower().endswith(".pkg") or not path.startswith(("/data/", "/mnt/")):
         raise E.PipeError("Elige un archivo .pkg de la consola")
-    z = _zftpd_or_fail("instalar .pkg")
+    try:
+        z = _zftpd_or_fail("instalar .pkg")
+    except E.PipeError:
+        sm = smp_info(fresh=True)          # sin zftpd: ShadowMountPlus 1.7 los instala desde su web
+        if sm.get("on"):
+            return {"smp": sm["url"], "ver": sm["ver"], "path": path}
+        raise
     r = z.install(path, overwrite)
     if r.get("already"):
         return {"already": True, "path": path}
@@ -10845,8 +11388,32 @@ LAN_DENY = {"/api/archive/list", "/api/archived/reveal", "/api/emu/put", "/api/s
             "/api/fm/open_local", "/api/lan", "/api/forge/download", "/api/payload/file", "/api/fixperms",
             "/api/ext/openpage", "/api/ext/setup", "/api/ui/focus", "/api/youtube", "/api/bug/list",
             "/api/rp/play", "/api/rp/path"}
+# Lo que el movil SI puede pedir (lista de permitidos): cualquier ruta nueva queda cerrada desde la red hasta que
+# se añada aquí a propósito. LAN_DENY gana siempre (familias con prefijo que tienen alguna ruta solo de PC).
+LAN_ALLOW = frozenset({
+    "/api/add", "/api/alembic", "/api/bug/js", "/api/calibrate", "/api/calibrate/state", "/api/cleanup/delete",
+    "/api/cleanup/scan", "/api/clear", "/api/clip/push", "/api/cloud/ls", "/api/cloud/send", "/api/cloud/state",
+    "/api/console/fix", "/api/console/status", "/api/crash/last", "/api/credits", "/api/diag", "/api/discover",
+    "/api/emu/info", "/api/emu/read", "/api/emu/write", "/api/ext/capture", "/api/ext/job", "/api/ext/pcmode",
+    "/api/ext/send", "/api/ext/status", "/api/extra_payload", "/api/forge/info", "/api/forge/status",
+    "/api/gh/notes", "/api/guard", "/api/health", "/api/history", "/api/history/clear", "/api/history/redo",
+    "/api/inbox/take", "/api/library/cancel", "/api/library/scan", "/api/library/state", "/api/links/scan",
+    "/api/locate", "/api/md/tr", "/api/os/check", "/api/os/image", "/api/patches/index", "/api/patches/sync",
+    "/api/payload/list", "/api/payload/send", "/api/pcinfo", "/api/pcspace", "/api/pkg/install", "/api/pkg/state",
+    "/api/places", "/api/played", "/api/pld/updates", "/api/ps5/power", "/api/ps5/wakeinfo", "/api/rec/install",
+    "/api/rec/kinds", "/api/rec/list", "/api/rec/mine/add", "/api/rec/mine/del", "/api/rec/mine/search",
+    "/api/rec/mine/show", "/api/rec/source", "/api/recomp", "/api/recomp/install", "/api/rp/state", "/api/schedule",
+    "/api/settings", "/api/shots/auto", "/api/speedtest", "/api/speedtest/result", "/api/state", "/api/sys/state",
+    "/api/test", "/api/title/launch", "/api/tr", "/api/upd/state", "/api/update/check", "/api/update/prepare",
+    "/api/update/progress", "/api/whatsnew", "/api/whatsnew/seen", "/api/wiki",
+})
+LAN_ALLOW_PREFIX = ("/api/ampr/", "/api/archived/", "/api/bk/", "/api/col/", "/api/fm/", "/api/grab/", "/api/gu/", "/api/job/", "/api/lib/", "/api/media/", "/api/notifs", "/api/report", "/api/residue/", "/api/routines", "/api/space/", "/api/trash/")
 LAN_LOCKED = {"sevenzip_path", "forge_path", "chiaki_path", "pc_temp_dir", "pc_library_dir", "update_repo", "lan_access", "lan_port", "lan_token",
-              "shots_tg_token", "shots_tg_chat", "shots_dc_hook"}
+              "shots_tg_token", "shots_tg_chat", "shots_dc_hook", "backup_dir", "watch_dir", "ftp_pass", "passwords",
+              "ftp_user", "ps5_ip", "ftp_port", "bf_port", "forge_consent", "forge_auto_update", "ext_secret"}
+# lo que nunca se manda al movil (contraseñas, tokens y carpetas del PC)
+LAN_HIDDEN = {"ftp_pass", "passwords", "lan_token", "ext_secret", "shots_tg_token", "shots_tg_chat", "shots_dc_hook", "backup_dir",
+              "watch_dir", "pc_temp_dir", "pc_library_dir", "sevenzip_path", "forge_path", "chiaki_path"}
 
 
 def token_ok(tok):
@@ -11170,6 +11737,7 @@ def residue_delete(ids):
 # ---------------------------------------------------------------------------
 
 FFMPEG_URL = "https://github.com/GyanD/codexffmpeg/releases/download/8.1/ffmpeg-8.1-essentials_build.7z"
+FFMPEG_SHA256 = "9b299a21fc1ca36ac22e4911f8958404c228e4059583c4651743122a8d0a7e56"  # fijada: si cambia, no se usa
 FFMPEG_LOCK = threading.Lock()
 CONV = {"busy": False, "phase": "", "i": 0, "n": 0, "pct": 0, "current": "", "done": [], "errors": [], "dir": ""}
 CONV_CANCEL = threading.Event()
@@ -11228,6 +11796,7 @@ def ffmpeg_install():
             CONV.update(phase="Instalando el convertidor (FFmpeg, 33 MB, solo la primera vez)", pct=0)
         try:
             F.http_get(FFMPEG_URL, limit=200 * 1024 * 1024, timeout=120, dest=tmp, progress=prog)
+            F.check_sha256(tmp, FFMPEG_SHA256, "El paquete de FFmpeg")
             exe = E.find_7z(cfg_snapshot().get("sevenzip_path") or "")
             if not exe:
                 raise E.PipeError("falta 7-Zip para abrir el paquete de FFmpeg")
@@ -11666,7 +12235,7 @@ def health_check():
 # Actualizaciones: desde un .zip o desde GitHub
 # ---------------------------------------------------------------------------
 
-UPDATE_EXTS = (".py", ".html", ".txt", ".bat", ".vbs", ".sh", ".ico", ".js", ".json", ".png", ".css", ".md", ".svg")
+UPDATE_EXTS = (".py", ".html", ".txt", ".bat", ".vbs", ".sh", ".ico", ".js", ".json", ".png", ".css", ".md", ".svg", ".pem")
 
 
 def _ver_tuple(v):
@@ -11905,6 +12474,40 @@ def _download_update(url, limit=60 * 1024 * 1024):
     return bytes(buf)
 
 
+def verify_update(data, url, repo):
+    """La actualización solo se instala si el zip coincide con el SHA256SUMS de su release y, en el repositorio
+    oficial, si ese SHA256SUMS está firmado con la clave de PS5 Directo (F.UPDATE_PUBKEY). Si algo no cuadra, error y
+    no se instala nada. Un repositorio propio (Ajustes) sin firma vale si trae SHA256SUMS."""
+    signed = (repo or DEFAULT_REPO).strip().strip("/").lower() == DEFAULT_REPO
+    key = bytes.fromhex(os.environ["PS5D_UPDATE_PUBKEY"]) if os.environ.get("PS5D_UPDATE_PUBKEY") else F.UPDATE_PUBKEY
+    if "/releases/download/" not in (url or ""):
+        if signed:
+            raise E.PipeError("Esa versión no se puede comprobar (no viene de una release): no la instalo por seguridad")
+        return False
+    base, name = url.rsplit("/", 1)
+    name = urllib.parse.unquote(name)
+    try:
+        raw = F.http_get(base + "/SHA256SUMS", limit=1024 * 1024, timeout=30)
+    except urllib.error.HTTPError as e:
+        if e.code == 404 and not signed:
+            return False
+        raise E.PipeError("Esa versión no trae SHA256SUMS para comprobarla: no la instalo por seguridad"
+                          if e.code == 404 else "No pude bajar la suma de comprobación (HTTP %d)" % e.code)
+    if signed:
+        try:
+            sig = F.http_get(base + "/SHA256SUMS.sig", limit=4096, timeout=30)
+        except Exception:
+            sig = b""
+        if not F.ed25519_verify(key, raw, sig):
+            raise E.PipeError("La firma de la actualización no es válida: no la instalo por seguridad. "
+                              "Bájala a mano de github.com/%s/releases" % DEFAULT_REPO)
+    want = F.sums_parse(raw.decode("utf-8", "replace")).get(name)
+    if not want:
+        raise E.PipeError("%s no aparece en el SHA256SUMS de la versión: no la instalo por seguridad" % name)
+    F.check_sha256(data, want, "El zip de la actualización")
+    return True
+
+
 UPD_PREP = {"ver": "", "data": None, "busy": False, "error": ""}
 
 
@@ -11919,6 +12522,7 @@ def update_prepare():
             if not url or _ver_tuple(ver) <= _ver_tuple(VERSION) or (UPD_PREP["ver"] == ver and UPD_PREP["data"]):
                 return
             data = _download_update(url)
+            verify_update(data, url, update_repo())
             import io
             import zipfile
             zipfile.ZipFile(io.BytesIO(data)).testzip()
@@ -11986,6 +12590,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header("Vary", "Accept-Encoding")
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")       # el código nunca viaja a otra web
             self.end_headers()
             self.wfile.write(body)
             self.wfile.flush()
@@ -12053,8 +12658,12 @@ class Handler(BaseHTTPRequestHandler):
             v = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("v") or [""])[0][:20]
             if v and self._from_extension():
                 EXT_SEEN.update(version=v, t=time.time())
-            return self._send(200, {"ok": True, "app": "PS5 Directo", "version": VERSION,
-                                    "ext_version": _ext_version(os.path.join(HERE, "extension"))})
+            c = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("c") or [""])[0]
+            out = {"ok": True, "app": "PS5 Directo", "version": VERSION,
+                   "ext_version": _ext_version(os.path.join(HERE, "extension"))}
+            if re.match(r"^[0-9a-f]{16,128}$", c) and not self.lan:
+                out["proof"] = ext_proof("ps5d-ping:" + c)       # la extensión comprueba que somos nosotros
+            return self._send(200, out)
         if self.path.startswith("/api/media/file?"):
             q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             if not token_ok((q.get("t") or [""])[0]):
@@ -12180,7 +12789,10 @@ class Handler(BaseHTTPRequestHandler):
             for k in ("shots_tg_token", "shots_dc_hook"):      # no se ensenan: solo si estan puestos
                 st["settings"][k] = "••••" if st["settings"].get(k) else ""
             if self.lan:
-                st["settings"].pop("lan_token", None)
+                for k in list(st["settings"]):
+                    if k in LAN_HIDDEN or any(x in k.lower() for x in SECRET_KEYS):
+                        st["settings"].pop(k, None)
+                st["home"] = ""
             return self._send(200, st)
         self._send(404, {"ok": False})
 
@@ -12286,9 +12898,12 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(404, {"ok": False})
 
     def do_POST(self):
-        if self.path in ("/api/ext/status", "/api/ext/send", "/api/ext/job", "/api/ext/pcmode"):
+        if self.path in ("/api/ext/status", "/api/ext/send", "/api/ext/job", "/api/ext/pcmode", "/api/ext/capture"):
             if self.lan or not self._from_extension():
                 return self._send(403, {"ok": False, "error": "solo desde la extension"})
+            if not ext_auth_ok(self):
+                return self._send(403, {"ok": False, "error": "pair"})
+        if self.path in ("/api/ext/status", "/api/ext/send", "/api/ext/job", "/api/ext/pcmode"):
             return self._ext_api()
         if self.path.split("?")[0] == "/api/bye":
             # la ventana se esta cerrando (sendBeacon no deja poner cabeceras: token en la URL)
@@ -12321,10 +12936,10 @@ class Handler(BaseHTTPRequestHandler):
         b = self._body()
         p = self.path
         if self.lan:
-            if p in LAN_DENY:
+            if p in LAN_DENY or not (p in LAN_ALLOW or p.startswith(LAN_ALLOW_PREFIX)):
                 return self._send(403, {"ok": False, "error": "Eso solo se puede hacer desde el PC"})
             if p == "/api/settings":
-                b = {k: v for k, v in b.items() if k not in LAN_LOCKED}
+                b = {k: v for k, v in b.items() if k not in LAN_LOCKED and k not in LAN_HIDDEN}
             if p == "/api/add":
                 ls = add_lines(b.get("lines", ""))
                 if any(not re.match(r"^((https?|ftp)://|magnet:\?)", x, re.I) for x in ls):
@@ -12392,7 +13007,10 @@ class Handler(BaseHTTPRequestHandler):
                 if not url:
                     raise E.PipeError("Esa release no tiene un .zip")
                 data = UPD_PREP["data"] if UPD_PREP.get("ver") == ver and UPD_PREP.get("data") else None
-                ver = install_zip(data or _download_update(url))
+                if not data:
+                    data = _download_update(url)
+                    verify_update(data, url, update_repo())
+                ver = install_zip(data)
             except Exception as e:
                 return self._send(400, {"ok": False, "error": str(e)})
             restart_soon()
@@ -12449,9 +13067,9 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 bases = ["/data/homebrew"]
             return self._send(200, {"ok": True, "dests": [b for b in bases if b.endswith("homebrew")]})
-        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p.startswith("/api/ampr/") or p in ("/api/discover", "/api/played", "/api/job/reveal", "/api/ps5/power", "/api/ps5/wakeinfo", "/api/links/scan", "/api/clip/push") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
+        if p.startswith("/api/fm/") or p.startswith("/api/lib/") or p.startswith("/api/space/") or p.startswith("/api/notifs") or p.startswith("/api/gu/") or p.startswith("/api/bk/") or p.startswith("/api/col/") or p.startswith("/api/media/") or p.startswith("/api/residue/") or p.startswith("/api/grab/") or p.startswith("/api/ampr/") or p.startswith("/api/routines") or p in ("/api/discover", "/api/played", "/api/job/reveal", "/api/ps5/power", "/api/ps5/wakeinfo", "/api/links/scan", "/api/clip/push") or p.startswith("/api/trash/") or p.startswith("/api/archived/") or p.startswith("/api/report") or p in ("/api/pick", "/api/history", "/api/history/clear", "/api/history/redo"):
             try:
-                return self._send(200, dict(ok=True, **fm_api(p, b)))
+                return self._send(200, {"ok": True, **(fm_api(p, b) or {})})
             except E.PipeError as e:
                 return self._send(200, {"ok": False, "error": str(e)})
             except Exception as e:
@@ -12506,6 +13124,11 @@ class Handler(BaseHTTPRequestHandler):
             pcdir = "" if self.lan else str(b.get("pcdir") or "").strip().strip('"')
             if pcdir and not os.path.isabs(pcdir):
                 return self._send(400, {"ok": False, "error": "La carpeta del PC tiene que ser una ruta completa"})
+            if (b.get("where") == "keep" and str(b.get("keep_steps") or "") != "convert" and not b.get("fmt")
+                    and not self.lan and all(os.path.exists(x.strip('"')) for x in lines)):
+                # «Solo a mi PC» con archivos que ya están en el PC: no hay nada que hacer (issue #12)
+                return self._send(400, {"ok": False, "ask": "local_keep",
+                                        "error": "Eso ya está en tu PC: «Solo a mi PC» no tiene nada que hacer con ello."})
             job = new_job(lines, (b.get("password") or "").strip(), dest, where=b.get("where"),
                           raw=bool(b.get("raw")), fmt=b.get("fmt"), comp=b.get("comp"), pcdir=pcdir,
                           keep_steps=str(b.get("keep_steps") or ""))
@@ -12862,15 +13485,77 @@ def pld_check(refresh=False):
         items.insert(0, {"slot": "pldmgr", "file": "", "kind": "self", "name": "Payload Manager",
                          "have": sv.get("running_version") or ver, "new": sv["pending_version"], "how": "restart",
                          "source": "", "source_url": "", "id": "pldmgr", "repo": "itsPLK/ps5-payload-manager"})
+    try:
+        procs = pm.processes()
+    except Exception:
+        procs = []
+    combo = pld_combo(items, procs)
     with LOCK:
-        PLD.update(t=time.time(), items=items, pm=ver, error=rerr)
+        PLD.update(t=time.time(), items=items, pm=ver, error=rerr, combo=combo)
+    if any(c["level"] == "bad" for c in combo):
+        notify("warn", "Tu mezcla de payloads puede dar problemas", combo[0]["text"], {"tab": "System"},
+               key="combo:" + "|".join(sorted(c["text"][:40] for c in combo)))
     return pld_state()
+
+
+def _vt(v):
+    """«1.7beta12» -> (1, 7) ; «v1.11» -> (1, 11)."""
+    m = re.search(r"(\d+)\.(\d+)", v or "")
+    return (int(m.group(1)), int(m.group(2))) if m else None
+
+
+def pld_combo(items, procs):
+    """Revisa la mezcla de payloads (lo que hay guardado y lo que corre) con lo que piden sus autores ahora mismo.
+    ShadowMountPlus 1.7 pide kstuff (lite 1.07 o más) y no usar etaHEN; los HEN no se mezclan entre ellos."""
+    names = [(x.get("name") or "") + " " + (x.get("file") or "") for x in items]
+    run = [(p.get("name") or "") for p in procs or []]
+    alln = " ".join(names + run)
+    out = []
+
+    def ver(rx):
+        for x in items:
+            if re.search(rx, (x.get("name") or "") + " " + (x.get("file") or "")):
+                return x.get("have") or ""
+        return ""
+    smp = ver(r"(?i)shadow.?mount")
+    try:
+        live = smp_info().get("ver") or ""
+    except Exception:
+        live = ""
+    if live and (_vt(live) or (0, 0)) >= (_vt(smp) or (0, 0)):
+        smp = live
+    smp_v = _vt(smp)
+    eta_run = any(re.search(r"(?i)etahen", n) for n in run)
+    eta_have = eta_run or re.search(r"(?i)etahen", " ".join(names))
+    hens = sorted({h for h in ("etaHEN", "onionHEN", "HyperHEN") if re.search(r"(?i)" + h, " ".join(run))})
+    if smp_v and smp_v >= (1, 7) and eta_have:
+        out.append({"level": "bad", "text": "Tienes ShadowMountPlus %s y etaHEN%s. Su autor pide no usar etaHEN con la 1.7: carga "
+                    "kstuff (o kstuff-lite) en su lugar, o títulos que no arrancan y cierres raros vienen de ahí." %
+                    (smp, " en marcha" if eta_run else "")})
+    kl = ver(r"(?i)kstuff.?lite")
+    if smp_v and smp_v >= (1, 7) and kl and _vt(kl) and _vt(kl) < (1, 7):
+        out.append({"level": "bad", "text": "ShadowMountPlus %s necesita kstuff-lite 1.07 o más nuevo y tienes la %s." % (smp, kl)})
+    if len(hens) > 1:
+        out.append({"level": "bad", "text": "Hay varios HEN cargados a la vez (%s): usa solo uno." % ", ".join(hens)})
+    if eta_run and re.search(r"(?i)kstuff", " ".join(run)):
+        out.append({"level": "warn", "text": "etaHEN ya trae su propio kstuff y tienes otro cargado: sobra uno."})
+    n_run = len([n for n in run if not re.search(r"(?i)payload.?manager|pldmgr|elfldr", n)])
+    if n_run >= 9:
+        out.append({"level": "warn", "text": "Tienes %d payloads cargados. Cada uno ocupa memoria que los títulos necesitan: si alguno se "
+                    "cierra, prueba quitando los que no uses." % n_run})
+    if smp_v and smp_v < (1, 7) and not eta_have:
+        pass
+    return out
 
 
 def pld_state():
     with LOCK:
         d = dict(PLD)
         d["updates"] = sum(1 for x in PLD["items"] if x.get("new"))
+    try:
+        d["smp"] = smp_info()
+    except Exception:
+        d["smp"] = None
     return d
 
 
@@ -12945,6 +13630,7 @@ def pld_github_install(it):
     a = elfs[0]
     with urllib.request.urlopen(urllib.request.Request(a["browser_download_url"], headers=F._ua()), timeout=120) as r:
         data = r.read(64 * 1024 * 1024)
+    F.verify_asset(rel.get("assets") or [], a, data)
     if data[:4] != b"\x7fELF":
         raise E.PipeError("Lo que se ha bajado no es un payload (.elf)")
     name = "%s_%s.elf" % (re.sub(r"(?i)\.elf$", "", a["name"]), re.sub(r"[^\w.-]", "_", tag))
@@ -13575,7 +14261,7 @@ def featured():
 
 
 SCENE_SKIP_RX = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|"
-                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|free.?(ps5.?)?games")
+                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|save.?mgr|ps5.?save\b|ps5.?library|free.?(ps5.?)?games")
 CAT_URL = os.environ.get("PS5D_CATALOGO") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/catalogo.json"
 CAT = {"t": 0.0, "tr": {}}
 
@@ -14095,7 +14781,9 @@ def extra_api(h, p, b):
             with LOCK:
                 port = int(SETTINGS.get("lan_port") or 8780)
             if b.get("allow"):
-                F.firewall_allow(port)
+                F.firewall_allow(port, unblock=bool(b.get("unblock")))
+            elif b.get("remove"):
+                F.firewall_remove()
             return dict(ok=True, **F.firewall_status(port))
         if p == "/api/pcspace":
             import shutil
@@ -14115,6 +14803,9 @@ def extra_api(h, p, b):
             exe = F.find_forge(cfg_snapshot().get("forge_path"), DATA_DIR)
             return {"ok": True, "path": exe or "", "found": bool(exe)}
         if p == "/api/forge/download":
+            with LOCK:
+                SETTINGS["forge_consent"] = True        # lo ha pedido a mano: eso es el permiso
+            save_settings()
             exe, tag = F.download_forge(DATA_DIR, log=print)
             return {"ok": True, "path": exe, "tag": tag}
         if p == "/api/archive/list":
@@ -14206,7 +14897,8 @@ def extra_api(h, p, b):
                             art[t.upper()] = ic
             return {"ok": True, "kinds": kinds, "art": art}
         if p == "/api/rec/mine/add":
-            return dict(ok=True, **mine_add(str(b.get("repo") or ""), b.get("show") if "show" in b else None))
+            return dict(ok=True, **mine_add(str(b.get("repo") or ""), b.get("show") if "show" in b else None,
+                                            bool(b.get("force"))))
         if p == "/api/rec/mine/show":
             return dict(ok=True, **mine_show(str(b.get("id") or ""), str(b.get("show") or "")))
         if p == "/api/rec/mine/search":
@@ -14920,6 +15612,7 @@ def main():
     threading.Thread(target=ensure_shortcuts, daemon=True).start()
     threading.Thread(target=console_auto, daemon=True).start()   # payloads que falten, con Payload Manager
     threading.Thread(target=console_watch, daemon=True).start()
+    threading.Thread(target=rt_loop, daemon=True).start()
     threading.Thread(target=clip_watch, daemon=True).start()
     threading.Thread(target=sync_extension, daemon=True).start()  # y si luego se abre Payload Manager, igual
     refresh_window_icon()
@@ -14946,7 +15639,7 @@ def phone_start():
     """Arranque dentro de la app de Android (modo «Usar sin PC»): el mismo PS5 Directo, sin ventana ni accesos
     directos ni nada del escritorio. Devuelve la direccion (con su codigo) que abre la app."""
     load_state()
-    for target in (transfer_worker, extract_worker, monitor, speed_watch, console_auto, console_watch):
+    for target in (transfer_worker, extract_worker, monitor, speed_watch, console_auto, console_watch, rt_loop):
         threading.Thread(target=target, daemon=True).start()
     srv = Server(("127.0.0.1", pick_port()), Handler)
     threading.Thread(target=srv.serve_forever, daemon=True).start()

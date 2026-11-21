@@ -224,6 +224,7 @@ jobs:
           rm -rf "$D" && mkdir -p "$D"
           cp app.py engine.py features.py destacados.json escena.json portadas.json catalogo.json LEEME.txt README_EN.txt "$D"/
           cp -r web "$D"/web
+          cp -r certs "$D"/certs
           : > "$D/__init__.py"
           find "$D" -name '__pycache__' -prune -exec rm -rf {} +
           ls -la "$D"
@@ -261,6 +262,25 @@ jobs:
           path: dist
           merge-multiple: true
 
+      # SHA256SUMS de todo lo publicado, firmado con Ed25519. La app solo se actualiza si la firma es buena (issue #6).
+      # La clave privada va en el secreto UPDATE_SIGN_KEY (el .pem entero); la publica esta en features.py.
+      - name: Sumas firmadas
+        env:
+          SIGN_KEY: ${{ secrets.UPDATE_SIGN_KEY }}
+        run: |
+          set -e
+          if [ -z "$SIGN_KEY" ]; then
+            echo "::error::Falta el secreto UPDATE_SIGN_KEY (Settings › Secrets and variables › Actions). Sin el, las apps no aceptarian la actualizacion."
+            exit 1
+          fi
+          cd dist
+          sha256sum PS5Directo-* > SHA256SUMS
+          cat SHA256SUMS
+          printf '%s\n' "$SIGN_KEY" > "$RUNNER_TEMP/sign.pem"
+          openssl pkeyutl -sign -inkey "$RUNNER_TEMP/sign.pem" -rawin -in SHA256SUMS -out SHA256SUMS.sig
+          rm -f "$RUNNER_TEMP/sign.pem"
+          ls -la
+
       # Con una etiqueta crea la release. Pulsando "Run workflow" en Actions añade (o rehace) los archivos
       # de la release de la version que pone app.py, aunque ya exista.
       - uses: softprops/action-gh-release@v2
@@ -273,3 +293,5 @@ jobs:
             dist/PS5Directo-*-Linux.tar.gz
             dist/PS5Directo-*-macOS.dmg
             dist/PS5Directo-*-Android.apk
+            dist/SHA256SUMS
+            dist/SHA256SUMS.sig

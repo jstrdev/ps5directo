@@ -65,6 +65,14 @@ def net_reason(e):
         return "el servidor no acepta la conexión"
     if "reset" in tl or "10054" in tl or "remote end closed" in tl:
         return "se cortó la conexión"
+    if "expired" in tl or "not yet valid" in tl:
+        return ("el certificado seguro no cuadra con la fecha: revisa que la fecha y la hora de tu equipo estén bien "
+                "(y la zona horaria)")
+    if "self signed certificate in certificate chain" in tl or "self-signed certificate in certificate chain" in tl \
+            or "unable to get local issuer" in tl:
+        return ("algo en tu equipo o tu red está interceptando las conexiones seguras: suele ser el antivirus con el "
+                "«análisis HTTPS/SSL» (o «escaneo web») activado, un proxy o el control parental. Desactiva esa opción "
+                "o añade PS5 Directo como excepción")
     if "certificate" in tl or "ssl" in tl:
         return "problema con el certificado seguro del servidor"
     if "network is unreachable" in tl or "no route" in tl or "10051" in tl:
@@ -187,7 +195,36 @@ def safe_name(name):
 # HTTP
 # ---------------------------------------------------------------------------
 
-_SSL = ssl.create_default_context()
+def _ssl_context():
+    """Las conexiones seguras confían en lo mismo que el sistema MÁS la lista de Mozilla que trae PS5 Directo
+    (certs/cacert.pem). Así funcionan aunque el Windows tenga su lista de certificados sin actualizar (pasa en
+    equipos recién instalados: Windows las baja cuando las pide Edge, pero Python no se entera) o el Python del
+    sistema no traiga ninguna (Mac). En Mac se suman también las del Llavero, donde ponen las suyas los antivirus
+    y las redes de empresa."""
+    ctx = ssl.create_default_context()
+    here = os.path.dirname(os.path.abspath(__file__))
+    for pem in (os.path.join(here, "certs", "cacert.pem"),):
+        if os.path.isfile(pem):
+            try:
+                ctx.load_verify_locations(cafile=pem)
+            except Exception:
+                pass
+    if sys.platform == "darwin":
+        try:
+            out = subprocess.run(["/usr/bin/security", "find-certificate", "-a", "-p",
+                                  "/Library/Keychains/System.keychain",
+                                  "/System/Library/Keychains/SystemRootCertificates.keychain"],
+                                 capture_output=True, text=True, timeout=15).stdout
+            if "BEGIN CERTIFICATE" in out:
+                ctx.load_verify_locations(cadata=out)
+        except Exception:
+            pass
+    return ctx
+
+
+_SSL = _ssl_context()
+# lo demás (urlopen sin «context», http.client) usa la misma
+ssl._create_default_https_context = lambda *a, **k: _SSL
 
 
 # Cabeceras alternativas por servidor. Algunos (Cloudflare) rechazan con 403 un

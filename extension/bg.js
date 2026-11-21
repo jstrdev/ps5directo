@@ -17,14 +17,40 @@ async function settings() {
 }
 const hostOf = u => { try { return new URL(u).hostname.toLowerCase().replace(/^www\./, ""); } catch (e) { return ""; } };
 
+// --- emparejamiento con PS5 Directo (issue #10): PS5 Directo deja un secreto en pair.json, dentro de la carpeta de
+// la extension que el mismo copia. Antes de mandar nada (enlaces, cookies), la extension comprueba que quien
+// contesta en 127.0.0.1 conoce ese secreto. Otro programa que escuche en el mismo puerto no lo sabe.
+let PAIR = null;
+async function pairSecret() {
+  if (PAIR !== null) return PAIR;
+  try { const r = await fetch(chrome.runtime.getURL("pair.json"), { cache: "no-store" }); PAIR = (await r.json()).secret || ""; }
+  catch (e) { PAIR = ""; }
+  return PAIR;
+}
+const hex = b => Array.from(new Uint8Array(b), x => x.toString(16).padStart(2, "0")).join("");
+async function hmac(key, msg) {
+  const k = await crypto.subtle.importKey("raw", new TextEncoder().encode(key), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return hex(await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(msg)));
+}
+let AUTH = "";
+async function extAuth() { if (!AUTH) { const s = await pairSecret(); AUTH = s ? await hmac(s, "ps5d-ext") : ""; } return AUTH; }
+
 async function findApp() {
   const { port: last } = await chrome.storage.local.get({ port: 0 });
+  const secret = await pairSecret();
+  if (!secret) { chrome.storage.local.set({ unpaired: "nopair" }); return null; }
   for (const port of (last ? [last, ...PORTS.filter(p => p !== last)] : PORTS)) {
     try {
-      const r = await fetch(`http://127.0.0.1:${port}/api/ext/ping?v=${encodeURIComponent(chrome.runtime.getManifest().version)}`, { cache: "no-store" });
+      const c = hex(crypto.getRandomValues(new Uint8Array(16)));
+      const r = await fetch(`http://127.0.0.1:${port}/api/ext/ping?v=${encodeURIComponent(chrome.runtime.getManifest().version)}&c=${c}`, { cache: "no-store" });
       if (r.ok) {
         const j = await r.json();
+        if (j.app === "PS5 Directo" && j.proof !== await hmac(secret, "ps5d-ping:" + c)) {
+          chrome.storage.local.set({ unpaired: j.proof ? "bad" : "old" });          // no es nuestro PS5 Directo
+          continue;
+        }
         if (j.app === "PS5 Directo") {
+          chrome.storage.local.set({ unpaired: "" });
           if (port !== last) chrome.storage.local.set({ port });
           selfUpdate(j.ext_version);
           return { port, version: j.version, ext_version: j.ext_version };
@@ -54,7 +80,7 @@ async function selfUpdate(want) {
 
 async function post(app, path, body) {
   const r = await fetch(`http://127.0.0.1:${app.port}${path}`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {})
+    method: "POST", headers: { "Content-Type": "application/json", "X-Ext-Auth": await extAuth() }, body: JSON.stringify(body || {})
   });
   return r.json();
 }
@@ -63,6 +89,8 @@ async function post(app, path, body) {
 // y la pagina de origen, para que el servidor nos trate igual.
 async function cookiesFor(urls) {
   const cookies = {};
+  // solo si el usuario lo ha activado en la ventanita (el permiso de cookies es opcional)
+  try { if (!(await chrome.permissions.contains({ permissions: ["cookies"] }))) return cookies; } catch (e) { return cookies; }
   for (const u of urls) {
     try {
       const host = new URL(u).host.toLowerCase();
@@ -111,7 +139,7 @@ async function handle(item) {
   try {
     const r = await fetch(`http://127.0.0.1:${app.port}/api/ext/capture`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Ext-Auth": await extAuth() },
       body: JSON.stringify({ url, original: item.url, name, cookies: await cookiesFor([url, item.url]),
                              ua: navigator.userAgent, referrer: item.referrer || "" })
     });

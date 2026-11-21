@@ -1,12 +1,11 @@
 {
   "manifest_version": 3,
   "name": "PS5 Directo",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Manda enlaces a PS5 Directo: al descargar un .rar/.7z/.zip/.pkg, o con clic derecho en un enlace o un texto seleccionado (también la contraseña que haya al lado). Muestra el progreso de la cola. Alt + clic: descarga normal.",
   "permissions": [
     "alarms",
     "contextMenus",
-    "cookies",
     "downloads",
     "notifications",
     "scripting",
@@ -14,7 +13,6 @@
     "tabs"
   ],
   "host_permissions": [
-    "http://127.0.0.1/*",
     "<all_urls>"
   ],
   "background": {
@@ -44,5 +42,8 @@
       "run_at": "document_start",
       "all_frames": true
     }
+  ],
+  "optional_permissions": [
+    "cookies"
   ]
 }

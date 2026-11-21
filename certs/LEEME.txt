@@ -1,0 +1,3 @@
+cacert.pem: la lista de autoridades de certificación de Mozilla (la misma que usan Firefox y el paquete
+«certifi» de Python, licencia MPL-2.0). PS5 Directo la suma a la del sistema para que las conexiones seguras
+(GitHub y demás) funcionen aunque el sistema tenga su lista sin actualizar. No quita ni cambia nada del sistema.

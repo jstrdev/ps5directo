@@ -778,6 +778,9 @@ EXTRA_PAYLOADS = [
     {"id": "patchsys", "name": "ps-patch-system", "repo": "illusionyy/ps-patch-system", "port": 23900,
      "pick": [r"(?i)^patch-bundle-loader-prospero\.elf$", r"(?i)^patch-bundle-prospero\.elf$"],
      "what": "Parches para títulos de PS4 y PS5 (60 fps, resolución…), se eligen en su web (puerto 23900)"},
+    {"id": "ps4mount", "name": "PS4Mount", "repo": "gasb07/ps4mount", "port": None,
+     "pick": [r"(?i)^ps4mount.*\.elf$", r"(?i)\.elf$"],
+     "what": "Abre tus .pkg de PS4 desde un USB sin instalarlos: los añade a la pantalla de inicio y los monta al abrirlos"},
     {"id": "neoenabler", "name": "NeoEnabler", "repo": "gasb07/NeoEnabler", "port": None,
      "pick": [r"(?i)^neo-manager\.elf$", r"(?i)neo.*\.elf$"],
      "what": "Títulos de PS4 en modo PS4 Pro (hasta 4K) con sus parches; va después de ps-patch-system"},
@@ -1135,6 +1138,17 @@ CATALOG = [
              "sus parches. Necesita ps-patch-system cargado antes.",
      "needs": "Firmware 4.00 a 13.60 y ps-patch-system cargado primero, después de cada reinicio. Solo sirve con los títulos "
               "que tienen parche."},
+    {"id": "ps4mount", "kind": "payload", "group": "patch", "name": "PS4Mount (.pkg de PS4 sin instalar)",
+     "repo": "gasb07/ps4mount", "exp": True,
+     "what": "Abre tus .pkg de PS4 directamente desde un USB, sin instalarlos: no esperas a la instalación ni gastas el "
+             "disco interno. Los añade a la pantalla de inicio y los monta al abrirlos; también coge su parche y sus "
+             "extras si están al lado.",
+     "needs": "Un USB en exFAT con tus .pkg de PS4 (los tuyos, en formato fake PKG) en la raíz, y una consola con soporte "
+              "de fake PKG (kstuff). Va después de cada reinicio.",
+     "guide": ["Copia tus .pkg de PS4 (y su parche, si lo tiene) a la raíz de un USB en exFAT y conéctalo a la consola.",
+               "Pulsa «Iniciar en la PS5»: PS4Mount encuentra los paquetes y los añade a la pantalla de inicio.",
+               "Ábrelos desde el menú de la consola. Si borras uno ahí, solo se quita de la biblioteca: el .pkg sigue en el USB.",
+               "También puedes mandar los .pkg al USB desde Enviar, eligiendo el USB como destino."]},
     {"id": "rpgetpin", "kind": "payload", "group": "rp", "name": "Remote Play: sacar el PIN",
      "repo": "idlesauce/ps5-remoteplay-get-pin",
      "what": "Con el jailbreak la consola no entra en PSN, así que no da el PIN para vincular Remote Play. Este payload "
@@ -1227,7 +1241,186 @@ CATALOG = [
              "(destino «La PS5 lo baja sola») y para la pestaña Sistema (temperatura, RAM, tiempo encendida).",
      "needs": "Nada instalado: se carga como payload. También es un servidor FTP: si ya tienes ftpsrv, zftpd usa otro "
               "puerto (lo dice en la notificación) y PS5 Directo sigue con ftpsrv."},
+    {"id": "pbspayload", "kind": "link", "group": "tool", "name": "PBS Payload", "repo": "seregonwar/PBS-Payload",
+     "what": "Emite y graba la pantalla de la consola en el navegador del PC o del móvil, con el codificador de la propia "
+             "PS5: capturas, clips y tutoriales sin capturadora. Es de seregonwar, el autor de zftpd.",
+     "needs": "Nada instalado: se carga como payload. Ábrelo en tu navegador con la dirección que te da al cargarlo.",
+     "guide": ["En su GitHub, baja el .elf de la última versión.",
+               "Cárgalo con Payload Manager (o el cargador de ELF): sale un aviso en la consola con la dirección de su web.",
+               "Abre esa dirección en el navegador del PC o del móvil: ahí ves la pantalla en directo y grabas o haces capturas.",
+               "Te aviso en la campana cuando saque una versión nueva."]},
+    {"id": "liveshell", "kind": "link", "group": "tool", "name": "LiveShell", "repo": "ZiZc3/LiveShell",
+     "what": "Fondos animados en la pantalla de inicio: un vídeo para cada título y para las apps (también Payload Manager "
+             "o el Toolbox de etaHEN). Es de ZiZc3, el autor de VLC y Ruffle para PS5.",
+     "needs": "Tus vídeos en .mp4 y el payload liveshell.elf.",
+     "guide": ["En su GitHub, baja liveshell.elf de la última versión.",
+               "Pon tus .mp4 en /data/LiveShell/video (con Archivos de la consola) o en una carpeta liveshell de un USB.",
+               "Carga liveshell.elf con Payload Manager.",
+               "Abre «LiveShell Engine» en la pantalla de inicio (en Multimedia) para elegir qué vídeo va con cada título.",
+               "Te aviso en la campana cuando saque una versión nueva."]},
 ]
+
+
+# --- Ed25519 (RFC 8032), solo comprobar firmas. Python puro: no hace falta instalar nada.
+_P = 2 ** 255 - 19
+_L = 2 ** 252 + 27742317777372353535851937790883648493
+_D = -121665 * pow(121666, _P - 2, _P) % _P
+_I = pow(2, (_P - 1) // 4, _P)
+
+
+def _ed_xrec(y, sign):
+    if y >= _P:
+        return None
+    x2 = (y * y - 1) * pow(_D * y * y + 1, _P - 2, _P)
+    if x2 == 0:
+        return None if sign else 0
+    x = pow(x2, (_P + 3) // 8, _P)
+    if (x * x - x2) % _P:
+        x = x * _I % _P
+    if (x * x - x2) % _P:
+        return None
+    if (x & 1) != sign:
+        x = _P - x
+    return x
+
+
+def _ed_add(a, b):
+    x1, y1, z1, t1 = a
+    x2, y2, z2, t2 = b
+    A = (y1 - x1) * (y2 - x2) % _P
+    B = (y1 + x1) * (y2 + x2) % _P
+    C = 2 * t1 * t2 * _D % _P
+    Dd = 2 * z1 * z2 % _P
+    E_, F_, G_, H_ = B - A, Dd - C, Dd + C, B + A
+    return (E_ * F_ % _P, G_ * H_ % _P, F_ * G_ % _P, E_ * H_ % _P)
+
+
+def _ed_mul(s, pt):
+    q = (0, 1, 1, 0)
+    while s > 0:
+        if s & 1:
+            q = _ed_add(q, pt)
+        pt = _ed_add(pt, pt)
+        s >>= 1
+    return q
+
+
+def _ed_eq(a, b):
+    return (a[0] * b[2] - b[0] * a[2]) % _P == 0 and (a[1] * b[2] - b[1] * a[2]) % _P == 0
+
+
+def _ed_dec(s):
+    if len(s) != 32:
+        return None
+    y = int.from_bytes(s, "little")
+    sign = y >> 255
+    y &= (1 << 255) - 1
+    x = _ed_xrec(y, sign)
+    return None if x is None else (x, y, 1, x * y % _P)
+
+
+_GY = 4 * pow(5, _P - 2, _P) % _P
+_G = (_ed_xrec(_GY, 0), _GY, 1, _ed_xrec(_GY, 0) * _GY % _P)
+
+
+def ed25519_verify(pub, msg, sig):
+    """True si sig (64 bytes) es la firma Ed25519 de msg con la clave pública pub (32 bytes)."""
+    try:
+        if len(pub) != 32 or len(sig) != 64:
+            return False
+        A = _ed_dec(pub)
+        R = _ed_dec(sig[:32])
+        if not A or not R:
+            return False
+        s = int.from_bytes(sig[32:], "little")
+        if s >= _L:
+            return False
+        h = int.from_bytes(hashlib.sha512(sig[:32] + pub + msg).digest(), "little") % _L
+        return _ed_eq(_ed_mul(s, _G), _ed_add(R, _ed_mul(h, A)))
+    except Exception:
+        return False
+
+
+# Clave PUBLICA con la que se firman las versiones de PS5 Directo (la privada solo la tiene GitHub Actions, en los
+# secretos del repositorio). Con ella, una actualización solo se instala si su SHA256SUMS lo firmó esa clave.
+UPDATE_PUBKEY = bytes.fromhex("6a0f584d8d0c27602c13b62e8d212161279523184153adfd6524e5f7fc2b5f44")
+
+
+def sums_parse(text):
+    """{nombre: sha256} de un SHA256SUMS (formato de sha256sum: «hash  nombre» o «hash *nombre»)."""
+    out = {}
+    for ln in (text or "").splitlines():
+        m = re.match(r"^\s*([0-9a-fA-F]{64})\s+\*?(.+?)\s*$", ln)
+        if m:
+            out[m.group(2).rsplit("/", 1)[-1]] = m.group(1).lower()
+    return out
+
+
+def release_sums(assets, sig_key=None):
+    """{nombre: sha256} que publica una release (SHA256SUMS, checksums.txt o un .sha256 por archivo), o {} si no trae.
+    Con sig_key, el SHA256SUMS tiene que venir firmado (SHA256SUMS.sig) con esa clave; si no, error."""
+    by = {a.get("name", ""): a for a in assets or []}
+    for n in ("SHA256SUMS", "SHA256SUMS.txt", "sha256sums.txt", "checksums.txt", "checksums.sha256"):
+        a = by.get(n)
+        if not a:
+            continue
+        raw = http_get(a["browser_download_url"], limit=MiB, timeout=30)
+        if sig_key is not None:
+            sa = by.get(n + ".sig")
+            sig = http_get(sa["browser_download_url"], limit=4096, timeout=30) if sa else b""
+            if not ed25519_verify(sig_key, raw, sig):
+                raise E.PipeError("La firma de %s no es válida: no instalo nada por seguridad" % n)
+        return sums_parse(raw.decode("utf-8", "replace"))
+    out = {}
+    for n, a in by.items():
+        if n.lower().endswith(".sha256") and n[:-7] in by:
+            t = http_get(a["browser_download_url"], limit=4096, timeout=30).decode("utf-8", "replace")
+            m = re.search(r"\b([0-9a-fA-F]{64})\b", t)
+            if m:
+                out[n[:-7]] = m.group(1).lower()
+    if sig_key is not None:
+        raise E.PipeError("Esa versión no trae SHA256SUMS firmado: no la instalo por seguridad")
+    return out
+
+
+def asset_sha256(assets, asset):
+    """SHA-256 esperado de un archivo de una release de GitHub: el que calcula GitHub al subirlo (campo «digest»)
+    o, si no está, el de las sumas que publica el autor. None si no hay ninguno."""
+    d = (asset or {}).get("digest") or ""
+    if d.lower().startswith("sha256:") and len(d) == 71:
+        return d[7:].lower()
+    try:
+        return release_sums(assets).get((asset or {}).get("name", ""))
+    except Exception:
+        return None
+
+
+def verify_asset(assets, asset, path_or_bytes, log=None):
+    """Comprueba lo bajado con su SHA-256 publicado (si lo hay). Si no coincide, error; si no hay suma, lo dice en log."""
+    want = asset_sha256(assets, asset)
+    name = (asset or {}).get("name", "la descarga")
+    if not want:
+        if log:
+            log("%s no publica suma SHA-256: no se puede comprobar" % name)
+        return False
+    check_sha256(path_or_bytes, want, name)
+    if log:
+        log("%s comprobado (SHA-256 correcto)" % name)
+    return True
+
+
+def check_sha256(path_or_bytes, want, what="la descarga"):
+    """Compara el SHA-256 de un archivo (ruta) o de unos bytes con el esperado. Si no coincide, error."""
+    h = hashlib.sha256()
+    if isinstance(path_or_bytes, (bytes, bytearray)):
+        h.update(path_or_bytes)
+    else:
+        with open(path_or_bytes, "rb") as f:
+            for ch in iter(lambda: f.read(MiB), b""):
+                h.update(ch)
+    if h.hexdigest() != (want or "").lower():
+        raise E.PipeError("%s no coincide con la suma SHA-256 que publica su autor: no la uso por seguridad" % what)
+    return True
 
 
 def pick_asset(assets, rxs):
@@ -1332,13 +1525,17 @@ def fetch_payload(pid, data_dir, log=None):
         hit = pick_asset(assets, p["pick"])
         elf = hit.get("name") if hit else None
     elf = elf or _pick_elf(list(names))
+    by_name = {a.get("name", ""): a for a in assets}
     if elf:
         data = http_get(names[elf], limit=64 * MiB)
+        verify_asset(assets, by_name.get(elf), data, log)
     else:
         z = next((n for n in names if n.lower().endswith(".zip")), None)
         if not z:
             raise E.PipeError("La última versión de %s no trae un .elf" % p["repo"])
-        zf = zipfile.ZipFile(io.BytesIO(http_get(names[z], limit=128 * MiB)))
+        zraw = http_get(names[z], limit=128 * MiB)
+        verify_asset(assets, by_name.get(z), zraw, log)
+        zf = zipfile.ZipFile(io.BytesIO(zraw))
         inner = _pick_elf([n for n in zf.namelist() if not n.endswith("/")])
         if not inner:
             raise E.PipeError("El .zip de %s no trae un .elf" % p["repo"])
@@ -1816,6 +2013,7 @@ def download_forge(data_dir, log=None, progress=None, release=None):
     http_get(a["browser_download_url"], limit=400 * MiB, timeout=120, dest=tmp, progress=progress)
     want = forge_cli_name()
     try:
+        verify_asset(assets, a, tmp, log)
         if a["name"].lower().endswith(".zip"):
             with zipfile.ZipFile(tmp) as z:
                 m = next((n for n in z.namelist() if posixpath.basename(n) == want and not n.endswith("/")), None)
@@ -2408,43 +2606,57 @@ def firewall_status(port):
     """{'rule': hay permiso para el puerto, 'blocked': Windows tiene una regla que bloquea Python,
     'public': la red esta como Publica}. Las reglas de bloqueo ganan a las de permitir."""
     if os.name != "nt":
-        return {"rule": True, "blocked": False, "public": False}
+        return {"rule": True, "blocked": False, "public": False, "wide": False}
     script = ("$ErrorActionPreference='SilentlyContinue';" + _FW_FIND_BLOCKS % _ps_list(_python_exes()) +
-              "$r=@(Get-NetFirewallRule -DisplayName '%s' | Where-Object {$_.Enabled -eq 'True'}).Count;"
+              "$rs=@(Get-NetFirewallRule -DisplayName '%s' | Where-Object {$_.Enabled -eq 'True'});$r=$rs.Count;"
+              "$w=@($rs | Where-Object {\"$($_.Profile)\" -match 'Public|Any'}).Count;"
               "$p=@(Get-NetConnectionProfile | Where-Object {$_.NetworkCategory -eq 'Public'}).Count;"
-              "[pscustomobject]@{rule=$r;blocked=$blk.Count;public=$p} | ConvertTo-Json -Compress") % FW_RULE
+              "[pscustomobject]@{rule=$r;wide=$w;blocked=$blk.Count;public=$p} | ConvertTo-Json -Compress") % FW_RULE
     try:
         j = json.loads(_ps(script, timeout=40).stdout.decode("utf-8", "replace").strip() or "{}")
         return {"rule": int(j.get("rule") or 0) > 0, "blocked": int(j.get("blocked") or 0) > 0,
-                "public": int(j.get("public") or 0) > 0}
+                "public": int(j.get("public") or 0) > 0, "wide": int(j.get("wide") or 0) > 0}
     except Exception:
         return {"rule": True, "blocked": False, "public": False}
 
 
-def firewall_allow(port):
-    """Con permiso de administrador: quita los bloqueos de Python que pone Windows si se cancela su aviso
-    y crea el permiso de entrada (puerto y programa) en redes privadas y publicas."""
-    if os.name != "nt":
-        return True
+def _fw_elevated(lines):
+    """Ejecuta los comandos de PowerShell con permiso de administrador (Windows pregunta)."""
     import base64
-    exes = _python_exes()
-    lines = ["$ErrorActionPreference='SilentlyContinue'",
-             _FW_FIND_BLOCKS % _ps_list(exes) + "$blk | Remove-NetFirewallRule",
-             "Get-NetFirewallRule -DisplayName '%s' | Remove-NetFirewallRule" % FW_RULE,
-             "New-NetFirewallRule -DisplayName '%s' -Direction Inbound -Action Allow -Protocol TCP -LocalPort %d "
-             "-Profile Private,Public | Out-Null" % (FW_RULE, int(port))]
-    for e in exes:
-        lines.append("New-NetFirewallRule -DisplayName '%s' -Direction Inbound -Action Allow -Program '%s' "
-                     "-Profile Private,Public | Out-Null" % (FW_RULE, e.replace("'", "''")))
-    enc = base64.b64encode(";".join(lines).encode("utf-16-le")).decode()
+    enc = base64.b64encode(";".join(["$ErrorActionPreference='SilentlyContinue'"] + lines).encode("utf-16-le")).decode()
     script = ("Start-Process -FilePath powershell.exe -Verb RunAs -WindowStyle Hidden -Wait "
               "-ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-EncodedCommand','%s'" % enc)
     try:
         _ps(script, timeout=180)
     except Exception:
         pass
+
+
+def firewall_allow(port, unblock=False):
+    """Con permiso de administrador crea UN permiso de entrada, lo más estrecho posible: solo TCP, solo el puerto
+    de PS5 Directo, solo redes privadas y solo desde la red local (LocalSubnet). No da permiso al programa Python
+    entero ni abre nada en redes públicas.
+    Los bloqueos que pone Windows a Python cuando se cierra su aviso no se tocan, salvo que lo pidas (unblock):
+    entonces se DESACTIVAN (no se borran) solo los del Python de PS5 Directo, y se pueden volver a activar."""
+    if os.name != "nt":
+        return True
+    lines = ["Get-NetFirewallRule -DisplayName '%s' | Remove-NetFirewallRule" % FW_RULE,
+             "New-NetFirewallRule -DisplayName '%s' -Description 'PS5 Directo: abrir la app desde el movil (misma red)' "
+             "-Direction Inbound -Action Allow -Protocol TCP -LocalPort %d -Profile Private -RemoteAddress LocalSubnet "
+             "| Out-Null" % (FW_RULE, int(port))]
+    if unblock:
+        lines.insert(0, _FW_FIND_BLOCKS % _ps_list(_python_exes()) + "$blk | Disable-NetFirewallRule")
+    _fw_elevated(lines)
     st = firewall_status(port)
     return st["rule"] and not st["blocked"]
+
+
+def firewall_remove():
+    """Quita el permiso de PS5 Directo del firewall (Windows pide permiso de administrador)."""
+    if os.name != "nt":
+        return True
+    _fw_elevated(["Get-NetFirewallRule -DisplayName '%s' | Remove-NetFirewallRule" % FW_RULE])
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -2655,6 +2867,11 @@ def rclone_install(data_dir, progress=None):
     total = int(a.get("size") or 0)
     http_get(a["browser_download_url"], limit=200 * MiB, timeout=120, dest=tmp,
              progress=(lambda got: progress(got, total)) if progress else None)
+    try:
+        verify_asset(assets, a, tmp)
+    except Exception:
+        os.remove(tmp)
+        raise
     with zipfile.ZipFile(tmp) as z:
         inner = next((n for n in z.namelist() if n.rsplit("/", 1)[-1] == rclone_exe_name()), None)
         if not inner:
@@ -2744,6 +2961,7 @@ CATALOG_ART = {
     'smplusgui': {"icon": 'https://raw.githubusercontent.com/KarnerF/SMPlusGui/main/assets-app/icon1.png', "hero": ''},
     'tailscale': {"icon": 'https://raw.githubusercontent.com/holdmysocks/ps5-tailscale/main/appicon/icon0.png', "hero": ''},
     'patchsys': {"icon": '', "hero": 'https://github.com/user-attachments/assets/fd047e71-391e-46d2-91a8-5bde99dfdf7d'},
+    'ps4mount': {"icon": '', "hero": ''},
     'neoenabler': {"icon": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/assets/icon0.png', "hero": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/docs/panel-games.jpg'},
     'doom': {"icon": '', "hero": '', "bg": ["#7a1e12", "#1c0805"]},
     'zftpd': {"icon": 'https://raw.githubusercontent.com/seregonwar/zftpd/main/assets/zftpd-logo.png', "hero": ''},

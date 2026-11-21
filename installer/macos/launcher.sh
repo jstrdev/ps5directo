@@ -90,6 +90,7 @@ Couldn't copy the program to $SUP. Is there free space on the Mac?"
 fi
 
 export PATH="$RES/bin:$PATH"   # 7-Zip incluido
+export PS5D_BUNDLE="$BUNDLE"   # para saber si se abre desde Aplicaciones (permiso de «Red local»)
 export PYTHONUNBUFFERED=1
 cd "$APP" || exit 1
 

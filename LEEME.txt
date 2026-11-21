@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.8
+PS5 DIRECTO 2.2.3
 =================
 (English: see README_EN.txt)
 
@@ -331,6 +331,110 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 2.2.3
+- Más seguridad (gracias a los avisos de GitHub):
+  · Las actualizaciones van firmadas: PS5 Directo solo instala una versión
+    nueva si su suma SHA-256 coincide y está firmada con la clave del
+    proyecto. Si algo no cuadra, no instala nada.
+  · Lo que se baja de otros autores (PS5 Dump Forge, rclone, aria2,
+    FFmpeg, payloads, parches) se comprueba con su suma SHA-256 antes de
+    usarlo. PS5 Dump Forge ya no se baja sin preguntarte la primera vez.
+  · La extensión del navegador se empareja con PS5 Directo: solo le manda
+    enlaces a tu PS5 Directo, no a otro programa que se haga pasar por él.
+    Pasar las cookies de la web es ahora una opción que activas tú en la
+    ventanita de la extensión.
+  · Acceso desde el móvil: el móvil ya no recibe contraseñas ni carpetas
+    del PC, no puede cambiar la IP de la consola ni las carpetas de copias
+    y vigilada, y solo puede usar lo que está permitido a propósito.
+  · Firewall de Windows: el permiso para el móvil es solo para el puerto
+    de PS5 Directo, solo en redes privadas y solo desde tu red local. Los
+    bloqueos de Windows ya no se borran (si quieres, se desactivan solo
+    los de PS5 Directo) y el permiso se puede quitar al apagar el acceso.
+- Mac: si macOS bloquea la red local, te dice el paso exacto según cómo
+  abriste la app (desde fuera de Aplicaciones, desde Terminal o si hay que
+  reiniciar). El informe de fallo incluye el registro del lanzador.
+- Más fácil de usar:
+  · Ajustes avisa si cierras con cambios sin guardar, y el botón Guardar
+    se queda a mano al bajar.
+  · «Solo a mi PC» con algo que ya está en tu PC te pregunta si lo mandas
+    a la PS5 en vez de dar error, y el diagnóstico ya no habla de
+    conversiones si no elegiste ninguna.
+  · Los errores de red en crudo («[Errno 111]…») salen como una frase que
+    se entiende.
+  · Sin consola, «Nueva carpeta», «Subir aquí» y «Revisar todo» se
+    apagan hasta que conectes.
+  · Un archivo suelto (un vídeo, un .elf) solo enseña los pasos Enviar y
+    Listo, y la cola y la tarjeta dan el mismo tiempo restante.
+  · En el móvil, la barra de pestañas se desliza y se ve que hay más.
+  · Si el Modo PC sigue activado al abrir, te lo recuerda.
+
+NOVEDADES 2.2.2
+- Paquetes .pkg al día con lo nuevo de la scene:
+  · PS4Mount en Descubrir › Mejorar tus títulos: abre tus .pkg de PS4
+    desde un USB sin instalarlos. Se carga con «Iniciar en la PS5».
+  · Si mandas un .pkg con un USB como destino, va a la raíz del USB (donde
+    lo buscan PS4Mount y el instalador de ShadowMountPlus); si no, a
+    /data/pkg como siempre. Al llegar te avisa en la campana y te lleva a
+    él para instalarlo.
+  · «Instalar .pkg» funciona también sin zftpd si tienes ShadowMountPlus
+    1.7: te abre su web, que instala base, parches y DLC.
+- PS5 Directo reconoce ShadowMountPlus 1.7 (su web del puerto 10101): en
+  Sistema › Payloads al día sale su versión real y un botón a su web, y
+  «Comprobar arranque» avisa si un título tiene el fakelib desactivado
+  ahí (su backport y su AMPR no se aplican).
+- El botón ⏻ dice qué hay abierto en la consola.
+- Las novedades ya no enseñan gestores de partidas ni tiendas de
+  descargas nuevas.
+- Arreglado: una respuesta del servidor podía quedarse sin contestar en
+  algunas acciones (salía como que no pasaba nada).
+
+NOVEDADES 2.2.1
+- Escudo para lo que añades a mano: en GitHub circulan copias falsas de
+  proyectos de PS5 (AnyPS5, KytyPS5…) que roban contraseñas. Antes de
+  guardar un «Añadido por ti», PS5 Directo mira si se llama igual que algo
+  de Descubrir pero es de otra cuenta, si trae programas para Windows o
+  archivos con contraseña, si promete juegos gratis, o si es muy nuevo y
+  casi nadie lo sigue. Si ve algo raro, te lo explica y te pregunta.
+  En la búsqueda también marca lo sospechoso.
+- En la caja de enlaces avisa si pegas enlaces a programas de Windows.
+- Revisión de tu mezcla de payloads (en Sistema › Payloads al día): avisa
+  si usas ShadowMountPlus 1.7 con etaHEN (su autor pide no hacerlo), si
+  tu kstuff-lite es más viejo que la 1.07, si hay varios HEN a la vez o
+  demasiados payloads ocupando memoria.
+- Nuevas en Descubrir › Herramientas: PBS Payload (emite y graba la
+  pantalla de la consola en el navegador) y LiveShell (fondos animados en
+  la pantalla de inicio).
+- Arreglado: «🔍 Enlaces de una página» abría la pestaña Espacio, y
+  «Buscar restos» no hacía nada. «Abrir carpeta» de la extensión no hacía
+  nada. «Estado de la consola» salía con la lista de payloads vacía.
+
+NOVEDADES 2.2.0
+- NUEVO: Rutinas (🤖). «Cuando pase esto, haz esto»: la consola se cuida
+  sola mientras PS5 Directo está abierto. Se abren desde el botón ⏻ de
+  arriba, el menú ⋯, Sistema o Ctrl+K. Recetas listas, de un clic:
+  · Encender la consola para la cola: si añades algo y está en reposo, la
+    enciende, carga los payloads y sigue sola.
+  · Reposo al terminar la cola.
+  · Copia de seguridad nocturna: la enciende, guarda partidas y ajustes
+    en el PC y la vuelve a dejar en reposo.
+  · Puesta a punto al encender: payloads, AMPR y capturas nuevas.
+  · Aviso si se calienta, y aviso en la tele si un envío falla.
+- También puedes crear las tuyas: eliges cuándo (una hora, al terminar la
+  cola, al encenderse, por temperatura…) y los pasos en orden.
+- Cada rutina tiene «Probar» y enseña lo último que hizo. Antes de poner
+  la consola en reposo siempre mira que no haya nada abierto en ella ni
+  trabajos en marcha.
+
+NOVEDADES 2.1.9
+- Arreglado «No he podido llegar a GitHub (problema con el certificado
+  seguro del servidor)» en algunos equipos: PS5 Directo trae ahora la
+  lista de certificados de Mozilla (la de Firefox) y la suma a la del
+  sistema, así funciona aunque Windows tenga la suya sin actualizar o el
+  Mac no se la dé a Python. En Mac usa también las del Llavero.
+- Si el fallo es por otra cosa, ahora dice cuál: la fecha y hora del
+  equipo mal puestas, o el antivirus (o un proxy) interceptando las
+  conexiones seguras, con lo que hay que tocar.
 
 NOVEDADES 2.1.8
 - Captar enlaces en el móvil, como la extensión del PC:

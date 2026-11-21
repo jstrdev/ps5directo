@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.1.8 — USER GUIDE (English)
+PS5 DIRECTO 2.2.3 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,94 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.2.3 - More security (thanks to the GitHub reports): updates are
+    signed, and PS5 Directo only installs a new version if its SHA-256 sum
+    matches and is signed with the project key; nothing is installed if
+    anything doesn't match.
+  - Downloads from other authors (PS5 Dump Forge, rclone, aria2, FFmpeg,
+    payloads, patches) are checked against their SHA-256 sum before use,
+    and PS5 Dump Forge is no longer downloaded without asking the first
+    time.
+  - The browser extension pairs with PS5 Directo: it only sends links to
+    your PS5 Directo, not to another program pretending to be it. Passing
+    the site's cookies is now an option you turn on in the extension popup.
+  - Phone access: the phone no longer receives passwords or PC folders,
+    can't change the console IP or the backup and watched folders, and can
+    only use what is allowed on purpose.
+  - Windows Firewall: the phone permission is only for PS5 Directo's port,
+    only on private networks and only from your local network. Windows
+    blocks are no longer deleted (if you want, only PS5 Directo's are
+    disabled) and the permission can be removed when access is off.
+  - Mac: when macOS blocks the local network, it tells you the exact step
+    depending on how you opened the app (outside Applications, from
+    Terminal, or a restart is needed). The bug report includes the
+    launcher log.
+  - Easier to use: Settings warns when you close with unsaved changes and
+    the Save button stays at hand; "Only to my PC" with something already
+    on your PC asks whether to send it to the PS5 instead of failing, and
+    the diagnosis no longer mentions conversions you didn't choose.
+  - Raw network errors ("[Errno 111]...") are shown as a plain sentence.
+  - Without a console, "New folder", "Upload here" and "Check all" are
+    disabled until you connect.
+  - A loose file (a video, an .elf) only shows the Send and Done steps, and
+    the queue and the card show the same time left.
+  - On the phone, the tab bar scrolls and shows there is more.
+  - If PC mode is still on when you open the app, it reminds you.
+2.2.2 - .pkg packages, up to date with the scene: PS4Mount in Discover >
+    Improve your titles (opens your PS4 .pkg files from a USB drive
+    without installing them); a .pkg sent with a USB drive as destination
+    goes to the drive's root (where PS4Mount and ShadowMountPlus look),
+    otherwise to /data/pkg, and the bell takes you to it; "Install .pkg"
+    also works without zftpd if you have ShadowMountPlus 1.7 (opens its
+    web UI, which installs base, patches and DLC).
+  - PS5 Directo recognises ShadowMountPlus 1.7 (its web UI on port 10101):
+    System > Payloads up to date shows its real version and a button to
+    its web UI, and "Check startup" warns when a title has fakelib turned
+    off there.
+  - The power button shows what is open on the console.
+  - News no longer shows save managers or new download stores.
+  - Fixed: some actions could get no answer from the server.
+
+2.2.1 - Shield for what you add by hand: fake copies of PS5 projects that
+    steal passwords (AnyPS5, KytyPS5...) are going around GitHub. Before
+    saving an "Added by you" project, PS5 Directo checks whether it has
+    the same name as something in Discover but from another account,
+    brings Windows programs or password-protected files, promises free
+    games, or is very new with almost no followers. If something looks
+    off, it explains it and asks you. Search results flag it too.
+  - The links box warns if you paste links to Windows programs.
+  - Payload mix check (System > Payloads up to date): warns if you use
+    ShadowMountPlus 1.7 with etaHEN (its author asks not to), kstuff-lite
+    older than 1.07, several HENs at once or too many payloads using memory.
+  - New in Discover > Tools: PBS Payload (streams and records the console
+    screen in the browser) and LiveShell (animated home screen backgrounds).
+  - Fixed: "Links from a page" opened the Space tab and "Look for
+    leftovers" did nothing; the extension's "Open folder" did nothing;
+    "Console status" showed an empty payload list.
+
+2.2.0 - NEW: Routines (🤖). "When this happens, do that": the console
+    looks after itself while PS5 Directo is open. Open them from the ⏻
+    button at the top, the ⋯ menu, System or Ctrl+K. One-click recipes:
+    turn the console on for the queue (wakes it, loads payloads, carries
+    on); rest mode when the queue finishes; nightly backup (wakes it,
+    backs up, puts it back to rest); tune-up on power-on (payloads, AMPR,
+    captures); warning if it gets hot; notice on the TV if a transfer
+    fails.
+  - Build your own too: choose when (a time, queue finished, console
+    turned on, temperature...) and the steps in order.
+  - Each routine has "Try" and shows what it did last. Before putting the
+    console in rest mode it always checks nothing is open on it and no
+    jobs are running.
+
+2.1.9 - Fixed "I couldn't reach GitHub (problem with the server's
+    security certificate)" on some computers: PS5 Directo now ships
+    Mozilla's certificate list (the one Firefox uses) and adds it to the
+    system's, so it works even if Windows has an outdated list or the Mac
+    doesn't give one to Python. On Mac it also uses the Keychain's.
+  - If the failure is something else, it now says what: the computer's
+    date and time are wrong, or the antivirus (or a proxy) is
+    intercepting secure connections, and what to change.
+
 2.1.8 - Catch links on the phone, like the PC extension: "Share" a page
     (a post, a forum) with PS5 Directo and it takes the download links it
     has; new "🔍 Links from a page" button in Send (also on the PC);

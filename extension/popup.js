@@ -1,6 +1,8 @@
 const EN = !(navigator.language || "es").toLowerCase().startsWith("es");
 const T = EN ? {
-  capture: "Capture .rar, .7z, .zip, .pkg… downloads", prog: "Queue progress on the icon", checking: "Checking…", reset: "Reset",
+  capture: "Capture .rar, .7z, .zip, .pkg… downloads", ck: "Pass the site's cookies (premium or logged-in accounts)",
+  nopair: "This extension isn't paired with PS5 Directo. Remove it and load it again from PS5 Directo (Settings → \"Open the extension folder\" → Load unpacked).",
+  badpair: "Something answered on this PC pretending to be PS5 Directo, so nothing was sent. If you have just updated, reload the extension from PS5 Directo's folder.", prog: "Queue progress on the icon", checking: "Checking…", reset: "Reset",
   help: "Pass the captcha and click Download as usual: if it's a .rar, .7z, .zip, .pkg… and PS5 Directo is open, the link goes to its link box and the browser downloads nothing. If PS5 Directo is closed, the download goes ahead normally.",
   old: (a, b) => `This extension is version ${a} and PS5 Directo comes with ${b}. Remove it on the extensions page and load the folder again (Settings → "Open the extension folder" → Load unpacked). From then on it updates by itself.`,
   sent: "Captured", last: "last", connected: "● Connected", to: "to PS5 Directo", closed: "● PS5 Directo is not open", normal: "(downloads will work normally)",
@@ -9,7 +11,9 @@ const T = EN ? {
   st: { pendiente: "waiting", comprobando: "checking", enviando: "sending", convirtiendo: "converting", extrayendo: "extracting", colocando: "placing",
         "en cola para descomprimir": "waiting to extract", hecho: "done", error: "error", cancelado: "cancelled", pausado: "paused" }
 } : {
-  capture: null, prog: null, checking: "Comprobando…", reset: null, help: null,
+  capture: null, prog: null, checking: "Comprobando…", reset: null, help: null, ck: null,
+  nopair: "Esta extensión no está emparejada con PS5 Directo. Quítala y vuelve a cargarla desde PS5 Directo (Ajustes → «Abrir la carpeta de la extensión» → Cargar descomprimida).",
+  badpair: "En este PC ha contestado algo que se hace pasar por PS5 Directo, así que no se ha mandado nada. Si acabas de actualizar, vuelve a cargar la extensión desde la carpeta de PS5 Directo.",
   sent: "Capturados", last: "último", connected: "● Conectado", to: "a PS5 Directo", closed: "● PS5 Directo no está abierto", normal: "(las descargas seguirán normales)",
   pcmode: "Modo PC", now: "Enviar ahora", left: (a, b) => `Queda: ${a}` + (b ? ` · unos ${b}` : ""), siteLbl: h => `En <b>${h}</b>`, thisSite: "esta web", empty: "No hay nada en la cola.", pause: "Pausar", resume: "Reanudar", cancel: "Cancelar", st: {},
   old: (a, b) => `Esta extensión es la versión ${a} y PS5 Directo trae la ${b}. Quítala en la página de extensiones y vuelve a cargar la carpeta (Ajustes → «Abrir la carpeta de la extensión» → Cargar descomprimida). Desde entonces se actualiza sola.`
@@ -18,7 +22,7 @@ const $ = id => document.getElementById(id);
 if (EN) {
   document.documentElement.lang = "en";
   $("lblEn").textContent = T.capture; $("lblProg").textContent = T.prog; $("st").textContent = T.checking;
-  $("reset").textContent = T.reset; $("help").textContent = T.help; $("lgSend").textContent = T.send;
+  $("reset").textContent = T.reset; $("help").textContent = T.help; $("lblCk").textContent = T.ck; $("lgSend").textContent = T.send;
   $("mBox").textContent = T.box; $("mQueue").textContent = T.queue; $("lWhere").textContent = T.where;
   $("where").options[0].textContent = T.ps5; $("where").options[1].textContent = T.keep;
   $("lblPcm").textContent = T.pcmLbl; $("lgRules").textContent = T.rules; $("lblMin").textContent = T.minLbl;
@@ -63,6 +67,14 @@ async function refresh() { chrome.runtime.sendMessage({ type: "poll" }, paint); 
   window._whereSet = cfg.whereSet;
   $("cnt").textContent = cfg.captured ? `${T.sent}: ${cfg.captured}${cfg.last ? " (" + T.last + ": " + cfg.last + ")" : ""}` : "";
   $("reset").onclick = async () => { await chrome.storage.local.set({ captured: 0, last: "" }); $("cnt").textContent = ""; };
+  // cookies: permiso opcional, se pide solo si se activa
+  try { $("ck").checked = await chrome.permissions.contains({ permissions: ["cookies"] }); } catch (e) {}
+  $("ck").onchange = async () => {
+    try { if ($("ck").checked) $("ck").checked = await chrome.permissions.request({ permissions: ["cookies"] });
+          else await chrome.permissions.remove({ permissions: ["cookies"] }); } catch (e) { $("ck").checked = false; }
+  };
+  const { unpaired = "" } = await chrome.storage.local.get({ unpaired: "" });
+  if (unpaired) { const w = document.createElement("div"); w.className = "warn"; w.textContent = unpaired === "bad" ? T.badpair : T.nopair; document.body.insertBefore(w, $("st")); }
   const { outdated = "" } = await chrome.storage.local.get({ outdated: "" });
   if (outdated) { const w = document.createElement("div"); w.className = "warn"; w.textContent = T.old(chrome.runtime.getManifest().version, outdated); document.body.insertBefore(w, $("st")); }
   $("pcm").onchange = () => chrome.runtime.sendMessage({ type: "pcmode", on: $("pcm").checked }, () => refresh());
