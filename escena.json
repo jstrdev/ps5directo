@@ -1,7 +1,64 @@
 {
  "_como": "Lo genera solo tools/escena.py (GitHub Action cada 3 horas). No lo edites a mano: para destacar algo usa destacados.json.",
- "updated": "2026-11-22T11:21:08Z",
+ "updated": "2026-11-22T19:37:31Z",
  "items": [
+  {
+   "id": "Press5elect/Crux2@v1.0.23",
+   "kind": "update",
+   "repo": "Press5elect/Crux2",
+   "cid": "crux2",
+   "name": "Crux2",
+   "tag": "v1.0.23",
+   "pre": false,
+   "date": "2026-11-22T17:53:26Z",
+   "notes": "Crux2 v1.0.23 Freezes in the interface are fixed, anti-aliasing can be set per game and no longer raises the resolution, and the M.2 storage can hold games. Added - Games on the M.2 storage ( /mnt/ext1 ) and on /mnt/ext0 : a folder named crux2 , ps2 or the like at the top is found as on a USB drive, and both are offered in the folder browser, for copying a disc, exporting…",
+   "url": "https://github.com/Press5elect/Crux2/releases/tag/v1.0.23",
+   "stars": 28,
+   "score": 1.0
+  },
+  {
+   "id": "quer3q/ps5-dump-forge@v0.5.7",
+   "kind": "update",
+   "repo": "quer3q/ps5-dump-forge",
+   "cid": "forge",
+   "name": "PS5 Dump Forge",
+   "tag": "v0.5.7",
+   "pre": false,
+   "date": "2026-11-22T17:12:11Z",
+   "notes": "New - edit in the CLI. ps5-dump-forge edit changes a game's files without mounting it, for scripts: --add : , --delete , --rename : and --mkdir , applied in the order given, in place or with --rebuild . It runs the same job as the Edit tab. - Static Linux CLI for arm64. A new linux-arm64-musl tarball carries the fully static ps5-dump-forge CLI for arm64 NASes and boards,…",
+   "url": "https://github.com/quer3q/ps5-dump-forge/releases/tag/v0.5.7",
+   "stars": 541,
+   "score": 2.4
+  },
+  {
+   "id": "fthdgn-gh/Alembic@v0.7.1",
+   "kind": "update",
+   "repo": "fthdgn-gh/Alembic",
+   "cid": "alembic",
+   "name": "Alembic",
+   "tag": "v0.7.1",
+   "pre": false,
+   "date": "2026-11-22T16:02:59Z",
+   "notes": "Keep the games you own playable: Alembic dumps an installed or disc game while it runs and turns it straight into an image, a folder or a package. 0.7.1 brings the suggestions from issue 6. New in 0.7.1 - Convert remembers your choices: the next conversion starts with the last one's format and options (never deleting the source; checking the output always starts on). \"Use the…",
+   "url": "https://github.com/fthdgn-gh/Alembic/releases/tag/v0.7.1",
+   "stars": 79,
+   "score": 1.0
+  },
+  {
+   "id": "bornaradusin/PC5@v2.4.7",
+   "kind": "new",
+   "repo": "bornaradusin/PC5",
+   "cid": "",
+   "name": "PC5",
+   "tag": "v2.4.7",
+   "pre": false,
+   "date": "2026-11-22T15:32:24Z",
+   "desc": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
+   "notes": "PC5 2.4.7 reads Microsoft's DirectX End-User Runtime as it is downloaded, gives older games Microsoft's own sound engine where Wine's falls short, and fixes games that stopped for memory while enough was free. Install - ProsperoStore : update PC5 from its page in the store. - PC5's own updater : Settings › System › Update now , or Update now when PC5 asks as it opens. It…",
+   "stars": 158,
+   "url": "https://github.com/bornaradusin/PC5",
+   "score": 13.6
+  },
   {
    "id": "folksheesh/PS-5-Emulator@1.2.0",
    "kind": "new",
@@ -28,9 +85,9 @@
    "date": "2026-11-22T09:38:11Z",
    "desc": "Clean up a jailbroken PS5 like new, no reinstall.",
    "notes": "For the PS5 you only need ps5cleanup v1.3.elf . The ZIP contains the same file plus the guides (DE/EN), license and checksum. The app starts in test mode. Nothing is deleted until you switch test mode off and confirm. Updating from 1.2: the updater in 1.2 may put the new file next to the old one instead of replacing it. In that case simply delete the old file (e.g. ps5cleanup…",
-   "stars": 130,
+   "stars": 132,
    "url": "https://github.com/xXBneutzerNameXx/PS5-Cleanup",
-   "score": 9.8
+   "score": 10.28
   },
   {
    "id": "aarvsn/PS5Droid@v1.0.6",
@@ -43,9 +100,9 @@
    "date": "2026-11-22T05:16:35Z",
    "desc": "Android games on your PS5",
    "notes": "What's Changed Release v1.0.6: clear feasible Linux ABI, APK and bionic technical debt by @aarvsn in https://github.com/aarvsn/PS5Droid/pull/7 Full Changelog : https://github.com/aarvsn/PS5Droid/compare/v1.0.5...v1.0.6",
-   "stars": 76,
+   "stars": 78,
    "url": "https://github.com/aarvsn/PS5Droid",
-   "score": 7.24
+   "score": 7.72
   },
   {
    "id": "mihawk-99/PS5_RetroArch@v4.7.0-beta-4",
@@ -60,21 +117,6 @@
    "url": "https://github.com/mihawk-99/PS5_RetroArch/releases/tag/v4.7.0-beta-4",
    "stars": 447,
    "score": 2.7
-  },
-  {
-   "id": "bornaradusin/PC5@v2.4.6",
-   "kind": "new",
-   "repo": "bornaradusin/PC5",
-   "cid": "",
-   "name": "PC5",
-   "tag": "v2.4.6",
-   "pre": false,
-   "date": "2026-11-22T01:35:25Z",
-   "desc": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
-   "notes": "PC5 2.4.6 starts games in the language you chose in PC5, installs NVIDIA's PhysX for the games that carry it, and fixes older games that froze when a cutscene started or was skipped. Install - ProsperoStore : update PC5 from its page in the store. - PC5's own updater : Settings › System › Update now , or Update now when PC5 asks as it opens. It downloads only what changed when…",
-   "stars": 158,
-   "url": "https://github.com/bornaradusin/PC5",
-   "score": 13.6
   },
   {
    "id": "bornaradusin/Emby5@1.3.4",
@@ -106,21 +148,6 @@
    "score": 6.52
   },
   {
-   "id": "iijegdumngfo/GTA6-KytyPS5-GTA-6-PC-Version@",
-   "kind": "new",
-   "repo": "iijegdumngfo/GTA6-KytyPS5-GTA-6-PC-Version",
-   "cid": "",
-   "name": "GTA6-KytyPS5-GTA-6-PC-Version",
-   "tag": "",
-   "pre": false,
-   "date": "2026-11-21T19:08:51Z",
-   "desc": "GTA6",
-   "notes": "",
-   "stars": 55,
-   "url": "https://github.com/iijegdumngfo/GTA6-KytyPS5-GTA-6-PC-Version",
-   "score": 4.2
-  },
-  {
    "id": "VivaLaVent/ps5-bazzite-deck@v3.0.1",
    "kind": "update",
    "repo": "VivaLaVent/ps5-bazzite-deck",
@@ -131,8 +158,23 @@
    "date": "2026-11-21T19:03:21Z",
    "notes": "What's new Pre-release on top of v3.0. - Monitors at 75 Hz, and old PC modes such as 800x600 and 1280x1024, show a picture (FLAVA3 HDMI chip). The HDMI chip only accepts these timings with one sync arrangement; the driver now always sends that one, as it already did for 1440p. Found by PS5-CachyOS. - The loader follows its upstream: soniciso1's loader now includes the official…",
    "url": "https://github.com/VivaLaVent/ps5-bazzite-deck/releases/tag/v3.0.1",
-   "stars": 608,
-   "score": 1.8
+   "stars": 609,
+   "score": 2.0
+  },
+  {
+   "id": "Ahmet-Dedeler/awesome-gta6-reverse-engineering@",
+   "kind": "new",
+   "repo": "Ahmet-Dedeler/awesome-gta6-reverse-engineering",
+   "cid": "",
+   "name": "awesome-gta6-reverse-engineering",
+   "tag": "",
+   "pre": false,
+   "date": "2026-11-21T17:08:48Z",
+   "desc": "Curated list of open-source GTA VI (GTA 6) reverse engineering tools, RAGE 9 / RPF9 archive explorers, TTPF texture & ADAT/AWC audio decoders, format docs, and Xbox Series / PS5 translation layers.",
+   "notes": "",
+   "stars": 144,
+   "url": "https://github.com/Ahmet-Dedeler/awesome-gta6-reverse-engineering",
+   "score": 7.76
   },
   {
    "id": "percdotdev/ps5-webkit-autoloader-esp32@0.8.3",
@@ -160,9 +202,9 @@
    "date": "2026-11-21T11:40:41Z",
    "desc": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
    "notes": "EmuFive 1.0.13: cheat manager, Internet and keyboard fixes, .zar art What's new - Cheat manager. Turn it on in Settings, Games, and a Cheats tile shows on the home screen. It downloads the PS5 cheats of the HEN Cheats Collection and lists your games that have cheats for their version. Pick the cheats you want; they are applied when the game starts. A game's menu shows how many…",
-   "stars": 359,
+   "stars": 360,
    "url": "https://github.com/blue0x1/EmuFive",
-   "score": 9.2
+   "score": 9.4
   },
   {
    "id": "heydemoura/PS5_Longshot@v0.1.5",
@@ -175,9 +217,9 @@
    "date": "2026-11-21T00:38:03Z",
    "desc": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
    "notes": "Prerelease: builds on computers with little memory, and Longshot's own title ID. Please report how the build goes on your computer, especially with Memory to use set low. Highlights - The builder now works on computers with little free memory. Before, it wanted about 10 GB free, and on some PCs the compile step was stopped for lack of memory. The window has a new Memory to use…",
-   "stars": 220,
+   "stars": 224,
    "url": "https://github.com/heydemoura/PS5_Longshot",
-   "score": 11.6
+   "score": 12.4
   },
   {
    "id": "grimmtroll2285-dot/TITAN@fix11",
@@ -235,9 +277,9 @@
    "date": "2026-11-20T18:04:53Z",
    "desc": "VERY experimental Nintendo Switch 2 emulator port for PS5",
    "notes": "Pre-release. 21 pull requests since v1.000.002, most of them upstream Eglantine work ported to the PS5. - Zelda: Ocarina of Time runs faster. 29 upstream Zelda fixes and speedups are ported (empty GPU submits skipped, cheaper command-list copies and query reports, faster fast-draw paths, x86-64 JIT code generation). In our console test scene it went from about 30 FPS to…",
-   "stars": 432,
+   "stars": 436,
    "url": "https://github.com/heydemoura/EglantinePS5",
-   "score": 12.8
+   "score": 13.6
   },
   {
    "id": "kvaps/ProsperoWeb@v0.3.0",
@@ -265,8 +307,8 @@
    "date": "2026-11-19T22:44:29Z",
    "notes": "",
    "url": "https://github.com/ps5-payload-dev/elfldr/releases/tag/v0.28",
-   "stars": 182,
-   "score": 2.1
+   "stars": 183,
+   "score": 2.3
   },
   {
    "id": "SandyPandyMandy/GTA-6-Switch-Version--PC-Emulator-2026@",
@@ -688,20 +730,6 @@
    "score": 1.2
   },
   {
-   "id": "Press5elect/Crux2@v1.0.22",
-   "kind": "update",
-   "repo": "Press5elect/Crux2",
-   "cid": "crux2",
-   "name": "Crux2",
-   "tag": "v1.0.22",
-   "pre": false,
-   "date": "2026-11-17T00:29:58Z",
-   "notes": "Crux2 v1.0.22 Heavy games run faster: the graphics thread no longer spends half its time creating textures. About fifty bugs in the interface are fixed. Added - Shared Render Target Memory and Streamed Memory Clearing (Settings, the Everything level; both on). At high internal resolutions the graphics thread spent about half its time creating textures: each render target had a…",
-   "url": "https://github.com/Press5elect/Crux2/releases/tag/v1.0.22",
-   "stars": 28,
-   "score": 1.0
-  },
-  {
    "id": "ZiZc3/XPSemu@v3.6",
    "kind": "update",
    "repo": "ZiZc3/XPSemu",
@@ -712,8 +740,8 @@
    "date": "2026-11-16T16:36:05Z",
    "notes": "XPSemu Alpha 3.6 EvolutionX dashboard, Basic AI Texture Upscaler, games fixes. What's new Basic Texture Upscaler - Makes the game's textures twice as big as they load, for cleaner surfaces and text up close. - Two modes: - SGSR : edge-aware upscaling, done at once. - ESRGAN : the Real-ESRGAN AI model running on the PS5's GPU. It adds detail a plain upscale can't. Each texture…",
    "url": "https://github.com/ZiZc3/XPSemu/releases/tag/v3.6",
-   "stars": 218,
-   "score": 2.7
+   "stars": 219,
+   "score": 2.9
   },
   {
    "id": "Press5elect/PSFlycast@v1.4.1",
@@ -728,20 +756,6 @@
    "url": "https://github.com/Press5elect/PSFlycast/releases/tag/v1.4.1",
    "stars": 40,
    "score": 1.0
-  },
-  {
-   "id": "quer3q/ps5-dump-forge@v0.5.6",
-   "kind": "update",
-   "repo": "quer3q/ps5-dump-forge",
-   "cid": "forge",
-   "name": "PS5 Dump Forge",
-   "tag": "v0.5.6",
-   "pre": false,
-   "date": "2026-11-16T15:47:29Z",
-   "notes": "New - ampr-emu-ng v0.4.1. The bundled runtime is the v0.4.1 release, in place of v0.3.4. - payloads.json for ps5-payload-manager. Each release now carries a payloads.json catalog. Add https://github.com/quer3q/ps5-dump-forge/releases/latest/download/payloads.json as a custom repository in ps5-payload-manager, and it installs and updates the PS5 payload. - Static Linux CLI. A…",
-   "url": "https://github.com/quer3q/ps5-dump-forge/releases/tag/v0.5.6",
-   "stars": 540,
-   "score": 2.2
   },
   {
    "id": "gasb07/NeoEnabler@0.7.0",
@@ -768,22 +782,8 @@
    "date": "2026-11-15T19:28:21Z",
    "notes": "PS5SX2 2.50 (build vk-285-321) Lossless Scaling frame generation, a new settings sheet, and a long list of fixes from your reports. Restart the console once after updating : the disc helper is now 171q. Lossless Scaling frame generation - A second frame generation method. On a game's settings: Picture Frame gen method Lossless Scaling , and frame generation on. - It uses your…",
    "url": "https://github.com/Swordpdf/PS5SX2/releases/tag/vk-285-321",
-   "stars": 1698,
-   "score": 1.6
-  },
-  {
-   "id": "fthdgn-gh/Alembic@v0.7.0",
-   "kind": "update",
-   "repo": "fthdgn-gh/Alembic",
-   "cid": "alembic",
-   "name": "Alembic",
-   "tag": "v0.7.0",
-   "pre": false,
-   "date": "2026-11-15T18:49:08Z",
-   "notes": "Keep the games you own playable: Alembic now dumps an installed or disc game while it runs and turns it straight into an image, a folder or a package. New in 0.7.0: dump a game - Images → Dump a game: the game running now, with Dump…; Installed games… with Dump when launched…; and Dump the next game that starts…. The app queues the same dumps (opening the app closes the…",
-   "url": "https://github.com/fthdgn-gh/Alembic/releases/tag/v0.7.0",
-   "stars": 79,
-   "score": 2.5
+   "stars": 1700,
+   "score": 2.0
   },
   {
    "id": "notmaj0r/ProsperoMgr@v1.2.1",
@@ -796,8 +796,8 @@
    "date": "2026-11-15T07:24:29Z",
    "notes": "Prospero Manager v1.2.1 A polish update on top of v1.2: logos for payloads and repositories, a clearer and safer PKG install , games recognised by what is inside their folder, and better behaviour when the network changes or goes away. See the full changelog here: Changelog If you encounter any issues, please report them through GitHub or in our Discord server! ✨ Highlights 📦…",
    "url": "https://github.com/notmaj0r/ProsperoMgr/releases/tag/v1.2.1",
-   "stars": 382,
-   "score": 1.0
+   "stars": 385,
+   "score": 1.6
   },
   {
    "id": "Press5elect/OGBox@v1.0.2",
@@ -825,9 +825,9 @@
    "date": "2026-11-14T22:44:59Z",
    "desc": "Y2JB Installer for PS5",
    "notes": "Changelog : https://github.com/jamesst20/ps5-y2jb-installer/blob/59a572a/CHANGELOG.md Full Changelog : https://github.com/jamesst20/ps5-y2jb-installer/compare/v1.3.0...v1.4.0 Y2JB Installer 1.4.0 1.4.0 — 2026-11-14 Changed - The console card offers one action for the current state: Connect and Scan while nothing answers, then Disconnect once elfldr or the payload is found.…",
-   "stars": 184,
+   "stars": 185,
    "url": "https://github.com/jamesst20/ps5-y2jb-installer",
-   "score": 8.0
+   "score": 8.2
   },
   {
    "id": "saawant12/orbit-play-ps5@v0.8.1",
@@ -913,9 +913,24 @@
    "date": "2026-11-13T05:01:24Z",
    "desc": "A PlayStation 5 emulator written in Rust, for Linux and Windows.",
    "notes": "Fixed - Ghost of Yōtei no longer freezes after its shaders are compiled ( 3). Two causes: - Planning the resources of a shader walked the shader's whole value graph again for every word of every buffer descriptor; on this game's largest shaders that took minutes on the GPU command thread, with nothing submitted meanwhile. Each value is now walked once per shader. - A few…",
-   "stars": 75,
+   "stars": 76,
    "url": "https://github.com/keklick1337/rps5e",
-   "score": 4.0
+   "score": 4.24
+  },
+  {
+   "id": "xvvulcanvx/PS5-TabShifter@v1.4.0",
+   "kind": "new",
+   "repo": "xvvulcanvx/PS5-TabShifter",
+   "cid": "",
+   "name": "PS5-TabShifter",
+   "tag": "v1.4.0",
+   "pre": false,
+   "date": "2026-11-13T00:27:16Z",
+   "desc": "Standalone PS5 on-console payload to move apps between Games/Media tabs and hide offline PSN bloatware (Universal FW 5.00 – 13.60)",
+   "notes": "Upgrading from v1.3.0: Clicking Update Now inside v1.3.0 will fail with Error because GitHub's release download URLs do not send CORS headers for browser fetch() . To upgrade from v1.3.0 to v1.4.0 once, either replace TabShifter.elf via Payload Manager / FTP, or while v1.3.0 is running on your PS5 send the downloaded v1.4.0 .elf directly from a PC/terminal without FTP: bash…",
+   "stars": 117,
+   "url": "https://github.com/xvvulcanvx/PS5-TabShifter",
+   "score": 8.68
   },
   {
    "id": "premohq/PS5-ECAM@es-de-1",
@@ -1028,9 +1043,9 @@
    "date": "2026-11-09T19:18:08Z",
    "desc": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI.",
    "notes": "Fixes - Endless loading screens are fixed. The rooftop in Lure, and other spots where the game got stuck loading, now go through. This was the game running out of room for something it needed to load, not the frame rate, so it's fixed at every resolution. - The final mission can be finished. Climbing into the chopper works again. That button mash was made for 30 FPS and didn't…",
-   "stars": 106,
+   "stars": 107,
    "url": "https://github.com/elripalda/gta4-ps5",
-   "score": 11.44
+   "score": 11.68
   },
   {
    "id": "streetpea/chiaki-ng@weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
@@ -1043,8 +1058,8 @@
    "date": "2026-11-09T08:20:23Z",
    "notes": "Weekly Test Build",
    "url": "https://github.com/chiaki-ng/chiaki-ng/releases/tag/weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
-   "stars": 3245,
-   "score": 6.6
+   "stars": 3253,
+   "score": 8.2
   },
   {
    "id": "JVK3R/JobeesLair@v0.5.7",
@@ -1086,8 +1101,8 @@
    "date": "2026-11-08T20:02:14Z",
    "notes": "- Introduced configuration format v2, with separate config.ini and profiles.ini, automatic migration, and runtime reloads. - Improved mount and launch recovery, including safer cleanup of sandbox layers and handling for M.2 storage. - Made library scans more resilient to inaccessible folders and source changes. - Improved metadata and filename handling for PS4 trophies, sce…",
    "url": "https://github.com/drakmor/ShadowMountPlus/releases/tag/1.7beta12",
-   "stars": 1450,
-   "score": 0.6
+   "stars": 1452,
+   "score": 1.0
   },
   {
    "id": "mihawk-99/PS5_MihawkOS@v8.2.0-alpha-8",
@@ -1160,20 +1175,6 @@
    "stars": 17,
    "url": "https://github.com/disco-trooper/hush",
    "score": 4.68
-  },
-  {
-   "id": "Herbrax/Chiral-FTP@v1.2",
-   "kind": "update",
-   "repo": "Herbrax/Chiral-FTP",
-   "cid": "chiral",
-   "name": "Chiral-FTP",
-   "tag": "v1.2",
-   "pre": false,
-   "date": "2026-11-03T16:08:39Z",
-   "notes": "chiral-ftp 1.2 [](https://github.com/Herbrax/chiral-ftp/releases/tag/v1.2) [](https://github.com/Herbrax/chiral-ftp/stargazers) chiral-ftp now runs on Android : phones, tablets, foldables and Android TV , from one APK. That makes six platforms: Windows, Mac, Linux, Android, Nintendo Switch and PS5. All of them find each other with Quick connect, and from this version on, all…",
-   "url": "https://github.com/Herbrax/Chiral-FTP/releases/tag/v1.2",
-   "stars": 10,
-   "score": 2.5
   }
  ],
  "hot": [
@@ -1402,7 +1403,7 @@
    ],
    [
     "2026-11-22",
-    608
+    609
    ]
   ],
   "mistertemaki/fbneo-ps5": [
@@ -1504,7 +1505,7 @@
    ],
    [
     "2026-11-22",
-    218
+    219
    ]
   ],
   "xxbneutzernamexx/ps5-cleanup": [
@@ -1538,7 +1539,7 @@
    ],
    [
     "2026-11-22",
-    130
+    132
    ]
   ],
   "quer3q/ps5-dump-forge": [
@@ -1572,7 +1573,7 @@
    ],
    [
     "2026-11-22",
-    540
+    541
    ]
   ],
   "elripalda/gta4-ps5": [
@@ -1606,7 +1607,7 @@
    ],
    [
     "2026-11-22",
-    106
+    107
    ]
   ],
   "blue0x1/emufive": [
@@ -1640,7 +1641,7 @@
    ],
    [
     "2026-11-22",
-    359
+    360
    ]
   ],
   "streetpea/chiaki-ng": [
@@ -1674,7 +1675,7 @@
    ],
    [
     "2026-11-22",
-    3245
+    3253
    ]
   ],
   "aarvsn/ps5droid": [
@@ -1708,7 +1709,7 @@
    ],
    [
     "2026-11-22",
-    76
+    78
    ]
   ],
   "jvk3r/jobeeslair": [
@@ -1776,7 +1777,7 @@
    ],
    [
     "2026-11-22",
-    382
+    385
    ]
   ],
   "ps5-payload-dev/ftpsrv": [
@@ -1844,7 +1845,7 @@
    ],
    [
     "2026-11-22",
-    1450
+    1452
    ]
   ],
   "x1nons/prefbar": [
@@ -2070,7 +2071,7 @@
    ],
    [
     "2026-11-22",
-    1698
+    1700
    ]
   ],
   "gasb07/ps4mount": [
@@ -2548,7 +2549,7 @@
    ],
    [
     "2026-11-22",
-    75
+    76
    ]
   ],
   "mucahidkambur/eglantineps5": [
@@ -2956,7 +2957,7 @@
    ],
    [
     "2026-11-22",
-    432
+    436
    ]
   ],
   "elripalda/recompstore": [
@@ -2990,7 +2991,7 @@
    ],
    [
     "2026-11-22",
-    411
+    412
    ]
   ],
   "niakw/prosperoeden-encore": [
@@ -3024,7 +3025,7 @@
    ],
    [
     "2026-11-22",
-    129
+    130
    ]
   ],
   "heydemoura/prosperoeden": [
@@ -3058,7 +3059,7 @@
    ],
    [
     "2026-11-22",
-    55
+    56
    ]
   ],
   "holdmysocks/mcla-recomp": [
@@ -3574,7 +3575,7 @@
    ],
    [
     "2026-11-22",
-    182
+    183
    ]
   ],
   "heni0xyz/ps5save": [
@@ -3778,7 +3779,7 @@
    ],
    [
     "2026-11-22",
-    78
+    77
    ]
   ],
   "smoxa/ps5-new-overlay": [
@@ -3962,7 +3963,7 @@
    ],
    [
     "2026-11-22",
-    537
+    539
    ]
   ],
   "pinkythegawd/ps5-webkit-autoloader": [
@@ -4064,7 +4065,7 @@
    ],
    [
     "2026-11-22",
-    89
+    91
    ]
   ],
   "larazadelsol/wings-app": [
@@ -4316,7 +4317,7 @@
    ],
    [
     "2026-11-22",
-    227
+    228
    ]
   ],
   "stonedmodder/pshare": [
@@ -4588,7 +4589,7 @@
    ],
    [
     "2026-11-22",
-    184
+    185
    ]
   ],
   "iziman127/ps5-dualsense-deadzone": [
@@ -4622,7 +4623,7 @@
    ],
    [
     "2026-11-22",
-    16
+    17
    ]
   ],
   "deepkicks/titaniapy": [
@@ -4878,7 +4879,7 @@
    ],
    [
     "2026-11-22",
-    220
+    224
    ]
   ],
   "forcevacavity/ps5-emulator-pc": [
@@ -5504,7 +5505,7 @@
    ],
    [
     "2026-11-22",
-    33
+    32
    ]
   ],
   "sandypandymandy/gta-6-switch-version--pc-emulator-2026": [
@@ -5565,6 +5566,18 @@
    [
     "2026-11-22",
     61
+   ]
+  ],
+  "ahmet-dedeler/awesome-gta6-reverse-engineering": [
+   [
+    "2026-11-22",
+    144
+   ]
+  ],
+  "xvvulcanvx/ps5-tabshifter": [
+   [
+    "2026-11-22",
+    117
    ]
   ]
  },
@@ -5830,8 +5843,8 @@
    "2026-10-10T18:59:54Z"
   ],
   "fthdgn-gh/alembic": [
-   "v0.7.0",
-   "2026-11-15T18:49:08Z"
+   "v0.7.1",
+   "2026-11-22T16:02:59Z"
   ],
   "gasb07/neoenabler": [
    "0.7.0",
@@ -6190,8 +6203,8 @@
    "2026-11-12T04:19:38Z"
   ],
   "press5elect/crux2": [
-   "v1.0.22",
-   "2026-11-17T00:29:58Z"
+   "v1.0.23",
+   "2026-11-22T17:53:26Z"
   ],
   "press5elect/ogbox": [
    "v1.0.2",
@@ -6222,8 +6235,8 @@
    "2026-11-12T00:18:30Z"
   ],
   "quer3q/ps5-dump-forge": [
-   "v0.5.6",
-   "2026-11-16T15:47:29Z"
+   "v0.5.7",
+   "2026-11-22T17:12:11Z"
   ],
   "rafaelngp/pico8-ps5": [
    "v0.1.2",
