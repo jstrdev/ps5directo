@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5-tabshifter",
+      "kind": "payload",
+      "group": "tool",
+      "name": "PS5-TabShifter",
+      "repo": "xvvulcanvx/PS5-TabShifter",
+      "exp": true,
+      "what": "Standalone PS5 on-console payload to move apps between Games/Media tabs and hide offline PSN bloatware (Universal FW 5.00 – 13.60)",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Standalone PS5 on-console payload to move apps between Games/Media tabs and hide offline PSN bloatware (Universal FW 5.00 – 13.60)"
+      },
+      "icon": "https://github.com/xvvulcanvx.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^TabShifter.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
