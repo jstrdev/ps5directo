@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "pc5",
+      "kind": "app",
+      "group": "tool",
+      "name": "PC5",
+      "repo": "bornaradusin/PC5",
+      "exp": true,
+      "what": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…"
+      },
+      "icon": "https://github.com/bornaradusin.png",
+      "tid": "PPSA11018",
+      "sys": "Aplicación · PPSA11018",
+      "asset": [
+        "(?i)^PPSA.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
