@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "prosperostore",
+      "kind": "app",
+      "group": "tool",
+      "name": "ProsperoStore",
+      "repo": "darkxex/ProsperoStore",
+      "exp": true,
+      "what": "Native PS5 app store for the homebrew catalog at ProsperoStore.net (title PPSA99000) https://discord.gg/Drx8tsqq3B",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Native PS5 app store for the homebrew catalog at ProsperoStore.net (title PPSA99000) https://discord.gg/Drx8tsqq3B"
+      },
+      "icon": "https://github.com/darkxex.png",
+      "tid": "PPSA99000",
+      "sys": "Aplicación · PPSA99000",
+      "asset": [
+        "(?i)^PPSA.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
