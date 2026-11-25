@@ -32,11 +32,11 @@ API = os.environ.get("PS5D_GITHUB_API") or "https://api.github.com"
 TOKEN = os.environ.get("GITHUB_TOKEN") or ""
 DAYS = 45               # lo que se guarda (la app enseña en el cartel solo lo de los últimos días)
 NEW_MIN_STARS = 5       # proyectos nuevos: mínimo de estrellas para salir
-TOPICS = ["ps5-homebrew", "ps5-jailbreak", "ps5-payload", "ps5-emulator", "playstation5-homebrew"]
+TOPICS = ["ps5-homebrew", "ps5-jailbreak", "ps5-payload", "ps5-emulator", "playstation5-homebrew", "ps5-linux"]
 BASE = ["drakmor/ShadowMountPlus", "ps5-payload-dev/ftpsrv", "ps5-payload-dev/elfldr", "ItsBlurf/BFpilot",
         "seregonwar/zftpd", "LightningMods/etaHEN", "EchoStretch/kstuff", "Gezine/Y2JB"]
 # lo que decidimos no recomendar (y cualquier cosa de piratería): no sale nunca
-SKIP = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|save.?(manager|edit)"
+SKIP = re.compile(r"(?i)gta.?(6|vi)\b|prospero.?store|botty|playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|save.?(manager|edit)"
                   r"|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|store.?(pkg|game)|free.?games|pkg.?(links|store)"
                   r"|nopaystation|psbox|hen.?store|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|save.?mgr|ps5.?save\b|ps5.?library|free.?(ps5.?)?games")
 
@@ -311,7 +311,28 @@ def popularity(old, repos, now):
     return pop, dlh, now.strftime("%Y-%m-%dT%H:%M:%SZ"), relx
 
 
+def forge(repo, path, params=None):
+    """Como gh(), para los proyectos que están en Codeberg (u otro Forgejo): su API contesta como la de GitHub."""
+    host = F.repo_host(repo)
+    url = host + "/api/v1/repos/" + repo + path + ("?" + urllib.parse.urlencode(params) if params else "")
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "PS5Directo-escena"}), timeout=30) as r:
+            return json.loads(r.read().decode("utf-8", "replace"))
+    except Exception as e:
+        print("!", url, e)
+        return None
+
+
+def on_github(repo):
+    return F.repo_host(repo) == "https://github.com"
+
+
 def newest(repo):
+    if not on_github(repo):
+        rels = forge(repo, "/releases", {"limit": 5}) or []
+        rels = [r for r in rels if isinstance(r, dict) and not r.get("draft") and r.get("published_at")]
+        rels.sort(key=lambda r: r["published_at"], reverse=True)
+        return rels[0] if rels else None
     rels = gh("/repos/%s/releases" % repo, {"per_page": 5}) or []
     rels = [r for r in rels if isinstance(r, dict) and not r.get("draft") and r.get("published_at")]
     rels.sort(key=lambda r: r["published_at"], reverse=True)
@@ -351,12 +372,16 @@ def main(out, props_out=""):
         cid, name = known.get(low, ("", repo.split("/")[1]))
         stars = 0
         try:
-            stars = int((gh("/repos/" + repo) or {}).get("stargazers_count") or 0)
+            if on_github(repo):
+                stars = int((gh("/repos/" + repo) or {}).get("stargazers_count") or 0)
+            else:
+                stars = int((forge(repo, "") or {}).get("stars_count") or 0)
         except Exception:
             pass
         prev = ""
         try:
-            rels = [r for r in gh("/repos/%s/releases" % repo, {"per_page": 5}) or [] if isinstance(r, dict)
+            rels = [r for r in ((gh("/repos/%s/releases" % repo, {"per_page": 5}) if on_github(repo)
+                                 else forge(repo, "/releases", {"limit": 5})) or []) if isinstance(r, dict)
                     and not r.get("draft") and r.get("published_at") and r.get("tag_name") != rel.get("tag_name")]
             rels.sort(key=lambda r: r["published_at"], reverse=True)
             prev = rels[0].get("tag_name") or "" if rels else ""
@@ -373,10 +398,12 @@ def main(out, props_out=""):
     # la scene, para no colar programas de PC que solo mencionan la PS5)
     queries = ["topic:%s created:>%s stars:>=%d" % (t, created, NEW_MIN_STARS) for t in TOPICS]
     queries += ["ps5 in:name,description created:>%s stars:>=%d" % (created, TEXT_MIN_STARS),
-                "playstation 5 in:name,description created:>%s stars:>=%d" % (created, TEXT_MIN_STARS)]
+                "playstation 5 in:name,description created:>%s stars:>=%d" % (created, TEXT_MIN_STARS),
+                # las distros de Linux para la PS5 (CachyOS, Bazzite…) no siempre dicen «homebrew» ni «payload»
+                "ps5 linux in:name,description created:>%s stars:>=%d" % (created, TEXT_MIN_STARS)]
     for q in queries:
         try:
-            res = gh("/search/repositories", {"q": q, "sort": "stars", "per_page": 30}) or {}
+            res = gh("/search/repositories", {"q": q, "sort": "stars", "per_page": 50}) or {}
         except Exception as e:
             print("!", q, e)
             continue
@@ -388,7 +415,7 @@ def main(out, props_out=""):
             text = " ".join([full, r.get("description") or ""] + list(r.get("topics") or []))
             if SKIP.search(text):
                 continue
-            if q.startswith(("ps5 in:", "playstation 5 in:")) and not SCENE_WORDS.search(text):
+            if q.startswith(("ps5 in:", "playstation 5 in:", "ps5 linux in:")) and not SCENE_WORDS.search(text):
                 continue
             try:
                 rel = newest(full)

@@ -56,7 +56,7 @@ sys.path.insert(0, HERE)
 import engine as E  # noqa: E402
 import features as F  # noqa: E402
 
-VERSION = "2.2.3"
+VERSION = "2.2.4"
 # Repositorio de GitHub donde se publican las versiones (usuario/nombre). Si lo rellenas,
 # todas las copias buscan actualizaciones ahi sin tener que configurar nada.
 DEFAULT_REPO = "jstrdev/ps5directo"
@@ -104,6 +104,7 @@ DEFAULTS = {
     "pc_mode": False,          # «Modo PC»: todo va a tu PC (bajar, descomprimir o convertir), nada a la consola
     "pc_mode_steps": "extract",  # en Modo PC: dl, extract o convert (lo que usan la extension y el movil)
     "pc_mode_fmt": "",         # en Modo PC con convert: formato
+    "fpkg_mode": "kraken",       # 12.00–13.60: «kraken» (abrir sin instalar) o «install» (kstuff nuevo)
     "forge_consent": False,      # el usuario ha aceptado bajar PS5 Dump Forge (programa de otro autor) la primera vez
     "forge_auto_update": False,  # bajar solo las versiones nuevas de PS5 Dump Forge (si no, avisa y pregunta)
     "tour_done": False,       # la guia de bienvenida ya se vio
@@ -3442,7 +3443,20 @@ def media_cached(path, preview=False):
 FMT_LABEL = {"plain": "carpeta normal", "ffpkg": "imagen .ffpkg", "exfat": "imagen .exfat", "ffpfs": "imagen .ffpfs",
              "ffpfsc": "imagen comprimida .ffpfsc", "fpkg": "paquete .fpkg", "lz4": "carpeta LZ4",
              "lz4ffpkg": "imagen .ffpkg con LZ4", "zstd": "carpeta zstd", "zstdffpkg": "imagen .ffpkg con zstd"}
-FPKG_MAX_FW = "11.60"
+FPKG_MAX_FW = "11.60"       # hasta aquí se pueden INSTALAR
+KRAKEN_MAX_FW = "13.60"     # hasta aquí se pueden ABRIR sin instalar con Kraken Mount (quer3q)
+
+
+def fpkg_range():
+    """De 12.00 a 13.60: el .fpkg se instala con el kstuff nuevo (kstuff-dr 1.15, en pruebas) o se abre sin
+    instalar con Kraken Mount; lo elige el usuario (fpkg_mode)."""
+    mine = (SETTINGS.get("console_fw") or "").strip()
+    return bool(mine) and F.fw_ok(FPKG_MAX_FW, mine) is False and F.fw_ok(KRAKEN_MAX_FW, mine) is not False
+
+
+def fpkg_kraken():
+    """True si el .fpkg se deja para Kraken Mount (sin instalar) en vez de para el Instalador de paquetes."""
+    return fpkg_range() and SETTINGS.get("fpkg_mode") != "install"
 
 
 def lib_load():
@@ -4124,11 +4138,18 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
                               "Mira Ajustes → PS5 Dump Forge." % (FORGE_UPD.get("error") or "sin conexión"))
     if fmt == "fpkg":
         mine = (SETTINGS.get("console_fw") or "").strip()
-        if mine and F.fw_ok(FPKG_MAX_FW, mine) is False:
-            raise E.PipeError("Los .fpkg solo funcionan con firmware %s o inferior y tu PS5 tiene %s. Elige "
-                              "«Imagen .ffpkg» (o «Sin convertir») y pulsa Reintentar." % (FPKG_MAX_FW, mine))
-        jlog(job, "Ojo: los .fpkg solo se instalan en firmware %s o inferior (con kstuff, fpkg-enable y "
-                  "ppr-patch)" % FPKG_MAX_FW)
+        if mine and F.fw_ok(KRAKEN_MAX_FW, mine) is False:
+            raise E.PipeError("Los .fpkg funcionan hasta el firmware %s y tu PS5 tiene %s. Elige «Imagen .ffpkg» "
+                              "(o «Sin convertir») y pulsa Reintentar." % (KRAKEN_MAX_FW, mine))
+        if fpkg_kraken():
+            jlog(job, "En tu firmware (%s) el .fpkg no se instala, pero se abre sin instalar con Kraken Mount "
+                      "(Descubrir › Mejorar tus títulos). Lo dejo en %s para que lo encuentre" % (mine, job.get("dest") or cfg["dest"]))
+        elif fpkg_range():
+            jlog(job, "En tu firmware (%s) el .fpkg se instala con el kstuff nuevo (kstuff-dr 1.15, en pruebas): lo dejo "
+                      "en /data/pkg para el Instalador de paquetes" % mine)
+        else:
+            jlog(job, "Ojo: los .fpkg se instalan en firmware %s o inferior con kstuff, fpkg-enable y ppr-patch, y hasta "
+                      "%s con el kstuff nuevo o abriéndolos sin instalar con Kraken Mount" % (FPKG_MAX_FW, KRAKEN_MAX_FW))
     if fmt in ("lz4", "lz4ffpkg", "zstd", "zstdffpkg") and not lz4.get("imports_ampr"):
         kind = "zstd" if fmt.startswith("zstd") else "LZ4"
         jlog(job, "Este título no usa AMPR, así que %s no sirve con él" % kind)
@@ -4161,7 +4182,7 @@ def forge_job(job, srcs, cfg, cancel, src_path, created, pc_folder, up):
                   "la actualización de fakelib, desactívala para este título")
     check_fw_warning(job, tid, title, need_fw, info.get("firmware"), bool(info.get("backport")))
     bf = E.BFpilot(cfg)
-    dest = "/data/pkg" if fmt == "fpkg" else (job.get("dest") or cfg["dest"]).rstrip("/")
+    dest = "/data/pkg" if fmt == "fpkg" and not fpkg_kraken() else (job.get("dest") or cfg["dest"]).rstrip("/")
     ext = F.FORGE_FORMATS[fmt][1]
     base = tid or E.safe_name(E.display_name(srcs[0].name))[:50]
     name = (base + ext) if ext else (base + "-app")
@@ -5993,7 +6014,8 @@ def smp_present(cfg):
     ok = True
     try:
         names = {n.lower() for n, v in E.Ftp(cfg).call(lambda f: E.ftp_listdir(f, "/data"))}
-        ok = bool(names & {"shadowmount", "shadowmountplus"})
+        # Kraken Mount (su carpeta /data/krakenmount) también registra y monta: con él no hace falta ShadowMountPlus
+        ok = bool(names & {"shadowmount", "shadowmountplus", "krakenmount"})
     except Exception:
         ok = True
     SMP_SEEN.update(t=time.time(), ok=ok)
@@ -6788,12 +6810,16 @@ def extract_worker():
                        or any(p.endswith("-app") or p.lower().endswith(E.IMAGE_EXTS) for p in placed)) \
                 and (job.get("dest", "").startswith("/data/homebrew") or "/homebrew" in job.get("dest", ""))
             is_pkg = any(p.lower().endswith(".pkg") for p in placed)
-            if is_pkg:
+            kraken = is_pkg and fpkg_kraken()
+            if kraken:
+                jlog(job, "Es un .fpkg: en tu firmware se abre sin instalar con Kraken Mount (Descubrir › Mejorar tus "
+                          "títulos). Recuerda que Kraken Mount y ShadowMountPlus no funcionan a la vez")
+            elif is_pkg:
                 jlog(job, "Es un .fpkg: instálalo desde /data/pkg con «Instalar en la consola» (Biblioteca o Archivos "
                           "de la consola, con zftpd) o con el instalador de paquetes que uses")
             if is_game and job.get("alembic") and placed:
                 placed = alembic_convert(job, placed, cancel) or placed
-            if is_game and not smp_present(cfg_snapshot()):
+            if is_game and not kraken and not smp_present(cfg_snapshot()):
                 jlog(job, "AVISO: no veo ShadowMountPlus en la consola. Sin él, lo que está en /data/homebrew no sale "
                           "en la pantalla de inicio: cárgalo (Descubrir › Herramientas, o Payload Manager) y en unos "
                           "segundos aparecerá.")
@@ -6801,7 +6827,8 @@ def extract_worker():
                        "%s está en la PS5, pero sin ShadowMountPlus no sale en la pantalla de inicio. Cárgalo y "
                        "aparecerá solo." % (job.get("title") or ""), {"tab": "Transfers", "job": job["id"]})
             setj(job, status="hecho", result=placed, extract_text="",
-                 phase=("Listo en /data/pkg: instálalo con el instalador de paquetes" if is_pkg
+                 phase=("Listo: ábrelo con Kraken Mount (sin instalar)" if kraken
+                        else "Listo en /data/pkg: instálalo con el instalador de paquetes" if is_pkg
                         else "Listo. ShadowMountPlus lo añadirá al inicio en unos segundos" if is_game
                         else "Listo. Copiado en la PS5"))
             jlog(job, "Terminado")
@@ -9731,7 +9758,7 @@ def rec_installed(f):
 # RecompStore). Se bajan una vez y se guardan en ~/.ps5directo/arte, así se ven al instante y también sin internet.
 # ---------------------------------------------------------------------------
 ART_DIR = os.path.join(DATA_DIR, "arte")
-ART_HOSTS = ("raw.githubusercontent.com", "githubusercontent.com", "github.com", "recompstore.com")
+ART_HOSTS = ("raw.githubusercontent.com", "githubusercontent.com", "github.com", "recompstore.com", "codeberg.org")
 ART_TYPES = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "webp": "image/webp", "svg": "image/svg+xml",
              "gif": "image/gif"}
 
@@ -9862,6 +9889,7 @@ def rec_list():
             it["latest_t"] = F.GH_DATES.get(rec_repo(c).lower(), "") if it["latest"] else ""
             it["newer"] = ver_newer(it["latest"], it["ver"], c["id"]) if it["ver"] else bool(it["latest"])
             it["repo"] = rec_repo(c)
+            it["host"] = F.repo_host(it["repo"])
             it["official"] = c["repo"]
             it["alts"] = [c["repo"]] + [r for r in (c.get("alts") or []) if r.lower() != c["repo"].lower()]
             it["guide"] = (c.get("emu") or {}).get("guide") or c.get("guide") or []
@@ -10873,7 +10901,9 @@ def gh_notes(repo, have="", to=""):
         rels = hit[1]
     else:
         try:
-            req = urllib.request.Request(F.GH_API + "/repos/%s/releases?per_page=15" % repo, headers=F._ua())
+            host = F.repo_host(repo)
+            req = urllib.request.Request((F.GH_API if host == "https://github.com" else host + "/api/v1")
+                                         + "/repos/%s/releases?per_page=15" % repo, headers=F._ua())
             with urllib.request.urlopen(req, timeout=20) as r:
                 rels = [x for x in json.load(r) if not x.get("draft")]
         except urllib.error.HTTPError as e:
@@ -11243,7 +11273,12 @@ def pkg_dir(dest):
     """Dónde se deja un .pkg: en /data/pkg, salvo que el destino sea un USB o disco externo; ahí va a su raíz, que es
     donde lo buscan PS4Mount (para abrirlo sin instalar) y el instalador de ShadowMountPlus."""
     m = re.match(r"^(/mnt/(?:usb|ext)\d+)(?:/|$)", dest or "")
-    return m.group(1) if m else "/data/pkg"
+    if m:
+        return m.group(1)
+    # de 12.00 a 13.60 un .pkg de PS5 no se instala: Kraken Mount lo abre si está en /data/homebrew (o una carpeta dentro)
+    if fpkg_kraken() and re.match(r"^/data/homebrew(/[^/]+)?/?$", dest or ""):
+        return dest.rstrip("/")
+    return "/data/pkg"
 
 
 def pkg_install(path, overwrite=False):
@@ -13399,8 +13434,13 @@ def gh_newest_tag(repo, pre=False):
     if hit and time.time() - hit[0] < 3600:
         return hit[1]
     req = urllib.request.Request(F.GH_API + "/repos/%s/releases?per_page=10" % repo, headers=F._ua())
-    with urllib.request.urlopen(req, timeout=20) as r:
-        lst = [x for x in json.load(r) if not x.get("draft") and (pre or not x.get("prerelease"))]
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            lst = [x for x in json.load(r) if not x.get("draft") and (pre or not x.get("prerelease"))]
+    except urllib.error.HTTPError as e:
+        if e.code not in (403, 429):
+            raise
+        lst = [{"tag_name": F.github_release(repo)[0]}]   # límite de la API: la última, de la web de GitHub
     tag = ""
     for x in lst:
         t = (x.get("tag_name") or "").strip()
@@ -13621,7 +13661,12 @@ def pld_github_install(it):
         with urllib.request.urlopen(req, timeout=20) as r:
             rel = json.load(r)
     except Exception as e:
-        raise E.PipeError("No he podido leer esa versión en GitHub (%s)" % E.net_reason(e))
+        try:                                   # límite de la API de GitHub: la lista de archivos de su web
+            if getattr(e, "code", None) not in (403, 429):
+                raise
+            rel = {"assets": F.github_assets_web(it["repo"], tag)}
+        except Exception:
+            raise E.PipeError("No he podido leer esa versión en GitHub (%s)" % E.net_reason(e))
     elfs = [a for a in rel.get("assets") or [] if a.get("name", "").lower().endswith(".elf")]
     if not elfs:
         raise E.PipeError("Esa versión no trae un .elf para cargar: mira su página de GitHub")
@@ -14261,7 +14306,7 @@ def featured():
 
 
 SCENE_SKIP_RX = re.compile(r"(?i)playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|"
-                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|save.?mgr|ps5.?save\b|ps5.?library|free.?(ps5.?)?games")
+                           r"save.?(manager|edit)|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|psbox|fan.?control|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|save.?mgr|ps5.?save\b|ps5.?library|free.?(ps5.?)?games|gta.?(6|vi)\b")
 CAT_URL = os.environ.get("PS5D_CATALOGO") or "https://raw.githubusercontent.com/jstrdev/ps5directo/main/catalogo.json"
 CAT = {"t": 0.0, "tr": {}}
 
@@ -14358,13 +14403,46 @@ def escena():
 
 
 def recomp_fetch(force=False):
+    """Catálogo de RecompStore. Para que «Novedades de la scene» abra al momento: se enseña lo último guardado
+    (también tras reiniciar la app) y, si tiene más de una hora, se renueva por detrás."""
     with LOCK:
+        if not RECOMP["items"] and not RECOMP.get("disk"):
+            RECOMP["disk"] = True
+            try:
+                with open(RECOMP_FILE, encoding="utf-8") as fh:
+                    d = json.load(fh)
+                if isinstance(d.get("items"), list) and d["items"]:
+                    RECOMP.update(items=d["items"], updated=str(d.get("updated") or ""), t=float(d.get("t") or 0))
+                    for it in RECOMP["items"]:
+                        it["new"] = it.get("id") in set(d.get("unseen") or [])
+            except Exception:
+                pass
         fresh = time.time() - RECOMP["t"] < 3600 and RECOMP["items"]
+        have = bool(RECOMP["items"])
+        busy = RECOMP.get("busy")
     if fresh and not force:
         return
+    if have and not force:
+        if not busy:
+            with LOCK:
+                RECOMP["busy"] = True
+            threading.Thread(target=_recomp_bg, daemon=True).start()
+        return
+    _recomp_fetch_now()
+
+
+def _recomp_bg():
+    try:
+        _recomp_fetch_now()
+    finally:
+        with LOCK:
+            RECOMP["busy"] = False
+
+
+def _recomp_fetch_now():
     try:
         req = urllib.request.Request(RECOMP_URL, headers={"User-Agent": "PS5Directo/%s" % VERSION, "Accept": "application/json"})
-        with urllib.request.urlopen(req, timeout=20) as r:
+        with urllib.request.urlopen(req, timeout=12) as r:
             j = json.loads(r.read(8 * 1024 * 1024).decode("utf-8", "replace"))
         items, seen = [], set()
         known = ["apps", "newerStoreApps", "v2Apps", "comingSoon", "comingSoonV2"]
@@ -14414,7 +14492,8 @@ def recomp_fetch(force=False):
         unseen = [it["id"] for it in items if it["new"]]
         try:
             with open(RECOMP_FILE, "w", encoding="utf-8") as fh:
-                json.dump({"known": [it["id"] for it in items], "unseen": unseen, "seen_at2": seen_at}, fh)
+                json.dump({"known": [it["id"] for it in items], "unseen": unseen, "seen_at2": seen_at,
+                           "items": items, "updated": str(j.get("updated") or "")[:30], "t": time.time()}, fh)
         except OSError:
             pass
         with LOCK:
@@ -14570,12 +14649,21 @@ def extra_api(h, p, b):
             if b.get("seen"):
                 recomp_seen()
                 return {"ok": True}
+            # las cuatro fuentes a la vez (antes una detrás de otra: si una tardaba, la pestaña esperaba la suma)
+            ths = [threading.Thread(target=f, daemon=True) for f in (covers_fix, featured, escena)]
+            for t in ths:
+                t.start()
             recomp_fetch(force=bool(b.get("refresh")))
-            fix = covers_fix()
+            end = time.time() + 12
+            for t in ths:
+                t.join(max(0.0, end - time.time()))
+            slow = [t.is_alive() for t in ths]          # la que siga tardando: lo que ya había, y se usa en la próxima
+            fix = COVERS["d"] if slow[0] else covers_fix()
             with LOCK:
                 its, err, upd = RECOMP["items"], RECOMP["error"], RECOMP["updated"]
             return {"ok": True, "items": its, "covers": fix, "error": err, "updated": upd,
-                    "source": "recompstore.com", "feat": featured(), "scene": escena(), "hot": ESC["hot"], "pop": ESC["pop"],
+                    "source": "recompstore.com", "feat": FEAT["d"] if slow[1] else featured(),
+                    "scene": ESC["d"] if slow[2] else escena(), "hot": ESC["hot"], "pop": ESC["pop"],
                     "rel": {k: v[1] for k, v in ESC["rel"].items()}}
         if p == "/api/wiki":
             return dict(ok=True, **wiki_summary(b.get("title"), b.get("lang")))

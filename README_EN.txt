@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.2.3 — USER GUIDE (English)
+PS5 DIRECTO 2.2.4 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -342,6 +342,33 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+2.2.4 - .pkg packages now install up to firmware 13.60: since 24
+    November there is a new kstuff (kstuff-dr 1.15, testing) that allows
+    it. On firmware 12.00-13.60, when you choose ".fpkg package" you pick
+    "Install it" (goes to /data/pkg, for the Package Installer) or "Open it
+    without installing" with Kraken Mount (goes to /data/homebrew). New
+    guide in Discover > Improve your titles with the steps.
+  - Kraken Mount up to date with its 0.4.0: it also installs .pkg and has
+    a new web UI on port 8097 (button to open it). If you use it, the app
+    no longer asks you for ShadowMountPlus.
+  - New in Discover > Remote Play: ProsperoSunshine, to play the console
+    with Moonlight from your PC, phone or browser (up to 4K and HDR). It
+    needs ShadowMountPlus.
+  - New in Discover: CachyOS for the PS5 (Steam and KDE desktop from an
+    external SSD). PS5 Lichii is now downloaded from Codeberg, where its
+    project lives, and since its 1.20 it has its own Title ID and its
+    /data/lichii folder.
+  - Scene news opens instantly: it shows what it last read (also after a
+    restart) and refreshes it in the background; the sources are read at
+    the same time instead of one after another. If RecompStore's website
+    doesn't answer (in Spain this happens with the blocks during football
+    matches), it explains it.
+  - If GitHub limits requests (60 per hour without an account), installing
+    and updating emulators and payloads keeps working: its website is used.
+  - When an update from Discover finishes, the "You have updates" notice
+    goes away by itself; while it is queued, its button says "Queued...".
+  - The tiles at the top of Discover are now all alike: icon in the same
+    place, name in the same space and the count below.
 2.2.3 - More security (thanks to the GitHub reports): updates are
     signed, and PS5 Directo only installs a new version if its SHA-256 sum
     matches and is signed with the project key; nothing is installed if

@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.2.3
+PS5 DIRECTO 2.2.4
 =================
 (English: see README_EN.txt)
 
@@ -330,6 +330,36 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   tienes (si no, se abre en tu navegador). Para los torrents hace falta
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
+
+
+NOVEDADES 2.2.4
+- Los .pkg ya se instalan hasta el firmware 13.60: desde el 24 de
+  noviembre hay un kstuff nuevo (kstuff-dr 1.15, en pruebas) que lo
+  permite. Con firmware 12.00–13.60, al elegir «Paquete .fpkg» eliges
+  «Instalarlo» (va a /data/pkg, para el Instalador de paquetes) o
+  «Abrirlo sin instalar» con Kraken Mount (va a /data/homebrew). Nueva
+  guía en Descubrir › Mejorar tus títulos con los pasos.
+- Kraken Mount al día con su 0.4.0: también instala .pkg y tiene web
+  nueva en el puerto 8097 (botón para abrirla). Si lo usas, la app ya no
+  te pide ShadowMountPlus.
+- Nuevo en Descubrir › Remote Play: ProsperoSunshine, para jugar a la
+  consola con Moonlight desde el PC, el móvil o el navegador (hasta 4K y
+  HDR). Necesita ShadowMountPlus.
+- Nuevo en Descubrir: CachyOS para la PS5 (Steam y escritorio KDE desde
+  un SSD externo). PS5 Lichii se baja ahora de Codeberg, donde está su
+  proyecto, y desde su 1.20 tiene su propio Title ID y su carpeta
+  /data/lichii.
+- Novedades de la scene abre al momento: enseña lo último que leyó
+  (también tras reiniciar) y lo renueva por detrás. Las fuentes se leen a
+  la vez y no una detrás de otra. Si la web de RecompStore no contesta
+  (en España pasa con los bloqueos durante el fútbol), lo explica.
+- Si GitHub limita las consultas (60 por hora sin cuenta), instalar y
+  actualizar emuladores y payloads sigue funcionando: se mira su web.
+- Al terminar una actualización desde Descubrir, el aviso «Tienes
+  actualizaciones» se quita solo; mientras está en la cola, su botón dice
+  «En la cola…».
+- Las casillas de arriba de Descubrir quedan todas iguales: el icono en
+  el mismo sitio, el nombre en el mismo hueco y el número debajo.
 
 
 NOVEDADES 2.2.3

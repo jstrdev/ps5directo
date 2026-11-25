@@ -778,6 +778,9 @@ EXTRA_PAYLOADS = [
     {"id": "patchsys", "name": "ps-patch-system", "repo": "illusionyy/ps-patch-system", "port": 23900,
      "pick": [r"(?i)^patch-bundle-loader-prospero\.elf$", r"(?i)^patch-bundle-prospero\.elf$"],
      "what": "Parches para títulos de PS4 y PS5 (60 fps, resolución…), se eligen en su web (puerto 23900)"},
+    {"id": "krakenmount", "name": "Kraken Mount", "repo": "quer3q/kraken-mount", "port": 8097,
+     "pick": [r"(?i)^kraken-mount\.elf$", r"(?i)kraken.*\.elf$"],
+     "what": "Abre .pkg (FPKG de depuración) y carpetas zstd/LZ4 sin instalarlos, o los instala; su web va en el puerto 8097"},
     {"id": "ps4mount", "name": "PS4Mount", "repo": "gasb07/ps4mount", "port": None,
      "pick": [r"(?i)^ps4mount.*\.elf$", r"(?i)\.elf$"],
      "what": "Abre tus .pkg de PS4 desde un USB sin instalarlos: los añade a la pantalla de inicio y los monta al abrirlos"},
@@ -948,23 +951,24 @@ CATALOG = [
                        "Después de añadir claves o firmware, ciérralo y vuelve a abrirlo.",
                        "Está en pruebas: muchos títulos aún no van o van lentos."]}},
     {"id": "lichii", "kind": "app", "group": "emu", "fam": "nin", "name": "PS5 Lichii", "sys": "Switch 2",
-     "tid": "PPSA99008", "repo": "mihawk-99/PS5_Lichii", "asset": [r"(?i)PS5_Lichii.*\.zip$", r"(?i)\.zip$"], "exp": True,
-     "what": "Emulador experimental de Switch 2 de mihawk (el de MihawkOS). Frente a EglantinePS5 usa una base más nueva "
-             "(Fritchii 5.3), compacta la memoria para aguantar zonas grandes y trae generación de fotogramas (30 → 60 fps). "
-             "Rinde mejor en PS5 Pro: allí mueve el remake de Ocarina of Time a unos 30 fps.",
-     "needs": "Las claves y el firmware de tu propia consola y tu contenido (.xci, .nsp o .nup). En la PS5 normal aún no "
-              "está medido y algunos títulos pueden quedarse sin memoria. Se instala en lugar de ProsperoEden (mismo "
-              "Title ID) y comparte su carpeta.",
+     "tid": "PPSA99009", "also": ["PPSA99008"], "repo": "mihawk/PS5_Lichii", "host": "https://codeberg.org",
+     "asset": [r"(?i)PS5_Lichii.*\.zip$", r"(?i)\.zip$"], "exp": True,
+     "what": "Emulador experimental de Switch 2 de mihawk (el de MihawkOS), la línea de Switch 2 de ProsperoEden. Usa una "
+             "base más nueva (Fritchii 5.5), compacta la memoria para aguantar zonas grandes y trae generación de "
+             "fotogramas (apagada de serie). Rinde mejor en PS5 Pro. Su proyecto está ahora en Codeberg.",
+     "needs": "Las claves y el firmware de tu propia consola y tu contenido (.xci, .nsp o .nup). Pensado para PS5 Pro: en "
+              "la PS5 normal se puede quedar sin memoria o colgarse. Desde la 1.20 se instala como su propio título "
+              "(PPSA99009) y guarda sus datos en /data/lichii, sin tocar ProsperoEden.",
      "update": "No avisa solo de versiones nuevas: te avisa PS5 Directo.",
-     "emu": {"data": "/data/prosperoeden", "fixed": True, "bios": "keys", "games": "roms",
+     "emu": {"data": "/data/lichii", "fixed": True, "bios": "keys", "games": "roms",
              "bios_what": "Claves de tu propia consola (prod.keys)", "bios_ext": [".keys"],
              "extra_dirs": [{"dir": "firmware", "what": "Firmware de tu consola (los archivos .nca)", "ext": [".nca"]}],
              "files": ["logs/"],
-             "guide": ["Todo va en /data/prosperoeden (lo comparte con ProsperoEden).",
+             "guide": ["Todo va en /data/lichii (desde la 1.20 ya no comparte la carpeta de ProsperoEden).",
                        "Claves en keys y firmware en firmware: tienen que ser de tu propia consola.",
-                       "Cada título en su carpeta dentro de roms, con su archivo .eden; mejor en un solo archivo (.xci o .nup).",
+                       "Cada título en su carpeta dentro de roms; ya no hace falta crear un archivo .eden.",
                        "Touchpad + R1 enseña el rendimiento; Touchpad + L1 cierra el título.",
-                       "Muy experimental: tirones al cambiar de zona y títulos que no arrancan."]}},
+                       "Muy experimental: tirones al cambiar de zona y títulos que no arrancan, sobre todo en la PS5 normal."]}},
     {"id": "ecam", "kind": "app", "group": "emu", "fam": "nin", "name": "PS5-ECAM", "sys": "Wii U / 3DS / DS / Switch",
      "tid": "PPSA99360", "repo": "premohq/PS5-ECAM", "asset": [r"(?i)PPSA99360.*\.zip$", r"(?i)\.zip$"], "exp": True,
      "what": "Cuatro emuladores en uno: Cemu (Wii U), Azahar (3DS), melonDS (DS) y Eden (Switch).",
@@ -1138,6 +1142,38 @@ CATALOG = [
              "sus parches. Necesita ps-patch-system cargado antes.",
      "needs": "Firmware 4.00 a 13.60 y ps-patch-system cargado primero, después de cada reinicio. Solo sirve con los títulos "
               "que tienen parche."},
+    {"id": "krakenmount", "kind": "payload", "group": "patch", "name": "Kraken Mount (.pkg de PS5 sin instalar)",
+     "repo": "quer3q/kraken-mount", "exp": True,
+     "what": "Monta tus paquetes .pkg de PS5 (FPKG de depuración, como los que crea PS5 Dump Forge) y tus carpetas, "
+             "también empaquetadas en zstd o LZ4, sin instalarlos: cada uno sale con su icono en la pantalla de inicio. "
+             "Funciona en firmware 12.00 a 13.60. Desde la 0.4.0 también instala los .pkg en la consola (y sus parches y "
+             "DLC), tiene una web nueva con biblioteca y buscador en el puerto 8097 y se actualiza sola. Trae ampr-emu-ng "
+             "y los emuladores de DLC y PlayGo.",
+     "needs": "kstuff cargado y ShadowMountPlus apagado (no funcionan a la vez: Kraken Mount espera a que se cierre). "
+              "Para instalar .pkg en 12.00–13.60 hace falta además un kstuff con FPKG para ese firmware (kstuff-dr 1.15, en "
+              "pruebas) y fpkg-enable y ppr-patch. Va después de cada reinicio. Para títulos grandes, su autor recomienda "
+              "zstd: rinde mejor que el .pkg.",
+     "guide": ["Manda tus .pkg o carpetas a /data/homebrew (o a una carpeta dentro), o a la raíz o la carpeta homebrew de "
+               "un USB o del M.2.",
+               "Si tienes ShadowMountPlus cargado, reinicia la consola y no lo cargues esta vez.",
+               "Pulsa «Iniciar en la PS5»: cada título avisa «registered» y aparece en la pantalla de inicio.",
+               "Su web (botón «Abrir su web», o el icono «Kraken Mount» de la consola) tiene la biblioteca, la pestaña "
+               "Instalar y los ajustes.",
+               "Sus ajustes y su registro quedan en /data/krakenmount."]},
+    {"id": "fpkg1360", "kind": "guide", "group": "patch", "name": "Instalar .pkg en 12.00–13.60 (kstuff-dr)",
+     "repo": "drakmor/kstuff-lite", "doc": "https://github.com/drakmor/kstuff-lite", "exp": True,
+     "what": "Desde el 24 de noviembre de 2026 los .pkg falsos (FPKG) se pueden instalar de verdad hasta el firmware "
+             "13.60, como hasta ahora en 11.60: con un kstuff nuevo de drakmor, EchoStretch y Ark Sama (kstuff-dr 1.15). "
+             "El título se instala con su icono, como uno de la tienda. kstuff-ng traerá lo mismo más adelante.",
+     "needs": "Es una versión de pruebas: puede fallar según el firmware. De momento solo se reparte fuera de GitHub "
+              "(los enlaces están en el X de sus autores), así que PS5 Directo no lo baja solo. No es un jailbreak: "
+              "sigue haciendo falta el tuyo.",
+     "guide": ["Haz el jailbreak y para el autocargador (que no cargue nada más).",
+               "Carga elfldr y manda kstuff-dr-1.15 (el .elf de prueba). Espera al aviso «successful».",
+               "No cargues Kraken Mount ni TITAN CORE a la vez. Si usas ShadowMountPlus, cárgalo antes o deja una pausa "
+               "antes de kstuff.",
+               "En PS5 Directo elige el formato «Paquete .fpkg» con «Instalarlo»: se deja en /data/pkg.",
+               "Instálalo desde Ajustes › Sistema › Ajustes de depuración › Juego › Instalador de paquetes."]},
     {"id": "ps4mount", "kind": "payload", "group": "patch", "name": "PS4Mount (.pkg de PS4 sin instalar)",
      "repo": "gasb07/ps4mount", "exp": True,
      "what": "Abre tus .pkg de PS4 directamente desde un USB, sin instalarlos: no esperas a la instalación ni gastas el "
@@ -1154,6 +1190,18 @@ CATALOG = [
      "what": "Con el jailbreak la consola no entra en PSN, así que no da el PIN para vincular Remote Play. Este payload "
              "lo saca: sale en una notificación de la PS5 junto con el ID de cuenta que hay que usar.",
      "needs": "Nada instalado: se carga una vez cuando vas a vincular. Luego usa ese PIN en chiaki-ng."},
+    {"id": "prosperosunshine", "kind": "app", "group": "rp", "name": "ProsperoSunshine (Moonlight)",
+     "repo": "Darkatek7/ProsperoSunshine", "tid": "PPSA47989", "asset": [r"(?i)^PPSA47989.*\.zip$", r"(?i)\.zip$"], "exp": True,
+     "what": "Convierte la PS5 en un servidor compatible con Moonlight: juegas a la consola desde el PC, el móvil, el "
+             "iPhone o el navegador, por tu red de casa. H.264, HEVC y HDR hasta 4K a 60 fps, con sonido, mando, "
+             "teclado y ratón. Una segunda persona se puede unir con su propio mando.",
+     "needs": "Necesita ShadowMountPlus (registra la aplicación desde /data/homebrew), así que no va con Kraken Mount. "
+              "Su autor lo ha probado en 13.00 y 10.20; los usuarios dicen que va hasta 13.60. En el móvil o el PC, "
+              "instala Moonlight y añade la IP de tu PS5.",
+     "guide": ["Instálala con PS5 Directo: va a /data/homebrew/PPSA47989.",
+               "Ábrela en la consola y pulsa iniciar el servidor (o déjalo en el arranque automático del Payload Manager).",
+               "En Moonlight añade la IP de la consola y escribe en la PS5 el PIN que te dé.",
+               "Elige «PS5 Screen» para ver la consola entera, o un juego de la lista."]},
     {"id": "chiaki", "kind": "pc", "group": "rp", "name": "chiaki-ng", "repo": "streetpea/chiaki-ng",
      "what": "Remote Play libre para PC (Windows, Mac, Linux), Steam Deck y Android: ves la consola y la manejas con "
              "mando, o con teclado y ratón, sin moverte del PC.",
@@ -1218,6 +1266,18 @@ CATALOG = [
                "Haz el jailbreak y pulsa «Enviar el cargador». Cuando la luz deje de parpadear, enciéndela.",
                "La primera vez completa el asistente de Steam. Para volver a la PS5, apaga y enciende normal.",
                "Desbloquear las unidades de cálculo extra de la GPU es opcional y puede dar fallos: déjalo para el final."]},
+    {"id": "cachyos", "kind": "guide", "group": "os", "name": "CachyOS (Steam y escritorio KDE)", "repo": "abrocoma/PS5-CachyOS",
+     "payload": "linuxloader", "doc": "https://github.com/abrocoma/PS5-CachyOS", "exp": True,
+     "what": "CachyOS listo para grabar: arranca en modo Steam como en la Steam Deck (1440p a 144 Hz, 4K a 60 Hz, HDR y "
+             "FreeSync) o en el escritorio KDE Plasma, con Wi-Fi, Bluetooth y DualSense. Todo en un SSD externo por USB: "
+             "no se instala nada en la PS5.",
+     "needs": "Firmware hasta 13.60 con el cargador de Linux (ps5-linux-loader) y un SSD USB 3. Imagen no oficial basada en "
+              "la de ps5-linux; los fallos se reportan en su GitHub.",
+     "guide": ["En su GitHub, baja la imagen .img.xz de la última versión y grábala en el SSD externo con Balena Etcher "
+               "(se borra el SSD).",
+               "Prepara la consola igual que para Linux: energía USB en reposo «Siempre» y vínculo HDMI desactivado.",
+               "Conecta el SSD, haz el jailbreak y pulsa «Enviar el cargador». Cuando la luz deje de parpadear, enciéndela.",
+               "Al reiniciar Linux vuelves al sistema de la PS5: para entrar otra vez, jailbreak y cargador."]},
     {"id": "mihawkos", "kind": "app", "group": "os", "name": "MihawkOS", "tid": "PPSA99170", "exp": True,
      "repo": "mihawk-99/PS5_MihawkOS", "asset": [r"(?i)PPSA99170.*\.zip$", r"(?i)mihawk.*\.zip$", r"(?i)\.zip$"],
      "what": "Tus programas de Windows en la PS5, sin Linux: un escritorio como el de Windows con explorador, navegador y "
@@ -1456,22 +1516,88 @@ def http_get(url, limit=200 * MiB, timeout=60, dest=None, progress=None):
 GH_API = os.environ.get("PS5D_GITHUB_API") or "https://api.github.com"   # se puede cambiar para pruebas
 
 
+GH_WEB = os.environ.get("PS5D_GITHUB_WEB") or "https://github.com"
+GH_CACHE = {}          # repo -> (hora, (tag, assets)): 10 minutos, para no gastar el límite de GitHub dos veces
+
+
 def github_release(repo):
-    """Como _github_release, pero con un error que se entiende si GitHub no contesta."""
+    """Como _github_release, pero con un error que se entiende si GitHub no contesta. Si la API de GitHub ha
+    llegado a su límite (60 consultas por hora sin cuenta), se mira la web de GitHub, que no tiene ese límite."""
+    key = (repo or "").lower()
+    hit = GH_CACHE.get(key)
+    if hit and time.time() - hit[0] < 600:
+        return hit[1]
     try:
-        return _github_release(repo)
+        out = _github_release(repo)
     except E.PipeError:
         raise
     except Exception as e:
         code = getattr(e, "code", None)
-        if code in (403, 429):
-            raise E.PipeError("GitHub ha limitado las consultas desde tu conexión: prueba otra vez en un rato")
-        raise E.PipeError("No he podido consultar GitHub (%s)" % E.net_reason(e))
+        if code in (403, 429) and repo_host(repo) == "https://github.com":
+            try:
+                out = _github_release_web(repo)
+            except Exception:
+                raise E.PipeError("GitHub ha limitado las consultas desde tu conexión: prueba otra vez en un rato")
+        else:
+            raise E.PipeError("No he podido consultar GitHub (%s)" % E.net_reason(e))
+    GH_CACHE[key] = (time.time(), out)
+    return out
+
+
+def github_assets_web(repo, tag):
+    """Los archivos de una versión concreta, de la web de GitHub (sin gastar el límite de su API)."""
+    ua = {"User-Agent": _ua().get("User-Agent", "PS5Directo")}
+    with urllib.request.urlopen(urllib.request.Request(
+            GH_WEB + "/%s/releases/expanded_assets/%s" % (repo, urllib.parse.quote(tag, safe="")), headers=ua),
+            timeout=20) as r:
+        html = r.read(2000000).decode("utf-8", "replace")
+    assets, seen = [], set()
+    for href in re.findall(r'href="(/[^"]+/releases/download/[^"]+)"', html):
+        name = urllib.parse.unquote(href.rsplit("/", 1)[-1])
+        if name not in seen:
+            seen.add(name)
+            assets.append({"name": name, "browser_download_url": GH_WEB + href, "size": 0})
+    return assets
+
+
+def _github_release_web(repo):
+    """(tag, [assets]) sacado de la web de GitHub en vez de su API: la página «latest» redirige a la etiqueta
+    (o, si solo hay versiones de prueba, la primera del feed releases.atom) y la lista de archivos sale de
+    «expanded_assets». Los archivos llevan nombre y enlace (sin tamaño ni suma)."""
+    ua = {"User-Agent": _ua().get("User-Agent", "PS5Directo")}
+    tag = ""
+    try:
+        with urllib.request.urlopen(urllib.request.Request(GH_WEB + "/%s/releases/latest" % repo, headers=ua),
+                                    timeout=20) as r:
+            m = re.search(r"/releases/tag/([^/?#]+)", r.geturl())
+            tag = urllib.parse.unquote(m.group(1)) if m else ""
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise
+    if not tag:
+        with urllib.request.urlopen(urllib.request.Request(GH_WEB + "/%s/releases.atom" % repo, headers=ua),
+                                    timeout=20) as r:
+            m = re.search(r"/releases/tag/([^\"'<>?#]+)", r.read(400000).decode("utf-8", "replace"))
+        if not m:
+            raise E.PipeError("%s no tiene versiones publicadas" % repo)
+        tag = urllib.parse.unquote(m.group(1))
+    return tag, github_assets_web(repo, tag)
+
+
+def repo_host(repo):
+    """Dónde está un proyecto: GitHub (lo normal) o Codeberg u otro Forgejo (campo «host» del catálogo)."""
+    low = (repo or "").lower()
+    for c in CATALOG + EXTRA_PAYLOADS:
+        if c.get("host") and (c.get("repo") or "").lower() == low:
+            return c["host"].rstrip("/")
+    return "https://github.com"
 
 
 def _github_release(repo):
-    """(tag, [assets]) de la ultima version publicada (si solo hay pruebas, la mas nueva)."""
-    base = GH_API + "/repos/%s/releases" % repo
+    """(tag, [assets]) de la ultima version publicada (si solo hay pruebas, la mas nueva). Los de Codeberg (u otro
+    Forgejo) se leen de su API, que contesta igual que la de GitHub."""
+    host = repo_host(repo)
+    base = (GH_API if host == "https://github.com" else host + "/api/v1") + "/repos/%s/releases" % repo
     try:
         req = urllib.request.Request(base + "/latest", headers=_ua())
         with urllib.request.urlopen(req, timeout=20) as r:
@@ -2927,7 +3053,7 @@ CATALOG_ART = {
     'rpcs3ps5': {"icon": 'https://raw.githubusercontent.com/lavavex/rpcs3-PS5/main/title/sce_sys/icon0.png', "hero": ''},
     'hookshot': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Hookshot/main/ps5/sce_sys/icon0.png', "hero": ''},
     'crux2': {"icon": 'https://raw.githubusercontent.com/Press5elect/Crux2/main/ps5/sce_sys/icon0.png', "hero": ''},
-    'lichii': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Lichii/main/sce_sys/icon0.png', "hero": ''},
+    'lichii': {"icon": 'https://codeberg.org/mihawk/PS5_Lichii/raw/branch/main/sce_sys/icon0.png', "hero": ''},
     'prosperoeden': {"icon": 'https://raw.githubusercontent.com/heydemoura/ProsperoEden/main/sce_sys/icon0.png', "hero": ''},
     'ps5sx2': {"icon": 'https://raw.githubusercontent.com/Swordpdf/PS5SX2/main/ps5/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/Swordpdf/PS5SX2/main/ps5/docs/banner.png'},
     'psxs5': {"icon": 'https://raw.githubusercontent.com/SynoPiia/PSXS5/main/sce_sys/icon0.png', "hero": 'https://raw.githubusercontent.com/SynoPiia/PSXS5/main/docs/media/banner.png'},
@@ -2956,12 +3082,16 @@ CATALOG_ART = {
     'forge': {"icon": 'https://raw.githubusercontent.com/quer3q/ps5-dump-forge/main/ps5/icon0.png', "hero": ''},
     'pkgmanager': {"icon": 'https://raw.githubusercontent.com/itsPLK/ps5-pkg-manager/main/assets/icon0.png', "hero": ''},
     'ps5linux': {"bg": ["#2b2f3a", "#0f1116"], "icon": 'https://raw.githubusercontent.com/ps5-linux/ps5-linux-loader/main/logo.webp', "hero": ''},
+    'cachyos': {"icon": 'https://raw.githubusercontent.com/CachyOS/calamares-config/master/etc/calamares/branding/cachyos/logo.png', "hero": 'https://raw.githubusercontent.com/abrocoma/PS5-CachyOS/main/files/usr/local/share/ps5-splash/gaming.png', "bg": ["#00a489", "#0b3b3a"]},
     'bazzite': {"icon": 'https://raw.githubusercontent.com/ublue-os/bazzite/main/press_kit/Bazzite_Color.svg', "hero": 'https://raw.githubusercontent.com/ublue-os/bazzite/main/press_kit/Bazzite_Color_Long.svg', "bg": ["#6a3fd8", "#24196b"]},
     'mihawkos': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_MihawkOS/main/ps5/sce_sys/icon0.png', "hero": ''},
     'smplusgui': {"icon": 'https://raw.githubusercontent.com/KarnerF/SMPlusGui/main/assets-app/icon1.png', "hero": ''},
     'tailscale': {"icon": 'https://raw.githubusercontent.com/holdmysocks/ps5-tailscale/main/appicon/icon0.png', "hero": ''},
     'patchsys': {"icon": '', "hero": 'https://github.com/user-attachments/assets/fd047e71-391e-46d2-91a8-5bde99dfdf7d'},
     'ps4mount': {"icon": '', "hero": ''},
+    'prosperosunshine': {"icon": 'https://raw.githubusercontent.com/Darkatek7/ProsperoSunshine/main/docs/images/banner.jpg', "hero": 'https://raw.githubusercontent.com/Darkatek7/ProsperoSunshine/main/docs/images/banner.jpg'},
+    'fpkg1360': {"icon": '', "hero": ''},
+    'krakenmount': {"icon": 'https://raw.githubusercontent.com/quer3q/kraken-mount/main/docs/logo.png', "hero": ''},
     'neoenabler': {"icon": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/assets/icon0.png', "hero": 'https://raw.githubusercontent.com/gasb07/NeoEnabler/main/docs/panel-games.jpg'},
     'doom': {"icon": '', "hero": '', "bg": ["#7a1e12", "#1c0805"]},
     'zftpd': {"icon": 'https://raw.githubusercontent.com/seregonwar/zftpd/main/assets/zftpd-logo.png', "hero": ''},
