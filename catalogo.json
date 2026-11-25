@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "octet",
+      "kind": "payload",
+      "group": "tool",
+      "name": "octet",
+      "repo": "sub0x00001/octet",
+      "exp": true,
+      "what": "8BitDo Ultimate 2C and 8BitDo USB Wireless Adapter 2 as extra DualSense pads on a jailbroken PS5 (tested on 13.60). Also any Bluetooth pad through the adapter (DualSense, Switch Pro, GameSir G8...), wired XInput and Switch Pro on USB. Rumble in PS4 games, up to 4 pads, settings…",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "8BitDo Ultimate 2C and 8BitDo USB Wireless Adapter 2 as extra DualSense pads on a jailbroken PS5 (tested on 13.60). Also any Bluetooth pad through the adapter (DualSense, Switch Pro, GameSir G8...), wired XInput and Switch Pro on USB. Rumble in PS4 games, up to 4 pads, settings…"
+      },
+      "icon": "https://github.com/sub0x00001.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^octet.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
