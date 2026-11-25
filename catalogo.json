@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "prefbar",
+      "kind": "payload",
+      "group": "tool",
+      "name": "PrefBar",
+      "repo": "X1NONs/PrefBar",
+      "exp": true,
+      "what": "PrefBar - Standalone On-Screen Performance Overlay for Jailbroken PS5",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "PrefBar - Standalone On-Screen Performance Overlay for Jailbroken PS5"
+      },
+      "icon": "https://github.com/X1NONs.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^Prefbar_V.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
