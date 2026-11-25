@@ -19,6 +19,26 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ps5save",
+      "kind": "payload",
+      "group": "tool",
+      "name": "PS5Save",
+      "repo": "heni0xyz/PS5Save",
+      "exp": true,
+      "what": "USB save backup utility for jailbroken PS5’s",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "USB save backup utility for jailbroken PS5’s"
+      },
+      "icon": "https://github.com/heni0xyz.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^backup.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
     }
   ]
 }
