@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "overdrive-releases",
+      "kind": "app",
+      "group": "tool",
+      "name": "overdrive-releases",
+      "repo": "overdriveps5/overdrive-releases",
+      "exp": true,
+      "what": "Overdrive releases for jailbroken PS5",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Overdrive releases for jailbroken PS5"
+      },
+      "icon": "https://github.com/overdriveps5.png",
+      "tid": "PPSA99058",
+      "sys": "Aplicación · PPSA99058",
+      "asset": [
+        "(?i)^Overdrive\\-PPSA.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
