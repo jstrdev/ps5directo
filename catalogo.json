@@ -19,6 +19,28 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "emufive",
+      "kind": "link",
+      "group": "emu",
+      "name": "EmuFive",
+      "repo": "blue0x1/EmuFive",
+      "exp": true,
+      "what": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/blue0x1.png"
     }
   ]
 }
