@@ -19,6 +19,27 @@
       "asset": [
         "(?i)\\.elf$"
       ]
+    },
+    {
+      "id": "ogbox",
+      "kind": "app",
+      "group": "tool",
+      "name": "OGBox",
+      "repo": "Press5elect/OGBox",
+      "exp": true,
+      "what": "XBOX emulator for PS5",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "XBOX emulator for PS5"
+      },
+      "icon": "https://github.com/Press5elect.png",
+      "tid": "PPSA99251",
+      "sys": "Aplicación · PPSA99251",
+      "asset": [
+        "(?i)^OGBox.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
     }
   ]
 }
