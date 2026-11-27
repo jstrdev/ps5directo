@@ -1,336 +1,356 @@
 {
- "_como": "Tarjetas extra de Descubrir. Se leen de GitHub cada 3 horas: añade una aquí y les llega a todos sin sacar versión. Campos: id (minúsculas, único), kind (app = se instala en /data/homebrew; payload = se carga en la PS5; link = solo guía y enlace), group (emu, media, rp, tool, patch, os), fam (para emuladores: nin, sony, sega, ms, retro, multi), name, sys (línea pequeña, p. ej. «Switch 2»), repo (autor/proyecto de GitHub), what (qué es), needs (qué hace falta), guide (lista de pasos), exp (true = en pruebas), tid (solo app: PPSA12345), asset (opcional: patrones del archivo de la release, p. ej. [\"(?i)\\\\.zip$\"]), port (solo payload, si escucha en un puerto), icon y hero (URL de imágenes), until (AAAA-MM-DD: deja de salir ese día) y en: {sys, what, needs, guide} con los textos en inglés (el nombre no se traduce). Si un id ya existe dentro de la app, esta tarjeta se ignora.",
- "items": [
-  {
-   "id": "ps4mount",
-   "kind": "payload",
-   "group": "tool",
-   "name": "ps4mount",
-   "repo": "gasb07/ps4mount",
-   "exp": true,
-   "what": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage"
-   },
-   "icon": "https://github.com/gasb07.png",
-   "sys": "Payload",
-   "asset": [
-    "(?i)\\.elf$"
-   ]
-  },
-  {
-   "id": "mcla-recomp",
-   "kind": "link",
-   "group": "tool",
-   "name": "mcla-recomp",
-   "repo": "holdmysocks/mcla-recomp",
-   "exp": true,
-   "what": "Static recompilation of Midnight Club: Los Angeles (Xbox 360) for PC and PS5. No game data included.",
-   "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
-   "auto_tr": true,
-   "en": {
-    "what": "Static recompilation of Midnight Club: Los Angeles (Xbox 360) for PC and PS5. No game data included.",
-    "needs": "It doesn't come ready to install: follow its GitHub guide.",
-    "guide": [
-     "Open it on GitHub and follow its guide (the README)."
-    ]
-   },
-   "guide": [
-    "Ábrelo en GitHub y sigue su guía (el README)."
-   ],
-   "icon": "https://github.com/holdmysocks.png"
-  },
-  {
-   "id": "pc5",
-   "kind": "app",
-   "group": "os",
-   "name": "PC5",
-   "repo": "bornaradusin/PC5",
-   "exp": true,
-   "what": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…"
-   },
-   "icon": "https://github.com/bornaradusin.png",
-   "tid": "PPSA11018",
-   "sys": "Aplicación · PPSA11018",
-   "asset": [
-    "(?i)^PPSA.*\\.zip$",
-    "(?i)\\.zip$"
-   ]
-  },
-  {
-   "id": "gta4-ps5",
-   "kind": "app",
-   "group": "tool",
-   "name": "gta4-ps5",
-   "repo": "elripalda/gta4-ps5",
-   "exp": true,
-   "what": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI.",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI."
-   },
-   "icon": "https://github.com/elripalda.png",
-   "tid": "PPSA94004",
-   "sys": "Aplicación · PPSA94004",
-   "asset": [
-    "(?i)^PPSA.*\\.zip$",
-    "(?i)\\.zip$"
-   ]
-  },
-  {
-   "id": "ps5lm",
-   "kind": "app",
-   "group": "tool",
-   "name": "PS5LM",
-   "repo": "cobanov/PS5LM",
-   "exp": true,
-   "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8"
-   },
-   "icon": "https://github.com/cobanov.png",
-   "tid": "PPSA99575",
-   "sys": "Aplicación · PPSA99575",
-   "asset": [
-    "(?i)\\.zip$"
-   ]
-  },
-  {
-   "id": "hearbridge-ps5",
-   "kind": "payload",
-   "group": "media",
-   "name": "HearBridge-PS5",
-   "repo": "X-F1REBALL-X/HearBridge-PS5",
-   "exp": true,
-   "what": "Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5"
-   },
-   "icon": "https://github.com/X-F1REBALL-X.png",
-   "sys": "Payload",
-   "asset": [
-    "(?i)^HearBridge.*\\.elf$",
-    "(?i)\\.elf$"
-   ]
-  },
-  {
-   "id": "ps5-y2jb-installer",
-   "kind": "link",
-   "group": "tool",
-   "name": "ps5-y2jb-installer",
-   "repo": "jamesst20/ps5-y2jb-installer",
-   "exp": true,
-   "what": "Y2JB Installer for PS5",
-   "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
-   "auto_tr": true,
-   "en": {
-    "what": "Y2JB Installer for PS5",
-    "needs": "It doesn't come ready to install: follow its GitHub guide.",
-    "guide": [
-     "Open it on GitHub and follow its guide (the README)."
-    ]
-   },
-   "guide": [
-    "Ábrelo en GitHub y sigue su guía (el README)."
-   ],
-   "icon": "https://github.com/jamesst20.png"
-  },
-  {
-   "id": "prefbar",
-   "kind": "payload",
-   "group": "tool",
-   "name": "PrefBar",
-   "repo": "X1NONs/PrefBar",
-   "exp": true,
-   "what": "PrefBar - Standalone On-Screen Performance Overlay for Jailbroken PS5",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "PrefBar - Standalone On-Screen Performance Overlay for Jailbroken PS5"
-   },
-   "icon": "https://github.com/X1NONs.png",
-   "sys": "Payload",
-   "asset": [
-    "(?i)^Prefbar_V.*\\.elf$",
-    "(?i)\\.elf$"
-   ]
-  },
-  {
-   "id": "y2jb-update-blocker",
-   "kind": "payload",
-   "group": "tool",
-   "name": "y2jb-update-blocker",
-   "repo": "Epinorr/y2jb-update-blocker",
-   "exp": true,
-   "what": "A PlayStation 5 payload for blocking YouTube update metadata",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "A PlayStation 5 payload for blocking YouTube update metadata"
-   },
-   "icon": "https://github.com/Epinorr.png",
-   "sys": "Payload",
-   "asset": [
-    "(?i)^YT\\-Blocker.*\\.elf$",
-    "(?i)\\.elf$"
-   ]
-  },
-  {
-   "id": "ps5-airplay",
-   "kind": "payload",
-   "group": "media",
-   "name": "ps5-airplay",
-   "repo": "rodri0x/ps5-airplay",
-   "exp": true,
-   "what": "AirPlay screen-mirroring receiver for jailbroken PS5: mirror an iPhone, iPad or Mac to your TV with sound, as a payload (not official)",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "AirPlay screen-mirroring receiver for jailbroken PS5: mirror an iPhone, iPad or Mac to your TV with sound, as a payload (not official)"
-   },
-   "icon": "https://github.com/rodri0x.png",
-   "sys": "Payload",
-   "asset": [
-    "(?i)^airplay\\-installer.*\\.elf$",
-    "(?i)\\.elf$"
-   ]
-  },
-  {
-   "id": "octet",
-   "kind": "payload",
-   "group": "tool",
-   "name": "octet",
-   "repo": "sub0x00001/octet",
-   "exp": true,
-   "what": "8BitDo Ultimate 2C and 8BitDo USB Wireless Adapter 2 as extra DualSense pads on a jailbroken PS5 (tested on 13.60). Also any Bluetooth pad through the adapter (DualSense, Switch Pro, GameSir G8...), wired XInput and Switch Pro on USB. Rumble in PS4 games, up to 4 pads, settings…",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "8BitDo Ultimate 2C and 8BitDo USB Wireless Adapter 2 as extra DualSense pads on a jailbroken PS5 (tested on 13.60). Also any Bluetooth pad through the adapter (DualSense, Switch Pro, GameSir G8...), wired XInput and Switch Pro on USB. Rumble in PS4 games, up to 4 pads, settings…"
-   },
-   "icon": "https://github.com/sub0x00001.png",
-   "sys": "Payload",
-   "asset": [
-    "(?i)^octet.*\\.elf$",
-    "(?i)\\.elf$"
-   ]
-  },
-  {
-   "id": "orbit-play-ps5",
-   "kind": "payload",
-   "group": "rp",
-   "name": "orbit-play-ps5",
-   "repo": "saawant12/orbit-play-ps5",
-   "exp": true,
-   "what": "Remote Play for jailbroken PS5s on Mac, Windows and Linux. Play at home without PSN sign-in, or away from home over a direct, encrypted connection. Supports local PS5 accounts and sets up Remote Play for you.",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "Remote Play for jailbroken PS5s on Mac, Windows and Linux. Play at home without PSN sign-in, or away from home over a direct, encrypted connection. Supports local PS5 accounts and sets up Remote Play for you."
-   },
-   "icon": "https://github.com/saawant12.png",
-   "sys": "Payload",
-   "asset": [
-    "(?i)^orbit\\-play.*\\.elf$",
-    "(?i)\\.elf$"
-   ]
-  },
-  {
-   "id": "ogbox",
-   "kind": "app",
-   "group": "emu",
-   "name": "OGBox",
-   "repo": "Press5elect/OGBox",
-   "exp": true,
-   "what": "XBOX emulator for PS5",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "XBOX emulator for PS5"
-   },
-   "icon": "https://github.com/Press5elect.png",
-   "tid": "PPSA99251",
-   "sys": "Aplicación · PPSA99251",
-   "asset": [
-    "(?i)^OGBox.*\\.zip$",
-    "(?i)\\.zip$"
-   ]
-  },
-  {
-   "id": "ps5droid",
-   "kind": "link",
-   "group": "os",
-   "name": "PS5Droid",
-   "repo": "aarvsn/PS5Droid",
-   "exp": true,
-   "what": "Android games on your PS5",
-   "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
-   "auto_tr": true,
-   "en": {
-    "what": "Android games on your PS5",
-    "needs": "It doesn't come ready to install: follow its GitHub guide.",
-    "guide": [
-     "Open it on GitHub and follow its guide (the README)."
-    ]
-   },
-   "guide": [
-    "Ábrelo en GitHub y sigue su guía (el README)."
-   ],
-   "icon": "https://github.com/aarvsn.png"
-  },
-  {
-   "id": "ps5-longshot",
-   "kind": "link",
-   "group": "tool",
-   "name": "PS5_Longshot",
-   "repo": "heydemoura/PS5_Longshot",
-   "exp": true,
-   "what": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
-   "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
-   "auto_tr": true,
-   "en": {
-    "what": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
-    "needs": "It doesn't come ready to install: follow its GitHub guide.",
-    "guide": [
-     "Open it on GitHub and follow its guide (the README)."
-    ]
-   },
-   "guide": [
-    "Ábrelo en GitHub y sigue su guía (el README)."
-   ],
-   "icon": "https://github.com/heydemoura.png"
-  },
-  {
-   "id": "lineup",
-   "kind": "app",
-   "group": "tool",
-   "name": "lineup",
-   "repo": "bps2414/lineup",
-   "exp": true,
-   "what": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React.",
-   "needs": "",
-   "auto_tr": true,
-   "en": {
-    "what": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React."
-   },
-   "icon": "https://github.com/bps2414.png",
-   "tid": "PPSA99077",
-   "sys": "Aplicación · PPSA99077",
-   "asset": [
-    "(?i)^Lineup.*\\.zip$",
-    "(?i)\\.zip$"
-   ]
-  }
- ]
+  "_como": "Tarjetas extra de Descubrir. Se leen de GitHub cada 3 horas: añade una aquí y les llega a todos sin sacar versión. Campos: id (minúsculas, único), kind (app = se instala en /data/homebrew; payload = se carga en la PS5; link = solo guía y enlace), group (emu, media, rp, tool, patch, os), fam (para emuladores: nin, sony, sega, ms, retro, multi), name, sys (línea pequeña, p. ej. «Switch 2»), repo (autor/proyecto de GitHub), what (qué es), needs (qué hace falta), guide (lista de pasos), exp (true = en pruebas), tid (solo app: PPSA12345), asset (opcional: patrones del archivo de la release, p. ej. [\"(?i)\\\\.zip$\"]), port (solo payload, si escucha en un puerto), icon y hero (URL de imágenes), until (AAAA-MM-DD: deja de salir ese día) y en: {sys, what, needs, guide} con los textos en inglés (el nombre no se traduce). Si un id ya existe dentro de la app, esta tarjeta se ignora.",
+  "items": [
+    {
+      "id": "ps4mount",
+      "kind": "payload",
+      "group": "tool",
+      "name": "ps4mount",
+      "repo": "gasb07/ps4mount",
+      "exp": true,
+      "what": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Allows for PKG games on USB external devices to mount on jailbroken PS5s without installing on internal storage or PS5 formatted USB storage"
+      },
+      "icon": "https://github.com/gasb07.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)\\.elf$"
+      ]
+    },
+    {
+      "id": "mcla-recomp",
+      "kind": "link",
+      "group": "tool",
+      "name": "mcla-recomp",
+      "repo": "holdmysocks/mcla-recomp",
+      "exp": true,
+      "what": "Static recompilation of Midnight Club: Los Angeles (Xbox 360) for PC and PS5. No game data included.",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "Static recompilation of Midnight Club: Los Angeles (Xbox 360) for PC and PS5. No game data included.",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/holdmysocks.png"
+    },
+    {
+      "id": "pc5",
+      "kind": "app",
+      "group": "os",
+      "name": "PC5",
+      "repo": "bornaradusin/PC5",
+      "exp": true,
+      "what": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "A launcher for PC games on a jailbroken PS5, built on prospero-win (Wine, DXVK, VKD3D-Proton). Install games from USB with automatic covers, pick them from a carousel, and use the DualSense: vibration, light bar, adaptive triggers. FPS counter and update check. Games that need a…"
+      },
+      "icon": "https://github.com/bornaradusin.png",
+      "tid": "PPSA11018",
+      "sys": "Aplicación · PPSA11018",
+      "asset": [
+        "(?i)^PPSA.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
+    },
+    {
+      "id": "gta4-ps5",
+      "kind": "app",
+      "group": "tool",
+      "name": "gta4-ps5",
+      "repo": "elripalda/gta4-ps5",
+      "exp": true,
+      "what": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "GTA IV, The Lost and Damned and The Ballad of Gay Tony running natively on a jailbroken PS5. Built on Liberty Recompiled by OZORDI."
+      },
+      "icon": "https://github.com/elripalda.png",
+      "tid": "PPSA94004",
+      "sys": "Aplicación · PPSA94004",
+      "asset": [
+        "(?i)^PPSA.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
+    },
+    {
+      "id": "ps5lm",
+      "kind": "app",
+      "group": "tool",
+      "name": "PS5LM",
+      "repo": "cobanov/PS5LM",
+      "exp": true,
+      "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "llama.cpp on a jailbroken PS5: run any GGUF model natively on the console, starting with Qwen 3.8"
+      },
+      "icon": "https://github.com/cobanov.png",
+      "tid": "PPSA99575",
+      "sys": "Aplicación · PPSA99575",
+      "asset": [
+        "(?i)\\.zip$"
+      ]
+    },
+    {
+      "id": "hearbridge-ps5",
+      "kind": "payload",
+      "group": "media",
+      "name": "HearBridge-PS5",
+      "repo": "X-F1REBALL-X/HearBridge-PS5",
+      "exp": true,
+      "what": "Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Play PS5 game audio on any Bluetooth headphones or earbuds. Payload for jailbroken PS5"
+      },
+      "icon": "https://github.com/X-F1REBALL-X.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^HearBridge.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
+    },
+    {
+      "id": "ps5-y2jb-installer",
+      "kind": "link",
+      "group": "tool",
+      "name": "ps5-y2jb-installer",
+      "repo": "jamesst20/ps5-y2jb-installer",
+      "exp": true,
+      "what": "Y2JB Installer for PS5",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "Y2JB Installer for PS5",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/jamesst20.png"
+    },
+    {
+      "id": "prefbar",
+      "kind": "payload",
+      "group": "tool",
+      "name": "PrefBar",
+      "repo": "X1NONs/PrefBar",
+      "exp": true,
+      "what": "PrefBar - Standalone On-Screen Performance Overlay for Jailbroken PS5",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "PrefBar - Standalone On-Screen Performance Overlay for Jailbroken PS5"
+      },
+      "icon": "https://github.com/X1NONs.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^Prefbar_V.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
+    },
+    {
+      "id": "y2jb-update-blocker",
+      "kind": "payload",
+      "group": "tool",
+      "name": "y2jb-update-blocker",
+      "repo": "Epinorr/y2jb-update-blocker",
+      "exp": true,
+      "what": "A PlayStation 5 payload for blocking YouTube update metadata",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "A PlayStation 5 payload for blocking YouTube update metadata"
+      },
+      "icon": "https://github.com/Epinorr.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^YT\\-Blocker.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
+    },
+    {
+      "id": "ps5-airplay",
+      "kind": "payload",
+      "group": "media",
+      "name": "ps5-airplay",
+      "repo": "rodri0x/ps5-airplay",
+      "exp": true,
+      "what": "AirPlay screen-mirroring receiver for jailbroken PS5: mirror an iPhone, iPad or Mac to your TV with sound, as a payload (not official)",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "AirPlay screen-mirroring receiver for jailbroken PS5: mirror an iPhone, iPad or Mac to your TV with sound, as a payload (not official)"
+      },
+      "icon": "https://github.com/rodri0x.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^airplay\\-installer.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
+    },
+    {
+      "id": "octet",
+      "kind": "payload",
+      "group": "tool",
+      "name": "octet",
+      "repo": "sub0x00001/octet",
+      "exp": true,
+      "what": "8BitDo Ultimate 2C and 8BitDo USB Wireless Adapter 2 as extra DualSense pads on a jailbroken PS5 (tested on 13.60). Also any Bluetooth pad through the adapter (DualSense, Switch Pro, GameSir G8...), wired XInput and Switch Pro on USB. Rumble in PS4 games, up to 4 pads, settings…",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "8BitDo Ultimate 2C and 8BitDo USB Wireless Adapter 2 as extra DualSense pads on a jailbroken PS5 (tested on 13.60). Also any Bluetooth pad through the adapter (DualSense, Switch Pro, GameSir G8...), wired XInput and Switch Pro on USB. Rumble in PS4 games, up to 4 pads, settings…"
+      },
+      "icon": "https://github.com/sub0x00001.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^octet.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
+    },
+    {
+      "id": "orbit-play-ps5",
+      "kind": "payload",
+      "group": "rp",
+      "name": "orbit-play-ps5",
+      "repo": "saawant12/orbit-play-ps5",
+      "exp": true,
+      "what": "Remote Play for jailbroken PS5s on Mac, Windows and Linux. Play at home without PSN sign-in, or away from home over a direct, encrypted connection. Supports local PS5 accounts and sets up Remote Play for you.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Remote Play for jailbroken PS5s on Mac, Windows and Linux. Play at home without PSN sign-in, or away from home over a direct, encrypted connection. Supports local PS5 accounts and sets up Remote Play for you."
+      },
+      "icon": "https://github.com/saawant12.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^orbit\\-play.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
+    },
+    {
+      "id": "ogbox",
+      "kind": "app",
+      "group": "emu",
+      "name": "OGBox",
+      "repo": "Press5elect/OGBox",
+      "exp": true,
+      "what": "XBOX emulator for PS5",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "XBOX emulator for PS5"
+      },
+      "icon": "https://github.com/Press5elect.png",
+      "tid": "PPSA99251",
+      "sys": "Aplicación · PPSA99251",
+      "asset": [
+        "(?i)^OGBox.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
+    },
+    {
+      "id": "ps5droid",
+      "kind": "link",
+      "group": "os",
+      "name": "PS5Droid",
+      "repo": "aarvsn/PS5Droid",
+      "exp": true,
+      "what": "Android games on your PS5",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "Android games on your PS5",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/aarvsn.png"
+    },
+    {
+      "id": "ps5-longshot",
+      "kind": "link",
+      "group": "tool",
+      "name": "PS5_Longshot",
+      "repo": "heydemoura/PS5_Longshot",
+      "exp": true,
+      "what": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
+      "needs": "No viene hecho para instalar: sigue la guía de su GitHub.",
+      "auto_tr": true,
+      "en": {
+        "what": "Longshot for the PlayStation 5: a port of Longshot (static recompilation) to the PS5, with the Longshot PS5 Builder for Linux and Windows. No PC builds of the game.",
+        "needs": "It doesn't come ready to install: follow its GitHub guide.",
+        "guide": [
+          "Open it on GitHub and follow its guide (the README)."
+        ]
+      },
+      "guide": [
+        "Ábrelo en GitHub y sigue su guía (el README)."
+      ],
+      "icon": "https://github.com/heydemoura.png"
+    },
+    {
+      "id": "lineup",
+      "kind": "app",
+      "group": "tool",
+      "name": "lineup",
+      "repo": "bps2414/lineup",
+      "exp": true,
+      "what": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Arrange your PS5 home screen with the controller: lift a game, carry it, drop it, and pin the ones that should never move. Homebrew for jailbroken PS5, built with PS5 React."
+      },
+      "icon": "https://github.com/bps2414.png",
+      "tid": "PPSA99077",
+      "sys": "Aplicación · PPSA99077",
+      "asset": [
+        "(?i)^Lineup.*\\.zip$",
+        "(?i)\\.zip$"
+      ]
+    },
+    {
+      "id": "glint",
+      "kind": "payload",
+      "group": "tool",
+      "name": "Glint",
+      "repo": "MiladRTX/Glint",
+      "exp": true,
+      "what": "Watch, hear and record a jailbroken PS5 on your Windows PC with low latency.",
+      "needs": "",
+      "auto_tr": true,
+      "en": {
+        "what": "Watch, hear and record a jailbroken PS5 on your Windows PC with low latency."
+      },
+      "icon": "https://github.com/MiladRTX.png",
+      "sys": "Payload",
+      "asset": [
+        "(?i)^Glint.*\\.elf$",
+        "(?i)\\.elf$"
+      ]
+    }
+  ]
 }
