@@ -1,7 +1,109 @@
 {
  "_como": "Lo genera solo tools/escena.py (GitHub Action cada 3 horas). No lo edites a mano: para destacar algo usa destacados.json.",
- "updated": "2026-11-26T16:53:52Z",
+ "updated": "2026-11-27T01:45:19Z",
  "items": [
+  {
+   "id": "blue0x1/EmuFive@1.0.17",
+   "kind": "new",
+   "repo": "blue0x1/EmuFive",
+   "cid": "",
+   "name": "EmuFive",
+   "tag": "1.0.17",
+   "pre": false,
+   "date": "2026-11-27T01:21:08Z",
+   "desc": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
+   "notes": "EmuFive 1.0.17: themes, animated avatars and a new-look browser What's new - The Light and Midnight themes now work in the new home screen layout and all its pages, and the on-screen keyboard follows the theme too. - Share opens at once (it took over ten seconds) and its text is readable in every theme. - Animated avatars: animated emoji, or your own photos and GIFs from a USB…",
+   "stars": 388,
+   "url": "https://github.com/blue0x1/EmuFive",
+   "score": 9.2
+  },
+  {
+   "id": "mr-Native/PSWloader@v1.2",
+   "kind": "new",
+   "repo": "mr-Native/PSWloader",
+   "cid": "",
+   "name": "PSWloader",
+   "tag": "v1.2",
+   "pre": false,
+   "date": "2026-11-26T22:27:13Z",
+   "desc": "Native Windows 11 on PS5",
+   "notes": "v1.2 brings the PSWloader Dashboard, native Bluetooth and the fixes reported since v1.1. Firmware r5.28.14, GPU driver 0.7.216.1230, PSWloader.elf release 2026-11-26. Already on an older version? Run the updater or accept the update window at sign-in. Replace PSWloader.elf only if the Dashboard says the firmware is still old after a restart. What's new - PSWloader Dashboard:…",
+   "stars": 142,
+   "url": "https://github.com/mr-Native/PSWloader",
+   "score": 12.28
+  },
+  {
+   "id": "Darkatek7/ProsperoSunshine@v0.6.9",
+   "kind": "update",
+   "repo": "Darkatek7/ProsperoSunshine",
+   "cid": "prosperosunshine",
+   "name": "ProsperoSunshine (Moonlight)",
+   "tag": "v0.6.9",
+   "pre": false,
+   "date": "2026-11-26T22:03:33Z",
+   "notes": "Requires a homebrew environment with an ELF loader. 0.6.9 is 0.6.8 with one fix: games installed on the M.2 SSD were missing from the app list. Fixed - Games on the M.2 SSD were missing from the app list. A game installed on the M.2 SSD has its folder there and none on the internal storage, the only place the host looked. So it was missing in Moonlight, in the web page's Apps…",
+   "url": "https://github.com/Darkatek7/ProsperoSunshine/releases/tag/v0.6.9",
+   "stars": 44,
+   "score": 1.2
+  },
+  {
+   "id": "J7mbo/nasbridge-ps5@v0.8.0-beta.1",
+   "kind": "new",
+   "repo": "J7mbo/nasbridge-ps5",
+   "cid": "",
+   "name": "nasbridge-ps5",
+   "tag": "v0.8.0-beta.1",
+   "pre": true,
+   "date": "2026-11-26T21:58:37Z",
+   "desc": "A native PS5 homebrew app to browse and install games from your NAS.",
+   "notes": "Install 1. ShadowMountPlus 1.7beta6-fix2 or newer , from its releases. 2. NASBridge: send NASBridge-0.8.0.elf to your PS5's ELF loader (port 9021). A notification says when it's installed. More in the README. Full Changelog : https://github.com/J7mbo/nasbridge-ps5/compare/v0.7.0...v0.8.0-beta.1",
+   "stars": 64,
+   "url": "https://github.com/J7mbo/nasbridge-ps5",
+   "score": 5.56
+  },
+  {
+   "id": "quer3q/kraken-mount@v0.4.1",
+   "kind": "update",
+   "repo": "quer3q/kraken-mount",
+   "cid": "krakenmount",
+   "name": "Kraken Mount (.pkg de PS5 sin instalar)",
+   "tag": "v0.4.1",
+   "pre": false,
+   "date": "2026-11-26T21:01:15Z",
+   "notes": "Fixes - Installed games are now properly launching and working both with ampr-emu-ng and real ppr patch (check out newest kstuff version by drakmor). New - ShadowMount+ API port: Kraken Mount also answers ShadowMount+'s API on 127.0.0.1:10101 , so apps that only know ShadowMount+ (Playden, RecompStore) find it without changes. - Close game: new API to close running game. -…",
+   "url": "https://github.com/quer3q/kraken-mount/releases/tag/v0.4.1",
+   "stars": 650,
+   "score": 1.6
+  },
+  {
+   "id": "bornaradusin/PC5@v2.5.2",
+   "kind": "update",
+   "repo": "bornaradusin/PC5",
+   "cid": "pc5",
+   "name": "PC5",
+   "tag": "v2.5.2",
+   "pre": false,
+   "date": "2026-11-26T18:54:02Z",
+   "notes": "PC5 2.5.2 fixes Infinity Engine games played from a USB drive and web games whose cache was cut short, and says when the console ran out of memory. Install - ProsperoStore : update PC5 from its page in the store. - PC5's own updater : Settings › System › Update now , or Update now when PC5 asks as it opens. It downloads only what changed when you have the version before,…",
+   "url": "https://github.com/bornaradusin/PC5/releases/tag/v2.5.2",
+   "stars": 167,
+   "score": 1.2
+  },
+  {
+   "id": "folksheesh/PS-5-Emulator@1.4.0",
+   "kind": "new",
+   "repo": "folksheesh/PS-5-Emulator",
+   "cid": "",
+   "name": "PS-5-Emulator",
+   "tag": "1.4.0",
+   "pre": false,
+   "date": "2026-11-26T18:40:33Z",
+   "desc": "Experience PlayStation 5 Pro emulation on your PC.",
+   "notes": "",
+   "stars": 61,
+   "url": "https://github.com/folksheesh/PS-5-Emulator",
+   "score": 6.44
+  },
   {
    "id": "quer3q/ps5-dump-forge@v0.6.0",
    "kind": "update",
@@ -13,8 +115,8 @@
    "date": "2026-11-26T16:25:55Z",
    "notes": "Redesign 🎨 and multiple FPKG fixes New - New UI. A side rail lists every screen (Build, Queue, Transfer, Edit, Storage, Connect, Settings, About) and folds to icons. - One Build screen. Convert and Pack are now one page. Pick a game, then choose Packs (None, ZSTD, LZ4) and a format (FPKG and Folder up front, the image formats under More). A gauge beside the choices shows the…",
    "url": "https://github.com/quer3q/ps5-dump-forge/releases/tag/v0.6.0",
-   "stars": 603,
-   "score": 6.5
+   "stars": 610,
+   "score": 3.9
   },
   {
    "id": "SulphurS16/Regaliant@v0.1.8",
@@ -27,24 +129,9 @@
    "date": "2026-11-26T13:57:57Z",
    "desc": "Unofficial Windows PC port of Demon's Souls (2020), Bluepoint's PS5 remake. Runs your own copy of the PS5 game (PPSA01341, version 1.07). No game files included.",
    "notes": "Regaliant 0.1.8, an early version of an unofficial PC port of Demon's Souls (PS5, PPSA01341 01.007.000). It runs the game's own program from your copy of the game files. Nothing of the game is included. Changes Since 0.1.7: - Fixed the washed-out, too bright picture with ghosting and black blotches at Render Scale 100% on a 4K screen (issue 6). Above 2048 lines two of the…",
-   "stars": 447,
+   "stars": 462,
    "url": "https://github.com/SulphurS16/Regaliant",
-   "score": 14.0
-  },
-  {
-   "id": "J7mbo/nasbridge-ps5@v0.7.0",
-   "kind": "new",
-   "repo": "J7mbo/nasbridge-ps5",
-   "cid": "",
-   "name": "nasbridge-ps5",
-   "tag": "v0.7.0",
-   "pre": false,
-   "date": "2026-11-26T11:21:49Z",
-   "desc": "A native PS5 homebrew app to browse and install games from your NAS.",
-   "notes": "Install 1. ShadowMountPlus 1.7beta6-fix2 or newer , from its releases. 2. NASBridge: send NASBridge-0.7.0.elf to your PS5's ELF loader (port 9021). A notification says when it's installed. More in the README. What's Changed Read .ffpfsc games in the library by @J7mbo in https://github.com/J7mbo/nasbridge-ps5/pull/10 Full Changelog :…",
-   "stars": 64,
-   "url": "https://github.com/J7mbo/nasbridge-ps5",
-   "score": 6.56
+   "score": 13.0
   },
   {
    "id": "bornaradusin/Emby5@1.3.6",
@@ -58,21 +145,7 @@
    "notes": "What's new Continue Watching, Next Up and Latest on Emby 4.10 and later - On Emby Server 4.10 and later (4.11 included), Home showed only My List and your libraries: Emby keeps its home screen as a new list of sections, which Emby5 didn't read, and the older layout it read instead was out of date. Emby5 now reads the new list, so Home follows the order you set on your server,…",
    "url": "https://github.com/bornaradusin/Emby5/releases/tag/1.3.6",
    "stars": 14,
-   "score": 1.2
-  },
-  {
-   "id": "bornaradusin/PC5@v2.5.0",
-   "kind": "update",
-   "repo": "bornaradusin/PC5",
-   "cid": "pc5",
-   "name": "PC5",
-   "tag": "v2.5.0",
-   "pre": false,
-   "date": "2026-11-26T08:11:00Z",
-   "notes": "PC5 2.5.0 makes Brian Lara International Cricket 2007 start by itself, gives Unity games the Xbox controller, and fixes Noreya and a driver check AMD-aware games make. Install - ProsperoStore : update PC5 from its page in the store. - PC5's own updater : Settings › System › Update now , or Update now when PC5 asks as it opens. It downloads only what changed when you have the…",
-   "url": "https://github.com/bornaradusin/PC5/releases/tag/v2.5.0",
-   "stars": 166,
-   "score": 2.9
+   "score": 1.0
   },
   {
    "id": "TheRealRexo/PS5-MultiBoot@v1.0.0",
@@ -100,23 +173,9 @@
    "date": "2026-11-26T01:27:47Z",
    "desc": "Experimental PlayStation 5 emulator for iOS and macOS",
    "notes": "Metaspero v0.2.0 WARNING: This is an early-stage experimental build. Expect crashes, visual glitches, and low frame rates. Metaspero is an experimental PlayStation 5 emulator and dynamic translation layer for ARM64 (iOS, macOS Apple Silicon, and Android). What's New - Added Android ARM64 support (uses custom Adreno/Turnip drivers) - Merged 600+ commits from upstream KytyPS5…",
-   "stars": 16,
+   "stars": 17,
    "url": "https://github.com/alamshafil/metaspero",
-   "score": 2.64
-  },
-  {
-   "id": "Darkatek7/ProsperoSunshine@v0.6.8",
-   "kind": "update",
-   "repo": "Darkatek7/ProsperoSunshine",
-   "cid": "prosperosunshine",
-   "name": "ProsperoSunshine (Moonlight)",
-   "tag": "v0.6.8",
-   "pre": false,
-   "date": "2026-11-26T00:19:19Z",
-   "notes": "Requires a homebrew environment with an ELF loader. 0.6.8 adds a list of recent streams to the web page and an experimental way to get over lost frames without a keyframe, and fixes three things in input and the app. New - Recent streams on the web page ( 63). The first tab lists the last 20 streams that ended: the device, when it ended and how long it ran, the codec and mode,…",
-   "url": "https://github.com/Darkatek7/ProsperoSunshine/releases/tag/v0.6.8",
-   "stars": 43,
-   "score": 1.0
+   "score": 2.88
   },
   {
    "id": "jstrdev/ps5directo@v2.2.4",
@@ -131,7 +190,7 @@
    "notes": "PS5 Directo 2.2.4 📦 Los .pkg ya se instalan hasta 13.60: desde el 24 de noviembre hay un kstuff nuevo (kstuff-dr 1.15, en pruebas). Con firmware 12.00–13.60, al elegir «Paquete .fpkg» eliges instalarlo (va a /data/pkg) o abrirlo sin instalar con Kraken Mount (va a /data/homebrew). Nueva guía con los pasos en Descubrir › Mejorar tus títulos. 🧩 Kraken Mount 0.4.0: también…",
    "stars": 96,
    "url": "https://github.com/jstrdev/ps5directo",
-   "score": 6.24
+   "score": 5.84
   },
   {
    "id": "abrocoma/PS5-CachyOS@image-2026-11-26",
@@ -158,7 +217,7 @@
    "date": "2026-11-25T19:45:25Z",
    "notes": "- Experimental 8GB Mode on firmware 13.00 (arthurprogramming tested it with Red Dead Redemption 2 and Bloodborne). (Contributed by arthurprogramming.) - Experimental 8GB Mode on firmware 12.02 (boykopovar tested it on a PS5 Pro with Red Dead Redemption 2). (Contributed by boykopovar.)",
    "url": "https://github.com/gasb07/NeoEnabler/releases/tag/v0.7.1-experimental",
-   "stars": 245,
+   "stars": 247,
    "score": 0.4
   },
   {
@@ -172,9 +231,9 @@
    "date": "2026-11-25T18:53:20Z",
    "desc": "Port of Longshot targeting 0400486024DEC000 rev 1.1.1 NS2 for Oberon (base PS5 only) optimized for RDNA2-class GPU (compute shaders) and a stable 30 (up to 60 with framegen). Build on Linux/Windows(WSL) - No copyrighted files included",
    "notes": "New No more glowing pop-in the first time you see something : the builder now ships Longshot's pipeline list (its pipeline tour of every map, actor and cutscene, plus 126 player-contributed lists, hashes and draw state only, no game code). The first start builds all of it before the title screen, so Link's house, Kaepora, Ganondorf's horse, the Market and so on no longer show…",
-   "stars": 41,
+   "stars": 42,
    "url": "https://github.com/rimidalv333/longshot-oberon",
-   "score": 6.64
+   "score": 5.88
   },
   {
    "id": "sub0x00001/octet@v2.1.0-rc1",
@@ -188,22 +247,7 @@
    "notes": "Test build for 10, from 11. Not a release yet: 2.0.0 stays the current version. Adds the Xbox 360 Wireless Receiver ( 045e:0719 , clones 045e:02a9 / 045e:0291 ): its first controller, an Xbox 360 Wireless Controller or the Xbox 360 Wireless Racing Wheel, as a virtual DualSense. The wheel: steering on the left stick, brake and gas on L2/R2. Built from the probe log in 10; not…",
    "url": "https://github.com/sub0x00001/octet/releases/tag/v2.1.0-rc1",
    "stars": 23,
-   "score": 1.7
-  },
-  {
-   "id": "mateo-cogeanu/ProsperoCraft@01.000.308",
-   "kind": "new",
-   "repo": "mateo-cogeanu/ProsperoCraft",
-   "cid": "",
-   "name": "ProsperoCraft",
-   "tag": "01.000.308",
-   "pre": false,
-   "date": "2026-11-25T16:50:12Z",
-   "desc": "Minecraft Java Edition homebrew for PS5. Java runtime port: https://github.com/mateo-cogeanu/ps5-java25-homebrew",
-   "notes": "Dedicated servers in early beta Host a Vanilla Minecraft Java 26.x world on your PS5 for players on the same network. Turn on Server [BETA] in Settings to show the Servers tab, now between Instances and Settings. Both Settings and Servers have larger text and controls for TV use. - Scan the Servers QR code or open the browser address shown on your PS5, then enter the pairing…",
-   "stars": 61,
-   "url": "https://github.com/mateo-cogeanu/ProsperoCraft",
-   "score": 6.44
+   "score": 1.5
   },
   {
    "id": "Press5elect/OGBox@v1.0.4",
@@ -218,20 +262,6 @@
    "url": "https://github.com/Press5elect/OGBox/releases/tag/v1.0.4",
    "stars": 17,
    "score": 1.0
-  },
-  {
-   "id": "quer3q/kraken-mount@v0.4.0",
-   "kind": "update",
-   "repo": "quer3q/kraken-mount",
-   "cid": "krakenmount",
-   "name": "Kraken Mount (.pkg de PS5 sin instalar)",
-   "tag": "v0.4.0",
-   "pre": false,
-   "date": "2026-11-25T10:21:29Z",
-   "notes": "The big one - redesign and installed games support - Install to the console: an FPKG game installs from its game sheet in the Library ( Install ). The new Install tab lists the patch and DLC .pkg files in the scan roots, with the queue and the results. - Installed games: games installed on the console ( /user/app and extended storage) show in the Library too. Kraken Mount…",
-   "url": "https://github.com/quer3q/kraken-mount/releases/tag/v0.4.0",
-   "stars": 647,
-   "score": 2.5
   },
   {
    "id": "abrocoma/PS5-Linux-Flasher@v1.6.5",
@@ -249,21 +279,6 @@
    "score": 7.64
   },
   {
-   "id": "mr-Native/PSWloader@v1.1",
-   "kind": "new",
-   "repo": "mr-Native/PSWloader",
-   "cid": "",
-   "name": "PSWloader",
-   "tag": "v1.1",
-   "pre": false,
-   "date": "2026-11-25T03:19:07Z",
-   "desc": "Native Windows 11 on PS5",
-   "notes": "v1.1 is the stable release of the v1.0.5 betas plus the fixes below. Firmware r5.26.6, GPU driver 0.7.216.1227, PSWloader.elf release 2026-11-25. What's new - HDMI audio: Windows now has a Digital Output audio device and plays sound over HDMI (stereo). The GPU driver turns on the audio stream to the console's HDMI bridge. - Wi-Fi connects: ps5wifi 1.0.5 finishes the WPA2…",
-   "stars": 129,
-   "url": "https://github.com/mr-Native/PSWloader",
-   "score": 11.36
-  },
-  {
    "id": "Swordpdf/PS5SX2@vk-285-345",
    "kind": "update",
    "repo": "Swordpdf/PS5SX2",
@@ -274,7 +289,7 @@
    "date": "2026-11-24T23:24:25Z",
    "notes": "PS5SX2 2.61 (build vk-285-345) Performance improvements. Download - PS5SX2-vk-285-345.zip : the app (eboot and files). The installer and System update install it for you. SHA-256: c85d4636f5d9cec182ad7173b1b566b02aef3bdce64ba247cd1b3eecd13a973f - PS5SX2Installer.elf : the installer (1.5, unchanged). Send it once and it installs this build; after that, use System update in the…",
    "url": "https://github.com/Swordpdf/PS5SX2/releases/tag/vk-285-345",
-   "stars": 1705,
+   "stars": 1706,
    "score": 1.2
   },
   {
@@ -290,7 +305,7 @@
    "notes": "Fixed - The Linux release plays game movies: it links a small static FFmpeg (FFmpeg's own H.264, HEVC, VP8/VP9, AAC, Opus, Vorbis and MP3 decoders, no other libraries), so it needs no FFmpeg on the system and works whatever FFmpeg version the distribution has. The 0.1.8 archive was built without FFmpeg, and Astro Bot crashed at its first movie ( 7).",
    "stars": 77,
    "url": "https://github.com/keklick1337/rps5e",
-   "score": 4.28
+   "score": 4.08
   },
   {
    "id": "kvaps/ProsperoWeb@v0.3.1",
@@ -332,23 +347,8 @@
    "date": "2026-11-24T15:02:32Z",
    "notes": "Whats new: Web Control Center (New) No more manually editing a .conf file. PrefBar now includes a built-in web dashboard. - Easy Customization: Adjust colors, font size, text shadow, screen position, layout, alignment, and spacing right from your browser. - Live Preview: See exactly how the overlay looks while you change the settings. - Instant Apply: Save directly to your…",
    "url": "https://github.com/X1NONs/PrefBar/releases/tag/v0.3.1",
-   "stars": 81,
-   "score": 4.8
-  },
-  {
-   "id": "folksheesh/PS-5-Emulator@1.3.5",
-   "kind": "new",
-   "repo": "folksheesh/PS-5-Emulator",
-   "cid": "",
-   "name": "PS-5-Emulator",
-   "tag": "1.3.5",
-   "pre": false,
-   "date": "2026-11-24T12:26:53Z",
-   "desc": "Experience PlayStation 5 Pro emulation on your PC.",
-   "notes": "-",
-   "stars": 61,
-   "url": "https://github.com/folksheesh/PS-5-Emulator",
-   "score": 6.44
+   "stars": 86,
+   "score": 2.0
   },
   {
    "id": "grimmtroll2285-dot/TITAN@fix12",
@@ -363,7 +363,7 @@
    "notes": "TITAN FIX12 · 1.0.10 · stable Что нового в FIX12 - Kraken Mount 0.3.2 и официальный AMPR 0.5.1. Обновлены нативный движок и модуль чтения упакованных игр. - Закрытие и переход между ELF игры: собственные монтирования в песочнице снимаются сразу после выхода, библиотечный overlay кратко сохраняется для перехода к следующему ELF той же игры. Занятые и чужие монтирования…",
    "stars": 6,
    "url": "https://github.com/grimmtroll2285-dot/TITAN",
-   "score": 4.44
+   "score": 4.24
   },
   {
    "id": "heydemoura/EglantinePS5@v1.000.004",
@@ -378,7 +378,7 @@
    "notes": "Pre-release. Two pull requests since v1.000.003, both about memory, and both built on work from PS5 Lichii. - Mario Kart World no longer ends early in a session on a PS5 Pro. In our console tests all five 30-minute sessions ran, at about 31 FPS; before, a session ended within minutes. Two causes are fixed. The game changed its render resolution every frame after a single late…",
    "stars": 456,
    "url": "https://github.com/heydemoura/EglantinePS5",
-   "score": 12.8
+   "score": 12.0
   },
   {
    "id": "VivaLaVent/ps5-bazzite-deck@v3.0.4",
@@ -391,8 +391,8 @@
    "date": "2026-11-23T18:37:39Z",
    "notes": "What's new Stable. Everything since v3.0, the previous Stable. Fixed - Games no longer drop out of Game Mode when VRAM fills up ( Failed to pin framebuffer : Returnal, Rift Apart, Miles Morales, Avowed and others). Game Mode keeps 512 MiB of VRAM for its own session; ps5-report shows VRAM floor for Game Mode: system 512 MiB, session 512 MiB . Steam's Force Composite is no…",
    "url": "https://github.com/VivaLaVent/ps5-bazzite-deck/releases/tag/v3.0.4",
-   "stars": 629,
-   "score": 1.2
+   "stars": 632,
+   "score": 1.6
   },
   {
    "id": "percdotdev/ps5-webkit-autoloader-esp32@0.8.4",
@@ -405,24 +405,9 @@
    "date": "2026-11-23T03:26:49Z",
    "desc": "ESP32 firmware: An automated payload loader for exploited PS5 consoles",
    "notes": "ESP32 firmware that serves itsPLK's WebKit Autoloader 0.8.4 to the PS5 over its own Wi-Fi, ESP32 PORTAL . Flash it Easiest: open the web flasher in Chrome or Edge. Choose your board, plug it in holding BOOT , press Install. It writes this release, checks it and restarts the board into the portal. By hand with esptool: put the board in download mode, then write the file for…",
-   "stars": 24,
+   "stars": 25,
    "url": "https://github.com/percdotdev/ps5-webkit-autoloader-esp32",
-   "score": 4.96
-  },
-  {
-   "id": "blue0x1/EmuFive@1.0.15",
-   "kind": "new",
-   "repo": "blue0x1/EmuFive",
-   "cid": "",
-   "name": "EmuFive",
-   "tag": "1.0.15",
-   "pre": false,
-   "date": "2026-11-23T01:48:50Z",
-   "desc": "A PS5 emulator for the PS4. Runs on a jailbroken PS4 with Linux, installed through PS4 Multiboot.",
-   "notes": "EmuFive 1.0.15: faster 3D games, Report a test, crash reports What's new - Faster 3D games: two new speed settings, GPU submit thread and Fewer memory traps, are on for all games (Settings, Games). Another Crab's Treasure went from 4–10 to 12–17 FPS. Each can be turned off for one game in its OPTIONS menu; Teardown starts with both off, since it runs faster without them. -…",
-   "stars": 382,
-   "url": "https://github.com/blue0x1/EmuFive",
-   "score": 8.6
+   "score": 5.2
   },
   {
    "id": "mihawk/PS5_Lichii@v0.2.0",
@@ -450,7 +435,7 @@
    "notes": "Keep the games you own playable: Alembic dumps an installed or disc game while it runs and turns it straight into an image, a folder or a package. 0.7.1 brings the suggestions from issue 6. New in 0.7.1 - Convert remembers your choices: the next conversion starts with the last one's format and options (never deleting the source; checking the output always starts on). \"Use the…",
    "url": "https://github.com/fthdgn-gh/Alembic/releases/tag/v0.7.1",
    "stars": 83,
-   "score": 1.4
+   "score": 1.0
   },
   {
    "id": "xXBneutzerNameXx/PS5-Cleanup@v1.3",
@@ -463,9 +448,9 @@
    "date": "2026-11-22T09:38:11Z",
    "desc": "Clean up a jailbroken PS5 like new, no reinstall.",
    "notes": "For the PS5 you only need ps5cleanup v1.3.elf . The ZIP contains the same file plus the guides (DE/EN), license and checksum. The app starts in test mode. Nothing is deleted until you switch test mode off and confirm. Updating from 1.2: the updater in 1.2 may put the new file next to the old one instead of replacing it. In that case simply delete the old file (e.g. ps5cleanup…",
-   "stars": 139,
+   "stars": 140,
    "url": "https://github.com/xXBneutzerNameXx/PS5-Cleanup",
-   "score": 9.96
+   "score": 9.8
   },
   {
    "id": "aarvsn/PS5Droid@v1.0.6",
@@ -492,8 +477,8 @@
    "date": "2026-11-22T02:34:08Z",
    "notes": "PS5 RetroArch-v4.7.0-beta-4 Four fixes from your reports, and achievements now make a sound. PS5 RetroArch is a passion project, not a piracy project. It exists so you can play the games you own on the console you own. - Piracy is not condoned. - No games, BIOS files, console firmware or decryption keys are included, and they never will be. - Use only legally obtained backups…",
    "url": "https://github.com/mihawk-99/PS5_RetroArch/releases/tag/v4.7.0-beta-4",
-   "stars": 452,
-   "score": 3.1
+   "stars": 454,
+   "score": 2.9
   },
   {
    "id": "ramalhoboss/XPS5@v1.1.0",
@@ -522,7 +507,7 @@
    "notes": "Prerelease: builds on computers with little memory, and Longshot's own title ID. Please report how the build goes on your computer, especially with Memory to use set low. Highlights - The builder now works on computers with little free memory. Before, it wanted about 10 GB free, and on some PCs the compile step was stopped for lack of memory. The window has a new Memory to use…",
    "url": "https://github.com/heydemoura/PS5_Longshot/releases/tag/v0.1.5",
    "stars": 245,
-   "score": 0.2
+   "score": 0.0
   },
   {
    "id": "NotHavocc/ps5-hwcon-plugin@v2.0.0",
@@ -537,7 +522,7 @@
    "notes": "changelog: 1. sidebar buttons have slightly changed 2. \"Display\" (\"Boot\" on plugin) page with HDMI link and boot options 3. CPU boost toggle, micro-stutter fix, better swap options, and a warm reboot shortcut button 4. gentler fan presets 5. other minor bug fixes",
    "stars": 18,
    "url": "https://github.com/NotHavocc/ps5-hwcon-plugin",
-   "score": 4.92
+   "score": 4.72
   },
   {
    "id": "NotHavocc/ps5-hwcon-gui@v2.0.0",
@@ -566,7 +551,7 @@
    "notes": "",
    "url": "https://github.com/ps5-payload-dev/elfldr/releases/tag/v0.28",
    "stars": 189,
-   "score": 2.1
+   "score": 1.5
   },
   {
    "id": "X-F1REBALL-X/HearBridge-PS5@v1.4.3",
@@ -580,7 +565,7 @@
    "notes": "HearBridge 1.4.3 - Headset connect and disconnect auto mode works - Interface layout updates for TV use - Optional ESP32-S3 board: plugs into the PS5 over USB and shows up as headphones, so Tempest 3D Audio can turn on while HearBridge still sends the sound to your real Bluetooth headset Flash file for the ESP32-S3: ESP32-S3-PS5-Audio-Sink.bin (write at offset 0x0 on the UART…",
    "url": "https://github.com/X-F1REBALL-X/HearBridge-PS5/releases/tag/v1.4.3",
    "stars": 224,
-   "score": 3.0
+   "score": 1.0
   },
   {
    "id": "holdmysocks/ps5-tailscale@v0.7.5",
@@ -593,7 +578,7 @@
    "date": "2026-11-19T13:00:20Z",
    "notes": "After updating, check your autoload settings. If a payload manager or autoloader starts Tailscale with the console, make sure it starts the new version, or the old one comes back after a restart. The easy way: keep that copy under a fixed name such as tailscale.elf and save the new release over it, or name its path under Payload file to keep up to date in the settings so the…",
    "url": "https://github.com/holdmysocks/ps5-tailscale/releases/tag/v0.7.5",
-   "stars": 75,
+   "stars": 77,
    "score": 1.4
   },
   {
@@ -652,7 +637,7 @@
    "date": "2026-11-16T16:36:05Z",
    "notes": "XPSemu Alpha 3.6 EvolutionX dashboard, Basic AI Texture Upscaler, games fixes. What's new Basic Texture Upscaler - Makes the game's textures twice as big as they load, for cleaner surfaces and text up close. - Two modes: - SGSR : edge-aware upscaling, done at once. - ESRGAN : the Real-ESRGAN AI model running on the PS5's GPU. It adds detail a plain upscale can't. Each texture…",
    "url": "https://github.com/ZiZc3/XPSemu/releases/tag/v3.6",
-   "stars": 220,
+   "stars": 221,
    "score": 2.7
   },
   {
@@ -666,8 +651,8 @@
    "date": "2026-11-16T16:26:00Z",
    "notes": "New in v1.4.1 - hotfix update Changed - Faster to move through: a held direction speeds up in the Settings' lists and search, a held range speeds up (5 steps, then 25), and L2 / R2 step on while held (letters, pages). A game's page no longer draws the library under it, and the new screens' shadows cost about half the drawing. - Cross changes a choice or a range in the…",
    "url": "https://github.com/Press5elect/PSFlycast/releases/tag/v1.4.1",
-   "stars": 40,
-   "score": 1.0
+   "stars": 41,
+   "score": 1.2
   },
   {
    "id": "Vampinity/GreenHatBoy@alpha-t186",
@@ -709,8 +694,8 @@
    "date": "2026-11-14T22:44:59Z",
    "notes": "Changelog : https://github.com/jamesst20/ps5-y2jb-installer/blob/59a572a/CHANGELOG.md Full Changelog : https://github.com/jamesst20/ps5-y2jb-installer/compare/v1.3.0...v1.4.0 Y2JB Installer 1.4.0 1.4.0 — 2026-11-14 Changed - The console card offers one action for the current state: Connect and Scan while nothing answers, then Disconnect once elfldr or the payload is found.…",
    "url": "https://github.com/jamesst20/ps5-y2jb-installer/releases/tag/v1.4.0",
-   "stars": 190,
-   "score": 3.3
+   "stars": 192,
+   "score": 2.9
   },
   {
    "id": "saawant12/orbit-play-ps5@v0.8.1",
@@ -723,7 +708,7 @@
    "date": "2026-11-14T20:27:59Z",
    "notes": "Orbit Play 0.8.1 (Beta) Orbit Play is a free, open-source Remote Play app for jailbroken PS5s on Mac, Windows and Linux. Stream without a PSN sign-in, including from offline PS5 accounts that have never been linked to PSN. Account setup, the account ID, the Remote Play PIN, pairing and streaming all happen in one desktop app, so there's no base64 account-ID conversion, PIN…",
    "url": "https://github.com/saawant12/orbit-play-ps5/releases/tag/v0.8.1",
-   "stars": 39,
+   "stars": 40,
    "score": 1.2
   },
   {
@@ -738,7 +723,7 @@
    "notes": "Someone republished PatchDL 0.3.12 as \"Updater Games\" and replaced my name with theirs in every file: B4ckd0orl/Updater-Games (my request to fix it). This release makes the authorship visible in PatchDL itself. - The settings page now ends with an About box: copyright, license, a link to the source, and where the ELF was built. Official builds say \"Built from…",
    "url": "https://github.com/knutwurst/ps5-patchdl/releases/tag/v0.3.13",
    "stars": 295,
-   "score": 1.2
+   "score": 1.0
   },
   {
    "id": "gasb07/ps4mount@v0.8.0",
@@ -780,8 +765,8 @@
    "date": "2026-11-12T04:19:38Z",
    "notes": "The optional EmulationStation launcher, downloaded from inside Playtendoh (Settings Launcher). Not a Playtendoh release.",
    "url": "https://github.com/premohq/PlayTendoh/releases/tag/es-de-1",
-   "stars": 536,
-   "score": 0.4
+   "stars": 539,
+   "score": 0.6
   },
   {
    "id": "seregonwar/PBS-Payload@v0.4.0-beta.6",
@@ -796,21 +781,6 @@
    "url": "https://github.com/seregonwar/PBS-Payload/releases/tag/v0.4.0-beta.6",
    "stars": 46,
    "score": 0.0
-  },
-  {
-   "id": "freefelt/Transmission-PS5@0.4",
-   "kind": "new",
-   "repo": "freefelt/Transmission-PS5",
-   "cid": "",
-   "name": "Transmission-PS5",
-   "tag": "0.4",
-   "pre": false,
-   "date": "2026-11-11T08:20:20Z",
-   "desc": "The Transmission BitTorrent client as a homebrew payload for the PlayStation 5",
-   "notes": "Changes - Improved the closing flow. - Added updating from the settings page. - Add Torrents: the \"Browse…\" button is now localized. - A .torrent file can now be chosen on the console. - Diagnostics now has a button that prepares a report for the author. - Interface improvements. - .torrent files can be chosen on iPad Safari again. Install How to install",
-   "stars": 14,
-   "url": "https://github.com/freefelt/Transmission-PS5",
-   "score": 5.16
   },
   {
    "id": "bps2414/lineup@v2.0.1",
@@ -838,7 +808,7 @@
    "notes": "LiveShell Engine v1.7.0 Animated tiles, 4K per game. What's new - Animated tiles 🎞️ - Your game and app icons move on the home screen: give any tile an APNG (animated PNG) or a GIF . - Works on any game or app , and on the PlayStation Store tile too. - Choose it in Library → pick a game → Animated Tile . Original icon gives the normal icon back. - Put your files in…",
    "url": "https://github.com/ZiZc3/LiveShell/releases/tag/v1.7.0",
    "stars": 225,
-   "score": 2.7
+   "score": 2.5
   },
   {
    "id": "MisterTemaki/fbneo-ps5@v2.4",
@@ -893,8 +863,8 @@
    "date": "2026-11-09T08:20:23Z",
    "notes": "Weekly Test Build",
    "url": "https://github.com/chiaki-ng/chiaki-ng/releases/tag/weekly-canary-release-43728af2e639fecb8a7af1cd68c29820a40de973",
-   "stars": 3351,
-   "score": 9.0
+   "stars": 3364,
+   "score": 7.6
   },
   {
    "id": "JVK3R/JobeesLair@v0.5.7",
@@ -907,9 +877,9 @@
    "date": "2026-11-09T04:21:27Z",
    "desc": "Standalone, content-neutral PS5 homebrew indexer and media framework. Proudly built alongside AI by JVK3R.",
    "notes": "New games keep reaching the store between releases, in a new catalog format. Changed - The store's catalog comes in a new format. New games keep arriving between releases. 0.5.6 and earlier stop receiving them and keep the games they already have, so update to keep the store current. Installing On 0.5.2 to 0.5.6: open Jobee'sLair and it offers 0.5.7. Download it, then Restart…",
-   "stars": 323,
+   "stars": 326,
    "url": "https://github.com/JVK3R/JobeesLair",
-   "score": 11.0
+   "score": 10.6
   },
   {
    "id": "ps5-payload-dev/ftpsrv@v0.22",
@@ -922,7 +892,7 @@
    "date": "2026-11-08T21:40:53Z",
    "notes": "cmd: initialize addr len before accept() in ftp data open",
    "url": "https://github.com/ps5-payload-dev/ftpsrv/releases/tag/v0.22",
-   "stars": 241,
+   "stars": 242,
    "score": 1.7
   },
   {
@@ -936,8 +906,8 @@
    "date": "2026-11-08T20:02:14Z",
    "notes": "- Introduced configuration format v2, with separate config.ini and profiles.ini, automatic migration, and runtime reloads. - Improved mount and launch recovery, including safer cleanup of sandbox layers and handling for M.2 storage. - Made library scans more resilient to inaccessible folders and source changes. - Improved metadata and filename handling for PS4 trophies, sce…",
    "url": "https://github.com/drakmor/ShadowMountPlus/releases/tag/1.7beta12",
-   "stars": 1512,
-   "score": 4.5
+   "stars": 1525,
+   "score": 3.1
   },
   {
    "id": "mihawk-99/PS5_MihawkOS@v8.2.0-alpha-8",
@@ -950,8 +920,8 @@
    "date": "2026-11-08T13:11:54Z",
    "notes": "PS5 MihawkOS-v8.2.0-alpha-8 MihawkOS is a passion project, not a piracy project. It exists so you can play the games you own on the console you own. - Piracy is not condoned. - No games, saves, keys, firmware or exploits are included, and they never will be. - Use only games and programs you have the right to run : your own copies, bought or installed by you. - Requests for,…",
    "url": "https://github.com/mihawk-99/PS5_MihawkOS/releases/tag/v8.2.0-alpha-8",
-   "stars": 413,
-   "score": 1.7
+   "stars": 415,
+   "score": 1.9
   },
   {
    "id": "MasterShivnath007/ytps5-sponsorblock@v1.2.0",
@@ -979,8 +949,8 @@
    "date": "2026-11-03T20:12:18Z",
    "notes": "CheatRunner v0.18.1 See the full changelog here: Changelog ⚠️ Before updating to a new CheatRunner version, please follow these steps: Updating CheatRunner Special Thanks: 💖 Supporters — those who supported the project through Ko-Fi, Buy Me a Coffee, or PIX. • Vinas • Someone • Bruno Sanglard • AirKingBR • Marcus • Jeffs • cavalcanti27 • Maffioh • PCYGOR • Lucas Clinio Maraia…",
    "url": "https://github.com/notmaj0r/CheatRunner/releases/tag/v0.18.1",
-   "stars": 321,
-   "score": 1.0
+   "stars": 322,
+   "score": 1.2
   },
   {
    "id": "elripalda/Porpoise-Dolphin-Emulator-for-PS5@v4.5",
@@ -993,8 +963,8 @@
    "date": "2026-11-03T19:07:50Z",
    "notes": "Porpoise 4.5 A new look, PlayStation Move motion controls, up to four players in Wii games, Triforce arcade games, and VRR. The new look - A new Porpoise look built around your collection: real disc cases you move through with the stick, in Light , Dark or OLED - The side menu: press Triangle , or swipe in from the right edge of the touch pad, to reach Settings and everything…",
    "url": "https://github.com/elripalda/Porpoise-Dolphin-Emulator-for-PS5/releases/tag/v4.5",
-   "stars": 252,
-   "score": 2.7
+   "stars": 254,
+   "score": 2.9
   },
   {
    "id": "disco-trooper/hush@v1.1.1",
@@ -1109,7 +1079,7 @@
    "notes": "Snes9x PS5 2.11 New: RetroAchievements Achievements for SNES games from retroachievements.org, with RetroAchievements' own client library (rcheevos 12.5.0). - Logging in. Settings RetroAchievements Log in, with your retroachievements.org user name and password. - The password is hidden as you type and sent once. Only the token the server sends back is kept, in…",
    "url": "https://github.com/MisterTemaki/snes9xPS5/releases/tag/v2.11",
    "stars": 69,
-   "score": 2.7
+   "score": 2.5
   },
   {
    "id": "freefelt/StoreTileHider-PS5@0.1",
@@ -1152,9 +1122,38 @@
    "date": "2026-10-31T00:54:04Z",
    "desc": "Watch, hear and record a jailbroken PS5 on your Windows PC with low latency.",
    "notes": "[!IMPORTANT] Glint only works in 60 Hz mode. If a game switches the PS5 to 120 Hz, capture stops until you restart the console. - Glint turns 120 Hz Output off while it runs and puts your setting back when you stop it. - Load Glint from the home screen, before you start a game. - A fix for 120 Hz mode is in the works. Lower latency - Sound much closer to the picture: about…",
-   "stars": 19,
+   "stars": 20,
    "url": "https://github.com/MiladRTX/Glint",
-   "score": 4.96
+   "score": 5.0
+  },
+  {
+   "id": "niakw/ProsperoEden-Encore@encore-test-56293953",
+   "kind": "new",
+   "repo": "niakw/ProsperoEden-Encore",
+   "cid": "",
+   "name": "ProsperoEden-Encore",
+   "tag": "encore-test-56293953",
+   "pre": true,
+   "date": "2026-10-30T03:32:26Z",
+   "desc": "ProsperoEden Encore experimental Switch 1 + 2 (NS1/NS2) emulator PS5 FW 13.60. Audited Eden Vulkan/OpenGL, per-core JIT, FSR, DualSense TV-first UI, 31 languages, multiplayer lobby, per-game profiles, hardened releases. NSP/XCI/NSZ/XCZ/ExeFS/NRO/NSO/NCA/NAX/KIP/NUP/NX/DNSP/DXCI…",
+   "notes": "Eden Encore — validated native PS5 test package Source SHA: 5629395324ff65c98b50c44f35f2142a4a92654a Successful native CI: https://github.com/niakw/Prospero.Eden-Encore/actions/runs/38752177232 This ZIP is repackaged from the existing successful CI artifact , without recompiling or changing PPSA99008/ . It is a test pre-release , not a stable R1. The selected All-On test build…",
+   "stars": 134,
+   "url": "https://github.com/niakw/ProsperoEden-Encore",
+   "score": 8.56
+  },
+  {
+   "id": "heydemoura/ProsperoEden@v1.000.111",
+   "kind": "update",
+   "repo": "heydemoura/ProsperoEden",
+   "cid": "prosperoeden",
+   "name": "ProsperoEden",
+   "tag": "v1.000.111",
+   "pre": true,
+   "date": "2026-10-29T21:36:41Z",
+   "notes": "This is a mirror of the last version of ProsperoEden by BlackBearReloaded. Until the upstream ProsperoEden repository is made public again this will serve as ProsperoEden distribution - A new title ID: PPSA99016. ProsperoEden used to be PPSA99008, the ID of the earlier ProsperoEden listed in the homebrew catalog, whose repository is not public currently. This version installs…",
+   "url": "https://github.com/heydemoura/ProsperoEden/releases/tag/v1.000.111",
+   "stars": 60,
+   "score": 0.0
   }
  ],
  "hot": [
@@ -1190,10 +1189,6 @@
  "hist": {
   "bornaradusin/pc5": [
    [
-    "2026-11-19",
-    153
-   ],
-   [
     "2026-11-20",
     154
    ],
@@ -1220,13 +1215,13 @@
    [
     "2026-11-26",
     166
+   ],
+   [
+    "2026-11-27",
+    167
    ]
   ],
   "jstrdev/ps5directo": [
-   [
-    "2026-11-19",
-    88
-   ],
    [
     "2026-11-20",
     88
@@ -1254,13 +1249,13 @@
    [
     "2026-11-26",
     96
+   ],
+   [
+    "2026-11-27",
+    96
    ]
   ],
   "fthdgn-gh/alembic": [
-   [
-    "2026-11-19",
-    78
-   ],
    [
     "2026-11-20",
     79
@@ -1288,13 +1283,13 @@
    [
     "2026-11-26",
     83
+   ],
+   [
+    "2026-11-27",
+    83
    ]
   ],
   "bps2414/lineup": [
-   [
-    "2026-11-19",
-    20
-   ],
    [
     "2026-11-20",
     20
@@ -1322,13 +1317,13 @@
    [
     "2026-11-26",
     20
+   ],
+   [
+    "2026-11-27",
+    20
    ]
   ],
   "vivalavent/ps5-bazzite-deck": [
-   [
-    "2026-11-19",
-    587
-   ],
    [
     "2026-11-20",
     591
@@ -1356,13 +1351,13 @@
    [
     "2026-11-26",
     629
+   ],
+   [
+    "2026-11-27",
+    632
    ]
   ],
   "mistertemaki/fbneo-ps5": [
-   [
-    "2026-11-19",
-    17
-   ],
    [
     "2026-11-20",
     18
@@ -1390,13 +1385,13 @@
    [
     "2026-11-26",
     18
+   ],
+   [
+    "2026-11-27",
+    18
    ]
   ],
   "zizc3/vlc": [
-   [
-    "2026-11-19",
-    76
-   ],
    [
     "2026-11-20",
     76
@@ -1424,13 +1419,13 @@
    [
     "2026-11-26",
     78
+   ],
+   [
+    "2026-11-27",
+    78
    ]
   ],
   "zizc3/xpsemu": [
-   [
-    "2026-11-19",
-    217
-   ],
    [
     "2026-11-20",
     217
@@ -1458,13 +1453,13 @@
    [
     "2026-11-26",
     220
+   ],
+   [
+    "2026-11-27",
+    221
    ]
   ],
   "xxbneutzernamexx/ps5-cleanup": [
-   [
-    "2026-11-19",
-    117
-   ],
    [
     "2026-11-20",
     123
@@ -1492,13 +1487,13 @@
    [
     "2026-11-26",
     139
+   ],
+   [
+    "2026-11-27",
+    140
    ]
   ],
   "quer3q/ps5-dump-forge": [
-   [
-    "2026-11-19",
-    524
-   ],
    [
     "2026-11-20",
     528
@@ -1526,13 +1521,13 @@
    [
     "2026-11-26",
     603
+   ],
+   [
+    "2026-11-27",
+    610
    ]
   ],
   "elripalda/gta4-ps5": [
-   [
-    "2026-11-19",
-    104
-   ],
    [
     "2026-11-20",
     105
@@ -1560,13 +1555,13 @@
    [
     "2026-11-26",
     113
+   ],
+   [
+    "2026-11-27",
+    113
    ]
   ],
   "blue0x1/emufive": [
-   [
-    "2026-11-19",
-    335
-   ],
    [
     "2026-11-20",
     341
@@ -1594,13 +1589,13 @@
    [
     "2026-11-26",
     382
+   ],
+   [
+    "2026-11-27",
+    388
    ]
   ],
   "streetpea/chiaki-ng": [
-   [
-    "2026-11-19",
-    3185
-   ],
    [
     "2026-11-20",
     3215
@@ -1628,13 +1623,13 @@
    [
     "2026-11-26",
     3351
+   ],
+   [
+    "2026-11-27",
+    3364
    ]
   ],
   "aarvsn/ps5droid": [
-   [
-    "2026-11-19",
-    73
-   ],
    [
     "2026-11-20",
     75
@@ -1662,13 +1657,13 @@
    [
     "2026-11-26",
     86
+   ],
+   [
+    "2026-11-27",
+    86
    ]
   ],
   "jvk3r/jobeeslair": [
-   [
-    "2026-11-19",
-    312
-   ],
    [
     "2026-11-20",
     313
@@ -1696,13 +1691,13 @@
    [
     "2026-11-26",
     323
+   ],
+   [
+    "2026-11-27",
+    326
    ]
   ],
   "notmaj0r/prosperomgr": [
-   [
-    "2026-11-19",
-    379
-   ],
    [
     "2026-11-20",
     380
@@ -1730,13 +1725,13 @@
    [
     "2026-11-26",
     392
+   ],
+   [
+    "2026-11-27",
+    392
    ]
   ],
   "ps5-payload-dev/ftpsrv": [
-   [
-    "2026-11-19",
-    237
-   ],
    [
     "2026-11-20",
     238
@@ -1764,13 +1759,13 @@
    [
     "2026-11-26",
     241
+   ],
+   [
+    "2026-11-27",
+    242
    ]
   ],
   "drakmor/shadowmountplus": [
-   [
-    "2026-11-19",
-    1434
-   ],
    [
     "2026-11-20",
     1440
@@ -1798,13 +1793,13 @@
    [
     "2026-11-26",
     1512
+   ],
+   [
+    "2026-11-27",
+    1525
    ]
   ],
   "x1nons/prefbar": [
-   [
-    "2026-11-19",
-    49
-   ],
    [
     "2026-11-20",
     49
@@ -1832,13 +1827,13 @@
    [
     "2026-11-26",
     81
+   ],
+   [
+    "2026-11-27",
+    86
    ]
   ],
   "mihawk-99/ps5_mihawkos": [
-   [
-    "2026-11-19",
-    408
-   ],
    [
     "2026-11-20",
     409
@@ -1866,13 +1861,13 @@
    [
     "2026-11-26",
     413
+   ],
+   [
+    "2026-11-27",
+    415
    ]
   ],
   "percdotdev/ps5-webkit-autoloader-esp32": [
-   [
-    "2026-11-19",
-    15
-   ],
    [
     "2026-11-20",
     17
@@ -1900,13 +1895,13 @@
    [
     "2026-11-26",
     24
+   ],
+   [
+    "2026-11-27",
+    25
    ]
   ],
   "nothavocc/ps5-hwcon-plugin": [
-   [
-    "2026-11-19",
-    17
-   ],
    [
     "2026-11-20",
     17
@@ -1934,13 +1929,13 @@
    [
     "2026-11-26",
     18
+   ],
+   [
+    "2026-11-27",
+    18
    ]
   ],
   "nothavocc/ps5-hwcon-gui": [
-   [
-    "2026-11-19",
-    12
-   ],
    [
     "2026-11-20",
     12
@@ -1968,13 +1963,13 @@
    [
     "2026-11-26",
     12
+   ],
+   [
+    "2026-11-27",
+    12
    ]
   ],
   "swordpdf/ps5sx2": [
-   [
-    "2026-11-19",
-    1691
-   ],
    [
     "2026-11-20",
     1695
@@ -2002,13 +1997,13 @@
    [
     "2026-11-26",
     1705
+   ],
+   [
+    "2026-11-27",
+    1706
    ]
   ],
   "gasb07/ps4mount": [
-   [
-    "2026-11-19",
-    230
-   ],
    [
     "2026-11-20",
     230
@@ -2036,13 +2031,13 @@
    [
     "2026-11-26",
     236
+   ],
+   [
+    "2026-11-27",
+    236
    ]
   ],
   "mastershivnath007/ytps5-sponsorblock": [
-   [
-    "2026-11-19",
-    11
-   ],
    [
     "2026-11-20",
     12
@@ -2070,13 +2065,13 @@
    [
     "2026-11-26",
     12
+   ],
+   [
+    "2026-11-27",
+    12
    ]
   ],
   "holdmysocks/ps5-tailscale": [
-   [
-    "2026-11-19",
-    70
-   ],
    [
     "2026-11-20",
     70
@@ -2104,13 +2099,13 @@
    [
     "2026-11-26",
     75
+   ],
+   [
+    "2026-11-27",
+    77
    ]
   ],
   "notmaj0r/cheatrunner": [
-   [
-    "2026-11-19",
-    316
-   ],
    [
     "2026-11-20",
     318
@@ -2138,13 +2133,13 @@
    [
     "2026-11-26",
     321
+   ],
+   [
+    "2026-11-27",
+    322
    ]
   ],
   "elripalda/porpoise-dolphin-emulator-for-ps5": [
-   [
-    "2026-11-19",
-    245
-   ],
    [
     "2026-11-20",
     248
@@ -2172,13 +2167,13 @@
    [
     "2026-11-26",
     252
+   ],
+   [
+    "2026-11-27",
+    254
    ]
   ],
   "disco-trooper/hush": [
-   [
-    "2026-11-19",
-    16
-   ],
    [
     "2026-11-20",
     16
@@ -2205,15 +2200,15 @@
    ],
    [
     "2026-11-26",
+    17
+   ],
+   [
+    "2026-11-27",
     17
    ]
   ],
   "herbrax/chiral-ftp": [
    [
-    "2026-11-19",
-    10
-   ],
-   [
     "2026-11-20",
     10
    ],
@@ -2240,13 +2235,13 @@
    [
     "2026-11-26",
     10
+   ],
+   [
+    "2026-11-27",
+    10
    ]
   ],
   "gasb07/neoenabler": [
-   [
-    "2026-11-19",
-    237
-   ],
    [
     "2026-11-20",
     238
@@ -2274,13 +2269,13 @@
    [
     "2026-11-26",
     245
+   ],
+   [
+    "2026-11-27",
+    247
    ]
   ],
   "knutwurst/ps5-patchdl": [
-   [
-    "2026-11-19",
-    285
-   ],
    [
     "2026-11-20",
     288
@@ -2308,13 +2303,13 @@
    [
     "2026-11-26",
     295
+   ],
+   [
+    "2026-11-27",
+    295
    ]
   ],
   "saawant12/orbit-play-ps5": [
-   [
-    "2026-11-19",
-    34
-   ],
    [
     "2026-11-20",
     34
@@ -2342,13 +2337,13 @@
    [
     "2026-11-26",
     39
+   ],
+   [
+    "2026-11-27",
+    40
    ]
   ],
   "kvaps/prosperoweb": [
-   [
-    "2026-11-19",
-    51
-   ],
    [
     "2026-11-20",
     52
@@ -2376,13 +2371,13 @@
    [
     "2026-11-26",
     56
+   ],
+   [
+    "2026-11-27",
+    56
    ]
   ],
   "bornaradusin/emby5": [
-   [
-    "2026-11-19",
-    13
-   ],
    [
     "2026-11-20",
     13
@@ -2410,13 +2405,13 @@
    [
     "2026-11-26",
     14
+   ],
+   [
+    "2026-11-27",
+    14
    ]
   ],
   "keklick1337/rps5e": [
-   [
-    "2026-11-19",
-    74
-   ],
    [
     "2026-11-20",
     75
@@ -2444,13 +2439,13 @@
    [
     "2026-11-26",
     77
+   ],
+   [
+    "2026-11-27",
+    77
    ]
   ],
   "mucahidkambur/eglantineps5": [
-   [
-    "2026-11-19",
-    229
-   ],
    [
     "2026-11-20",
     229
@@ -2477,6 +2472,10 @@
    ],
    [
     "2026-11-26",
+    227
+   ],
+   [
+    "2026-11-27",
     227
    ]
   ],
@@ -2516,10 +2515,6 @@
   ],
   "press5elect/crux2": [
    [
-    "2026-11-19",
-    28
-   ],
-   [
     "2026-11-20",
     28
    ],
@@ -2545,15 +2540,15 @@
    ],
    [
     "2026-11-26",
+    29
+   ],
+   [
+    "2026-11-27",
     29
    ]
   ],
   "press5elect/psswanstation": [
    [
-    "2026-11-19",
-    39
-   ],
-   [
     "2026-11-20",
     39
    ],
@@ -2579,15 +2574,15 @@
    ],
    [
     "2026-11-26",
+    39
+   ],
+   [
+    "2026-11-27",
     39
    ]
   ],
   "press5elect/psflycast": [
    [
-    "2026-11-19",
-    40
-   ],
-   [
     "2026-11-20",
     40
    ],
@@ -2614,14 +2609,14 @@
    [
     "2026-11-26",
     40
+   ],
+   [
+    "2026-11-27",
+    41
    ]
   ],
   "mistertemaki/snes9xps5": [
    [
-    "2026-11-19",
-    67
-   ],
-   [
     "2026-11-20",
     68
    ],
@@ -2647,6 +2642,10 @@
    ],
    [
     "2026-11-26",
+    69
+   ],
+   [
+    "2026-11-27",
     69
    ]
   ],
@@ -2686,10 +2685,6 @@
   ],
   "freefelt/storetilehider-ps5": [
    [
-    "2026-11-19",
-    6
-   ],
-   [
     "2026-11-20",
     6
    ],
@@ -2715,15 +2710,15 @@
    ],
    [
     "2026-11-26",
+    7
+   ],
+   [
+    "2026-11-27",
     7
    ]
   ],
   "rodri0x/ps5-hackintosh": [
    [
-    "2026-11-19",
-    138
-   ],
-   [
     "2026-11-20",
     139
    ],
@@ -2749,6 +2744,10 @@
    ],
    [
     "2026-11-26",
+    143
+   ],
+   [
+    "2026-11-27",
     143
    ]
   ],
@@ -2788,10 +2787,6 @@
   ],
   "miladrtx/glint": [
    [
-    "2026-11-19",
-    19
-   ],
-   [
     "2026-11-20",
     19
    ],
@@ -2818,13 +2813,13 @@
    [
     "2026-11-26",
     19
+   ],
+   [
+    "2026-11-27",
+    20
    ]
   ],
   "heydemoura/eglantineps5": [
-   [
-    "2026-11-19",
-    413
-   ],
    [
     "2026-11-20",
     416
@@ -2851,6 +2846,10 @@
    ],
    [
     "2026-11-26",
+    456
+   ],
+   [
+    "2026-11-27",
     456
    ]
   ],
@@ -2890,10 +2889,6 @@
   ],
   "niakw/prosperoeden-encore": [
    [
-    "2026-11-19",
-    122
-   ],
-   [
     "2026-11-20",
     123
    ],
@@ -2920,13 +2915,13 @@
    [
     "2026-11-26",
     133
+   ],
+   [
+    "2026-11-27",
+    134
    ]
   ],
   "heydemoura/prosperoeden": [
-   [
-    "2026-11-19",
-    50
-   ],
    [
     "2026-11-20",
     51
@@ -2954,13 +2949,13 @@
    [
     "2026-11-26",
     60
+   ],
+   [
+    "2026-11-27",
+    60
    ]
   ],
   "holdmysocks/mcla-recomp": [
-   [
-    "2026-11-10",
-    238
-   ],
    [
     "2026-11-11",
     238
@@ -2988,13 +2983,13 @@
    [
     "2026-11-26",
     251
+   ],
+   [
+    "2026-11-27",
+    251
    ]
   ],
   "griches/jamespond2robocodrecomp": [
-   [
-    "2026-11-19",
-    25
-   ],
    [
     "2026-11-20",
     26
@@ -3021,15 +3016,15 @@
    ],
    [
     "2026-11-26",
+    26
+   ],
+   [
+    "2026-11-27",
     26
    ]
   ],
   "seregonwar/zftpd": [
    [
-    "2026-11-19",
-    141
-   ],
-   [
     "2026-11-20",
     141
    ],
@@ -3056,13 +3051,13 @@
    [
     "2026-11-26",
     141
+   ],
+   [
+    "2026-11-27",
+    141
    ]
   ],
   "premohq/ps5-ecam": [
-   [
-    "2026-11-19",
-    526
-   ],
    [
     "2026-11-20",
     526
@@ -3090,6 +3085,10 @@
    [
     "2026-11-26",
     536
+   ],
+   [
+    "2026-11-27",
+    539
    ]
   ],
   "xavyprod-git/pkg-mutant-shop": [
@@ -3162,10 +3161,6 @@
   ],
   "ballerisleet/anycontroller": [
    [
-    "2026-11-19",
-    18
-   ],
-   [
     "2026-11-20",
     18
    ],
@@ -3192,14 +3187,14 @@
    [
     "2026-11-26",
     18
+   ],
+   [
+    "2026-11-27",
+    19
    ]
   ],
   "wigglez-sudo/12.xx-linux-loader": [
    [
-    "2026-11-19",
-    54
-   ],
-   [
     "2026-11-20",
     54
    ],
@@ -3225,15 +3220,15 @@
    ],
    [
     "2026-11-26",
+    55
+   ],
+   [
+    "2026-11-27",
     55
    ]
   ],
   "mistertemaki/genplusgxps5": [
    [
-    "2026-11-19",
-    14
-   ],
-   [
     "2026-11-20",
     14
    ],
@@ -3259,15 +3254,15 @@
    ],
    [
     "2026-11-26",
+    14
+   ],
+   [
+    "2026-11-27",
     14
    ]
   ],
   "mistertemaki/beetlepceps5": [
    [
-    "2026-11-19",
-    2
-   ],
-   [
     "2026-11-20",
     2
    ],
@@ -3294,13 +3289,13 @@
    [
     "2026-11-26",
     2
+   ],
+   [
+    "2026-11-27",
+    2
    ]
   ],
   "itsblurf/bfpilot": [
-   [
-    "2026-11-19",
-    68
-   ],
    [
     "2026-11-20",
     68
@@ -3327,6 +3322,10 @@
    ],
    [
     "2026-11-26",
+    70
+   ],
+   [
+    "2026-11-27",
     70
    ]
   ],
@@ -3366,10 +3365,6 @@
   ],
   "brinootk/ps5x360": [
    [
-    "2026-11-19",
-    418
-   ],
-   [
     "2026-11-20",
     418
    ],
@@ -3396,13 +3391,13 @@
    [
     "2026-11-26",
     420
+   ],
+   [
+    "2026-11-27",
+    423
    ]
   ],
   "ps5-payload-dev/elfldr": [
-   [
-    "2026-11-19",
-    179
-   ],
    [
     "2026-11-20",
     179
@@ -3429,6 +3424,10 @@
    ],
    [
     "2026-11-26",
+    189
+   ],
+   [
+    "2026-11-27",
     189
    ]
   ],
@@ -3468,10 +3467,6 @@
   ],
   "griches/ps5_mariogalaxy": [
    [
-    "2026-11-19",
-    29
-   ],
-   [
     "2026-11-20",
     29
    ],
@@ -3497,15 +3492,15 @@
    ],
    [
     "2026-11-26",
+    29
+   ],
+   [
+    "2026-11-27",
     29
    ]
   ],
   "zizc3/ruffle-flash-ps5": [
    [
-    "2026-11-19",
-    20
-   ],
-   [
     "2026-11-20",
     20
    ],
@@ -3532,13 +3527,13 @@
    [
     "2026-11-26",
     20
+   ],
+   [
+    "2026-11-27",
+    20
    ]
   ],
   "mihawk-99/ps5_retroarch": [
-   [
-    "2026-11-19",
-    442
-   ],
    [
     "2026-11-20",
     443
@@ -3566,13 +3561,13 @@
    [
     "2026-11-26",
     452
+   ],
+   [
+    "2026-11-27",
+    454
    ]
   ],
   "marice/ps5-exporter": [
-   [
-    "2026-11-19",
-    13
-   ],
    [
     "2026-11-20",
     13
@@ -3600,13 +3595,13 @@
    [
     "2026-11-26",
     14
+   ],
+   [
+    "2026-11-27",
+    14
    ]
   ],
   "epinorr/y2jb-update-blocker": [
-   [
-    "2026-11-19",
-    68
-   ],
    [
     "2026-11-20",
     68
@@ -3634,13 +3629,13 @@
    [
     "2026-11-26",
     76
+   ],
+   [
+    "2026-11-27",
+    76
    ]
   ],
   "smoxa/ps5-new-overlay": [
-   [
-    "2026-11-19",
-    29
-   ],
    [
     "2026-11-20",
     29
@@ -3668,14 +3663,14 @@
    [
     "2026-11-26",
     35
+   ],
+   [
+    "2026-11-27",
+    37
    ]
   ],
   "therealretro/mupen64plus-ps5": [
    [
-    "2026-11-19",
-    38
-   ],
-   [
     "2026-11-20",
     38
    ],
@@ -3702,14 +3697,14 @@
    [
     "2026-11-26",
     37
+   ],
+   [
+    "2026-11-27",
+    38
    ]
   ],
   "02dnot/jelly5": [
    [
-    "2026-11-19",
-    47
-   ],
-   [
     "2026-11-20",
     50
    ],
@@ -3736,6 +3731,10 @@
    [
     "2026-11-26",
     52
+   ],
+   [
+    "2026-11-27",
+    53
    ]
   ],
   "abhi245y/ps5lm-plus": [
@@ -3774,10 +3773,6 @@
   ],
   "zigzagboi1/ps5-14.10-research": [
    [
-    "2026-11-19",
-    524
-   ],
-   [
     "2026-11-20",
     529
    ],
@@ -3804,13 +3799,13 @@
    [
     "2026-11-26",
     573
+   ],
+   [
+    "2026-11-27",
+    576
    ]
   ],
   "pinkythegawd/ps5-webkit-autoloader": [
-   [
-    "2026-11-19",
-    6
-   ],
    [
     "2026-11-20",
     6
@@ -3837,15 +3832,15 @@
    ],
    [
     "2026-11-26",
+    7
+   ],
+   [
+    "2026-11-27",
     7
    ]
   ],
   "fstat13/pscapture": [
    [
-    "2026-11-19",
-    8
-   ],
-   [
     "2026-11-20",
     8
    ],
@@ -3872,13 +3867,13 @@
    [
     "2026-11-26",
     8
+   ],
+   [
+    "2026-11-27",
+    8
    ]
   ],
   "lvndry/ps5-firmware-pin": [
-   [
-    "2026-11-19",
-    87
-   ],
    [
     "2026-11-20",
     87
@@ -3905,6 +3900,10 @@
    ],
    [
     "2026-11-26",
+    91
+   ],
+   [
+    "2026-11-27",
     91
    ]
   ],
@@ -3978,10 +3977,6 @@
   ],
   "griches/ps5_devtools": [
    [
-    "2026-11-19",
-    6
-   ],
-   [
     "2026-11-20",
     6
    ],
@@ -4007,15 +4002,15 @@
    ],
    [
     "2026-11-26",
+    6
+   ],
+   [
+    "2026-11-27",
     6
    ]
   ],
   "rodri0x/ps5-airplay": [
    [
-    "2026-11-19",
-    40
-   ],
-   [
     "2026-11-20",
     40
    ],
@@ -4041,6 +4036,10 @@
    ],
    [
     "2026-11-26",
+    40
+   ],
+   [
+    "2026-11-27",
     40
    ]
   ],
@@ -4386,10 +4385,6 @@
   ],
   "jamesst20/ps5-y2jb-installer": [
    [
-    "2026-11-19",
-    177
-   ],
-   [
     "2026-11-20",
     180
    ],
@@ -4416,6 +4411,10 @@
    [
     "2026-11-26",
     190
+   ],
+   [
+    "2026-11-27",
+    192
    ]
   ],
   "iziman127/ps5-dualsense-deadzone": [
@@ -4454,10 +4453,6 @@
   ],
   "deepkicks/titaniapy": [
    [
-    "2026-11-19",
-    6
-   ],
-   [
     "2026-11-20",
     7
    ],
@@ -4484,13 +4479,13 @@
    [
     "2026-11-26",
     7
+   ],
+   [
+    "2026-11-27",
+    7
    ]
   ],
   "x-f1reball-x/hearbridge-ps5": [
-   [
-    "2026-11-14",
-    198
-   ],
    [
     "2026-11-15",
     201
@@ -4518,13 +4513,13 @@
    [
     "2026-11-26",
     224
+   ],
+   [
+    "2026-11-27",
+    224
    ]
   ],
   "sub0x00001/octet": [
-   [
-    "2026-11-13",
-    20
-   ],
    [
     "2026-11-14",
     21
@@ -4551,6 +4546,10 @@
    ],
    [
     "2026-11-26",
+    23
+   ],
+   [
+    "2026-11-27",
     23
    ]
   ],
@@ -4590,10 +4589,6 @@
   ],
   "press5elect/ogbox": [
    [
-    "2026-11-19",
-    15
-   ],
-   [
     "2026-11-20",
     15
    ],
@@ -4620,13 +4615,13 @@
    [
     "2026-11-26",
     17
+   ],
+   [
+    "2026-11-27",
+    17
    ]
   ],
   "oliv3rmoon/solanum": [
-   [
-    "2026-11-19",
-    15
-   ],
    [
     "2026-11-20",
     15
@@ -4653,6 +4648,10 @@
    ],
    [
     "2026-11-26",
+    16
+   ],
+   [
+    "2026-11-27",
     16
    ]
   ],
@@ -4692,10 +4691,6 @@
   ],
   "heydemoura/ps5_longshot": [
    [
-    "2026-11-19",
-    161
-   ],
-   [
     "2026-11-20",
     189
    ],
@@ -4722,6 +4717,10 @@
    [
     "2026-11-26",
     245
+   ],
+   [
+    "2026-11-27",
+    245
    ]
   ],
   "forcevacavity/ps5-emulator-pc": [
@@ -4739,10 +4738,6 @@
    ]
   ],
   "griches/ps5_burnout3": [
-   [
-    "2026-11-19",
-    13
-   ],
    [
     "2026-11-20",
     14
@@ -4769,6 +4764,10 @@
    ],
    [
     "2026-11-26",
+    14
+   ],
+   [
+    "2026-11-27",
     14
    ]
   ],
@@ -5492,6 +5491,10 @@
    [
     "2026-11-26",
     32
+   ],
+   [
+    "2026-11-27",
+    32
    ]
   ],
   "sandypandymandy/gta-6-switch-version--pc-emulator-2026": [
@@ -5546,6 +5549,10 @@
    [
     "2026-11-26",
     6
+   ],
+   [
+    "2026-11-27",
+    6
    ]
   ],
   "iijegdumngfo/gta6-kytyps5-gta-6-pc-version": [
@@ -5574,6 +5581,10 @@
    [
     "2026-11-26",
     46
+   ],
+   [
+    "2026-11-27",
+    46
    ]
   ],
   "zizc3/liveshell": [
@@ -5595,6 +5606,10 @@
    ],
    [
     "2026-11-26",
+    225
+   ],
+   [
+    "2026-11-27",
     225
    ]
   ],
@@ -5618,6 +5633,10 @@
    [
     "2026-11-26",
     11
+   ],
+   [
+    "2026-11-27",
+    11
    ]
   ],
   "folksheesh/ps-5-emulator": [
@@ -5639,6 +5658,10 @@
    ],
    [
     "2026-11-26",
+    61
+   ],
+   [
+    "2026-11-27",
     61
    ]
   ],
@@ -5680,6 +5703,10 @@
    [
     "2026-11-26",
     117
+   ],
+   [
+    "2026-11-27",
+    117
    ]
   ],
   "gta6-tools/gta6-kytyps5-gta-6-pc-version": [
@@ -5718,6 +5745,10 @@
    [
     "2026-11-26",
     129
+   ],
+   [
+    "2026-11-27",
+    142
    ]
   ],
   "blank-worldwide/stable-kytyps5-gta6": [
@@ -5744,6 +5775,10 @@
    [
     "2026-11-26",
     447
+   ],
+   [
+    "2026-11-27",
+    462
    ]
   ],
   "kisame-tech/gta-6-stable-build": [
@@ -5776,17 +5811,29 @@
    [
     "2026-11-26",
     41
+   ],
+   [
+    "2026-11-27",
+    42
    ]
   ],
   "darkatek7/prosperosunshine": [
    [
     "2026-11-26",
     43
+   ],
+   [
+    "2026-11-27",
+    44
    ]
   ],
   "abrocoma/ps5-cachyos": [
    [
     "2026-11-26",
+    101
+   ],
+   [
+    "2026-11-27",
     101
    ]
   ],
@@ -5800,11 +5847,19 @@
    [
     "2026-11-26",
     647
+   ],
+   [
+    "2026-11-27",
+    650
    ]
   ],
   "abrocoma/ps5-linux-flasher": [
    [
     "2026-11-26",
+    16
+   ],
+   [
+    "2026-11-27",
     16
    ]
   ],
@@ -5812,17 +5867,29 @@
    [
     "2026-11-26",
     3
+   ],
+   [
+    "2026-11-27",
+    3
    ]
   ],
   "j7mbo/nasbridge-ps5": [
    [
     "2026-11-26",
     64
+   ],
+   [
+    "2026-11-27",
+    64
    ]
   ],
   "ramalhoboss/xps5": [
    [
     "2026-11-26",
+    6
+   ],
+   [
+    "2026-11-27",
     6
    ]
   ],
@@ -5836,11 +5903,19 @@
    [
     "2026-11-26",
     60
+   ],
+   [
+    "2026-11-27",
+    60
    ]
   ],
   "lineage-shell/lineage-ps1-for-ps5": [
    [
     "2026-11-26",
+    8
+   ],
+   [
+    "2026-11-27",
     8
    ]
   ],
@@ -5848,11 +5923,19 @@
    [
     "2026-11-26",
     10
+   ],
+   [
+    "2026-11-27",
+    10
    ]
   ],
   "vampinity/greenhatboy": [
    [
     "2026-11-26",
+    6
+   ],
+   [
+    "2026-11-27",
     6
    ]
   ],
@@ -5860,11 +5943,19 @@
    [
     "2026-11-26",
     7
+   ],
+   [
+    "2026-11-27",
+    7
    ]
   ],
   "cobanov/ps5lm": [
    [
     "2026-11-26",
+    881
+   ],
+   [
+    "2026-11-27",
     881
    ]
   ],
@@ -5872,11 +5963,19 @@
    [
     "2026-11-26",
     82
+   ],
+   [
+    "2026-11-27",
+    82
    ]
   ],
   "leafyjerk/ps5_luigismansion": [
    [
     "2026-11-26",
+    9
+   ],
+   [
+    "2026-11-27",
     9
    ]
   ],
@@ -5884,11 +5983,19 @@
    [
     "2026-11-26",
     62
+   ],
+   [
+    "2026-11-27",
+    62
    ]
   ],
   "griches/ps5_eternaldarkness": [
    [
     "2026-11-26",
+    8
+   ],
+   [
+    "2026-11-27",
     8
    ]
   ],
@@ -5896,11 +6003,19 @@
    [
     "2026-11-26",
     61
+   ],
+   [
+    "2026-11-27",
+    61
    ]
   ],
   "devvnirvana/afterglow": [
    [
     "2026-11-26",
+    9
+   ],
+   [
+    "2026-11-27",
     9
    ]
   ],
@@ -5908,12 +6023,20 @@
    [
     "2026-11-26",
     10
+   ],
+   [
+    "2026-11-27",
+    10
    ]
   ],
   "alamshafil/metaspero": [
    [
     "2026-11-26",
     16
+   ],
+   [
+    "2026-11-27",
+    17
    ]
   ]
  },
@@ -5967,8 +6090,8 @@
    "2026-11-10T18:46:58Z"
   ],
   "bornaradusin/pc5": [
-   "v2.5.0",
-   "2026-11-26T08:11:00Z"
+   "v2.5.2",
+   "2026-11-26T18:54:02Z"
   ],
   "bornaradusin/prosperoradio": [
    "01.000.010",
@@ -6067,8 +6190,8 @@
    "2026-11-19T18:17:15Z"
   ],
   "darkatek7/prosperosunshine": [
-   "v0.6.8",
-   "2026-11-26T00:19:19Z"
+   "v0.6.9",
+   "2026-11-26T22:03:33Z"
   ],
   "darkatek7/prosperothemes": [
    "01.000.043",
@@ -6603,8 +6726,8 @@
    "2026-11-12T00:18:30Z"
   ],
   "quer3q/kraken-mount": [
-   "v0.4.0",
-   "2026-11-25T10:21:29Z"
+   "v0.4.1",
+   "2026-11-26T21:01:15Z"
   ],
   "quer3q/ps5-dump-forge": [
    "v0.6.0",
