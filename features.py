@@ -22,6 +22,7 @@ import posixpath
 import re
 import shutil
 import socket
+import struct
 import subprocess
 import sys
 import tarfile
@@ -758,7 +759,10 @@ def inspect_remote_game(f, path, listing=None):
 # ---------------------------------------------------------------------------
 
 PAYLOADS = [
+    # desde la v0.22 ftpsrv publica también ftpsrv-ps5-install.elf, que solo pone un icono en el menú (para websrv)
+    # y NO arranca el servidor: hay que coger ftpsrv-ps5.elf
     {"id": "ftpsrv", "name": "ftpsrv", "repo": "ps5-payload-dev/ftpsrv",
+     "pick": [r"(?i)^ftpsrv-ps5\.elf$", r"(?i)^ftpsrv(?!.*install).*\.elf$"],
      "what": "Servidor FTP (puerto 2121): por él se envía todo"},
     {"id": "bfpilot", "name": "BFpilot", "repo": "ItsBlurf/BFpilot",
      "what": "Descomprime, mueve y borra en la consola (puerto 5905)"},
@@ -800,6 +804,10 @@ EXTRA_PAYLOADS = [
     {"id": "overlay", "name": "PS5 Hardware Overlay", "repo": "smoxa/ps5-new-overlay", "port": 8585,
      "pick": [r"(?i)^ps5-overlay.*\.elf$", r"(?i)overlay.*\.elf$"],
      "what": "FPS, temperaturas, frecuencias, RAM, ventilador y consumo encima de la imagen (se ajusta en su web, puerto 8585)"},
+    {"id": "prefbar", "name": "PrefBar", "repo": "X1NONs/PrefBar", "port": 8998,
+     "pick": [r"(?i)^prefbar.*\.elf$"],
+     "what": "FPS, 1% lows, tiempo por fotograma, CPU, GPU, RAM, VRAM, ventilador y consumo encima de la imagen "
+             "(se ajusta en su web, puerto 8998)"},
     {"id": "exporter", "name": "ps5-exporter", "repo": "Marice/ps5-exporter", "port": 9100,
      "what": "Temperaturas, ventilador, consumo, FPS y título abierto, de solo lectura (puerto 9100)"},
     {"id": "pkgmanager", "name": "PKG Manager", "repo": "itsPLK/ps5-pkg-manager", "port": 8844,
@@ -807,6 +815,18 @@ EXTRA_PAYLOADS = [
     {"id": "linuxloader", "name": "ps5-linux-loader", "repo": "ps5-linux/ps5-linux-loader", "port": None, "rest": True,
      "pick": [r"(?i)^ps5-linux-loader.*\.elf$", r"(?i)linux.*loader.*\.elf$"],
      "what": "Arranca Linux (Ubuntu o Bazzite) desde tu USB o tu M.2: la consola pasa a reposo y al encenderla entra en Linux"},
+    {"id": "nanodns", "name": "nanoDNS", "repo": "drakmor/nanoDNS", "port": None, "setup": True,
+     "pick": [r"(?i)^nanodns.*\.elf$", r"(?i)dns.*\.elf$"],
+     "what": "DNS dentro de la propia consola: con la DNS de la PS5 en 127.0.0.1 vuelve a haber internet y sigue "
+             "bloqueando las direcciones de Sony (actualizaciones y demás). Sus ajustes van en /data/nanodns/nanodns.ini"},
+    {"id": "shadowmountplus", "name": "ShadowMountPlus", "repo": "drakmor/ShadowMountPlus", "port": 10101, "setup": True,
+     "pick": [r"(?i)^shadowmountplus.*\.elf$", r"(?i)shadowmount.*\.elf$"],
+     "what": "Monta lo que tienes en /data/homebrew y en los USB y lo añade a la pantalla de inicio; va ANTES que kstuff, "
+             "con 3 s de pausa (su web en el puerto 10101)"},
+    {"id": "kstufflite", "name": "kstuff-lite", "repo": "EchoStretch/kstuff-lite", "port": None, "setup": True,
+     "pick": [r"(?i)^kstuff[-_]?lite.*\.elf$", r"(?i)^kstuff.*\.elf$"],
+     "what": "Los parches del sistema que pide ShadowMountPlus (hasta la 13.60). Va DESPUÉS de ShadowMountPlus y no "
+             "se mezcla con otro kstuff ni con Kraken Mount"},
     {"id": "smplusgui", "name": "SMPlusGui", "repo": "KarnerF/SMPlusGui", "port": 7777,
      "pick": [r"(?i)^SMPlusGui.*\.elf$"],
      "what": "Ajustes de ShadowMountPlus desde el navegador, con copias de su configuración y su registro (puerto 7777)"},
@@ -1110,22 +1130,6 @@ CATALOG = [
                "Ábrelo desde el menú de la PS5. La primera vez que abres cada título va lento mientras prepara su caché.",
                "Si se cierra solo, el motivo está en /data/rpcs3/cache/RPCS3.log (míralo en Archivos de la consola).",
                "Hay otra versión, KB-RPCS3 (github.com/kamb205/KB-RPCS3, carpeta PPSA99303), también para construir en el PC."]},
-    {"id": "hookshot", "kind": "link", "group": "emu", "fam": "nin", "name": "PS5 Hookshot (Ocarina of Time)",
-     "sys": "Switch 2 · nativo", "repo": "mihawk-99/PS5_Hookshot", "exp": True,
-     "what": "El remake de Zelda: Ocarina of Time de Switch 2 como título nativo de PS5 (PPSA99024): no es un emulador, "
-             "el código del juego se recompila. Es de mihawk, el autor de PS5 Lichii. Se construye en tu PC a partir de tu "
-             "propia copia, así que no viene hecho para descargar.",
-     "needs": "Un PC con Linux o con Windows 10/11 y Ubuntu 24.04 en WSL 2, tu copia del juego en .nup (la versión que pide "
-              "su guía), unos 60 GB libres y una hora o más de compilación la primera vez.",
-     "guide": ["En su GitHub, baja build-windows.bat y build-title.sh de la última versión y ponlos juntos en una carpeta.",
-               "En Windows, si no tienes Ubuntu en WSL: abre una terminal como administrador, ejecuta "
-               "wsl --install -d Ubuntu-24.04 y abre «Ubuntu 24.04» una vez para crear tu usuario.",
-               "Arrastra el .nup de tu copia encima de build-windows.bat (en Linux: ./build-title.sh tu-copia.nup). "
-               "La primera vez tarda una hora o más; si se corta, vuelve a lanzarlo y sigue donde iba.",
-               "Al terminar sale la carpeta PPSA99024 al lado. En PS5 Directo › Enviar, pega la ruta de esa carpeta y "
-               "mándala «A la PS5» (va a /data/homebrew).",
-               "Manda también tu .nup a la consola, a /data/lichii/roms/oot/ con el nombre oot.nup: el título lee sus datos de ahí.",
-               "Ábrelo desde el menú de la PS5."]},
     {"id": "cheatrunner", "kind": "link", "group": "patch", "name": "CheatRunner", "repo": "notmaj0r/CheatRunner",
      "exp": True,
      "what": "Parches de rendimiento que se aplican mientras juegas: títulos de PS4 a 60 fps con el ritmo corregido (que no "
@@ -1162,18 +1166,29 @@ CATALOG = [
                "Sus ajustes y su registro quedan en /data/krakenmount."]},
     {"id": "fpkg1360", "kind": "guide", "group": "patch", "name": "Instalar .pkg en 12.00–13.60 (kstuff-dr)",
      "repo": "drakmor/kstuff-lite", "doc": "https://github.com/drakmor/kstuff-lite", "exp": True,
-     "what": "Desde el 24 de noviembre de 2026 los .pkg falsos (FPKG) se pueden instalar de verdad hasta el firmware "
-             "13.60, como hasta ahora en 11.60: con un kstuff nuevo de drakmor, EchoStretch y Ark Sama (kstuff-dr 1.15). "
-             "El título se instala con su icono, como uno de la tienda. kstuff-ng traerá lo mismo más adelante.",
-     "needs": "Es una versión de pruebas: puede fallar según el firmware. De momento solo se reparte fuera de GitHub "
-              "(los enlaces están en el X de sus autores), así que PS5 Directo no lo baja solo. No es un jailbreak: "
-              "sigue haciendo falta el tuyo.",
-     "guide": ["Haz el jailbreak y para el autocargador (que no cargue nada más).",
-               "Carga elfldr y manda kstuff-dr-1.15 (el .elf de prueba). Espera al aviso «successful».",
-               "No cargues Kraken Mount ni TITAN CORE a la vez. Si usas ShadowMountPlus, cárgalo antes o deja una pausa "
-               "antes de kstuff.",
+     "what": "Desde finales de noviembre de 2026 los .pkg falsos (FPKG) se pueden instalar de verdad hasta el firmware "
+             "13.60, como hasta ahora en 11.60: con el kstuff nuevo de drakmor (con EchoStretch, Ark Sama y el método de "
+             "Fuuko). La versión recomendada es kstuff-1.15-dr-test3-stable: «semiestable», vale de 1.00 a 13.60 y el "
+             "modo reposo funciona. El título se instala con su icono, como uno de la tienda.",
+     "needs": "Sigue siendo una versión de pruebas. Se reparte en el Discord de su autor (no en GitHub), así que PS5 Directo "
+              "no lo baja solo: comprueba su SHA256 (6c3758c2cc84e3aa7e3c41952371fd04e641647d46d03f8d4bea2ab77c16ecf5 para "
+              "la test3-stable). No es un jailbreak: sigue haciendo falta el tuyo. Si antes usabas Kraken Mount o TITAN "
+              "CORE, desactívalos y vuelve a instalar esos títulos.",
+     "guide": ["Haz el jailbreak y para el autocargador.",
+               "Orden de carga: primero el recolector de registros del kernel (si lo usas), luego kstuff y luego "
+               "ShadowMountPlus. Deja unos 5 segundos antes y después de kstuff: cuanto menos esté haciendo la consola, "
+               "mejor sale.",
+               "No cargues Kraken Mount ni TITAN CORE a la vez, ni otro kstuff.",
                "En PS5 Directo elige el formato «Paquete .fpkg» con «Instalarlo»: se deja en /data/pkg.",
-               "Instálalo desde Ajustes › Sistema › Ajustes de depuración › Juego › Instalador de paquetes."]},
+               "Instálalo desde Ajustes › Sistema › Ajustes de depuración › Juego › Instalador de paquetes, o desde la "
+               "web de ShadowMountPlus, que instala desde cualquier carpeta.",
+               "Si sale «PPR failed»: borra la caché del sistema en Modo seguro, apaga la consola del todo y vuelve a "
+               "probar.",
+               "Es una versión de pruebas: un cuelgue al cargarlo puede dañar el almacenamiento interno y obligar a "
+               "restablecer la consola (se pierde lo que hay dentro y, en consolas con lector desmontable, su "
+               "emparejamiento). Pruébalo primero a mano, sin carga automática, y no aceptes «restablecer» si sale: "
+               "entra en Modo seguro y prueba antes «Reconstruir base de datos». PS5 Directo › Sistema › «Payloads "
+               "seguros» revisa las pausas y las mezclas de tu carga automática."]},
     {"id": "ps4mount", "kind": "payload", "group": "patch", "name": "PS4Mount (.pkg de PS4 sin instalar)",
      "repo": "gasb07/ps4mount", "exp": True,
      "what": "Abre tus .pkg de PS4 directamente desde un USB, sin instalarlos: no esperas a la instalación ni gastas el "
@@ -1234,6 +1249,12 @@ CATALOG = [
              "Eliges qué se ve, dónde y con qué colores desde su web.",
      "needs": "Nada instalado: se carga como payload y se quita desde su web (botón Unload) sin reiniciar. "
               "Sus ajustes se guardan en /data/overlay/config.ini."},
+    {"id": "prefbar", "kind": "payload", "group": "tool", "name": "PrefBar", "repo": "X1NONs/PrefBar",
+     "what": "Overlay de rendimiento que va por su cuenta: FPS, 1% lows, tiempo por fotograma, uso y temperatura de "
+             "CPU y GPU, RAM, VRAM, ventilador y consumo en vatios encima de la imagen. Se ajusta desde su web.",
+     "needs": "Se carga como payload (en pruebas: versiones 0.x). Su web está en el puerto 8998 y no tiene "
+              "contraseña: úsalo solo en tu red de casa. Triple toque en el panel táctil del mando para verlo u "
+              "ocultarlo. No lo cargues a la vez que PS5 Hardware Overlay."},
     {"id": "exporter", "kind": "payload", "group": "tool", "name": "ps5-exporter", "repo": "Marice/ps5-exporter",
      "what": "Datos de la consola de solo lectura: temperaturas, ventilador, consumo, FPS, qué título está abierto y "
              "horas de uso. Lo usa la pestaña Sistema.",
@@ -1618,8 +1639,62 @@ def _github_release(repo):
 GH_DATES = {}      # repo -> fecha de su última versión (para «Nueva versión hace 2 días»)
 
 
+def human_size(n):
+    for u in ("B", "KB", "MB", "GB", "TB"):
+        if n < 1024 or u == "TB":
+            return ("%.0f %s" if u == "B" else "%.2f %s") % (n, u)
+        n /= 1024.0
+
+
+PARTIAL_EXT = (".part", ".crdownload", ".tmp", ".download", ".!ut", ".!qb", ".aria2", ".partial", ".opdownload")
+
+
+def local_incomplete(path, wait=1.5):
+    """Si un archivo del PC está a medias, por qué (texto); si no, ''. Mira: extensión de descarga sin terminar, un
+    .pkg más corto de lo que dice su cabecera (está cortado) y un archivo que sigue creciendo (se está copiando)."""
+    n = os.path.basename(path).lower()
+    if n.endswith(PARTIAL_EXT):
+        return "«%s» es una descarga sin terminar: espera a que acabe y envía el archivo final." % os.path.basename(path)
+    try:
+        st = os.stat(path)
+    except OSError:
+        return ""
+    if n.endswith(".pkg") and st.st_size >= 0x438:
+        try:
+            with open(path, "rb") as fh:
+                head = fh.read(0x438)
+            if head[:4] == b"\x7fCNT":
+                want = struct.unpack(">Q", head[0x430:0x438])[0]
+                if st.st_size < want:
+                    return ("«%s» está cortado: mide %s y su cabecera dice %s. Se copió o descargó a medias: vuelve "
+                            "a copiarlo." % (os.path.basename(path), human_size(st.st_size), human_size(want)))
+        except (OSError, struct.error):
+            pass
+    if wait and time.time() - st.st_mtime < 60:
+        time.sleep(wait)
+        try:
+            st2 = os.stat(path)
+        except OSError:
+            return ""
+        if st2.st_size != st.st_size or st2.st_mtime != st.st_mtime:
+            return ("«%s» se está copiando o descargando todavía (está cambiando de tamaño): espera a que termine."
+                    % os.path.basename(path))
+    return ""
+
+
+def is_installer(data):
+    """El .elf es un instalador (pone un icono en el menú de la consola con sceAppInstUtil) y no el programa."""
+    return b"sceAppInstUtilAppInstallAll" in (data or b"")
+
+
+# los que PS5 Directo necesita que sean el programa en sí (un instalador «funciona» pero no abre su puerto). Solo
+# ftpsrv: el BFpilot oficial también lleva esa función dentro (instala su lanzador) y es el programa de verdad
+NOT_INSTALLER = ("ftpsrv",)
+
+
 def _pick_elf(names):
     elfs = [n for n in names if n.lower().endswith((".elf", ".bin"))]
+    elfs = [n for n in elfs if "install" not in n.lower()] or elfs
     pref = [n for n in elfs if "ps5" in n.lower()] or [n for n in elfs if "ps4" not in n.lower()] or elfs
     return pref[0] if pref else None
 
@@ -1633,6 +1708,11 @@ def fetch_payload(pid, data_dir, log=None):
     os.makedirs(folder, exist_ok=True)
     cached = sorted((n for n in os.listdir(folder) if n.startswith(pid + "-") and n.endswith(".elf")),
                     key=lambda n: os.path.getmtime(os.path.join(folder, n)), reverse=True)
+    if pid in NOT_INSTALLER:
+        def _ok(n):
+            with open(os.path.join(folder, n), "rb") as fh:
+                return not is_installer(fh.read())
+        cached = [n for n in cached if _ok(n)]
     try:
         tag, assets = github_release(p["repo"])
     except Exception as e:
@@ -1644,7 +1724,13 @@ def fetch_payload(pid, data_dir, log=None):
     safe_tag = re.sub(r"[^\w.-]", "_", tag or "ultima")
     dest = os.path.join(folder, "%s-%s.elf" % (pid, safe_tag))
     if os.path.isfile(dest) and os.path.getsize(dest) > 0:
-        return dest, tag
+        with open(dest, "rb") as fh:
+            bad = pid in NOT_INSTALLER and is_installer(fh.read())
+        if not bad:
+            return dest, tag
+        os.remove(dest)                      # se bajó el instalador por error (ftpsrv 0.22): se vuelve a bajar
+        if log:
+            log("%s: la copia guardada era el instalador, no el programa; la vuelvo a bajar" % p["name"])
     names = {a.get("name", ""): a.get("browser_download_url") for a in assets}
     elf = None
     if p.get("pick"):
@@ -1662,12 +1748,20 @@ def fetch_payload(pid, data_dir, log=None):
         zraw = http_get(names[z], limit=128 * MiB)
         verify_asset(assets, by_name.get(z), zraw, log)
         zf = zipfile.ZipFile(io.BytesIO(zraw))
-        inner = _pick_elf([n for n in zf.namelist() if not n.endswith("/")])
+        files = [n for n in zf.namelist() if not n.endswith("/")]
+        inner = None
+        for rx in p.get("pick") or []:
+            inner = next((n for n in files if re.search(rx, n.rsplit("/", 1)[-1])), None)
+            if inner:
+                break
+        inner = inner or _pick_elf(files)
         if not inner:
             raise E.PipeError("El .zip de %s no trae un .elf" % p["repo"])
         data = zf.read(inner)
     if not data[:4] == b"\x7fELF":
         raise E.PipeError("Lo descargado de %s no parece un payload (.elf)" % p["repo"])
+    if pid in NOT_INSTALLER and is_installer(data):
+        raise E.PipeError("La última versión de %s solo trae su instalador, no el programa" % p["repo"])
     tmp = dest + ".tmp"
     with open(tmp, "wb") as fo:
         fo.write(data)
@@ -1675,6 +1769,61 @@ def fetch_payload(pid, data_dir, log=None):
     if log:
         log("Descargado %s %s de GitHub" % (p["name"], tag))
     return dest, tag
+
+
+class Ps5uHelper:
+    """La web que el ayudante de PS5Upload (phantomptr/ps5upload) pone en la consola, puerto 9180 («Minion»). Solo
+    contesta desde fuera de la consola si en sus ajustes está «Permitir otros dispositivos de la red». Sus rutas
+    /api/ piden el token que da GET /api/token en la cabecera x-ps5u-token, y solo aceptan el Host de la consola."""
+    PORT = 9180
+
+    def __init__(self, ip, timeout=8):
+        self.host = E.clean_host(ip or "")[0]
+        self.base = "http://%s:%d" % (self.host, self.PORT)
+        self.timeout = timeout
+        self._tok = None
+
+    def token(self):
+        if self._tok is None:
+            req = urllib.request.Request(self.base + "/api/token", headers={"User-Agent": "PS5Directo"})
+            with urllib.request.urlopen(req, timeout=4) as r:
+                j = json.loads(r.read(65536).decode("utf-8", "replace") or "{}")
+            t = str(j.get("token") or "")
+            if not re.match(r"^[0-9a-fA-F]{16,128}$", t):
+                raise E.PipeError("El ayudante de PS5Upload no ha dado su código de acceso")
+            self._tok = t
+        return self._tok
+
+    def alive(self):
+        try:
+            self.token()
+            return True
+        except Exception:
+            return False
+
+    def post(self, path, body, timeout=None):
+        h = {"User-Agent": "PS5Directo", "Content-Type": "application/json", "x-ps5u-token": self.token()}
+        req = urllib.request.Request(self.base + path, data=json.dumps(body).encode(), headers=h, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=timeout or self.timeout) as r:
+                j = json.loads(r.read(MiB).decode("utf-8", "replace") or "{}")
+                return j if isinstance(j, dict) else {}
+        except urllib.error.HTTPError as e:
+            try:
+                j = json.loads(e.read(65536).decode("utf-8", "replace") or "{}")
+            except Exception:
+                j = {}
+            code = str((j or {}).get("error") or (j or {}).get("reason") or e.reason)
+            raise Ps5uRefused(code, e.code)
+
+    def uninstall(self, tid):
+        return self.post("/api/apps/uninstall", {"title_id": tid}, timeout=90)
+
+
+class Ps5uRefused(E.PipeError):
+    def __init__(self, code, http):
+        self.code, self.http = code, http
+        super().__init__("%s (HTTP %s)" % (code, http))
 
 
 class Zftpd:
@@ -1765,6 +1914,20 @@ class Zftpd:
 
     def install_status(self):
         return self.get_json("/api/admin/games/install_status", 6)
+
+    # -- desinstalar un titulo instalado (zftpd 1.7.0 o posterior: usa el desinstalador de la propia consola)
+    def has_uninstall(self):
+        """Sin pedir nada: su ruta sin ?id= contesta 400 si existe y 404 en versiones anteriores a la 1.7.0."""
+        try:
+            self._get("/api/admin/games/uninstall", 4)
+            return True
+        except urllib.error.HTTPError as e:
+            return e.code != 404
+        except Exception:
+            return False
+
+    def uninstall(self, tid):
+        return self.post("/api/admin/games/uninstall?" + urllib.parse.urlencode({"id": tid}), timeout=90)
 
     # -- estado del sistema
     def stats(self):
@@ -1991,6 +2154,17 @@ class PayloadManager:
         q = urllib.parse.urlencode({"filename": filename, "mode": "new"})
         self._req("POST", "/manage:upload?" + q, body=data, ctype="application/octet-stream", timeout=60)
 
+    def delete(self, slot):
+        self._req("POST", "/manage:delete?" + urllib.parse.urlencode({"slot": slot}), timeout=30)
+
+    def set_config(self, conf):
+        """Guarda AUTOLOAD_LIST / AUTOLOAD_ENABLED (Payload Manager escribe su autoload.txt de forma atomica)."""
+        self._req("POST", "/set_config", body=json.dumps(conf).encode(), ctype="application/json", timeout=15)
+
+    def autoload_status(self):
+        """Como fue la ultima carga automatica: outcomes = una letra por entrada (s ok, f fallo, p pausa)."""
+        return self._json("/autoload_status", timeout=5)
+
     def add_autoload(self, slots):
         """Anade esos payloads a su lista de carga automatica (sin quitar lo que ya tuviera) y la activa."""
         cfg = self.config()
@@ -2009,12 +2183,19 @@ def send_elf(host, port, data, timeout=15):
     try:
         s = socket.create_connection((host, int(port)), timeout=timeout)
     except OSError as e:
-        raise E.PipeError("El cargador de payloads no responde en %s:%s (%s). Necesitas el "
+        err = E.PipeError("El cargador de payloads no responde en %s:%s (%s). Necesitas el "
                           "jailbreak cargado con un cargador de ELF que acepte la red (etaHEN, "
                           "elfldr). El de Y2JB Autoloader solo acepta la propia consola: con él usa "
                           "Payload Manager." % (host, port, e))
+        err.not_sent = True          # no llego a conectar: no se ejecuto nada
+        raise err
     try:
-        s.sendall(data)
+        try:
+            s.sendall(data)
+        except OSError as e:
+            err = E.PipeError("Se cortó mientras se enviaba el payload (%s): no se sabe si llegó a ejecutarse" % e)
+            err.unknown = True       # pudo llegar entero o a medias: no se repite solo
+            raise err
         try:
             s.shutdown(socket.SHUT_WR)
         except OSError:
@@ -2106,19 +2287,24 @@ def find_forge(custom, data_dir, skip=()):
 
 
 def _forge_asset(assets):
+    """El archivo de Forge para este PC. Desde la 0.6.0 publica el programa de consola suelto
+    (ps5-dump-forge-cli-<versión>-windows-x86-64.exe, ...-macos-arm64, ...-linux-x86-64); hasta la 0.5.x, un .zip o
+    .tar.gz con él dentro. Nunca el de ventanas (ps5-dump-forge-<versión>-windows-x86-64.exe), que no sirve aquí."""
     import platform
     mach = platform.machine().lower()
     arm = "arm" in mach or "aarch64" in mach
+    arch = "arm64" if arm else "x86-64"
     if os.name == "nt":
-        rx = r"windows-arm64\.zip$" if arm else r"windows-x86-64\.zip$"
+        new, old = r"^ps5-dump-forge-cli-[^/]*-windows-%s\.exe$" % arch, r"windows-%s\.zip$" % arch
     elif sys.platform == "darwin":
-        rx = r"macos-universal\.zip$"
+        new, old = r"^ps5-dump-forge-cli-[^/]*-macos-(%s|universal)$" % arch, r"macos-universal\.zip$"
     else:
-        rx = r"linux-arm64\.tar\.gz$" if arm else r"linux-x86-64\.tar\.gz$"
-    for a in assets:
-        n = a.get("name", "")
-        if re.search(rx, n, re.I) and "webview2" not in n.lower():
-            return a
+        new, old = r"^ps5-dump-forge-cli-[^/]*-linux-(musl-)?%s$" % arch, r"linux-%s\.tar\.gz$" % arch
+    for rx in (new, old):
+        for a in assets:
+            n = a.get("name", "")
+            if re.search(rx, n, re.I) and "webview2" not in n.lower():
+                return a
     return None
 
 
@@ -2140,7 +2326,10 @@ def download_forge(data_dir, log=None, progress=None, release=None):
     want = forge_cli_name()
     try:
         verify_asset(assets, a, tmp, log)
-        if a["name"].lower().endswith(".zip"):
+        low = a["name"].lower()
+        if not (low.endswith(".zip") or low.endswith(".tar.gz") or low.endswith(".tgz")):
+            shutil.copyfile(tmp, exe + ".tmp")          # 0.6.0 o posterior: el programa viene suelto
+        elif low.endswith(".zip"):
             with zipfile.ZipFile(tmp) as z:
                 m = next((n for n in z.namelist() if posixpath.basename(n) == want and not n.endswith("/")), None)
                 if not m:
@@ -2687,8 +2876,9 @@ def pick_windows(kind, title):
         body = ("$d=New-Object System.Windows.Forms.OpenFileDialog;$d.Title='%s';$d.Multiselect=$true;"
                 "if($d.ShowDialog($f) -eq 'OK'){$out=@($d.FileNames)}") % t
     script = ("[Console]::OutputEncoding=[Text.Encoding]::UTF8;Add-Type -AssemblyName System.Windows.Forms;"
-              "$f=New-Object System.Windows.Forms.Form -Property @{TopMost=$true;ShowInTaskbar=$false};"
-              "$out=@();" + body + ";ConvertTo-Json -InputObject @($out) -Compress")
+              "$f=New-Object System.Windows.Forms.Form -Property @{TopMost=$true;ShowInTaskbar=$false;Opacity=0;"
+              "StartPosition='CenterScreen';Width=1;Height=1};$f.Show();$f.Activate();"
+              "$out=@();" + body + ";$f.Close();ConvertTo-Json -InputObject @($out) -Compress")
     p = subprocess.run(["powershell", "-NoProfile", "-STA", "-ExecutionPolicy", "Bypass", "-Command", script],
                        capture_output=True, timeout=3600, creationflags=NO_WINDOW)
     if p.returncode != 0:
@@ -3051,7 +3241,6 @@ def open_terminal(cmd):
 # del catálogo de RecompStore para ese repositorio o el icono de la consola si ya está instalado.
 CATALOG_ART = {
     'rpcs3ps5': {"icon": 'https://raw.githubusercontent.com/lavavex/rpcs3-PS5/main/title/sce_sys/icon0.png', "hero": ''},
-    'hookshot': {"icon": 'https://raw.githubusercontent.com/mihawk-99/PS5_Hookshot/main/ps5/sce_sys/icon0.png', "hero": ''},
     'crux2': {"icon": 'https://raw.githubusercontent.com/Press5elect/Crux2/main/ps5/sce_sys/icon0.png', "hero": ''},
     'lichii': {"icon": 'https://codeberg.org/mihawk/PS5_Lichii/raw/branch/main/sce_sys/icon0.png', "hero": ''},
     'prosperoeden': {"icon": 'https://raw.githubusercontent.com/heydemoura/ProsperoEden/main/sce_sys/icon0.png', "hero": ''},

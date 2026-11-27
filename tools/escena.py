@@ -38,7 +38,16 @@ BASE = ["drakmor/ShadowMountPlus", "ps5-payload-dev/ftpsrv", "ps5-payload-dev/el
 # lo que decidimos no recomendar (y cualquier cosa de piratería): no sale nunca
 SKIP = re.compile(r"(?i)gta.?(6|vi)\b|prospero.?store|botty|playden|art.?swap|psgfx|steamgrid|romm|nuvio|stremio|smarttube|trophy|savegam|save.?(manager|edit)"
                   r"|cheat|dump(er)?s?\b|piracy|pirat|warez|crack|keygen|store.?(pkg|game)|free.?games|pkg.?(links|store)"
-                  r"|nopaystation|psbox|hen.?store|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|save.?mgr|ps5.?save\b|ps5.?library|free.?(ps5.?)?games")
+                  r"|nopaystation|psbox|hen.?store|overdrive|orbit.?store|game.?store|dlc.?unlock|fake.?licen|cooling.?system|fan.?(control|speed|curve)|save.?mgr|ps5.?save\b|ps5.?library|free.?(ps5.?)?games"
+                  # tiendas, descargadores e indexadores de títulos
+                  r"|\bstore\b|download.?manager|torrent|indexer|\bbotty"
+                  # lo que toca la base de datos o el sistema de la consola (lo que puede dejarla mal)
+                  r"|clean.?up|cleaner|debloat|app\.?db|database|registry|tab.?shift|hide.?(apps|psn)|activator|flasher"
+                  # lo que no es para la PS5: PC, PS4, investigación, listas
+                  r"|hackintosh|\bxnu\b|windows.?1[01]\b|pc.?port|for.?(the.?)?ps4\b|ps4.?linux|reverse.?engineering|\bresearch\b|^awesome|kyty"
+                  # lo que ya hace PS5 Directo (comprimir y mandar)
+                  r"|game.?compress|compress.{0,30}(send|ps5)")
+PROPOSE_MIN_AGE_DAYS = 14   # un proyecto recién creado no se propone: que tenga recorrido (y que no sea un cebo)
 
 
 def gh(path, params=None):
@@ -434,7 +443,8 @@ def main(out, props_out=""):
                           "name": r.get("name") or full, "tag": rel.get("tag_name") or "", "pre": bool(rel.get("prerelease")),
                           "date": rel["published_at"], "desc": short(r.get("description"), 280), "notes": short(rel.get("body")),
                           "stars": int(r.get("stargazers_count") or 0), "url": r.get("html_url") or "",
-                          "installable": kind, "_rel": rel, "_asset": asset})
+                          "installable": kind, "_rel": rel, "_asset": asset,
+                          "_created": r.get("created_at") or "", "_lang": r.get("language") or "", "_size": int(r.get("size") or 0)})
         time.sleep(0 if "127.0.0.1" in API else 2)                                             # la búsqueda tiene un límite más bajo
     items.sort(key=lambda x: x["date"], reverse=True)
     # --- lo gordo: nota de cada novedad, con la historia de estrellas de la vez anterior
@@ -469,8 +479,16 @@ def main(out, props_out=""):
     # propuestas de tarjeta: proyectos nuevos que se pueden instalar y tienen nota
     props = []
     have_tid = {(c.get("tid") or "").upper() for c in F.CATALOG} - {""}
+    in_recomp = {r.lower() for r in recomp_repos()}          # lo que ya sale en Descubrir por RecompStore
+    old_enough = (now - dt.timedelta(days=PROPOSE_MIN_AGE_DAYS)).strftime("%Y-%m-%dT%H:%M:%S")
     for x in items:
         if x["kind"] != "new":
+            continue
+        why = ("ya está en RecompStore" if x["repo"].lower() in in_recomp else
+               "sin código (solo README o binarios)" if not x.get("_lang") or x.get("_size", 0) < 30 else
+               "demasiado nuevo" if (x.get("_created") or "9999") > old_enough else "")
+        if why:
+            print("no se propone (%s): %s" % (why, x["repo"]))
             continue
         pr = None
         if x.get("installable") and x["score"] >= PROPOSE_MIN:

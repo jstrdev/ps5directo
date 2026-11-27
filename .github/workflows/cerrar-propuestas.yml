@@ -1,0 +1,39 @@
+# Cierra de una vez varias pull requests (por ejemplo, propuestas del robot que no quieres) y borra sus ramas.
+# Se lanza a mano: pestaña Actions › «Cerrar propuestas» › Run workflow, y escribe los números separados por espacios.
+name: Cerrar propuestas
+
+on:
+  workflow_dispatch:
+    inputs:
+      numeros:
+        description: "Números de las pull requests a cerrar, separados por espacios (por ejemplo: 2 14 15 16)"
+        required: true
+      motivo:
+        description: "Comentario que se deja en cada una"
+        required: false
+        default: "Gracias. Lo cerramos: ya está en PS5 Directo, no encaja con lo que recomendamos o todavía no es seguro."
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  cerrar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cerrar y borrar ramas
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          NUMEROS: ${{ inputs.numeros }}
+          MOTIVO: ${{ inputs.motivo }}
+        run: |
+          for n in $NUMEROS; do
+            case "$n" in (*[!0-9]*|"") echo "«$n» no es un número: lo salto"; continue;; esac
+            st=$(gh pr view "$n" -R "$REPO" --json state --jq .state 2>/dev/null || echo "")
+            if [ "$st" != "OPEN" ]; then echo "#$n: no está abierta ($st)"; continue; fi
+            # la rama solo se borra si es una del robot (propuesta/...) de este mismo repositorio
+            br=$(gh pr view "$n" -R "$REPO" --json headRefName,isCrossRepository --jq 'select(.isCrossRepository==false) | .headRefName')
+            gh pr close "$n" -R "$REPO" --comment "$MOTIVO" && echo "#$n cerrada"
+            case "$br" in (propuesta/*) gh api -X DELETE "repos/$REPO/git/refs/heads/$br" >/dev/null 2>&1 && echo "   rama $br borrada";; esac
+          done

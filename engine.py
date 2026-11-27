@@ -31,6 +31,133 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/130.0 Safari/537.36")
 MiB = 1024 * 1024
 
+# ---- Guardia de la consola -------------------------------------------------------------
+# Con la PS5 apagada, cada conexión a su IP espera hasta agotar su tiempo (5-20 s) y, como
+# muchas partes de la app preguntan a la vez, todo se queda «pensando». Aquí, para la IP de la
+# consola: cada intento espera como mucho GATE_CONNECT s, y si no contesta se da por apagada
+# durante GATE_HOLD s (lo que pregunte mientras recibe la respuesta al momento). En cuanto
+# contesta, todo sigue igual que siempre.
+import errno as _errno
+GATE_HOST = None            # función que devuelve la IP de la consola (la pone app.py)
+GATE_CONNECT = 3.0
+GATE_HOLD = 8.0
+_GATE = {}                  # IP -> cuándo volver a mirar si ya contesta (mientras no contesta)
+_GATE_PROBE = {}
+_GATE_LOCK = threading.Lock()
+_CONN_ORIG = socket.create_connection
+DOWN_TEXT = "La PS5 no contesta: ¿está apagada o en otra red?"
+
+
+class ConsoleDown(ConnectionError):
+    def __str__(self):                      # sin el «[Errno 10064]» que pone Python delante
+        return DOWN_TEXT
+
+
+def console_down():
+    """True si la consola no contestó hace poco (para no esperar a que se agote el tiempo): algún puerto suyo no
+    contesta y ninguno ha contestado en los últimos GATE_HOLD s."""
+    try:
+        h = GATE_HOST() if GATE_HOST else None
+    except Exception:
+        h = None
+    if not h:
+        return False
+    with _GATE_LOCK:
+        dead = any(k[0] == h for k in _GATE)
+        return dead and time.monotonic() - _GATE_OK.get(h, -1e9) > GATE_HOLD
+
+
+# Cada PUERTO va por separado: una PS5 recién restaurada (o sin todos los payloads) deja sin contestar muchos puertos
+# (el de BFpilot, el del cargador de ELF…) y eso no quiere decir que esté apagada: Payload Manager en el 8084 puede
+# estar contestando perfectamente. Antes un solo puerto mudo daba por apagada la consola entera.
+_GATE_OK = {}               # IP -> último momento en que algún puerto suyo contestó
+
+
+def _gated_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, source_address=None, *a, **kw):
+    try:
+        h = GATE_HOST() if GATE_HOST else None
+    except Exception:
+        h = None
+    host = address[0] if isinstance(address, tuple) and address else None
+    if not h or host != h or host in ("127.0.0.1", "localhost", "::1"):
+        return _CONN_ORIG(address, timeout, source_address, *a, **kw)
+    key = (host, address[1])
+    with _GATE_LOCK:
+        if _GATE.get(key, 0):
+            # ese puerto no contestaba: se responde al momento y, de vez en cuando, se mira por detrás si ya contesta
+            if time.monotonic() >= _GATE[key] and not _GATE_PROBE.get(key):
+                _GATE[key] = time.monotonic() + GATE_HOLD / 2
+                _GATE_PROBE[key] = True
+                threading.Thread(target=_gate_probe, args=key, daemon=True).start()
+            raise ConsoleDown(_errno.EHOSTDOWN, DOWN_TEXT)
+    dflt = timeout is socket._GLOBAL_DEFAULT_TIMEOUT
+    ct = GATE_CONNECT if (dflt or timeout is None) else min(float(timeout), GATE_CONNECT)
+    try:
+        sk = _CONN_ORIG(address, ct, source_address, *a, **kw)
+    except (socket.timeout, TimeoutError):
+        with _GATE_LOCK:
+            _GATE[key] = time.monotonic() + GATE_HOLD
+        raise
+    except ConnectionRefusedError:
+        with _GATE_LOCK:                           # la consola está (ese puerto, cerrado)
+            _GATE_OK[host] = time.monotonic()
+            _GATE.pop(key, None)
+        raise
+    except OSError as e:
+        if e.errno in (_errno.EHOSTUNREACH, _errno.ENETUNREACH, _errno.EHOSTDOWN, 10065, 10064, 10060):
+            with _GATE_LOCK:
+                _GATE[key] = time.monotonic() + GATE_HOLD
+        raise
+    with _GATE_LOCK:
+        _GATE.pop(key, None)
+        _GATE_OK[host] = time.monotonic()
+    sk.settimeout(socket.getdefaulttimeout() if dflt else timeout)
+    return sk
+
+
+def _gate_probe(host, port):
+    key = (host, port)
+    try:
+        _CONN_ORIG(key, GATE_CONNECT).close()
+        ok = True
+    except ConnectionRefusedError:
+        ok = True                                  # contesta (ese puerto está cerrado, pero la consola está)
+    except OSError:
+        ok = False
+    with _GATE_LOCK:
+        _GATE_PROBE.pop(key, None)
+        if ok:
+            _GATE.pop(key, None)
+            _GATE_OK[host] = time.monotonic()
+
+
+socket.create_connection = _gated_connection
+
+
+# Si Windows tiene un proxy puesto (lo ponen algunas VPN, antivirus o programas de bloqueo), Python manda por él
+# también lo que va a la consola y la PS5 «no contesta» aunque esté bien. Lo que va a la red de casa va directo.
+import ipaddress as _ip
+import urllib.request as _ur
+
+
+class _LanDirect(_ur.ProxyHandler):
+    def proxy_open(self, req, proxy, type):
+        host = (req.host or "").rsplit(":", 1)[0].strip("[]")
+        try:
+            a = _ip.ip_address(host)
+            if a.is_private or a.is_loopback or a.is_link_local:
+                return None                         # sin proxy: lo atiende el siguiente (conexión directa)
+        except ValueError:
+            pass
+        return super().proxy_open(req, proxy, type)
+
+
+try:
+    _ur.install_opener(_ur.build_opener(_LanDirect()))
+except Exception:
+    pass
+
+
 
 class Cancelled(Exception):
     pass

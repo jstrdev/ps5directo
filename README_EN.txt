@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.2.4 — USER GUIDE (English)
+PS5 DIRECTO 3.0 — USER GUIDE (English)
 ========================================
 
 QUICK START (5 MINUTES)
@@ -117,6 +117,64 @@ https://github.com/itsPLK/ps5-payload-manager )
   home screen: https://github.com/drakmor/ShadowMountPlus
 
 To check that everything works: Settings > "Full check".
+
+
+SET UP THE CONSOLE (AFTER A RESET, NO USB STICK)
+-----------------------------------------------
+After resetting the console or a fresh jailbreak you don't need to copy the
+.elf files to a USB stick. Jailbreak, open Payload Manager on the console
+and in PS5 Directo go to System > "Set up the console":
+- Tick what you want: ftpsrv, BFpilot, nanoDNS, ShadowMountPlus and
+  kstuff-lite. They're downloaded from each author's official page,
+  installed into Payload Manager over the network, with a copy on the PC.
+- They're loaded once in the order their authors ask for: ShadowMountPlus
+  first and, 3 s later, kstuff-lite (as ShadowMountPlus's README says). If
+  ShadowMountPlus fails, kstuff-lite isn't loaded.
+- kstuff-lite patches the system (up to 13.60): don't mix it with another
+  kstuff or with Kraken Mount. If another one is running, it isn't ticked.
+- "Keep them in autoload" saves them to Payload Manager with their pauses.
+  Better try once without it. The previous list is backed up and you can
+  go back from "Safe payloads".
+- nanoDNS: if you set the PS5's DNS to 127.0.0.1 (to block Sony updates),
+  the console has no internet until nanoDNS is loaded. The PS5's own
+  connection test failing without it is normal.
+Use each one at your own responsibility.
+
+SEND A PAYLOAD (.elf): System > Payloads > "Send a payload" (also in
+Transfers > More ways, or drop an .elf anywhere on the window). With Payload
+Manager open it's installed like an app: load it now, just install it, or
+install it and load it automatically at startup. Payloads published on GitHub
+install from Discover > Scene news with one click. The System tab is now
+grouped (Everyday, Payloads, Protection, Titles); "Set up the console" is at
+the top only when ftpsrv or BFpilot is missing, and without a console there's
+one notice at the top instead of the same error in every card.
+
+SCENE NEWS, TWO CATALOGS: besides RecompStore, Discover reads the
+prosperostore.net homebrew catalog (native PS5 apps only, each from its
+author's GitHub), merged without duplicates and with the same filters. It's
+signed: it's only used if the signature is good and each file matches its
+hash. "✔ Verified" items are installed with the exact file and their SHA-256
+is checked while sending. "New version available" compares the exact
+contentVersion, and "More" shows the author's release notes and what the
+catalog's scan saw (a hint, not a guarantee).
+
+NANODNS (System > "nanoDNS"): see and change /data/nanodns/nanodns.ini
+without editing it by hand (DNS servers, no startup notification, answer other
+devices, or the whole file), with a backup on the PC and on the console. It
+warns about Yandex's old DNS (77.77.88.88) and fixes it to 77.88.8.8. Press
+"Reload nanoDNS" afterwards.
+
+KSTUFF, ONCE PER BOOT: loading kstuff (or etaHEN, HyperHEN...) on top of one
+already loaded stacks a second copy and can hang the console. PS5 Directo
+records every system patch it loads and won't load another in the same boot.
+
+ALSO NEW: the speed test ends with a network diagnosis (VPN or virtual
+adapter, cable or Wi-Fi with band/signal/link speed, latency under load); a
+cut-short .pkg, an unfinished download or a file still being copied isn't
+sent; extracting on the console checks the exact extracted size first (with
+7-Zip) when the archive is on the PC; "⇆ Two panes" in Console files shows a
+PC folder alongside to send and download; Ctrl+K also finds System cards and
+Settings sections.
 
 
 ABOUT BFPILOT AND PERMISSIONS (important even if you use it on its own)
@@ -342,6 +400,106 @@ settings are kept in case you install it again.
 
 WHAT'S NEW
 ----------
+3.0 - Library: what the console installed (from a .pkg) can now be
+    uninstalled from here, in ⋯ › "Uninstall…". The console's own
+    uninstaller does it, like "Delete" in its menu, through zftpd 1.7.0 or
+    later (if you don't have it, it offers to start it), or through the
+    PS5Upload helper when "Allow other devices on the network" is on in its
+    settings. Your saves aren't touched.
+    PS5 Dump Forge 0.6.0 updates properly (it changed how it's
+    published); new Dump Forge options when converting; Discover warns
+    when its catalog is old; «Install .fpkg without breaking anything»
+    guide; no raw «[Errno ...]» codes.
+  - Suggested routines right where they make sense (one click), and
+    PrefBar in System > Measure while you play (in testing).
+  - Console guard: PS5 Directo only changes things in /data and on
+    USB or extended drives (never system folders), and never deletes,
+    moves or renames key folders as a whole. Safer save restore. Power
+    actions check that the console really did it.
+  - No more waiting when the console is off: a PS5 that doesn't
+    answer costs 3 seconds at most and everything else answers at once.
+    Settings has an "Update and extension" section with updating first
+    (and a blue dot when there's a new version). Warning before turning off,
+    restarting or resting the console while something is being written,
+    and the YouTube fix won't touch the console database if it has
+    unfinished changes.
+  - Everything new since 2.0.4 in animated cards (shown once after
+    updating, and from What's new > "See it as cards"); smooth icon
+    animations in "Where does it go?" (the arrow goes up to the PS5, down
+    to the PC drive or down from the cloud).
+  - Update button with a blue dot in the header, "More ways" explained in
+    cards, a Backup guide so you don't lose everything after a reset, and
+    a short description under each Settings section.
+  - Renewed header (bigger title, FTP and BFpilot in one capsule, icon
+    buttons), the same blue highlight as the Update options in menus, a
+    different hover animation for each Discover section, and Discover no
+    longer hangs on images when an image server doesn't answer.
+  - Bigger titles and tabs, wider content on large screens, and
+    Settings that fits each section (Console shows the connection).
+  - Redesign with one style across the app: new Lucide icons
+    everywhere (they used to be hand-drawn and didn't all match), coloured
+    neutral icons in the "..." menu and "More" (only Update and Quit stand
+    out), the same tiles as the
+    formats in "Where does it go?" and Discover, new animations (menu items
+    and Settings slide in one after another, Discover tiles appear in
+    sequence, icons move on hover; none if your system turns them off) and
+    a visible footer.
+  - Transfers with less noise: Files, Folder and My storage in view; the
+    rest under "More ways" (with a green dot if one is active).
+  - Discover opens at once even with the console off (it used to wait up
+    to 30 s), with grey placeholder cards while loading.
+  - Scene news: version, date and stars in one quiet line instead of four
+    coloured badges.
+  - Cleaner interface (part one): Settings split into sections with a
+    side menu (Console, Transfers, Formats, Extension, Update, Tools and
+    Advanced), technical values in Advanced with "Restore recommended
+    values", and Save always at the top. The top bar keeps the 5 daily
+    tabs; System, Backup, Captures and Activity are under "More", with a
+    dot when System needs a look. On phones the bottom bar now fits.
+    Library: "Refresh list" as the main button and the rest under "More".
+  - Fixed: the first time PS5 Directo opened, the setup assistant
+    sometimes didn't show.
+  - Fixed: on a freshly reset console (no /data/homebrew), Library and
+    Console files showed "550 No such file or directory".
+  - New in System: "Safe payloads". It checks Payload Manager's
+    autoload list and warns about pauses shorter than the author
+    recommends (for example 5 s before and after kstuff-dr), repeated
+    payloads, two kstuffs at once, combinations that don't work together
+    (etaHEN with kstuff, Kraken Mount with ShadowMountPlus, sentinel_warden
+    or backpork with ShadowMountPlus 1.6+...), load order and firmware. One
+    button fixes it, backing up the list first.
+  - Experimental versions (test, beta, rc... even if they say "stable")
+    never go into autoload or load on their own: it asks you first.
+  - When installing or changing a payload: it checks that the .elf is
+    complete and built for the PS5, saves a copy of the previous version
+    and of the autoload list on the PC, swaps it with a "rename" on the same
+    drive (never writing over it) and reads it back from the console to
+    check its SHA-256. If anything doesn't match, it goes back to the
+    previous version.
+  - If the connection drops or PS5 Directo closes in the middle of a
+    change, it finishes or undoes it by itself afterwards. From "Safe
+    payloads" you can go back to any saved version or list.
+  - If it's unknown whether a payload actually loaded (the console stopped
+    answering), PS5 Directo won't load it again on its own, so it doesn't
+    load twice. And it asks before you manually load one that's already
+    running.
+  - Critical payloads (kstuff, HEN, ShadowMountPlus...) aren't changed or
+    loaded while transfers, extractions or copies are running.
+  - Log on the PC of everything done with payloads (versions, SHA-256,
+    paths, dates and errors), in the payloads_seguros folder.
+  - Important: this reduces risk, but it can't stop a faulty payload from
+    crashing the console or damaging its storage when it runs.
+2.2.5 - Fixed: adding a .torrent (or a link list) with "Only to my PC"
+    said "That's already on your PC" instead of starting the download.
+  - Fixed: in Settings, scrolling down with the wheel showed the bottom cut
+    off. Now the Save row stays pinned at the top while you scroll and
+    everything shows to the end.
+  - Fixed: "Send another .elf from the PC..." (in Console status) kept
+    loading because the Windows file window opened behind. Now you pick it
+    in the browser and it shows its SHA256 so you can check it.
+  - "Install .pkg on 12.00-13.60" guide updated: the recommended build is
+    kstuff-1.15-dr-test3-stable (1.00 to 13.60, with rest mode), with its
+    SHA256 sum, the load order and the pauses its author recommends.
 2.2.4 - .pkg packages now install up to firmware 13.60: since 24
     November there is a new kstuff (kstuff-dr 1.15, testing) that allows
     it. On firmware 12.00-13.60, when you choose ".fpkg package" you pick

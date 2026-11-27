@@ -1,4 +1,4 @@
-PS5 DIRECTO 2.2.4
+PS5 DIRECTO 3.0
 =================
 (English: see README_EN.txt)
 
@@ -148,6 +148,78 @@ https://github.com/itsPLK/ps5-payload-manager )
 Para comprobar que todo está bien: Ajustes > "Revisión completa".
 
 
+PREPARAR LA CONSOLA (DESPUÉS DE RESTAURARLA, SIN PENDRIVE)
+---------------------------------------------------------
+Si has restaurado la consola o es un jailbreak nuevo, no hace falta copiar
+los .elf a un pendrive. Haz el jailbreak, abre Payload Manager en la consola
+y en PS5 Directo ve a Sistema > "Preparar la consola":
+- Marca lo que quieres: ftpsrv, BFpilot, nanoDNS, ShadowMountPlus y
+  kstuff-lite. Se bajan de la página oficial de cada autor, se instalan en
+  Payload Manager por la red y se guarda copia en el PC.
+- Se cargan una vez en el orden que piden sus autores: ShadowMountPlus
+  primero y, 3 s después, kstuff-lite (así lo dice el README de
+  ShadowMountPlus). Si ShadowMountPlus falla, kstuff-lite no se carga.
+- kstuff-lite parchea el sistema (hasta la 13.60): no lo mezcles con otro
+  kstuff ni con Kraken Mount. Si ya hay otro en marcha, no se marca.
+- "Dejarlo en la carga automática" lo guarda en Payload Manager con sus
+  pausas. Mejor pruébalo antes una vez sin esto. Se guarda copia de la
+  lista anterior y se puede volver atrás desde "Payloads seguros".
+- nanoDNS: si pones la DNS de la PS5 en 127.0.0.1 (para bloquear las
+  actualizaciones de Sony), la consola se queda sin internet hasta que
+  cargas nanoDNS. Es normal que la prueba de conexión de la PS5 falle sin él.
+Cada uno lo usas bajo tu responsabilidad.
+
+ENVIAR UN PAYLOAD (.elf) — Sistema > Payloads > "Enviar un payload"
+- Suelta el .elf en la tarjeta (o en cualquier parte de la ventana) o
+  elígelo del PC. También está en Transferencias > Más formas.
+- Con Payload Manager abierto se instala como una aplicación: "Cargarlo
+  ahora", "Solo instalarlo" (queda en su lista) o "Instalarlo y que se cargue
+  solo" (carga automática con las pausas de su autor). Se guarda copia en el
+  PC y pasa las mismas comprobaciones que lo demás.
+- Los payloads publicados en GitHub se instalan desde Descubrir > Novedades
+  de la scene con un clic, como una aplicación.
+
+SISTEMA, ORDENADO
+La pestaña Sistema va por grupos: Uso diario, Payloads, Protección y
+Títulos. "Preparar la consola" sale arriba solo cuando falta ftpsrv o BFpilot;
+si no, abajo y plegada. Sin consola sale un solo aviso arriba y las
+tarjetas que la necesitan se ven atenuadas.
+
+NOVEDADES DE LA SCENE: DOS CATÁLOGOS
+- Además de RecompStore, Descubrir lee el catálogo de homebrew de
+  prosperostore.net (solo apps nativas de PS5, cada una desde el GitHub de
+  su autor). Se juntan sin repetir y pasan los mismos filtros que lo demás.
+  Si RecompStore no contesta, lo de prosperostore.net sigue al día.
+- Ese catálogo va firmado: PS5 Directo solo lo usa si la firma es buena y
+  cada archivo coincide con su huella.
+- Lo marcado con "✔ Comprobado" se instala con el archivo exacto que dice el
+  catálogo y se comprueba su SHA-256 mientras se envía: si no coincide, no
+  se instala.
+- Si tienes algo instalado y hay una versión más nueva, sale "Hay versión
+  nueva" (se compara la versión exacta, contentVersion) y el filtro "Con
+  actualización".
+- En "Más" salen las notas de la versión (las escribe su autor) y lo que vio
+  el escaneo de prosperostore.net (si sale del entorno protegido de la
+  consola, si usa internet...). Es un aviso, no una garantía.
+
+NANODNS (Sistema > "nanoDNS")
+- Ves y cambias su configuración (/data/nanodns/nanodns.ini) sin abrir el
+  archivo: servidores DNS, sin avisos al arrancar, si contesta también a
+  otros aparatos, o el archivo entero. Se guarda copia del anterior en el PC
+  y en la consola (nanodns.ini.ps5d-anterior).
+- Si lleva la DNS antigua de Yandex (77.77.88.88), que ya no contesta, te
+  avisa y la cambia por 77.88.8.8 con un botón.
+- nanoDNS lee su configuración al arrancar: después pulsa "Volver a cargar
+  nanoDNS".
+
+KSTUFF, UNA VEZ POR ARRANQUE
+Cargar kstuff (o etaHEN, HyperHEN...) encima de otro ya cargado pone una
+segunda copia sobre la primera y puede colgar la consola. PS5 Directo apunta
+cada carga de un parche del sistema y no carga otro en el mismo arranque
+(lo sabe por el tiempo que lleva encendida, con ps5-exporter, o porque la
+ha estado viendo sin que se apagase). Reinicia la consola y vuelve a probar.
+
+
 SOBRE BFPILOT Y LOS PERMISOS (importante si lo usas por tu cuenta)
 -----------------------------------------------------------------
 Hasta su versión 0.4.4 al menos, cuando BFpilot descomprime un RAR, 7z o
@@ -234,6 +306,10 @@ En una transferencia pausada o terminada, "Test de velocidad" mide (unos 30 s):
 descarga sola, envio PC -> PS5 solo y las dos cosas a la vez, y te dice
 de quien es la culpa cuando va lento. Tambien hay uno solo PC -> PS5 en
 Ajustes.
+Al final hace un diagnóstico de la red: si sales hacia la PS5 por una VPN o
+un adaptador virtual, si el PC va por cable o por Wi-Fi (banda, señal y
+velocidad del enlace, o un cable a 100 Mb/s) y si la latencia se dispara con
+la red cargada.
 
 
 BIBLIOTECA
@@ -286,6 +362,19 @@ ANTES DE ENVIAR
 - Si falta sitio, el error trae un botón "Hacer sitio": en la pestaña Espacio
   te propone qué borrar (restos, copias repetidas, instaladores .pkg) hasta
   llegar a lo que necesitas. Nada se borra sin confirmar.
+- Un .pkg cortado (mide menos de lo que dice su cabecera), una descarga sin
+  terminar (.part, .crdownload…) o un archivo que todavía se está copiando no
+  se envía: te dice qué le pasa.
+- Para descomprimir en la consola, si el comprimido está en el PC, mira lo
+  que ocupará descomprimido (con 7-Zip) y, si no caben a la vez el
+  comprimido y lo descomprimido, te lo dice antes de enviar nada.
+
+DOS PANELES (Archivos de la consola)
+"⇆ Dos paneles" pone una carpeta del PC al lado de la consola (en pantallas
+anchas): eliges archivos del PC y "Enviar a la PS5 →" los manda a la carpeta
+abierta de la consola; eliges de la consola y "← Descargar aquí" los baja a
+la carpeta del PC. Ctrl+K ("Ir a…") también encuentra las tarjetas de
+Sistema y las secciones de Ajustes por palabras como "dns" o "kstuff".
 
 
 PAYLOADS, DIAGNÓSTICO, MÓVIL Y PROGRAMAR
@@ -331,6 +420,160 @@ Desinstalar. Tus ajustes se conservan por si vuelves a instalarlo.
   aria2: sudo apt install aria2. En Linux no hay "Enviar a" ni el aviso
   del cortafuegos de Windows.
 
+
+NOVEDADES 3.0
+- Biblioteca: lo que instaló la consola (desde un .pkg) ya se puede
+  desinstalar desde aquí, en ⋯ › «Desinstalar…». Lo hace el desinstalador
+  de la propia consola, igual que «Eliminar» en su menú, a través de zftpd
+  1.7.0 o posterior (si no lo tienes, te ofrece iniciarlo). También vale el
+  ayudante de PS5Upload si en sus ajustes tiene «Permitir otros dispositivos
+  de la red». Tus partidas no se tocan.
+- Tras restablecer la consola: con Payload Manager abierto, instala solo
+  ftpsrv y BFpilot por la red (sin pendrive). Si la PS5 cambió de IP, lo
+  detecta y te ofrece la nueva.
+- PS5 Dump Forge 0.6.0 se actualiza bien (cambió cómo lo publica) y, si
+  algo falla, se dice. Opciones nuevas de Dump Forge al convertir.
+- Descubrir avisa si el catálogo es viejo y reintenta cada 5 minutos.
+- Guía «Instalar .fpkg sin romper nada» (Kraken Mount o kstuff nuevo).
+- Sin «[Errno ...]» en los avisos; ficha de Descubrir siempre animada.
+- Rutinas sugeridas en su sitio y con un clic: reposo al terminar la
+  cola, copia nocturna, cargar los payloads al encender y encender la
+  consola para la cola.
+- PrefBar en Sistema › Medir mientras juegas (en pruebas), junto a PS5
+  Hardware Overlay; también en Descubrir.
+- Guardia de la consola: PS5 Directo solo cambia cosas en /data y en los
+  discos USB o ampliados (nunca carpetas del sistema), y no borra, mueve
+  ni renombra enteras las carpetas clave (homebrew, etaHEN, Payload
+  Manager, el autocargador...).
+- Restaurar partidas: nunca queda una a medias, no se hace con el título
+  abierto y no se aceptan copias con rutas raras.
+- Apagar, reposo y reiniciar comprueban que la consola lo ha hecho: si
+  dice que no (o al minuto sigue encendida) te avisa y te dice por qué.
+- Si usas «Captar lo que copies» o la carpeta vigilada, sale una etiqueta
+  verde junto a «Más formas» mientras estén encendidas.
+- Los errores de conexión se explican con palabras normales (la consola
+  no contesta, falta el FTP, redes distintas...) en vez de «[Errno 111]».
+- Cabecera más ordenada: el firmware junto a la versión, los botones de
+  la extensión y del móvil en gris como los demás, «Más» con su flecha y
+  el aviso de consola no encontrada en ámbar.
+- Con la consola apagada la app ya no se queda «pensando»: si la PS5 no
+  contesta, se espera como mucho 3 segundos y lo demás responde al
+  momento; por detrás se mira solo cuándo vuelve.
+- Actualizar se encuentra donde se busca: en Ajustes la sección se llama
+  «Actualizar y extensión», lo de actualizar va primero y lleva un punto
+  azul cuando hay versión nueva.
+- Más seguro: si pides apagar, reiniciar o reposo mientras se escribe
+  algo en la consola (envío, copia o cambio de payload), te avisa antes.
+  El arreglo de YouTube no toca la base de datos de la consola si tiene
+  cambios a medias o si cambia mientras se prepara.
+- Las novedades desde la 2.0.4, en tarjetas animadas (como el antiguo
+  «¿Qué hace PS5 Directo?»): salen solas una vez al actualizar y desde
+  Novedades > «Verlo en tarjetas».
+- «¿A dónde va?»: cada icono cuenta lo que hace al pasar el ratón, con
+  una animación suave (la flecha sube a la PS5, baja al disco del PC o
+  cae de la nube).
+- Si hay una versión nueva, sale un botón con un punto azul en la
+  cabecera («Actualización disponible: v…» al pasar el ratón).
+- «Más formas» de añadir explicadas en tarjetas: Sacar enlaces de una
+  web, Añadir lo que copies y Carpeta de descargas automática.
+- Copia de seguridad: nueva guía «Para no perderlo todo si la consola
+  hay que restablecerla» (títulos en un disco externo, la copia de la
+  propia consola, la nube y el emparejamiento del lector).
+- Ajustes: cada sección del menú lleva una línea que explica qué hay.
+- Cabecera renovada: título más grande, FTP y BFpilot en una cápsula,
+  botones del mismo tamaño con iconos (la rueda en Ajustes).
+- Los menús marcan la opción con el mismo azul que las opciones de
+  «Actualizar». Cada sección de Descubrir tiene su propia animación al
+  pasar el ratón (la tele se enciende, el mando vibra, la llave gira...).
+- Descubrir ya no se queda con imágenes a medias: si un servidor de
+  imágenes no contesta (RecompStore bloqueado durante el fútbol) deja de
+  esperarlo, y las imágenes se bajan por detrás, 8 a la vez, para la
+  próxima vez.
+- Títulos de cada apartado y pestañas algo más grandes; en pantallas
+  grandes el contenido usa más ancho.
+- Ajustes se ajusta a lo que tiene cada sección (sin huecos vacíos),
+  Consola enseña el estado de la conexión, y Extensión y Actualizar van
+  juntas en «App y extensión».
+- Diseño renovado con un solo estilo en toda la app:
+  · Iconos nuevos de Lucide en todas partes (antes eran dibujos hechos a
+    mano y no todos casaban), con trazo más fino.
+  · El menú «⋯» y «Más» llevan iconos discretos; solo destacan
+    «Buscar actualizaciones» (azul) y «Salir» (rojo).
+  · «¿A dónde va?» y las secciones de Descubrir usan las mismas baldosas
+    que los formatos.
+  · Animaciones nuevas: las opciones de los menús y de Ajustes entran
+    una tras otra, las secciones de Descubrir aparecen escalonadas, los
+    iconos se mueven al pasar el ratón y el tic de seleccionado da un
+    pequeño rebote (nada si tu sistema tiene las animaciones quitadas).
+  · Pie de página visible: «Informar de un fallo», «Guía de uso» y
+    GitHub como botones.
+- Transferencias con menos ruido: a la vista Archivos, Carpeta y Mis
+  almacenamientos; Enlaces de una página, Captar lo que copies y Carpeta
+  vigilada en «Más formas» (con un puntito verde si alguno está activo).
+  Texto de ejemplo más corto y «¿Qué formatos sirven?» en la misma fila.
+- Descubrir abre al momento aunque la consola esté apagada: antes
+  esperaba hasta 30 s a que contestara. Mientras carga, se ven las
+  tarjetas en gris en vez de una rueda.
+- Novedades de la scene: la versión, la fecha y las estrellas van en una
+  línea discreta en vez de en cuatro insignias de colores.
+- Interfaz más limpia (primera parte):
+  · Ajustes por secciones, con un menú a la izquierda: Consola, Envíos,
+    Formatos, Extensión, Actualizar, Herramientas y Avanzado. Lo técnico
+    (puertos, conexiones, trozo, memoria...) está en Avanzado, con un
+    botón «Restaurar valores recomendados». «Guardar» siempre arriba.
+  · Arriba quedan las 5 pestañas de uso diario. Sistema, Copia de
+    seguridad, Capturas y Actividad están en «Más ▾», con un puntito
+    cuando en Sistema hay algo que mirar. En el móvil la barra de abajo
+    ya cabe entera.
+  · Biblioteca: «Actualizar lista» como botón principal y el resto
+    (Revisar todo, Ordenar nombres, Exportar...) en «⋯ Más».
+- Arreglado: la primera vez que se abría PS5 Directo, el asistente de
+  primeros pasos a veces no salía.
+- Arreglado: en una consola recién restablecida (sin /data/homebrew),
+  Biblioteca y Archivos enseñaban «550 No such file or directory».
+- Nuevo en Sistema: «Payloads seguros». Revisa la carga automática de
+  Payload Manager y avisa de pausas más cortas de lo que recomienda su
+  autor (por ejemplo, 5 s antes y después de kstuff-dr), payloads
+  repetidos, dos kstuff a la vez, mezclas que no funcionan juntas
+  (etaHEN con kstuff, Kraken Mount con ShadowMountPlus, sentinel_warden o
+  backpork con ShadowMountPlus 1.6+...), orden de carga y firmware. Un
+  botón lo corrige guardando antes copia de la lista.
+- Las versiones de pruebas (test, beta, rc... aunque digan «stable»)
+  nunca entran solas en la carga automática ni se cargan solas: te
+  pregunta antes.
+- Al instalar o cambiar un payload: comprueba que el .elf está entero y
+  es para la PS5, guarda en el PC copia de la versión anterior y de la
+  lista de carga automática, lo cambia con un «renombrar» en la misma
+  unidad (nunca escribe encima) y lo vuelve a leer de la consola para
+  comprobar su SHA-256. Si algo no cuadra, vuelve a la versión anterior.
+- Si se corta la conexión o se cierra PS5 Directo a mitad de un cambio,
+  al volver lo termina o lo deshace solo. Desde «Payloads seguros» puedes
+  volver a cualquier versión o lista guardada.
+- Si no se sabe si un payload llegó a cargarse (la consola dejó de
+  contestar), PS5 Directo no lo vuelve a cargar solo, para no cargarlo
+  dos veces. Y no deja cargar a mano uno que ya está en marcha sin
+  preguntar.
+- No se cambian ni se cargan payloads críticos (kstuff, HEN,
+  ShadowMountPlus...) mientras haya envíos, descompresiones o copias en
+  marcha.
+- Registro en el PC de todo lo que se hace con los payloads (versiones,
+  SHA-256, rutas, fechas y errores), en la carpeta payloads_seguros.
+- Importante: esto reduce riesgos, pero no puede evitar que un payload
+  defectuoso cuelgue la consola o dañe su almacenamiento al ejecutarse.
+
+NOVEDADES 2.2.5
+- Arreglado: al añadir un .torrent (o una lista de enlaces) con «Solo a
+  mi PC», decía «Eso ya está en tu PC» en vez de empezar a bajarlo.
+- Arreglado: en Ajustes, al bajar con la rueda, la parte de abajo se
+  veía cortada. Ahora la fila de Guardar se queda fija arriba mientras
+  bajas y todo se ve hasta el final.
+- Arreglado: «Enviar otro .elf del PC…» (en Estado de la consola) se
+  quedaba cargando porque la ventana de Windows para elegir el archivo
+  salía detrás. Ahora se elige en el navegador y te enseña su SHA256
+  para comprobarlo.
+- Guía «Instalar .pkg en 12.00–13.60» al día: la versión recomendada es
+  kstuff-1.15-dr-test3-stable (de 1.00 a 13.60, con modo reposo), con su
+  suma SHA256, el orden de carga y las pausas que recomienda su autor.
 
 NOVEDADES 2.2.4
 - Los .pkg ya se instalan hasta el firmware 13.60: desde el 24 de

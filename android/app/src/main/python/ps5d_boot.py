@@ -1,6 +1,6 @@
 """Arranque de PS5 Directo dentro de la app de Android (modo «Usar sin PC»).
 
-El flujo de GitHub copia app.py, engine.py, features.py, web/ y los .json al paquete «ps5d» de al lado
+El flujo de GitHub copia app.py, engine.py, features.py, pldsafe.py, nanodns.py, netdoctor.py, web/ y los .json al paquete «ps5d» de al lado
 antes de compilar la app; Chaquopy lo deja como carpeta normal en el movil (extractPackages), asi que
 PS5 Directo funciona igual que en el PC, solo que en la direccion 127.0.0.1 del propio movil.
 """
